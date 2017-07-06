@@ -65,6 +65,12 @@ public class Explosion : MonoBehaviour {
 
         if (collider.tag == "Player")
         {
+            // Raycast to see if player is behind cover.
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, collider.transform.position - transform.position, out hit, explosionRadius, 1<<8))
+            {
+                if (hit.transform != collider.transform) return;
+            }
             gameManager.PlayerHurt();
         }
 
