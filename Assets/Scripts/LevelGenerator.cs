@@ -89,7 +89,7 @@ public class LevelGenerator : MonoBehaviour {
             PlaceObstacle();
         }
 
-        for (int i = 0; i < emptySpaces.Count * 5; i++)
+        for (int i = 0; i < emptySpaces.Count * 3; i++)
         {
             PlaceColumn();
         }
@@ -132,6 +132,8 @@ public class LevelGenerator : MonoBehaviour {
 
         // Update billboards.
         GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
+
+        //Debug.Break();
     }
 
 
@@ -143,6 +145,7 @@ public class LevelGenerator : MonoBehaviour {
 
         if (emptySpaces.Count > 0) emptySpaces.Clear();
 
+        int loopSafeguard1 = 0;
         // Fill up level with empty space.
         while (currentPlazaArea < emptyArea)
         {
@@ -153,6 +156,8 @@ public class LevelGenerator : MonoBehaviour {
             Vector3 newPlazaPosition = Vector3.zero;
             Vector3 newPlazaScale = Vector3.zero;
 
+            int loopSafeguard2 = 0;
+            loopSafeguard2++;
             while (!plazaTransformChosen)
             {
                 // Give the new plaza a random size and location.
@@ -172,6 +177,9 @@ public class LevelGenerator : MonoBehaviour {
                 {
                     plazaTransformChosen = true;
                 }
+
+                loopSafeguard2++;
+                if (loopSafeguard2 > 100) return;
             }
 
             newPlaza.transform.localScale = newPlazaScale;
@@ -221,9 +229,10 @@ public class LevelGenerator : MonoBehaviour {
             emptySpaces.Add(newPlaza);
             Debug.Log("Number of empty spaces: " + emptySpaces.Count);
             Debug.Log("Total Empty Area: " + currentPlazaArea + ", Empty Area To Fill: " + emptyArea);
-        }
 
-        Debug.Break();
+            loopSafeguard1++;
+            if (loopSafeguard1 > 100) return;
+        }
     }
 
 
@@ -282,15 +291,76 @@ public class LevelGenerator : MonoBehaviour {
 
             // Test this location with an overlap box that is high enough to catch the player in midair.
             // Also make it a little bit larger than the actual obstacle.
-            Collider[] overlaps = Physics.OverlapBox(newPosition, new Vector3(newScale.x, 400, newScale.z), newRotation);
+            Collider[] overlaps = Physics.OverlapBox(newPosition, new Vector3(newScale.x/2, 400, newScale.z/2), newRotation);
 
-            // Make sure this obstacle isn't going to be placed on top of the player or an enemy or empty space.
             placed = true;
+
+            // Make sure this obstacle is in a good location.
             foreach (Collider collider in overlaps)
             {
+                // Make sure the obstacle is not on top of a player/enemy and not within designated empty space.
                 if (collider.tag == "Player" || collider.tag == "Enemy" || collider.tag == "Empty Space") //|| collider.tag == "Obstacle" || collider.tag == "Wall")
                 {
+                    //Debug.Log("Obstacle was going to be placed on: " + collider.tag);
+
                     placed = false;
+                    break;
+                }
+            }
+
+            // Make sure the obstacle is not too close to another one so as to create tempting but impassible gap.
+
+            // See if there are any obstacles around me.
+            Vector3 overlapBoxExtents = new Vector3(
+                    (newScale.x / 2) + player.GetComponent<CharacterController>().radius * 3f,
+                    newScale.y / 2,
+                    (newScale.z / 2) + player.GetComponent<CharacterController>().radius * 3f
+                );
+
+            foreach (Collider nearbySolid in Physics.OverlapBox(newPosition, overlapBoxExtents, newRotation))
+            {
+                // See if this obstacle is not also overlapping the position of the new obstacle itself.
+                if (!nearbySolid.bounds.Intersects(new Bounds(newPosition, newScale)))
+                {
+                    if (nearbySolid.tag == "Obstacle")
+                    {
+                        // If it's not, then this position is inappropriate.
+                        placed = false;
+                        break;
+                    }
+
+                    else if (nearbySolid.tag == "Wall")
+                    {
+                        //Debug.Log("Moved obstacle to touch wall.");
+
+                        // Figure out which direction the wall is in.
+                        Vector3 toWall = nearbySolid.ClosestPointOnBounds(newPosition) - newPosition;
+                        Debug.DrawLine(nearbySolid.ClosestPointOnBounds(newPosition), newPosition, Color.green, 5f);
+                        //Debug.Log("Direction to wall: " + toWall);
+
+                        //if (toWall == Vector3.zero)
+                        //{
+                        //    Debug.Log("Zero vector");
+                        //    Debug.Log("New position: " + newPosition);
+                        //    Debug.Log("Closest point to new position: " + nearbySolid.ClosestPointOnBounds(newPosition));
+                        //    Debug.DrawRay(newPosition, Vector3.up * 100f, Color.cyan);
+                        //    Debug.Break();
+                        //}
+
+                        // Get the half extent of the obstacle on the proper coordinate.
+                        Vector3 halfExtent = newScale;
+                        halfExtent.Scale(toWall.normalized);
+                        halfExtent *= 0.5f;
+                        //Debug.Log("Half extent: " + halfExtent);
+
+                        // Move the obstacle in the direction of the wall by it's distance from the wall minus it's half extent from above.
+                        newPosition += (toWall - halfExtent);
+                        //Debug.Log("Moving to: " + (newPosition + (toWall - halfExtent)));
+                        //Debug.DrawLine(newPosition, newPosition + (toWall - halfExtent), Color.red, 1f);
+                        //Debug.Break();
+                        placed = true;
+                        break;
+                    }
                 }
             }
 
@@ -396,15 +466,27 @@ public class LevelGenerator : MonoBehaviour {
             );
 
             // Test this location
-            placed = true;
+            bool inEmptySpace = false;
+            bool collidingWithObject = false;
             Collider[] overlaps = Physics.OverlapSphere(newPosition, newEnemy.GetComponent<Collider>().bounds.extents.x * 1.5f);
             foreach (Collider c in overlaps)
             {
                 if (c.tag == "Player" || c.tag == "Enemy" || c.tag == "Obstacle" || c.tag == "Wall")
                 {
                     //Debug.Log("Tried to place enemy on " + c.tag);
-                    placed = false;
+                    collidingWithObject = true;
+                    break;
                 }
+
+                if (c.tag == "Empty Space")
+                {
+                    inEmptySpace = true;
+                }
+            }
+
+            if (!collidingWithObject && inEmptySpace)
+            {
+                placed = true;
             }
 
             loopSafeguard++;
@@ -418,6 +500,7 @@ public class LevelGenerator : MonoBehaviour {
         newEnemy.transform.position = newPosition;
 
         numberOfEnemies++;
+        //Debug.Log("Number of enemies in this level: " + numberOfEnemies);
     }
 }
 

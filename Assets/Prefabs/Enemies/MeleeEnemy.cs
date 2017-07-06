@@ -7,7 +7,7 @@ public class MeleeEnemy : Enemy {
 	enum BehaviorState { MovingTowardsPlayer, ChargingUpAttack, Attacking, FinishingAttack };
     BehaviorState currentState;
 
-    Vector3 flankSpot;
+    Vector3 flankSpot = Vector3.zero;
     float flankRange = 20f;
 
     // ATTACKING

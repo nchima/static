@@ -70,7 +70,7 @@ public class PlayerBullet : MonoBehaviour
      * and now all my hands have this perfect flaw
      * where they can never catch nothing but they are never wrong
      * but I have lived my life in a grain of salt
-     * it feels so free in that it's no one's fault
+     * now feels so free in that it's no one's fault
      * 
      * because i'm ready
      * i feel so ready right now
@@ -79,7 +79,7 @@ public class PlayerBullet : MonoBehaviour
      * i wanna feel it in my lungs
      * 
      * my vomit is all haunted with a spectral kiss
-     * and I had a dream when I was a child that I would seee days like this
+     * and I had a dream when I was a child that I would see days like this
      * 
      * now all my songs are distorting pain
      * some cruel cruel flame that runs through my days
