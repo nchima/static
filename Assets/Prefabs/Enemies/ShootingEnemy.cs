@@ -10,6 +10,7 @@ public class ShootingEnemy : Enemy {
     [SerializeField] protected float preShotDelay = 0.7f; // How long I pause motionless before firing a shot.
     [SerializeField] protected float postShotDelay = 0.4f;    // How long I pause motionless after firing a shot.
     [SerializeField] protected GameObject shotPrefab;
+    [SerializeField] bool requireLineOfSight;
     protected Timer shotTimer;    // Keeps track of how long it's been since I last fired a shot.
 
     // BEHAVIOR STATES
@@ -77,15 +78,36 @@ public class ShootingEnemy : Enemy {
         shotTimer.Run();
         if (shotTimer.finished)
         {
-            // Set timer for pre shot delay
-            shotTimer = new Timer(preShotDelay);
+            // See if we have line-of-sight to the player.
+            if (requireLineOfSight)
+            {
+                RaycastHit hit;
+                Debug.DrawRay(transform.position, playerTransform.position - transform.position, Color.yellow, 5f);
+                if (Physics.Raycast(transform.position, playerTransform.position - transform.position, out hit, 200f, 1<<8 | 1<<16))
+                {
+                    Debug.Log("Enemy saw " + hit.transform.name);
+                    if (hit.transform == playerTransform)
+                    {
+                        // Set timer for pre shot delay
+                        shotTimer = new Timer(preShotDelay);
 
-            // Begin the charging up animation.
-            myAnimator.SetTrigger("ChargeUp");
+                        // Begin the charging up animation.
+                        myAnimator.SetTrigger("ChargeUp");
 
-            currentState = BehaviorState.PreShooting;
+                        currentState = BehaviorState.PreShooting;
 
-            return;
+                        return;
+                    }
+
+                    else
+                    {
+                        shotTimer = new Timer(Random.Range(shotTimerMin, shotTimerMax));
+                        currentState = BehaviorState.PreparingToMove;
+                        return;
+                    }
+                }
+            }
+
         }
 
         // Move towards target position
