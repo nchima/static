@@ -1,0 +1,461 @@
+﻿using UnityEngine;
+using UnityEngine.AI;
+using System.Collections;
+using System.Collections.Generic;
+
+public class LevelGenerator : MonoBehaviour {
+
+    // LEVEL GEN VARIABLES
+    public float levelSize; // The size of the level (the level is always square so this is the width and height.)
+    [SerializeField] float levelSizeIncrease;   // How much the size of each level increases.
+
+    // Enemies
+    int numberOfEnemies;
+    [SerializeField] int basicEnemiesAddedPerLevel = 7;
+    [SerializeField] int firstLevelWithTankEnemies = 3;
+    [SerializeField] int tankEnemiesAddedPerLevel = 1;
+    [SerializeField] int firstLevelWithMeleeEnemies = 2;
+    [SerializeField] int meleeEnemiesAddedPerLevel = 3;
+
+    // Guaranteed Empty Space
+    [SerializeField] FloatRange emptyAreaRange = new FloatRange(0.25f, 0.75f);   // Guaranteed empty space as percentage of level's total area.
+    [SerializeField] FloatRange plazaSizeRange = new FloatRange(1f, 20f);
+    [SerializeField] FloatRange corridorWidthRange = new FloatRange(5f, 10f);
+    List<GameObject> emptySpaces;
+
+    // Obstacles
+    float numberOfObstacles;
+    [SerializeField] IntRange numberOfObstaclesRange = new IntRange(15, 40); // The number of obstacles in a level.
+    [SerializeField] FloatRange obstacleSizeRange = new FloatRange(4f, 30f);
+
+    float numberOfTrees;
+    
+    // NAVMMESH STUFF
+    [SerializeField] Transform navMeshRoot;
+
+    // PREFAB REFERENCES
+    [SerializeField] private GameObject basicEnemyPrefab;
+    [SerializeField] private GameObject tankEnemyPrefab;
+    [SerializeField] private GameObject meleeEnemyPrefab;
+    [SerializeField] private GameObject obstaclePrefab;
+    [SerializeField] GameObject emptySpacePrefab;
+
+    GameManager gameManager;
+    Transform playerSpawnPoint;
+    Transform player;
+    [SerializeField] Transform floor;
+    [SerializeField] Transform[] walls;
+
+
+    private void Awake()
+    {
+        gameManager = FindObjectOfType<GameManager>();
+        playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        floor = GameObject.Find("Floor").transform;
+        emptySpaces = new List<GameObject>();
+    }
+
+
+    public void Generate()
+    {
+        if (gameManager.levelNumber != 0) levelSize += levelSizeIncrease;
+        numberOfEnemies = 0;
+
+        numberOfObstacles = numberOfObstaclesRange.Random + gameManager.levelNumber * 4;
+
+        // Clear level of all current obstacles and enemies.
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            Destroy(go);
+        }
+
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag("Obstacle"))
+        {
+            Destroy(go);
+        }
+
+        foreach (EnemyShot shot in FindObjectsOfType<EnemyShot>())
+        {
+            Destroy(shot.gameObject);
+        }
+
+        SetupWallsAndFloor();
+
+        SetupEmptySpace();
+
+        // Put all things in the level.
+        for (int i = 0; i < numberOfObstacles; i++) {
+            PlaceObstacle();
+        }
+
+        for (int i = 0; i < emptySpaces.Count * 5; i++)
+        {
+            PlaceColumn();
+        }
+
+        for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++) {
+            PlaceEnemy(basicEnemyPrefab);
+        }
+
+        GenerateNavMesh();
+
+        if (gameManager.levelNumber >= firstLevelWithTankEnemies)
+        {
+            for (int i = 0; i < (gameManager.levelNumber - firstLevelWithTankEnemies + 1) * tankEnemiesAddedPerLevel; i++)
+            {
+                PlaceEnemy(tankEnemyPrefab);
+            }
+        }
+
+        if (gameManager.levelNumber >= firstLevelWithMeleeEnemies)
+        {
+            for (int i = 0; i < (gameManager.levelNumber - firstLevelWithMeleeEnemies + 1) * meleeEnemiesAddedPerLevel; i++)
+            {
+                PlaceEnemy(meleeEnemyPrefab);
+            }
+        }
+
+        // Delete all empty space.
+        for (int i = 0; i < emptySpaces.Count; i++) Destroy(emptySpaces[i]);
+        emptySpaces.Clear();
+
+
+        //Debug.Log("Number of enemies: " + numberOfEnemies);
+        gameManager.currentEnemyAmt = numberOfEnemies;
+
+        // Place the player in the correct spot above the level.
+        player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
+
+        // Re-enable the floor's collision (since it is disabled when the player completes a level.)
+        floor.GetComponent<Collider>().enabled = true;
+
+        // Update billboards.
+        GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
+    }
+
+
+    void SetupEmptySpace()
+    {
+        // Get the area of space (in square units) which should be guaranteed empty.
+        float emptyArea = ((levelSize*2) * (levelSize*2)) * emptyAreaRange.Random;
+        float currentPlazaArea = 0f;
+
+        if (emptySpaces.Count > 0) emptySpaces.Clear();
+
+        // Fill up level with empty space.
+        while (currentPlazaArea < emptyArea)
+        {
+            // Create a plaza.
+            GameObject newPlaza = Instantiate(emptySpacePrefab);
+
+            bool plazaTransformChosen = false;
+            Vector3 newPlazaPosition = Vector3.zero;
+            Vector3 newPlazaScale = Vector3.zero;
+
+            while (!plazaTransformChosen)
+            {
+                // Give the new plaza a random size and location.
+                newPlazaScale = new Vector3(
+                        plazaSizeRange.Random,
+                        1f,
+                        plazaSizeRange.Random
+                    );
+
+                newPlazaPosition = new Vector3(
+                        Random.Range(-levelSize + newPlaza.transform.localScale.x / 2, levelSize - newPlaza.transform.localScale.x / 2),
+                        1f,
+                        Random.Range(-levelSize + newPlaza.transform.localScale.z / 2, levelSize - newPlaza.transform.localScale.z / 2)
+                    );
+
+                if (Physics.OverlapBox(newPlazaPosition, newPlazaScale * 0.5f, Quaternion.identity, 1<<15).Length == 0)
+                {
+                    plazaTransformChosen = true;
+                }
+            }
+
+            newPlaza.transform.localScale = newPlazaScale;
+            newPlaza.transform.position = newPlazaPosition;
+
+            // Add the new plaza's area to the total amount of empty space.
+            currentPlazaArea += newPlaza.transform.localScale.x * newPlaza.transform.localScale.z;
+
+            // If this is not the first empty space in the current level, see if it needs a connecting corridor.
+            if (emptySpaces.Count > 0)
+            {
+                Debug.Log("Checking to see if we need to generate a corridor.");
+
+                // See if the new plaza is overlapping any other instance of empty space.
+                Vector3 newPlazaHalfExtents = new Vector3(newPlaza.transform.localScale.x / 2, newPlaza.transform.localScale.y, newPlaza.transform.localScale.z / 2);
+                bool newPlazaIsOverlappingEmptySpace = Physics.OverlapBox(newPlaza.transform.position, newPlazaHalfExtents, newPlaza.transform.rotation, 1 << 15).Length-1 > 0;
+                Debug.Log("New plaza overlapping this many empty areas: " + Physics.OverlapBox(newPlaza.transform.position, newPlazaHalfExtents, newPlaza.transform.rotation, 1 << 15).Length);
+
+                // If the new plaza is not overlapping empty space, create a corridor to another random instance of empty space.
+                if (!newPlazaIsOverlappingEmptySpace)
+                {
+                    Debug.Log("Creating corridor.");
+
+                    // Select a random instance of empty space and get its position.
+                    Vector3 corridorEnd = emptySpaces[Random.Range(0, emptySpaces.Count)].transform.position;
+
+                    // Get the point half way between the new plaza and the chosen end point.
+                    Vector3 corridorPosition = newPlaza.transform.position + (corridorEnd - newPlaza.transform.position) / 2;
+
+                    // Get a rotation so that the new corridor is oriented in the correct manner.
+                    Quaternion corridorRotation = Quaternion.LookRotation(Vector3.Normalize(corridorPosition - corridorEnd), Vector3.up);
+
+                    // Instantiate the new corridor and set its width and length.
+                    GameObject newCorridor = Instantiate(emptySpacePrefab, corridorPosition, corridorRotation);
+                    newCorridor.transform.localScale = new Vector3(
+                            corridorWidthRange.Random,
+                            1f,
+                            Vector3.Distance(newPlaza.transform.position, corridorEnd)
+                        );
+
+                    // Add the new corridor to the list of empty spaces, then update the area of the level that has been filled with empty space.
+                    emptySpaces.Add(newCorridor);
+                }
+            }
+
+            // Add the new plaza to the list of empty space.
+            emptySpaces.Add(newPlaza);
+            Debug.Log("Number of empty spaces: " + emptySpaces.Count);
+            Debug.Log("Total Empty Area: " + currentPlazaArea + ", Empty Area To Fill: " + emptyArea);
+        }
+
+        Debug.Break();
+    }
+
+
+    public void SetupWallsAndFloor()
+    {
+        // Give the correct size and position to the floor and walls.
+        floor.localScale = new Vector3(
+            levelSize * 0.2f,
+            1f,
+            levelSize * 0.2f
+            );
+
+        for (int i = 0; i < walls.Length; i++)
+        {
+            walls[i].localScale = new Vector3(
+                levelSize * 2f,
+                walls[i].localScale.y,
+                walls[i].localScale.z
+                );
+
+            if (walls[i].position.z > 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, levelSize);
+            else if (walls[i].position.z < 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, -levelSize);
+            else if (walls[i].position.x > 0) walls[i].position = new Vector3(levelSize, walls[i].transform.position.y, 0f);
+            else walls[i].position = new Vector3(-levelSize, walls[i].transform.position.y, 0f);
+        }
+    }
+
+
+    void PlaceObstacle()
+    {
+        Vector3 newPosition = Vector3.zero;
+        Vector3 newScale = Vector3.zero;
+        Quaternion newRotation = Quaternion.identity;
+
+        bool placed = false;
+        int loopSafeguard = 0;
+
+        while (!placed)
+        {
+            // Get size
+            newScale = new Vector3(
+                obstacleSizeRange.Random,
+                20f,
+                obstacleSizeRange.Random
+            );
+
+            // Get my position
+            newPosition = new Vector3(
+                Random.Range(-levelSize + newScale.x / 2, levelSize - newScale.x / 2),
+                newScale.y * 0.5f,
+                Random.Range(-levelSize + newScale.z / 2, levelSize - newScale.z / 2)
+            );
+
+            // Get a random rotation.
+            //newRotation = Quaternion.Euler(newRotation.x, Random.Range(-180f, 180f), newRotation.y);
+
+            // Test this location with an overlap box that is high enough to catch the player in midair.
+            // Also make it a little bit larger than the actual obstacle.
+            Collider[] overlaps = Physics.OverlapBox(newPosition, new Vector3(newScale.x, 400, newScale.z), newRotation);
+
+            // Make sure this obstacle isn't going to be placed on top of the player or an enemy or empty space.
+            placed = true;
+            foreach (Collider collider in overlaps)
+            {
+                if (collider.tag == "Player" || collider.tag == "Enemy" || collider.tag == "Empty Space") //|| collider.tag == "Obstacle" || collider.tag == "Wall")
+                {
+                    placed = false;
+                }
+            }
+
+            loopSafeguard++;
+            if (loopSafeguard > 100) return;
+        }
+
+        // Instantiate the obstacle.
+        GameObject newObstacle = Instantiate(obstaclePrefab);
+        newObstacle.transform.position = newPosition;
+        newObstacle.transform.localScale = newScale;
+        newObstacle.transform.rotation = newRotation;
+        newObstacle.transform.parent = navMeshRoot;
+    }
+
+
+    void PlaceColumn()
+    {
+        Vector3 newPosition = Vector3.zero;
+        Vector3 newScale = Vector3.zero;
+        Quaternion newRotation = Quaternion.identity;
+
+        bool placed = false;
+        int loopSafeguard = 0;
+
+        while (!placed)
+        {
+            // Get size
+            newScale = new Vector3(5f, 20f, 5f);
+
+            // Get my position
+            newPosition = new Vector3(
+                Random.Range(-levelSize + newScale.x / 2, levelSize - newScale.x / 2),
+                newScale.y * 0.5f,
+                Random.Range(-levelSize + newScale.z / 2, levelSize - newScale.z / 2)
+            );
+
+            // Get a random rotation.
+            //newRotation = Quaternion.Euler(newRotation.x, Random.Range(-180f, 180f), newRotation.y);
+
+            // Test this location with an overlap box that is high enough to catch the player in midair.
+            // Also make it a little bit larger than the actual obstacle.
+            Collider[] overlaps = Physics.OverlapBox(newPosition, new Vector3(newScale.x + 5f, 400, newScale.z + 5f), newRotation);
+
+            // Make sure this obstacle isn't going to be placed on top of the player or an enemy or empty space.
+            placed = true;
+            bool inEmptySpace = false;
+            foreach (Collider collider in overlaps)
+            {
+                if (collider.tag == "Empty Space") inEmptySpace = true;
+
+                if (collider.tag == "Player" || collider.tag == "Enemy" || collider.tag == "Obstacle" || collider.tag == "Wall")
+                {
+                    placed = false;
+                    break;
+                }
+            }
+
+            if (!inEmptySpace)
+            {
+                placed = false;
+            }
+
+            loopSafeguard++;
+            if (loopSafeguard > 100) return;
+        }
+
+        // Instantiate the obstacle.
+        GameObject newObstacle = Instantiate(obstaclePrefab);
+        newObstacle.transform.position = newPosition;
+        newObstacle.transform.localScale = newScale;
+        newObstacle.transform.rotation = newRotation;
+        newObstacle.transform.parent = navMeshRoot;
+    }
+
+
+
+    void GenerateNavMesh()
+    {
+        //List<NavMeshBuildMarkup> markups = new List<NavMeshBuildMarkup>();
+        //List<NavMeshBuildSource> sources = new List<NavMeshBuildSource>();
+        //NavMeshBuilder.CollectSources(navMeshRoot, 1 << 8 | 1 << 9, NavMeshCollectGeometry.PhysicsColliders, 0, markups, sources);
+        //navMeshRoot.GetComponent<NavMeshSurface>().BuildNavMesh();
+        //navMeshRoot.GetComponent<NavMeshSurface>().navMeshData;
+    }
+
+
+    void PlaceEnemy(GameObject enemyToPlace)
+    {
+        GameObject newEnemy = Instantiate(enemyToPlace);
+        Vector3 newPosition = Vector3.zero;
+
+        bool placed = false;
+        int loopSafeguard = 0;
+
+        while (!placed)
+        {
+            // Get my position
+            newPosition = new Vector3(
+                Random.Range(-levelSize + newEnemy.GetComponent<Collider>().bounds.extents.x, levelSize - newEnemy.GetComponent<Collider>().bounds.extents.x),
+                2f,
+                Random.Range(-levelSize + newEnemy.GetComponent<Collider>().bounds.extents.z, levelSize - newEnemy.GetComponent<Collider>().bounds.extents.z)
+            );
+
+            // Test this location
+            placed = true;
+            Collider[] overlaps = Physics.OverlapSphere(newPosition, newEnemy.GetComponent<Collider>().bounds.extents.x * 1.5f);
+            foreach (Collider c in overlaps)
+            {
+                if (c.tag == "Player" || c.tag == "Enemy" || c.tag == "Obstacle" || c.tag == "Wall")
+                {
+                    //Debug.Log("Tried to place enemy on " + c.tag);
+                    placed = false;
+                }
+            }
+
+            loopSafeguard++;
+            if (loopSafeguard > 100)
+            {
+                Debug.Log("Infinite Loop");
+                return;
+            }
+        }
+
+        newEnemy.transform.position = newPosition;
+
+        numberOfEnemies++;
+    }
+}
+
+
+
+
+
+
+    /*
+     * 
+     * christmas was ringing
+     * in the idea of all that i've lost
+     * if you ever see that big picture
+     * i bet a mirror isn't that robust
+     * 
+     * but you'll never get sick where i come from
+     * there's a ministry in every bite
+     * 
+     * now I'm a believer
+     * a big time believer
+     * 
+     * you gotta hand it to the other side
+     * at least they're forgiven
+     * and they've got a rhythm that you can't deny
+     * 
+     * i tend to hate a good kisser
+     * the smell of mistletoe is so plain
+     * i've become such a bad singer
+     * my girlfriend called me by my last name
+     * 
+     * they say when you're back where you come from
+     * you're bound to lose that self control
+     * 
+     * now i'm a believer
+     * a true blue believer
+     * 
+     * you gotta hand it to the birds and the bees
+     * at least they're human
+     * but i've got enough of that sweet disease
+     * 
+     */

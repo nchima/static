@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: abb6e292c434ce3419d651ffe955c289
+timeCreated: 1489707365
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: DustySalmon
+  fontNames:
+  - DustySalmon
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
