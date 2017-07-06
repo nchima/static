@@ -84,12 +84,14 @@ public class LevelGenerator : MonoBehaviour {
 
         SetupEmptySpace();
 
+        //Debug.Break();
+
         // Put all things in the level.
         for (int i = 0; i < numberOfObstacles; i++) {
             PlaceObstacle();
         }
 
-        for (int i = 0; i < emptySpaces.Count * 3; i++)
+        for (int i = 0; i < emptySpaces.Count * 2; i++)
         {
             PlaceColumn();
         }
@@ -116,11 +118,6 @@ public class LevelGenerator : MonoBehaviour {
             }
         }
 
-        // Delete all empty space.
-        for (int i = 0; i < emptySpaces.Count; i++) Destroy(emptySpaces[i]);
-        emptySpaces.Clear();
-
-
         //Debug.Log("Number of enemies: " + numberOfEnemies);
         gameManager.currentEnemyAmt = numberOfEnemies;
 
@@ -133,7 +130,9 @@ public class LevelGenerator : MonoBehaviour {
         // Update billboards.
         GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
 
-        //Debug.Break();
+        // Delete all empty space.
+        for (int i = 0; i < emptySpaces.Count; i++) Destroy(emptySpaces[i]);
+        emptySpaces.Clear();
     }
 
 
@@ -157,7 +156,6 @@ public class LevelGenerator : MonoBehaviour {
             Vector3 newPlazaScale = Vector3.zero;
 
             int loopSafeguard2 = 0;
-            loopSafeguard2++;
             while (!plazaTransformChosen)
             {
                 // Give the new plaza a random size and location.
@@ -178,8 +176,8 @@ public class LevelGenerator : MonoBehaviour {
                     plazaTransformChosen = true;
                 }
 
-                loopSafeguard2++;
-                if (loopSafeguard2 > 100) return;
+                //loopSafeguard2++;
+                //if (loopSafeguard2 > 1000) break;
             }
 
             newPlaza.transform.localScale = newPlazaScale;
@@ -230,8 +228,8 @@ public class LevelGenerator : MonoBehaviour {
             Debug.Log("Number of empty spaces: " + emptySpaces.Count);
             Debug.Log("Total Empty Area: " + currentPlazaArea + ", Empty Area To Fill: " + emptyArea);
 
-            loopSafeguard1++;
-            if (loopSafeguard1 > 100) return;
+            //loopSafeguard1++;
+            //if (loopSafeguard1 > 1000) break;
         }
     }
 
@@ -302,64 +300,65 @@ public class LevelGenerator : MonoBehaviour {
                 if (collider.tag == "Player" || collider.tag == "Enemy" || collider.tag == "Empty Space") //|| collider.tag == "Obstacle" || collider.tag == "Wall")
                 {
                     //Debug.Log("Obstacle was going to be placed on: " + collider.tag);
-
                     placed = false;
                     break;
                 }
             }
 
-            // Make sure the obstacle is not too close to another one so as to create tempting but impassible gap.
-
-            // See if there are any obstacles around me.
-            Vector3 overlapBoxExtents = new Vector3(
-                    (newScale.x / 2) + player.GetComponent<CharacterController>().radius * 3f,
-                    newScale.y / 2,
-                    (newScale.z / 2) + player.GetComponent<CharacterController>().radius * 3f
-                );
-
-            foreach (Collider nearbySolid in Physics.OverlapBox(newPosition, overlapBoxExtents, newRotation))
+            if (placed)
             {
-                // See if this obstacle is not also overlapping the position of the new obstacle itself.
-                if (!nearbySolid.bounds.Intersects(new Bounds(newPosition, newScale)))
+                // Make sure the obstacle is not too close to another one so as to create tempting but impassible gap.
+                // See if there are any obstacles around me.
+                Vector3 overlapBoxExtents = new Vector3(
+                        (newScale.x / 2) + player.GetComponent<CharacterController>().radius * 3f,
+                        newScale.y / 2,
+                        (newScale.z / 2) + player.GetComponent<CharacterController>().radius * 3f
+                    );
+
+                foreach (Collider nearbySolid in Physics.OverlapBox(newPosition, overlapBoxExtents, newRotation))
                 {
-                    if (nearbySolid.tag == "Obstacle")
+                    // See if this obstacle is not also overlapping the position of the new obstacle itself.
+                    if (!nearbySolid.bounds.Intersects(new Bounds(newPosition, newScale)))
                     {
-                        // If it's not, then this position is inappropriate.
-                        placed = false;
-                        break;
-                    }
+                        if (nearbySolid.tag == "Obstacle")
+                        {
+                            // If it's not, then this position is inappropriate.
+                            placed = false;
+                            break;
+                        }
 
-                    else if (nearbySolid.tag == "Wall")
-                    {
-                        //Debug.Log("Moved obstacle to touch wall.");
+                        else if (nearbySolid.tag == "Wall")
+                        {
+                            //Debug.Log("Moved obstacle to touch wall.");
 
-                        // Figure out which direction the wall is in.
-                        Vector3 toWall = nearbySolid.ClosestPointOnBounds(newPosition) - newPosition;
-                        Debug.DrawLine(nearbySolid.ClosestPointOnBounds(newPosition), newPosition, Color.green, 5f);
-                        //Debug.Log("Direction to wall: " + toWall);
+                            // Figure out which direction the wall is in.
+                            Vector3 toWall = nearbySolid.ClosestPointOnBounds(newPosition) - newPosition;
+                            Debug.DrawLine(nearbySolid.ClosestPointOnBounds(newPosition), newPosition, Color.green, 5f);
+                            //Debug.Log("Direction to wall: " + toWall);
 
-                        //if (toWall == Vector3.zero)
-                        //{
-                        //    Debug.Log("Zero vector");
-                        //    Debug.Log("New position: " + newPosition);
-                        //    Debug.Log("Closest point to new position: " + nearbySolid.ClosestPointOnBounds(newPosition));
-                        //    Debug.DrawRay(newPosition, Vector3.up * 100f, Color.cyan);
-                        //    Debug.Break();
-                        //}
+                            //if (toWall == Vector3.zero)
+                            //{
+                            //    Debug.Log("Zero vector");
+                            //    Debug.Log("New position: " + newPosition);
+                            //    Debug.Log("Closest point to new position: " + nearbySolid.ClosestPointOnBounds(newPosition));
+                            //    Debug.DrawRay(newPosition, Vector3.up * 100f, Color.cyan);
+                            //    Debug.Break();
+                            //}
 
-                        // Get the half extent of the obstacle on the proper coordinate.
-                        Vector3 halfExtent = newScale;
-                        halfExtent.Scale(toWall.normalized);
-                        halfExtent *= 0.5f;
-                        //Debug.Log("Half extent: " + halfExtent);
+                            // Get the half extent of the obstacle on the proper coordinate.
+                            Vector3 halfExtent = newScale;
+                            halfExtent.Scale(toWall.normalized);
+                            halfExtent *= 0.5f;
+                            //Debug.Log("Half extent: " + halfExtent);
 
-                        // Move the obstacle in the direction of the wall by it's distance from the wall minus it's half extent from above.
-                        newPosition += (toWall - halfExtent);
-                        //Debug.Log("Moving to: " + (newPosition + (toWall - halfExtent)));
-                        //Debug.DrawLine(newPosition, newPosition + (toWall - halfExtent), Color.red, 1f);
-                        //Debug.Break();
-                        placed = true;
-                        break;
+                            // Move the obstacle in the direction of the wall by it's distance from the wall minus it's half extent from above.
+                            newPosition += (toWall - halfExtent);
+                            //Debug.Log("Moving to: " + (newPosition + (toWall - halfExtent)));
+                            //Debug.DrawLine(newPosition, newPosition + (toWall - halfExtent), Color.red, 1f);
+                            //Debug.Break();
+                            placed = true;
+                            break;
+                        }
                     }
                 }
             }
