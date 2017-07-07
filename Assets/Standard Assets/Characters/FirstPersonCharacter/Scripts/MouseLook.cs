@@ -11,6 +11,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public float XSensitivityRun = 4f;
         public float YSensitivity = 2f;
         public bool clampVerticalRotation = true;
+        public bool enabled = true;
         public float MinimumX = -90F;
         public float MaximumX = 90F;
         public bool smooth;
@@ -31,6 +32,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         public void LookRotation(Transform character, Transform camera)
         {
+            if (!enabled) return;
+
             // Set sensitivity based on whether a controller button is being held down.
             float XSensitivity = XSensitivityWalk;
             if (Input.GetAxisRaw("Run") != 0) XSensitivity = XSensitivityRun;

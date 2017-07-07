@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityStandardAssets.Characters.FirstPerson;
+using DG.Tweening;
 
 public class GameManager : MonoBehaviour {
 
@@ -18,13 +19,20 @@ public class GameManager : MonoBehaviour {
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
     LevelGenerator levelGenerator;  // A reference to the level generator script.
 
+    // USED FOR FALLING INTO THE NEXT LEVEL
+    enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
+    PlayerState playerState = PlayerState.Normal;
+    float pauseAfterLevelCompleteLength = 2f;
+    float fallingTimer;
+    float lookUpSpeed = 0.2f;
+
     // MENU SCREENS
     [SerializeField] GameObject highScoreScreen;
     [SerializeField] GameObject gameOverScreen; 
     [SerializeField] GameObject nameEntryScreen;
     [SerializeField] GameObject mainMenuScreen; 
 
-    // USED FOR TIMER
+    // USED FOR IDLE TIMER
     [SerializeField] float idleResetTime = 20f;
     float timeSinceLastInput = 0f;
     public bool gameStarted = false;
@@ -54,8 +62,9 @@ public class GameManager : MonoBehaviour {
         // Pause everything for the main menu.
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            //enemy.GetComponent<Enemy>().enabled = false;
+            enemy.GetComponent<Enemy>().enabled = false;
         }
+
         GameObject.Find("FPSController").GetComponent<FirstPersonController>().enabled = false;
         foreach(Gun gun in FindObjectsOfType<Gun>())
         {
@@ -118,6 +127,67 @@ public class GameManager : MonoBehaviour {
 
             timeSinceLastInput += Time.deltaTime;
         }
+
+        // Handle falling.
+        if (playerState != PlayerState.Normal)
+        {
+            switch (playerState)
+            {
+                case PlayerState.PauseAfterLevelComplete:
+                    PauseAfterLevelComplete();
+                    break;
+                case PlayerState.FallingIntoLevel:
+                    FallIntoLevel();
+                    break;
+                case PlayerState.FiringShockwave:
+                    FireShockwave();
+                    break;
+            }
+        }
+    }
+
+
+    void PauseAfterLevelComplete()
+    {
+        fallingTimer += Time.deltaTime;
+        Debug.Log(fallingTimer);
+
+        if (fallingTimer >= pauseAfterLevelCompleteLength)
+        {
+            // Generate new level.
+            levelNumber += 1;
+            levelGenerator.Generate();
+
+            // Start rotating player camera to face down.
+            player.GetComponent<FirstPersonController>().m_MouseLook.enabled = false;
+            player.transform.Find("FirstPersonCharacter").transform.DORotate(new Vector3(90f, player.transform.Find("FirstPersonCharacter").transform.rotation.eulerAngles.y, 0f), 0.5f, RotateMode.Fast);
+
+            // Begin falling sequence.
+            playerState = PlayerState.FallingIntoLevel;
+        }
+    }
+
+
+    void FallIntoLevel()
+    {
+        // See if the player has touched down.
+        if (player.transform.position.y <= 3f)
+        {
+            player.transform.Find("FirstPersonCharacter").transform.DORotate(new Vector3(0f, player.transform.Find("FirstPersonCharacter").transform.rotation.eulerAngles.y, 0f), lookUpSpeed, RotateMode.Fast);
+            fallingTimer = 0f;
+            playerState = PlayerState.FiringShockwave;
+        }
+    }
+
+
+    void FireShockwave()
+    {
+        fallingTimer += Time.deltaTime;
+        if (fallingTimer >= lookUpSpeed)
+        {
+            player.GetComponent<FirstPersonController>().m_MouseLook.enabled = true;
+            playerState = PlayerState.Normal;
+        }
     }
 
 
@@ -143,11 +213,12 @@ public class GameManager : MonoBehaviour {
         // Disable the floor's collider so the player falls through it.
         floor.GetComponent<Collider>().enabled = false;
 
-        // Increase level number.
-        levelNumber += 1;
+        // Initiate falling sequence.
+        fallingTimer = 0f;
+        playerState = PlayerState.PauseAfterLevelComplete;
 
         // Generate a new level.
-        levelGenerator.Invoke("Generate", 1.4f);
+        //levelGenerator.Invoke("Generate", 1.4f);
     }
 
 

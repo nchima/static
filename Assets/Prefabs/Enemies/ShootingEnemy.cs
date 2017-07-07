@@ -85,7 +85,7 @@ public class ShootingEnemy : Enemy {
                 Debug.DrawRay(transform.position, playerTransform.position - transform.position, Color.yellow, 5f);
                 if (Physics.Raycast(transform.position, playerTransform.position - transform.position, out hit, 200f, 1<<8 | 1<<16))
                 {
-                    Debug.Log("Enemy saw " + hit.transform.name);
+                    //Debug.Log("Enemy saw " + hit.transform.name);
                     if (hit.transform == playerTransform)
                     {
                         // Set timer for pre shot delay
@@ -106,8 +106,18 @@ public class ShootingEnemy : Enemy {
                         return;
                     }
                 }
-            }
+            } else
+            {
+                // Set timer for pre shot delay
+                shotTimer = new Timer(preShotDelay);
 
+                // Begin the charging up animation.
+                myAnimator.SetTrigger("ChargeUp");
+
+                currentState = BehaviorState.PreShooting;
+
+                return;
+            }
         }
 
         // Move towards target position

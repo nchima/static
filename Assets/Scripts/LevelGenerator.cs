@@ -60,8 +60,8 @@ public class LevelGenerator : MonoBehaviour {
     public void Generate()
     {
         if (gameManager.levelNumber != 0) levelSize += levelSizeIncrease;
-        numberOfEnemies = 0;
 
+        numberOfEnemies = 0;
         numberOfObstacles = numberOfObstaclesRange.Random + gameManager.levelNumber * 4;
 
         // Clear level of all current obstacles and enemies.
@@ -189,17 +189,17 @@ public class LevelGenerator : MonoBehaviour {
             // If this is not the first empty space in the current level, see if it needs a connecting corridor.
             if (emptySpaces.Count > 0)
             {
-                Debug.Log("Checking to see if we need to generate a corridor.");
+                //Debug.Log("Checking to see if we need to generate a corridor.");
 
                 // See if the new plaza is overlapping any other instance of empty space.
                 Vector3 newPlazaHalfExtents = new Vector3(newPlaza.transform.localScale.x / 2, newPlaza.transform.localScale.y, newPlaza.transform.localScale.z / 2);
                 bool newPlazaIsOverlappingEmptySpace = Physics.OverlapBox(newPlaza.transform.position, newPlazaHalfExtents, newPlaza.transform.rotation, 1 << 15).Length-1 > 0;
-                Debug.Log("New plaza overlapping this many empty areas: " + Physics.OverlapBox(newPlaza.transform.position, newPlazaHalfExtents, newPlaza.transform.rotation, 1 << 15).Length);
+                //Debug.Log("New plaza overlapping this many empty areas: " + Physics.OverlapBox(newPlaza.transform.position, newPlazaHalfExtents, newPlaza.transform.rotation, 1 << 15).Length);
 
                 // If the new plaza is not overlapping empty space, create a corridor to another random instance of empty space.
                 if (!newPlazaIsOverlappingEmptySpace)
                 {
-                    Debug.Log("Creating corridor.");
+                    //Debug.Log("Creating corridor.");
 
                     // Select a random instance of empty space and get its position.
                     Vector3 corridorEnd = emptySpaces[Random.Range(0, emptySpaces.Count)].transform.position;
@@ -225,8 +225,8 @@ public class LevelGenerator : MonoBehaviour {
 
             // Add the new plaza to the list of empty space.
             emptySpaces.Add(newPlaza);
-            Debug.Log("Number of empty spaces: " + emptySpaces.Count);
-            Debug.Log("Total Empty Area: " + currentPlazaArea + ", Empty Area To Fill: " + emptyArea);
+            //Debug.Log("Number of empty spaces: " + emptySpaces.Count);
+            //Debug.Log("Total Empty Area: " + currentPlazaArea + ", Empty Area To Fill: " + emptyArea);
 
             //loopSafeguard1++;
             //if (loopSafeguard1 > 1000) break;

@@ -118,7 +118,7 @@ public class HomingShot : EnemyShot {
         // See if the player is near me.
         if (Vector3.Distance(transform.position, playerTransform.position) <= playerLockOnDistance)
         {
-            Debug.Log("Homing shot locking onto player.");
+            //Debug.Log("Homing shot locking onto player.");
             //velocity = Vector3.zero;
             currentTarget = playerTransform.position;
             state = HomingShotState.LockedOn;
