@@ -159,8 +159,7 @@ public class GameManager : MonoBehaviour {
             levelGenerator.Generate();
 
             // Start rotating player camera to face down.
-            player.GetComponent<FirstPersonController>().m_MouseLook.enabled = false;
-            player.transform.Find("FirstPersonCharacter").transform.DORotate(new Vector3(90f, player.transform.Find("FirstPersonCharacter").transform.rotation.eulerAngles.y, 0f), 0.5f, RotateMode.Fast);
+            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.5f, RotateMode.Fast);
 
             // Begin falling sequence.
             playerState = PlayerState.FallingIntoLevel;
@@ -171,9 +170,9 @@ public class GameManager : MonoBehaviour {
     void FallIntoLevel()
     {
         // See if the player has touched down.
-        if (player.transform.position.y <= 3f)
+        if (player.transform.position.y <= 10f)
         {
-            player.transform.Find("FirstPersonCharacter").transform.DORotate(new Vector3(0f, player.transform.Find("FirstPersonCharacter").transform.rotation.eulerAngles.y, 0f), lookUpSpeed, RotateMode.Fast);
+            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed, RotateMode.Fast);
             fallingTimer = 0f;
             playerState = PlayerState.FiringShockwave;
         }
@@ -185,7 +184,6 @@ public class GameManager : MonoBehaviour {
         fallingTimer += Time.deltaTime;
         if (fallingTimer >= lookUpSpeed)
         {
-            player.GetComponent<FirstPersonController>().m_MouseLook.enabled = true;
             playerState = PlayerState.Normal;
         }
     }
