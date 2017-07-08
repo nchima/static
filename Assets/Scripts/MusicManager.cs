@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class MusicManager : MonoBehaviour {
 
+    [SerializeField] bool dontPlayMusic = false;
+
 	[SerializeField] private AudioClip[] tracks;    // An array holding references to the music tracks I will choose from.
     Stack<AudioClip> trackStack;
     private int previousTrackIndex;  // The index of the track that I played last (to make sure the same track doesn't play twice.)
@@ -35,6 +37,8 @@ public class MusicManager : MonoBehaviour {
 
     void Update()
     {
+        if (dontPlayMusic) return;
+
         if (!audioSource.isPlaying)
         {
             ChooseNewClip();
