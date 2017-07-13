@@ -27,8 +27,8 @@ public class LevelGenerator : MonoBehaviour {
     float numberOfObstacles;
     [SerializeField] IntRange numberOfObstaclesRange = new IntRange(15, 40); // The number of obstacles in a level.
     [SerializeField] FloatRange obstacleSizeRange = new FloatRange(4f, 30f);
-
     float numberOfTrees;
+    [SerializeField] GameObject obstacleContainer;
     
     // NAVMMESH STUFF
     [SerializeField] Transform navMeshRoot;
@@ -96,6 +96,8 @@ public class LevelGenerator : MonoBehaviour {
             PlaceColumn();
         }
 
+        obstacleContainer.transform.position = new Vector3(0f, -19.59f, 0f);
+
         for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++) {
             PlaceEnemy(basicEnemyPrefab);
         }
@@ -120,6 +122,11 @@ public class LevelGenerator : MonoBehaviour {
 
         //Debug.Log("Number of enemies: " + numberOfEnemies);
         gameManager.currentEnemyAmt = numberOfEnemies;
+
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            enemy.GetComponent<Enemy>().willAttack = false;
+        }
 
         // Place the player in the correct spot above the level.
         player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
@@ -372,7 +379,7 @@ public class LevelGenerator : MonoBehaviour {
         newObstacle.transform.position = newPosition;
         newObstacle.transform.localScale = newScale;
         newObstacle.transform.rotation = newRotation;
-        newObstacle.transform.parent = navMeshRoot;
+        newObstacle.transform.parent = obstacleContainer.transform;
     }
 
 
@@ -432,7 +439,7 @@ public class LevelGenerator : MonoBehaviour {
         newObstacle.transform.position = newPosition;
         newObstacle.transform.localScale = newScale;
         newObstacle.transform.rotation = newRotation;
-        newObstacle.transform.parent = navMeshRoot;
+        newObstacle.transform.parent = obstacleContainer.transform;
     }
 
 

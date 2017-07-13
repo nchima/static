@@ -14,6 +14,7 @@ public class Explosion : MonoBehaviour {
     [SerializeField] float fadeDuration;
     [SerializeField] int damageMin;
     [SerializeField] int damageMax;
+    [SerializeField] bool shouldDamagePlayer = true;    
 
     List<Collider> affectedObjects; // Contains references to all objects that have been collided with so that I don't hurt the same enemy multiple times.
 
@@ -40,14 +41,14 @@ public class Explosion : MonoBehaviour {
             if (explosionSphere.transform.localScale.x >= explosionRadius * 0.99f)
             {
                 //Debug.Log("Explosion reached full size.");
-                explosionSphere.GetComponent<Renderer>().material.DOFade(0f, fadeDuration);
+                foreach(Renderer renderer in explosionSphere.GetComponentsInChildren<Renderer>()) renderer.material.DOFade(0f, fadeDuration);
                 explosionState = ExplosionState.Fading;
             }
         }
 
         else if (explosionState == ExplosionState.Fading)
         {
-            if (explosionSphere.GetComponent<Renderer>().material.color.a <= 0.01f)
+            if (explosionSphere.GetComponentInChildren<Renderer>().material.color.a <= 0.01f)
             {
                 //Debug.Log("Explosion deleting self.");
                 Destroy(gameObject);
@@ -65,6 +66,8 @@ public class Explosion : MonoBehaviour {
 
         if (collider.tag == "Player")
         {
+            if (!shouldDamagePlayer) return;
+
             // Raycast to see if player is behind cover.
             RaycastHit hit;
             if (Physics.Raycast(transform.position + Vector3.up * 0.5f, collider.transform.position - transform.position, out hit, explosionRadius, 1<<8))

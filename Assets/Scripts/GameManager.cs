@@ -22,9 +22,16 @@ public class GameManager : MonoBehaviour {
     // USED FOR FALLING INTO THE NEXT LEVEL
     enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
     PlayerState playerState = PlayerState.Normal;
-    float pauseAfterLevelCompleteLength = 2f;
-    float fallingTimer;
-    float lookUpSpeed = 0.2f;
+    float pauseAfterLevelCompleteLength = 1.5f;
+    float fallingSequenceTimer;
+    float lookUpSpeed = 0.25f;
+    float playerMoveSpeedWhenFalling = 50f;
+    float savedRegularMoveSpeed;
+    Vector3 savedGravity;
+    float speedFallGravityMultipier = 10f;
+    bool speedFallActivated = false;
+    [SerializeField] GameObject shockwavePrefab;
+    [HideInInspector] public bool playerTouchedDown = false;
 
     // MENU SCREENS
     [SerializeField] GameObject highScoreScreen;
@@ -52,6 +59,7 @@ public class GameManager : MonoBehaviour {
     Transform floor;    // The floor of the game environment.
     ScoreManager scoreManager;
     HealthManager healthManager;
+    Gun gun;
     [HideInInspector] public GameObject player;
 
 
@@ -86,6 +94,7 @@ public class GameManager : MonoBehaviour {
         scoreManager = GetComponent<ScoreManager>();
         healthManager = GetComponent<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
+        gun = FindObjectOfType<Gun>();
         player = GameObject.Find("FPSController");
     }
 
@@ -149,17 +158,24 @@ public class GameManager : MonoBehaviour {
 
     void PauseAfterLevelComplete()
     {
-        fallingTimer += Time.deltaTime;
-        Debug.Log(fallingTimer);
+        fallingSequenceTimer += Time.deltaTime;
+        //Debug.Log(fallingTimer);
 
-        if (fallingTimer >= pauseAfterLevelCompleteLength)
+        if (fallingSequenceTimer >= pauseAfterLevelCompleteLength)
         {
             // Generate new level.
             levelNumber += 1;
             levelGenerator.Generate();
 
-            // Start rotating player camera to face down.
-            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.5f, RotateMode.Fast);
+            // Set up variables for falling.
+            playerTouchedDown = false;
+            gun.canShoot = false;
+            savedRegularMoveSpeed = player.GetComponent<FirstPersonController>().m_WalkSpeed;
+            player.GetComponent<FirstPersonController>().m_WalkSpeed = playerMoveSpeedWhenFalling;
+            savedGravity = Physics.gravity;
+
+            // Begin rotating player camera to face down.
+            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.2f, RotateMode.Fast);
 
             // Begin falling sequence.
             playerState = PlayerState.FallingIntoLevel;
@@ -169,11 +185,37 @@ public class GameManager : MonoBehaviour {
 
     void FallIntoLevel()
     {
-        // See if the player has touched down.
-        if (player.transform.position.y <= 10f)
+        // Player can activate speed fall by pressing fire.
+        if (!speedFallActivated && Input.GetButtonDown("Fire1"))
         {
-            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed, RotateMode.Fast);
-            fallingTimer = 0f;
+            player.GetComponent<Rigidbody>().isKinematic = false;
+            player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
+            Physics.gravity *= speedFallGravityMultipier;
+            speedFallActivated = true;
+        }
+
+        // See if the player has touched down.
+        if (player.transform.position.y <= 2.2f)
+        {
+            // Begin rotating camera back to regular position.
+            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed*0.6f, RotateMode.Fast);
+
+            // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
+            DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+            FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
+
+            // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
+            gun.canShoot = true;
+            DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, gun.burstsPerSecondModifierMax, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+
+            // Reset movement variables.
+            player.GetComponent<Rigidbody>().isKinematic = true;
+            player.GetComponent<FirstPersonController>().m_WalkSpeed = savedRegularMoveSpeed;
+
+            // Fire shockwave.
+            if (speedFallActivated) Instantiate(shockwavePrefab, player.transform.position, Quaternion.identity);
+
+            fallingSequenceTimer = 0f;
             playerState = PlayerState.FiringShockwave;
         }
     }
@@ -181,9 +223,37 @@ public class GameManager : MonoBehaviour {
 
     void FireShockwave()
     {
-        fallingTimer += Time.deltaTime;
-        if (fallingTimer >= lookUpSpeed)
+        fallingSequenceTimer += Time.deltaTime;
+        if (fallingSequenceTimer >= lookUpSpeed)
         {
+            // Allow enemies to start attacking.
+            foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+            {
+                enemy.GetComponent<Enemy>().willAttack = true;
+            }
+
+            // Begin tweening time scale, gun burst rate, and music pitch back to normal.
+            DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+            DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+            FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(1f, 1f).SetUpdate(true);
+
+            // Destroy any obstacles that the player is touching.
+            Collider[] overlappingSolids = Physics.OverlapCapsule(player.transform.position, -player.transform.up * 10f, player.GetComponent<CharacterController>().radius, 1 << 8);
+            for (int i = 0; i < overlappingSolids.Length; i++)
+            {
+                if (overlappingSolids[i].tag == "Obstacle")
+                {
+                    overlappingSolids[i].GetComponent<Obstacle>().DestroyByPlayerFalling();
+                }
+            }
+
+            // Begin moving obstacles to their full height.
+            GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
+
+            Physics.gravity = savedGravity;
+
+            speedFallActivated = false;
+
             playerState = PlayerState.Normal;
         }
     }
@@ -212,7 +282,7 @@ public class GameManager : MonoBehaviour {
         floor.GetComponent<Collider>().enabled = false;
 
         // Initiate falling sequence.
-        fallingTimer = 0f;
+        fallingSequenceTimer = 0f;
         playerState = PlayerState.PauseAfterLevelComplete;
 
         // Generate a new level.

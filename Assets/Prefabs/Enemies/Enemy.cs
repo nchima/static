@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
     protected NavMeshAgent navMeshAgent;
 
     // USED FOR MOVING
+    [HideInInspector] public bool willAttack = false;
     [SerializeField] protected float moveRandomness = 40f;    // When I move, I move towards a spot inside a circle of this diameter surrounding the player.
     [SerializeField] protected float moveDistanceMin = 1f;  // The shortest distance I will move.
     [SerializeField] protected float moveDistanceMax = 15f; // The longest distance I will move.

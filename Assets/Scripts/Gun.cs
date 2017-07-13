@@ -6,16 +6,15 @@ public class Gun : MonoBehaviour
     /* TWEAKABLE VARIABLES */
 
     // How many bullets are fired per shot.
-    [SerializeField]
-    int bulletsPerBurstMin = 2;
-    [SerializeField]
-    int bulletsPerBurstMax = 30;
+    [SerializeField] int bulletsPerBurstMin = 2;
+    [SerializeField] int bulletsPerBurstMax = 30;
 
     // How many shots can be fired per second.
-    [SerializeField]
-    int burstsPerSecondMin = 1;
-    [SerializeField]
-    int burstsPerSecondMax = 5;
+    [SerializeField] float burstsPerSecondMin = 1f;
+    [SerializeField] float burstsPerSecondMax = 5f;
+    [HideInInspector] public float burstsPerSecondModifier = 1f;
+    [SerializeField] public float burstsPerSecondModifierMax = 2f;   // Your rate of fire increases by this multiplier during slow motion.
+
 
     // Bullet spread.
     [SerializeField]
@@ -34,14 +33,13 @@ public class Gun : MonoBehaviour
     int bulletDamageMax = 15;
 
     // Bullet Color
-    [SerializeField]
-    Color bulletColor1;
-    [SerializeField]
-    Color bulletColor2;
+    [SerializeField] Color bulletColor1;
+    [SerializeField] Color bulletColor2;
 
     // How quickly the gun oscillates between extremes.
-    [SerializeField]
-    float oscSpeed = 0.3f;
+    [SerializeField] float oscSpeed = 0.3f;
+
+    [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
 
     /* MISSILE STUFF */
     [SerializeField] float missileCooldown = 0.15f;  // Time in between firing individual missiles.
@@ -107,7 +105,7 @@ public class Gun : MonoBehaviour
     {
         // Get new firing variables based on current oscillation.
         int bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
-        float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax);
+        float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
         float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
         shootAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
 
@@ -124,12 +122,12 @@ public class Gun : MonoBehaviour
         }
 
         /* Firing missile launcher */
-        if (gameManager.currentSine >= missileSineRange && !firingMissiles && !firedMissiles)
+        if (canShoot && gameManager.currentSine >= missileSineRange && !firingMissiles && !firedMissiles)
         {
             if (Input.GetButton("Fire2") || Input.GetAxisRaw("Fire2") != 0)
             {
                 missilesFired = 0;
-                missileTimer = 2820f;
+                missileTimer = 0f;
                 firingMissiles = true;
             }
         }
@@ -137,7 +135,7 @@ public class Gun : MonoBehaviour
         if (firingMissiles) FireMissiles();
 
         /* Firing normal bullets */
-        else if ((Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) && timeSinceLastShot >= 1 / burstsPerSecond)
+        else if (canShoot && (Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) && timeSinceLastShot >= 1 / burstsPerSecond)
         {
             // Fire a burst
             FireBurst(bulletsPerBurst, inaccuracy);

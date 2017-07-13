@@ -55,7 +55,7 @@ public class MeleeEnemy : Enemy {
     void MoveTowardsPlayer()
     {
         // Check if the player is near enough to attack.
-        if (Vector3.Distance(playerTransform.position, transform.position) <= attackRange)
+        if (willAttack && Vector3.Distance(playerTransform.position, transform.position) <= attackRange)
         {
             myAnimator.SetTrigger("ChargeUp");
             currentState = BehaviorState.ChargingUpAttack;

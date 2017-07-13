@@ -76,7 +76,7 @@ public class ShootingEnemy : Enemy {
     {
         // See if it's time to shoot at the player
         shotTimer.Run();
-        if (shotTimer.finished)
+        if (shotTimer.finished && willAttack)
         {
             // See if we have line-of-sight to the player.
             if (requireLineOfSight)

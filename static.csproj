@@ -116,10 +116,13 @@
     <Compile Include="Assets\Examples\Scripts\RandomInstancing.cs" />
     <Compile Include="Assets\Examples\Scripts\RandomWalk.cs" />
     <Compile Include="Assets\Examples\Scripts\SpawnPrefabOnKeyDown.cs" />
+    <Compile Include="Assets\KeepBehind.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshLink.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshModifier.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshModifierVolume.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshSurface.cs" />
+    <Compile Include="Assets\Obstacle.cs" />
+    <Compile Include="Assets\PlayerCollisionMonitor.cs" />
     <Compile Include="Assets\Prefabs\Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Prefabs\Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Basic Enemy\BasicEnemy.cs" />

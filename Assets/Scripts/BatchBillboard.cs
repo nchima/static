@@ -26,8 +26,11 @@ public class BatchBillboard : MonoBehaviour {
 		{
 			if (billboardTransforms [i] != null)
             {
-				billboardTransforms [i].rotation = Camera.main.transform.rotation;
-			}
+                float zRot = billboardTransforms[i].rotation.eulerAngles.z;
+                Vector3 newRotation = Camera.main.transform.rotation.eulerAngles;
+                newRotation.z = zRot;
+                billboardTransforms[i].rotation = Quaternion.Euler(newRotation);
+            }
 		}
 	}
 
