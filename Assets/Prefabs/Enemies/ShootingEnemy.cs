@@ -13,6 +13,7 @@ public class ShootingEnemy : Enemy {
     [SerializeField] bool requireLineOfSight;
     protected Timer shotTimer;    // Keeps track of how long it's been since I last fired a shot.
 
+
     // BEHAVIOR STATES
     protected enum BehaviorState { PreparingToMove, Moving, PreShooting, Shooting, PostShooting };
     protected BehaviorState currentState;
@@ -54,6 +55,8 @@ public class ShootingEnemy : Enemy {
 
     void PrepareToMove()
     {
+        //bool newPositionChosen = false;
+
         // Get a random point in a circle around the player.
         Vector3 nearPlayer = playerTransform.position + Random.insideUnitSphere * moveRandomness;
         nearPlayer.y = transform.position.y;
@@ -127,8 +130,10 @@ public class ShootingEnemy : Enemy {
         //myRigidbody.MovePosition(transform.position + navMeshAgent.desiredVelocity);
 
         // If we've reached the target position, find a new target position
-        if (newPosition == targetPosition)
+        moveTimer += Time.deltaTime;
+        if (Vector3.Distance(newPosition, targetPosition) < 2f || moveTimer > 5f)
         {
+            moveTimer = 0f;
             currentState = BehaviorState.PreparingToMove;
             return;
         }

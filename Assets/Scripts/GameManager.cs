@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour {
     public int levelNumber = 0;    // The current level.
     int numberOfEnemies = 4;    // The number of enemies that spawned in the current level.
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
-    LevelGenerator levelGenerator;  // A reference to the level generator script.
+    public LevelGenerator levelGenerator;  // A reference to the level generator script.
 
     // USED FOR FALLING INTO THE NEXT LEVEL
     enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };

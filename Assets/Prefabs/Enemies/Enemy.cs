@@ -14,7 +14,8 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected float moveDistanceMin = 1f;  // The shortest distance I will move.
     [SerializeField] protected float moveDistanceMax = 15f; // The longest distance I will move.
     [SerializeField] protected float moveSpeed = 5f;  // How quickly I move.
-    protected Vector3 targetPosition; // The position I am currently moving towards.
+    [SerializeField] protected Vector3 targetPosition; // The position I am currently moving towards.
+    protected float moveTimer = 0f;
 
     // USED FOR GETTING HURT
     [SerializeField] protected int _HP = 20; // Health points.
