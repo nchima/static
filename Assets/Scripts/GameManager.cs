@@ -213,7 +213,12 @@ public class GameManager : MonoBehaviour {
             player.GetComponent<FirstPersonController>().m_WalkSpeed = savedRegularMoveSpeed;
 
             // Fire shockwave.
-            if (speedFallActivated) Instantiate(shockwavePrefab, player.transform.position, Quaternion.identity);
+            if (speedFallActivated)
+            {
+                Vector3 shockwavePosition = player.transform.position;
+                shockwavePosition.y = 0f;
+                Instantiate(shockwavePrefab, shockwavePosition, Quaternion.identity);
+            }
 
             fallingSequenceTimer = 0f;
             playerState = PlayerState.FiringShockwave;
@@ -326,6 +331,26 @@ public class GameManager : MonoBehaviour {
     void ShowGameOverScreen()
     {
         gameOverScreen.SetActive(true);
+    }
+
+
+    public void StartGame()
+    {
+        // Unpause enemies in the background.
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        {
+            enemy.GetComponent<Enemy>().enabled = true;
+            enemy.GetComponent<Enemy>().willAttack = true;
+        }
+
+        // Enable player movement and shooting.
+        GameObject.Find("FPSController").GetComponent<FirstPersonController>().enabled = true;
+        foreach (Gun gun in FindObjectsOfType<Gun>())
+        {
+            gun.enabled = true;
+        }
+
+        gameStarted = true;
     }
 
 

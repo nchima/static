@@ -22,23 +22,10 @@ public class MainMenuUI : MonoBehaviour {
 
     public void PlayButton()
     {
-        // Unpause enemies in the background.
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            enemy.GetComponent<Enemy>().enabled = true;
-        }
-
-        // Enable player movement and shooting.
-        GameObject.Find("FPSController").GetComponent<FirstPersonController>().enabled = true;
-        foreach (Gun gun in FindObjectsOfType<Gun>())
-        {
-            gun.enabled = true;
-        }
-
         // Turn off the main menu.
         transform.parent.gameObject.SetActive(false);
 
-        FindObjectOfType<GameManager>().gameStarted = true;
+        FindObjectOfType<GameManager>().StartGame();
     }
 
 
