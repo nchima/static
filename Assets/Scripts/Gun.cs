@@ -17,20 +17,19 @@ public class Gun : MonoBehaviour
 
 
     // Bullet spread.
-    [SerializeField]
-    float inaccuracyMin = 1f;
-    [SerializeField]
-    float inaccuracyMax = 10f;
+    [SerializeField] float inaccuracyMin = 1f;
+    [SerializeField] float inaccuracyMax = 10f;
 
     // How far bullets can travel.
-    [SerializeField]
-    float bulletRange = 500f;
+    [SerializeField] float bulletRange = 500f;
 
     // Damage per bullet
-    [SerializeField]
-    int bulletDamageMin = 5;
-    [SerializeField]
-    int bulletDamageMax = 15;
+    [SerializeField] int bulletDamageMin = 5;
+    [SerializeField] int bulletDamageMax = 15;
+
+    // Force per bullet
+    [SerializeField] int minBulletsForce = 10;  // The number of bullets which must hit before force is applied.
+    [SerializeField] float forcePerBullet = 0.2f;
 
     // Bullet Color
     [SerializeField] Color bulletColor1;
@@ -50,9 +49,14 @@ public class Gun : MonoBehaviour
     bool firedMissiles = false;
     float missileSineRange = 0f;  // The sine range during which the missile launcher is active.
 
+    // USED DURING SHOOTING
+    int bulletsPerBurst;
+    int bulletsHitThisBurst = 0;
+
     /* PREFABS */
     public GameObject bulletPrefab;
     public GameObject bulletStrikePrefab;
+    [SerializeField] GameObject bulletStrikeEnemyPrefab;
     public AudioSource shootAudio;
     public AudioSource bulletStrikeAudio;
     public GameObject muzzleFlash;
@@ -104,7 +108,7 @@ public class Gun : MonoBehaviour
     void Update()
     {
         // Get new firing variables based on current oscillation.
-        int bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
+        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
         float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
         float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
         shootAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
@@ -173,6 +177,8 @@ public class Gun : MonoBehaviour
     // Firing a burst of bullets.
     void FireBurst(int numberOfBullets, float inaccuracy)
     {
+        bulletsHitThisBurst = 0;
+
         // Play shooting sound.
         shootAudio.Play();
 
@@ -216,7 +222,6 @@ public class Gun : MonoBehaviour
         RaycastHit hit;
         if (Physics.SphereCast(bulletSpawnTransform.position, 0.4f, bulletSpawnTransform.up, out hit, bulletRange, (1 << 8) | (1 << 13) | (1 << 14)))
         {
-
             // Show particle effect
             Instantiate(bulletStrikePrefab, hit.point, Quaternion.identity);
 
@@ -229,6 +234,20 @@ public class Gun : MonoBehaviour
             // If the bullet hit an enemy...
             if (hit.collider.tag == "Enemy")
             {
+                bulletsHitThisBurst++;
+
+                Instantiate(bulletStrikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
+
+                if (bulletsPerBurst >= minBulletsForce)
+                {
+                    hit.collider.GetComponent<Enemy>().BecomePhysicsObject(0.5f);
+                    //hit.collider.GetComponent<Rigidbody>().AddForceAtPosition(
+                    //    Vector3.Normalize(hit.point - GameManager.instance.player.transform.position)*forcePerBullet,
+                    //    hit.point,
+                    //    ForceMode.Impulse);
+                    hit.collider.GetComponent<Rigidbody>().AddExplosionForce(forcePerBullet, hit.point, 1f, 0.01f, ForceMode.Impulse);
+                }
+
                 // Tell the enemy it was hurt.
                 hit.collider.GetComponent<Enemy>().HP -= Random.Range(bulletDamageMin, bulletDamageMax);
 

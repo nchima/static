@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 public class Enemy : MonoBehaviour
 {
@@ -52,6 +53,8 @@ public class Enemy : MonoBehaviour
     bool isPhysicsObject = false;
     float physicsObjectTimer = 0f;
     [SerializeField] protected int _HP = 20; // Health points.
+    Color baseColor;
+    Color baseEmissionColor;
     public int HP
     {
         get
@@ -69,7 +72,17 @@ public class Enemy : MonoBehaviour
 
             else
             {
+                foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
+                {
+                    mr.material.color = Color.red;
+                    mr.material.SetColor("_EmissionColor", Color.yellow);
+
+                    mr.material.DOColor(baseColor, 1.25f);
+                    mr.material.DOColor(baseEmissionColor, "_EmissionColor", 0.75f);
+                }
+
                 hurtAudio.Play();
+
                 _HP = value;
             }
         }
@@ -80,6 +93,7 @@ public class Enemy : MonoBehaviour
 
     // USED FOR MATERIAL MODIFICATION
     protected Material myMaterial;
+    [SerializeField] GameObject myGeometry;
     protected float noiseTime;
     [SerializeField] protected float noiseSpeed = 0.01f;
     protected float noiseRange = 100f;
@@ -100,6 +114,11 @@ public class Enemy : MonoBehaviour
         gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
         myAnimator = GetComponent<Animator>();
         myMaterial = GetComponentInChildren<MeshRenderer>().material;
+
+        // Remember my starting color.
+        baseColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.color;
+        baseEmissionColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.GetColor("_EmissionColor");
+        //Debug.Log(baseColor);
 
         // Get a random starting point for Perlin noise.
         noiseTime = Random.Range(-1000f, 1000f);
