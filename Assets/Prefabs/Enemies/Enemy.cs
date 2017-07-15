@@ -10,6 +10,20 @@ public class Enemy : MonoBehaviour
 
     // USED FOR MOVING
     [HideInInspector] public bool willAttack = false;
+    protected bool canSeePlayer
+    {
+        get
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, playerTransform.position - transform.position, out hit, 200f, 1 << 8 | 1 << 16))
+            {
+                //Debug.Log("Enemy saw " + hit.transform.name);
+                if (hit.transform == playerTransform) return true;
+            }
+
+            return false;
+        }
+    }
     [SerializeField] protected float moveRandomness = 40f;    // When I move, I move towards a spot inside a circle of this diameter surrounding the player.
     [SerializeField] protected float moveDistanceMin = 1f;  // The shortest distance I will move.
     [SerializeField] protected float moveDistanceMax = 15f; // The longest distance I will move.
@@ -102,5 +116,4 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
 }

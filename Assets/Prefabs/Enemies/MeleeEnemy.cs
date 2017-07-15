@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class MeleeEnemy : Enemy {
 
@@ -52,6 +53,12 @@ public class MeleeEnemy : Enemy {
 
     void MoveTowardsPlayer()
     {
+        float tempMoveSpeed = moveSpeed;
+        if (!canSeePlayer)
+        {
+            tempMoveSpeed *= 0.5f;
+        }
+
         // Check if the player is near enough to attack.
         if (Vector3.Distance(playerTransform.position, transform.position) <= attackRange)
         {
@@ -79,8 +86,10 @@ public class MeleeEnemy : Enemy {
         directionTowardsPlayer.y = 0f;
         directionTowardsPlayer = Quaternion.AngleAxis(flankingAngle, Vector3.up) * directionTowardsPlayer;
 
+        transform.DORotate(Quaternion.LookRotation(directionTowardsPlayer).eulerAngles, 0.5f);
+
         navMeshAgent.SetDestination(transform.position + directionTowardsPlayer.normalized * 5f);
-        Vector3 nextPosition = transform.position + navMeshAgent.desiredVelocity.normalized * moveSpeed * Time.deltaTime;
+        Vector3 nextPosition = transform.position + navMeshAgent.desiredVelocity.normalized * tempMoveSpeed * Time.deltaTime;
         //Vector3 velocity = (Vector3.Normalize(navMeshAgent.desiredVelocity) + Vector3.Normalize(gameManager.playerVelocity)*2.5f) * moveSpeed * Time.deltaTime;
         //Vector3 nextPosition = transform.position + velocity;
 
@@ -89,6 +98,7 @@ public class MeleeEnemy : Enemy {
 
     void ChargeUpAttack()
     {
+        transform.DORotate(Quaternion.LookRotation(playerTransform.position - transform.position).eulerAngles, 0.5f);
         // Do nothing and wait for animation to finish.
     }
 
@@ -98,6 +108,7 @@ public class MeleeEnemy : Enemy {
         {
             Vector3 attackDirection = Vector3.Normalize(playerTransform.position - transform.position);
             attackFinishPoint = transform.position + attackDirection * (Vector3.Distance(transform.position, playerTransform.position) + attackDistance);
+            transform.LookAt(attackFinishPoint);
             Debug.DrawLine(transform.position, attackFinishPoint, Color.green, 10f);
             isAttacking = true;
 
