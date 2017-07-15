@@ -79,7 +79,9 @@ public class Explosion : MonoBehaviour {
 
         else if (collider.tag == "Enemy")
         {
-            collider.GetComponent<Rigidbody>().AddExplosionForce(pushForce, transform.position, explosionSphere.transform.localScale.x);
+            Debug.Log("Enemy affected by explosion.");
+            collider.GetComponent<Enemy>().BecomePhysicsObject(1f);
+            collider.GetComponent<Rigidbody>().AddExplosionForce(pushForce, Vector3.Scale(transform.position, new Vector3(1f, -1f, 1f)), explosionRadius, pushForce*0.2f, ForceMode.Impulse);
             collider.GetComponent<Enemy>().HP -= Random.Range(damageMin, damageMax);
         }
 

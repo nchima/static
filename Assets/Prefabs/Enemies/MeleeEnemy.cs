@@ -8,12 +8,20 @@ public class MeleeEnemy : Enemy {
 	enum BehaviorState { MovingTowardsPlayer, ChargingUpAttack, Attacking, FinishingAttack };
     BehaviorState currentState;
 
+    // ANIMATION
+    float rotationSpeedMax = 2000f;
+    float rotationSpeedCurrent;
+    [SerializeField] GameObject geometry;
+    [SerializeField] GameObject meshParticleObject;
+
+    // MOVING
     float flankingAngle = 45f;
 
     // ATTACKING
     bool isAttacking; // Whether we are currently attacking.
     float attackRange = 15f; // We will begin attacking when we are this close to the player.
     float attackDistance { get { return attackRange * 3; } }    // This is how far we 'charge' forward during our attack.
+    float chargeUpDuration = 2.5f;
     float distanceCharged = 0f; // Used to keep track of how far we have charged during our current attack.
     float attackSpeed { get { return moveSpeed * 8; } } // This is how quickly we travel during a charge attack.
     Vector3 attackFinishPoint;  // This is point towards which we charge. (No longer necessary?)
@@ -31,8 +39,18 @@ public class MeleeEnemy : Enemy {
         currentState = BehaviorState.MovingTowardsPlayer;
     }
 
-    private void Update()
+    new void Update()
     {
+        base.Update();
+
+        // Handle animation.
+        if (rotationSpeedCurrent != 0f)
+        {
+            Vector3 newRotation = geometry.transform.localRotation.eulerAngles;
+            newRotation.z += rotationSpeedCurrent * Time.deltaTime;
+            geometry.transform.localRotation = Quaternion.Euler(newRotation);
+        }
+
         switch (currentState)
         {
             case BehaviorState.MovingTowardsPlayer:
@@ -53,6 +71,8 @@ public class MeleeEnemy : Enemy {
 
     void MoveTowardsPlayer()
     {
+        if (!willMove) return;
+
         float tempMoveSpeed = moveSpeed;
         if (!canSeePlayer)
         {
@@ -65,7 +85,7 @@ public class MeleeEnemy : Enemy {
             if (willAttack)
             {
                 navMeshAgent.isStopped = true;
-                myAnimator.SetTrigger("ChargeUp");
+                DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, rotationSpeedMax, chargeUpDuration*0.9f).SetEase(Ease.InQuad).SetUpdate(true);
                 currentState = BehaviorState.ChargingUpAttack;
                 timer = 0f;
                 return;
@@ -99,22 +119,33 @@ public class MeleeEnemy : Enemy {
     void ChargeUpAttack()
     {
         transform.DORotate(Quaternion.LookRotation(playerTransform.position - transform.position).eulerAngles, 0.5f);
-        // Do nothing and wait for animation to finish.
+
+        timer += Time.deltaTime;
+
+        if (timer >= chargeUpDuration)
+        {
+            timer = 0f;
+            Vector3 attackDirection = Vector3.Normalize(playerTransform.position - transform.position);
+            attackFinishPoint = transform.position + attackDirection * (Vector3.Distance(transform.position, playerTransform.position) + attackDistance);
+            transform.LookAt(attackFinishPoint);
+
+            ParticleSystem.EmissionModule em = meshParticleObject.GetComponent<ParticleSystem>().emission;
+            em.enabled = true;
+
+            ParticleSystem.MainModule mm = meshParticleObject.GetComponent<ParticleSystem>().main;
+            //mm.startRotation3D = true;
+            mm.startRotation = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
+
+            Debug.DrawLine(transform.position, attackFinishPoint, Color.green, 10f);
+
+            isAttacking = true;
+            currentState = BehaviorState.Attacking;
+            return;
+        }
     }
 
     void Attack()
     {
-        if (currentState != BehaviorState.Attacking)
-        {
-            Vector3 attackDirection = Vector3.Normalize(playerTransform.position - transform.position);
-            attackFinishPoint = transform.position + attackDirection * (Vector3.Distance(transform.position, playerTransform.position) + attackDistance);
-            transform.LookAt(attackFinishPoint);
-            Debug.DrawLine(transform.position, attackFinishPoint, Color.green, 10f);
-            isAttacking = true;
-
-            currentState = BehaviorState.Attacking;
-        }
-
         //Debug.Log("Attacking");
 
         // Charge towards the player.
@@ -127,11 +158,21 @@ public class MeleeEnemy : Enemy {
 
         if (distanceCharged >= attackDistance || timer >= 1)
         {
-            distanceCharged = 0f;
-            timer = 0f;
-            currentState = BehaviorState.FinishingAttack;
+            CompleteAttack();
             return;
         }
+    }
+
+    void CompleteAttack()
+    {
+        distanceCharged = 0f;
+        timer = 0f;
+        DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, 0f, 1).SetEase(Ease.InQuad).SetUpdate(true);
+
+        ParticleSystem.EmissionModule em = meshParticleObject.GetComponent<ParticleSystem>().emission;
+        em.enabled = false;
+
+        currentState = BehaviorState.FinishingAttack;
     }
 
     void FinishAttack()
@@ -141,6 +182,7 @@ public class MeleeEnemy : Enemy {
         if (timer >= afterAttackPauseTime)
         {
             Debug.Log("Melee enemy resetting.");
+            geometry.transform.DOLocalRotate(Vector3.zero, 0.5f);
             if (Random.value >= 0.5f) flankingAngle *= -1;
             navMeshAgent.isStopped = false;
             currentState = BehaviorState.MovingTowardsPlayer;
@@ -153,6 +195,12 @@ public class MeleeEnemy : Enemy {
         if (collision.collider.tag == "Player")
         {
             gameManager.PlayerHurt();
+        }
+
+        // See if we hit an obstacle.
+        else if ((collision.collider.tag == "Obstacle" || collision.collider.tag == "Wall") && currentState == BehaviorState.Attacking)
+        {
+            CompleteAttack();
         }
     }
 }

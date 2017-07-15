@@ -31,8 +31,10 @@ public class ShootingEnemy : Enemy {
         currentState = BehaviorState.PreparingToMove;
     }
 	
-	void Update ()
+	new void Update ()
     {
+        base.Update();
+
         switch (currentState)
         {
             case BehaviorState.PreparingToMove:
@@ -55,7 +57,7 @@ public class ShootingEnemy : Enemy {
 
     void PrepareToMove()
     {
-        //bool newPositionChosen = false;
+        if (!willMove) return;
 
         // Get a random point in a circle around the player.
         Vector3 nearPlayer = playerTransform.position + Random.insideUnitSphere * moveRandomness;

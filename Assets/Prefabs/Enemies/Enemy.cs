@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour
 
     // USED FOR MOVING
     [HideInInspector] public bool willAttack = false;
+    protected bool willMove = true;
     protected bool canSeePlayer
     {
         get
@@ -24,6 +25,22 @@ public class Enemy : MonoBehaviour
             return false;
         }
     }
+    protected bool isOnGround
+    {
+        get
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 4f) && hit.collider.name == "Floor")
+            {
+                return true;
+            }
+
+            else
+            {
+                return false;
+            }
+        }
+    }
     [SerializeField] protected float moveRandomness = 40f;    // When I move, I move towards a spot inside a circle of this diameter surrounding the player.
     [SerializeField] protected float moveDistanceMin = 1f;  // The shortest distance I will move.
     [SerializeField] protected float moveDistanceMax = 15f; // The longest distance I will move.
@@ -32,6 +49,8 @@ public class Enemy : MonoBehaviour
     protected float moveTimer = 0f;
 
     // USED FOR GETTING HURT
+    bool isPhysicsObject = false;
+    float physicsObjectTimer = 0f;
     [SerializeField] protected int _HP = 20; // Health points.
     public int HP
     {
@@ -87,11 +106,20 @@ public class Enemy : MonoBehaviour
     }
 
 
-    void Update()
+    protected void Update()
     {
         // Change material tiling using Perlin noise. (For the static effect).
         myMaterial.mainTextureScale = new Vector2(MyMath.Map(Mathf.PerlinNoise(noiseTime, 0), 0f, 1f, -noiseRange, noiseRange), 0);
         noiseTime += noiseSpeed;
+
+        if (isPhysicsObject)
+        {
+            physicsObjectTimer -= Time.deltaTime;
+            if (physicsObjectTimer <= 0f && isOnGround)
+            {
+                ReturnToKinematic();
+            }
+        }
     }
 
 
@@ -115,5 +143,24 @@ public class Enemy : MonoBehaviour
             isAlive = false;
             Destroy(gameObject);
         }
+    }
+
+
+    public void BecomePhysicsObject(float duration)
+    {
+        navMeshAgent.enabled = false;
+        willMove = false;
+        GetComponent<Rigidbody>().isKinematic = false;
+        physicsObjectTimer = duration;
+        isPhysicsObject = true;
+    }
+
+
+    void ReturnToKinematic()
+    {
+        navMeshAgent.enabled = true;
+        willMove = true;
+        GetComponent<Rigidbody>().isKinematic = true;
+        isPhysicsObject = false;
     }
 }
