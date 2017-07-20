@@ -117,6 +117,7 @@
     <Compile Include="Assets\Examples\Scripts\RandomWalk.cs" />
     <Compile Include="Assets\Examples\Scripts\SpawnPrefabOnKeyDown.cs" />
     <Compile Include="Assets\KeepBehind.cs" />
+    <Compile Include="Assets\MoveAudioSourceCloseToPlayer.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshLink.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshModifier.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshModifierVolume.cs" />

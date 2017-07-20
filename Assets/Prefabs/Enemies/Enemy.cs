@@ -224,7 +224,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    void ReturnToKinematic()
+    protected void ReturnToKinematic()
     {
         navMeshAgent.enabled = true;
         willMove = true;

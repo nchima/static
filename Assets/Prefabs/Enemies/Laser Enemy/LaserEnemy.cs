@@ -22,6 +22,9 @@ public class LaserEnemy : ShootingEnemy {
     {
         Debug.Log("Derived class");
 
+        ReturnToKinematic();
+        immovable = true;
+
         shotTimer = new Timer(preShotDelay);
 
         navMeshAgent.isStopped = true;
@@ -37,7 +40,7 @@ public class LaserEnemy : ShootingEnemy {
         // Fire a shot.
         if (!shotFired)
         {
-            GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 1.75f, transform.position.z), Quaternion.identity);
+            GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 2.4f, transform.position.z), Quaternion.identity);
             newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
             newShot.GetComponent<LaserShot>().preDamageDuration = preShotDelay;
             lastShot = newShot;

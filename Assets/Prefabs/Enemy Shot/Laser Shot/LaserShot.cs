@@ -19,7 +19,7 @@ public class LaserShot : EnemyShot {
     public enum State { PreDamage, Damage, PostDamage };
     public State state;
 
-    // USED FOR ANIMATION.
+    /* USED FOR AUDIO */
 
     // The child game object which contains all my mesh renderers.
     [SerializeField] GameObject geometry;
@@ -38,6 +38,13 @@ public class LaserShot : EnemyShot {
     const float MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y = 0.5f;
 
     Vector2 currentMaterialOffsetSpeed = Vector2.zero;
+
+
+    /* USED FOR AUDIO */
+
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip firingClip;
+    const float AUDIO_PITCH_MAX = 3f;
 	
 
     new void Start()
@@ -76,6 +83,8 @@ public class LaserShot : EnemyShot {
         geometry.transform.DOScaleZ(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
 
         geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", preDamageDuration * 0.9f);
+
+        audioSource.DOPitch(AUDIO_PITCH_MAX, preDamageDuration * 0.8f).SetEase(Ease.Linear);
     }
 
 
@@ -121,6 +130,13 @@ public class LaserShot : EnemyShot {
             geometry.transform.Find("Outer Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
 
             currentMaterialOffsetSpeed = new Vector2(MATERIAL_OFFSET_SPEED_DAMAGE_STATE_X, MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y);
+
+            audioSource.Stop();
+            audioSource.clip = firingClip;
+            audioSource.loop = false;
+            audioSource.volume = 1f;
+            audioSource.pitch = 0.8f;
+            audioSource.Play();
 
             timer = 0f;
             state = State.Damage;

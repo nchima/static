@@ -23,6 +23,8 @@ public class MeleeEnemy : Enemy {
 
     // MOVING
     float flankingAngle = 70f;
+    FloatRange changeDirectionFrequencyRange = new FloatRange(3f, 10f);
+    float nextDirectionChangeTime;
 
     // ATTACKING
     bool isAttacking; // Whether we are currently attacking.
@@ -41,8 +43,10 @@ public class MeleeEnemy : Enemy {
         base.Start();
 
         // Choose whether to flank the player on their left or their right.
-        flankingAngle *= Random.Range(0.75f, 1f);
-        if (Random.value >= 0.5f) flankingAngle *= -1;
+        GetNewFlankingAngle();
+
+        nextDirectionChangeTime = changeDirectionFrequencyRange.Random;
+        timer = 0f;
 
         originalHumVolume = humAudio.volume;
         originalHumPitch = humAudio.pitch;
@@ -88,6 +92,14 @@ public class MeleeEnemy : Enemy {
         if (!canSeePlayer)
         {
             tempMoveSpeed *= 0.5f;
+        }
+
+        timer += Time.deltaTime;
+        if (timer >= nextDirectionChangeTime)
+        {
+            GetNewFlankingAngle();
+            nextDirectionChangeTime = changeDirectionFrequencyRange.Random;
+            timer = 0f;
         }
 
         // Check if the player is near enough to attack.
@@ -207,9 +219,8 @@ public class MeleeEnemy : Enemy {
         if (timer >= afterAttackPauseTime)
         {
             //Debug.Log("Melee enemy resetting.");
+            GetNewFlankingAngle();
             geometry.transform.DOLocalRotate(Vector3.zero, 0.5f);
-            flankingAngle *= Random.Range(0.75f, 1f);
-            if (Random.value >= 0.5f) flankingAngle *= -1;
             navMeshAgent.isStopped = false;
             currentState = BehaviorState.MovingTowardsPlayer;
         }
@@ -230,5 +241,11 @@ public class MeleeEnemy : Enemy {
             GetComponent<Rigidbody>().MovePosition(transform.position);
             CompleteAttack();
         }
+    }
+
+    void GetNewFlankingAngle()
+    {
+        flankingAngle *= Random.Range(0.75f, 1f);
+        if (Random.value >= 0.5f) flankingAngle *= -1;
     }
 }
