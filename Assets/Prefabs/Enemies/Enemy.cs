@@ -50,12 +50,15 @@ public class Enemy : MonoBehaviour
     protected float moveTimer = 0f;
 
     // USED FOR GETTING HURT
+    protected bool immovable = false; // Whether I can currently be turned into a physics object.
     bool isPhysicsObject = false;
     float physicsObjectTimer = 0f;
     [SerializeField] protected int _HP = 20; // Health points.
-    Color baseColor;
-    Color baseEmissionColor;
-    public int HP
+    float colorLerp = 0f;
+    protected Color baseColor;
+    protected Color baseEmissionColor;
+    int maxHP;
+    public virtual int HP
     {
         get
         {
@@ -74,12 +77,14 @@ public class Enemy : MonoBehaviour
             {
                 foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
                 {
-                    mr.material.color = Color.red;
-                    mr.material.SetColor("_EmissionColor", Color.yellow);
+                    //mr.material.color = Color.red;
+                    mr.material.SetColor("_EmissionColor", Color.red);
 
-                    mr.material.DOColor(baseColor, 1.25f);
+                    //mr.material.DOColor(Color.Lerp(baseColor, Color.red, MyMath.Map(HP, maxHP, 0, 0f, 1f)), 1.25f);
                     mr.material.DOColor(baseEmissionColor, "_EmissionColor", 0.75f);
                 }
+
+                vertexJitterRate += 1f;
 
                 hurtAudio.Play();
 
@@ -90,10 +95,17 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected GameObject deathParticles;
     [SerializeField] protected AudioSource hurtAudio;
     protected bool isAlive = true;
+    List<Vector3[]> originalVertices;
+    [HideInInspector] public float vertexJitterRate = 0f;
+
+    // AUDIO
+    [SerializeField] protected AudioSource humAudio;
+
 
     // USED FOR MATERIAL MODIFICATION
     protected Material myMaterial;
-    [SerializeField] GameObject myGeometry;
+    [SerializeField] protected GameObject myGeometry;
+    protected Color originalEmissionColor;
     protected float noiseTime;
     [SerializeField] protected float noiseSpeed = 0.01f;
     protected float noiseRange = 100f;
@@ -118,7 +130,19 @@ public class Enemy : MonoBehaviour
         // Remember my starting color.
         baseColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.color;
         baseEmissionColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.GetColor("_EmissionColor");
+        originalEmissionColor = baseEmissionColor;
         //Debug.Log(baseColor);
+
+        // Remember max hp.
+        maxHP = HP;
+
+        // Remember original vertex locations.
+        originalVertices = new List<Vector3[]>();
+        MeshFilter[] myMeshFilters = myGeometry.GetComponentsInChildren<MeshFilter>();
+        for (int i = 0; i < myMeshFilters.Length; i++)
+        {
+            originalVertices.Add(myMeshFilters[i].mesh.vertices);
+        }
 
         // Get a random starting point for Perlin noise.
         noiseTime = Random.Range(-1000f, 1000f);
@@ -131,6 +155,8 @@ public class Enemy : MonoBehaviour
         myMaterial.mainTextureScale = new Vector2(MyMath.Map(Mathf.PerlinNoise(noiseTime, 0), 0f, 1f, -noiseRange, noiseRange), 0);
         noiseTime += noiseSpeed;
 
+        foreach(MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.SetColor("_EmissionColor", baseEmissionColor);
+
         if (isPhysicsObject)
         {
             physicsObjectTimer -= Time.deltaTime;
@@ -138,6 +164,27 @@ public class Enemy : MonoBehaviour
             {
                 ReturnToKinematic();
             }
+        }
+
+        vertexJitterRate -= 0.5f;
+        vertexJitterRate = Mathf.Clamp(vertexJitterRate, 0.1f, 20f);
+        if (vertexJitterRate > 0f) JitterVertices();
+    }
+
+
+    void JitterVertices()
+    {
+        MeshFilter[] myMeshFilters = myGeometry.GetComponentsInChildren<MeshFilter>();
+        for (int i = 0; i < myMeshFilters.Length; i++)
+        {
+            Vector3[] myVertices = myMeshFilters[i].mesh.vertices;
+            for (int j = 0; j < myVertices.Length; j++)
+            {
+                myVertices[j] = originalVertices[i][j] + Random.insideUnitSphere * vertexJitterRate * Time.deltaTime;
+            }
+
+            myMeshFilters[i].mesh.vertices = myVertices;
+            myMeshFilters[i].mesh.RecalculateBounds();
         }
     }
 
@@ -152,7 +199,7 @@ public class Enemy : MonoBehaviour
     //}
 
 
-    protected void Die()
+    protected virtual void Die()
     {
         // isAlive is used to make sure that this function is not called more than once.
         if (isAlive)
@@ -167,6 +214,8 @@ public class Enemy : MonoBehaviour
 
     public void BecomePhysicsObject(float duration)
     {
+        if (immovable) return;
+
         navMeshAgent.enabled = false;
         willMove = false;
         GetComponent<Rigidbody>().isKinematic = false;

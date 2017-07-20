@@ -127,12 +127,14 @@
     <Compile Include="Assets\Prefabs\Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Basic Enemy\BasicEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Enemy.cs" />
+    <Compile Include="Assets\Prefabs\Enemies\Laser Enemy\LaserEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\MeleeEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\NavMeshEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\ShootingEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\TankEnemy\TankEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemy Shot\EnemyShot.cs" />
     <Compile Include="Assets\Prefabs\Enemy Shot\Homing Shot\HomingShot.cs" />
+    <Compile Include="Assets\Prefabs\Enemy Shot\Laser Shot\LaserShot.cs" />
     <Compile Include="Assets\Prefabs\Enemy Shot\Normal Shot\NormalShot.cs" />
     <Compile Include="Assets\Prefabs\Player Missile\PlayerMissile.cs" />
     <Compile Include="Assets\Scripts\BatchBillboard.cs" />

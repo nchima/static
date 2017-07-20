@@ -57,7 +57,8 @@ public class Gun : MonoBehaviour
     public GameObject bulletPrefab;
     public GameObject bulletStrikePrefab;
     [SerializeField] GameObject bulletStrikeEnemyPrefab;
-    public AudioSource shootAudio;
+    public AudioSource machineGunAudio;
+    [SerializeField] AudioSource shotgunAudio;
     public AudioSource bulletStrikeAudio;
     public GameObject muzzleFlash;
     [SerializeField] private GameObject missilePrefab;
@@ -111,7 +112,12 @@ public class Gun : MonoBehaviour
         bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
         float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
         float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
-        shootAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+
+        machineGunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        machineGunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
+
+        shotgunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        shotgunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
 
         // Update gun animation state
         animator.SetFloat("Gun State", gameManager.currentSine);
@@ -180,7 +186,8 @@ public class Gun : MonoBehaviour
         bulletsHitThisBurst = 0;
 
         // Play shooting sound.
-        shootAudio.Play();
+        machineGunAudio.Play();
+        shotgunAudio.Play();
 
         transform.parent.SendMessage("IncreaseShake", 0.1f);
 

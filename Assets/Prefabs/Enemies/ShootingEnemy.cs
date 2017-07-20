@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class ShootingEnemy : Enemy {
 
@@ -55,9 +56,11 @@ public class ShootingEnemy : Enemy {
         }
     }
 
-    void PrepareToMove()
+    protected virtual void PrepareToMove()
     {
         if (!willMove) return;
+
+        if (navMeshAgent.isStopped) navMeshAgent.isStopped = false;
 
         // Get a random point in a circle around the player.
         Vector3 nearPlayer = playerTransform.position + Random.insideUnitSphere * moveRandomness;
@@ -88,14 +91,7 @@ public class ShootingEnemy : Enemy {
             {
                 if (canSeePlayer)
                 {
-                    // Set timer for pre shot delay
-                    shotTimer = new Timer(preShotDelay);
-
-                    // Begin the charging up animation.
-                    myAnimator.SetTrigger("ChargeUp");
-
-                    currentState = BehaviorState.PreShooting;
-
+                    ReadyPreShoot();
                     return;
                 }
 
@@ -109,14 +105,7 @@ public class ShootingEnemy : Enemy {
 
             else
             {
-                // Set timer for pre shot delay
-                shotTimer = new Timer(preShotDelay);
-
-                // Begin the charging up animation.
-                myAnimator.SetTrigger("ChargeUp");
-
-                currentState = BehaviorState.PreShooting;
-
+                ReadyPreShoot();
                 return;
             }
         }
@@ -137,16 +126,32 @@ public class ShootingEnemy : Enemy {
         }
     }
 
-    void PreShoot()
+    protected virtual void ReadyPreShoot()
+    {
+        // Set timer for pre shot delay
+        shotTimer = new Timer(preShotDelay);
+
+        navMeshAgent.isStopped = true;
+
+        // Begin the charging up animation.
+        myAnimator.SetTrigger("ChargeUp");
+        DOTween.To(() => baseEmissionColor, x => baseEmissionColor = x, new Color(0.5f, 1f, 1f, 0.9f), 0.8f).SetEase(Ease.InCubic).SetUpdate(true);
+
+        currentState = BehaviorState.PreShooting;
+    }
+
+    protected virtual void PreShoot()
     {
         // Do nothing and wait for charge-up animation to finish.
     }
 
-    void Attack()
+    protected virtual void Attack()
     {
         // Fire a shot.
         GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 1.75f, transform.position.z), Quaternion.identity);
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
+
+        while (baseEmissionColor != originalEmissionColor) baseEmissionColor = originalEmissionColor;
 
         // Set the shot timer for the post shot delay.
         shotTimer = new Timer(postShotDelay);

@@ -106,8 +106,14 @@ public class GameManager : MonoBehaviour {
         playerPositionLast = player.transform.position;
 
         // Update sine
-        //currentSine = Mathf.Sin(sineTime * oscSpeed);
-        currentSine = Mathf.Sin(sineTime);
+        sineTime += Time.deltaTime;
+        currentSine = Mathf.Sin(sineTime * oscSpeed);
+        //currentSine = Mathf.Sin(sineTime);
+        //currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.1f);
+        //if (Input.GetAxis("Horizontal") != 0) currentSine += Input.GetAxis("Horizontal") * 0.05f;
+        //else currentSine = Mathf.Lerp(currentSine, 0f, 0.05f);
+        //else if (currentSine > 0) currentSine -= 0.04f;
+        //currentSine = Mathf.Clamp(currentSine, -1f, 1f);
         //currentSine = MyMath.Map(player.transform.rotation.eulerAngles.y, 0f, 360f, -1f, 1);
 
         // Run idle timer.
@@ -192,6 +198,7 @@ public class GameManager : MonoBehaviour {
             player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
             Physics.gravity *= speedFallGravityMultipier;
             speedFallActivated = true;
+            godMode = true;
         }
 
         // See if the player has touched down.
@@ -259,6 +266,8 @@ public class GameManager : MonoBehaviour {
 
             speedFallActivated = false;
 
+            godMode = false;
+
             playerState = PlayerState.Normal;
         }
     }
@@ -324,7 +333,7 @@ public class GameManager : MonoBehaviour {
     public void BulletHit()
     {
         scoreManager.BulletHit();
-        sineTime += bulletHitSineIncrease;
+        //sineTime += bulletHitSineIncrease;
     }
 
 

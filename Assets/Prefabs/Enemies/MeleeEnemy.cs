@@ -13,17 +13,24 @@ public class MeleeEnemy : Enemy {
     float rotationSpeedCurrent;
     [SerializeField] GameObject geometry;
     [SerializeField] GameObject meshParticleObject;
+    Color attackingColor = new Color(0.5f, 1f, 1f, 0.9f);
+
+    // AUDIO
+    float originalHumVolume;
+    float originalHumPitch;
+    [SerializeField] AudioSource attackAudio;
+
 
     // MOVING
-    float flankingAngle = 45f;
+    float flankingAngle = 70f;
 
     // ATTACKING
     bool isAttacking; // Whether we are currently attacking.
-    float attackRange = 15f; // We will begin attacking when we are this close to the player.
-    float attackDistance { get { return attackRange * 3; } }    // This is how far we 'charge' forward during our attack.
-    float chargeUpDuration = 2.5f;
+    float attackRange = 10f; // We will begin attacking when we are this close to the player.
+    float attackDistance { get { return attackRange * 1; } }    // This is how far we 'charge' forward during our attack.
+    float chargeUpDuration = 1f;
     float distanceCharged = 0f; // Used to keep track of how far we have charged during our current attack.
-    float attackSpeed { get { return moveSpeed * 8; } } // This is how quickly we travel during a charge attack.
+    float attackSpeed { get { return moveSpeed * 5; } } // This is how quickly we travel during a charge attack.
     Vector3 attackFinishPoint;  // This is point towards which we charge. (No longer necessary?)
     float afterAttackPauseTime = 1f;  // How long we pause after attacking.
 
@@ -34,7 +41,11 @@ public class MeleeEnemy : Enemy {
         base.Start();
 
         // Choose whether to flank the player on their left or their right.
+        flankingAngle *= Random.Range(0.75f, 1f);
         if (Random.value >= 0.5f) flankingAngle *= -1;
+
+        originalHumVolume = humAudio.volume;
+        originalHumPitch = humAudio.pitch;
 
         currentState = BehaviorState.MovingTowardsPlayer;
     }
@@ -86,6 +97,12 @@ public class MeleeEnemy : Enemy {
             {
                 navMeshAgent.isStopped = true;
                 DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, rotationSpeedMax, chargeUpDuration*0.9f).SetEase(Ease.InQuad).SetUpdate(true);
+
+                DOTween.To(() => baseEmissionColor, x => baseEmissionColor = x, attackingColor, chargeUpDuration * 0.75f).SetEase(Ease.InCubic).SetUpdate(true);
+
+                humAudio.DOPitch(3f, chargeUpDuration * 0.9f).SetEase(Ease.InQuad);
+                humAudio.DOFade(1f, chargeUpDuration * 0.9f);
+
                 currentState = BehaviorState.ChargingUpAttack;
                 timer = 0f;
                 return;
@@ -124,6 +141,11 @@ public class MeleeEnemy : Enemy {
 
         if (timer >= chargeUpDuration)
         {
+            attackAudio.Play();
+
+            humAudio.DOFade(originalHumVolume, 1f);
+            humAudio.DOPitch(originalHumPitch, 0.5f);
+
             timer = 0f;
             Vector3 attackDirection = Vector3.Normalize(playerTransform.position - transform.position);
             attackFinishPoint = transform.position + attackDirection * (Vector3.Distance(transform.position, playerTransform.position) + attackDistance);
@@ -167,10 +189,13 @@ public class MeleeEnemy : Enemy {
     {
         distanceCharged = 0f;
         timer = 0f;
-        DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, 0f, 1).SetEase(Ease.InQuad).SetUpdate(true);
 
         ParticleSystem.EmissionModule em = meshParticleObject.GetComponent<ParticleSystem>().emission;
         em.enabled = false;
+
+        DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, 0f, 1).SetEase(Ease.InQuad).SetUpdate(true);
+
+        DOTween.To(() => baseEmissionColor, x => baseEmissionColor = x, originalEmissionColor, afterAttackPauseTime * 0.9f).SetEase(Ease.InCubic).SetUpdate(true);
 
         currentState = BehaviorState.FinishingAttack;
     }
@@ -181,8 +206,9 @@ public class MeleeEnemy : Enemy {
         timer += Time.deltaTime;
         if (timer >= afterAttackPauseTime)
         {
-            Debug.Log("Melee enemy resetting.");
+            //Debug.Log("Melee enemy resetting.");
             geometry.transform.DOLocalRotate(Vector3.zero, 0.5f);
+            flankingAngle *= Random.Range(0.75f, 1f);
             if (Random.value >= 0.5f) flankingAngle *= -1;
             navMeshAgent.isStopped = false;
             currentState = BehaviorState.MovingTowardsPlayer;
@@ -200,6 +226,8 @@ public class MeleeEnemy : Enemy {
         // See if we hit an obstacle.
         else if ((collision.collider.tag == "Obstacle" || collision.collider.tag == "Wall") && currentState == BehaviorState.Attacking)
         {
+            Debug.Log("Melee enemy hit obstacle.");
+            GetComponent<Rigidbody>().MovePosition(transform.position);
             CompleteAttack();
         }
     }

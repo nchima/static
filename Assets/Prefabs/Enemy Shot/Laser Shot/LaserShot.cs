@@ -1,0 +1,172 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using DG.Tweening;
+
+public class LaserShot : EnemyShot {
+
+    float inaccuracy = 45f;
+
+    //const float PRE_DAMAGE_DURATION = 0.7f; Actually, this will be set by the firing enemy.
+    public float preDamageDuration;
+    const float DAMAGE_DURATION = 0.7f;
+    const float POST_DAMAGE_DURATION = 0.5f;
+
+    float timer = 0f;
+
+    Vector3 direction;
+
+    public enum State { PreDamage, Damage, PostDamage };
+    public State state;
+
+    // USED FOR ANIMATION.
+
+    // The child game object which contains all my mesh renderers.
+    [SerializeField] GameObject geometry;
+
+    // Values for the thickness of my laser beam at various states.
+    const float INITIAL_BEAM_THICKNESS = 0.01f;
+    const float MAX_PRE_DAMAGE_BEAM_THICKNESS = 0.2f;
+    const float DAMAGE_BEAM_THICKNESS = 2f;
+
+    // Values for the color of my laser beam at various states.
+    [SerializeField] Color finalPreDamageBeamColor;
+    [SerializeField] Color damageColor;
+
+    // Values for the speed at which my material tiling settings change at various stages.
+    const float MATERIAL_OFFSET_SPEED_DAMAGE_STATE_X = 0.1f;
+    const float MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y = 0.5f;
+
+    Vector2 currentMaterialOffsetSpeed = Vector2.zero;
+	
+
+    new void Start()
+    {
+        base.Start();
+
+        state = State.PreDamage;
+
+        // Find the player's x and z position.
+        Vector3 targetPosition = GameManager.instance.player.transform.position;
+        targetPosition = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
+
+        // Get the direction to the player.
+        direction = targetPosition - transform.position;
+        direction.Normalize();
+
+        // Rotate that direction by my inaccuracy.
+        direction = Quaternion.Euler(0, Random.Range(-inaccuracy, inaccuracy), 0) * direction;
+
+        // Raycast in that direction to get the nearest solid collider.
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, direction, out hit, 500f, 1<<8))
+        {
+            // Scale me correctly.
+            geometry.transform.localScale = new Vector3(INITIAL_BEAM_THICKNESS, Vector3.Distance(transform.position, hit.point) * 0.5f, INITIAL_BEAM_THICKNESS);
+
+            // Move my position halfway down the ray.
+            transform.position += (direction * Vector3.Distance(transform.position, hit.point)) * 0.5f;
+
+            // Rotate me correctly.
+            transform.rotation = Quaternion.LookRotation(Vector3.down, direction);
+        }
+
+        // Begin tweening.
+        geometry.transform.DOScaleX(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
+        geometry.transform.DOScaleZ(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
+
+        geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", preDamageDuration * 0.9f);
+    }
+
+
+    new void Update()
+    {
+        base.Update();
+
+        // Handle texture animation.
+        if (currentMaterialOffsetSpeed != Vector2.zero)
+        {
+            foreach(MeshRenderer mr in geometry.GetComponentsInChildren<MeshRenderer>())
+            {
+                Vector2 newOffset = mr.material.mainTextureOffset + currentMaterialOffsetSpeed;
+                mr.material.mainTextureOffset = newOffset;
+            }
+        }
+
+        switch(state)
+        {
+            case State.PreDamage:
+                PreDamage();
+                break;
+            case State.Damage:
+                Damage();
+                break;
+            case State.PostDamage:
+                PostDamage();
+                break;
+        }
+    }
+
+
+    void PreDamage()
+    {
+        timer += Time.deltaTime;
+        if (timer >= preDamageDuration)
+        {
+            // Tween to damage state values.
+            geometry.transform.DOScaleX(DAMAGE_BEAM_THICKNESS, 0.05f);
+            geometry.transform.DOScaleZ(DAMAGE_BEAM_THICKNESS, 0.05f);
+
+            geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(damageColor, "_EmissionColor", 0.05f);
+            geometry.transform.Find("Outer Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
+
+            currentMaterialOffsetSpeed = new Vector2(MATERIAL_OFFSET_SPEED_DAMAGE_STATE_X, MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y);
+
+            timer = 0f;
+            state = State.Damage;
+        }
+    }
+
+    void Damage()
+    {
+        timer += Time.deltaTime;
+        if (timer >= DAMAGE_DURATION)
+        {
+            ReadyPostDamage();
+        }
+    }
+
+    public void ReadyPostDamage()
+    {
+        timer = 0f;
+        state = State.PostDamage;
+
+        // Begin tweening to post damage values.
+        geometry.transform.DOScaleX(INITIAL_BEAM_THICKNESS, 0.05f);
+        geometry.transform.DOScaleZ(INITIAL_BEAM_THICKNESS, 0.05f);
+
+        geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
+        geometry.transform.Find("Outer Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
+
+        currentMaterialOffsetSpeed = new Vector2(MATERIAL_OFFSET_SPEED_DAMAGE_STATE_X * 0.1f, MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y * 0.1f);
+    }
+
+    void PostDamage()
+    {
+        timer += Time.deltaTime;
+        if (timer >= POST_DAMAGE_DURATION)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
+    void OnTriggerEnterChild(Collider other)
+    {
+        if (state == State.Damage && other.transform == GameManager.instance.player.transform)
+        {
+            GameManager.instance.PlayerHurt();
+            GetComponentInChildren<Collider>().enabled = false;
+        }
+    }
+}
