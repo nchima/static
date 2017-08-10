@@ -12,12 +12,14 @@ public class Enemy : MonoBehaviour
     // USED FOR MOVING
     [HideInInspector] public bool willAttack = false;
     protected bool willMove = true;
-    protected bool canSeePlayer
+    public bool canSeePlayer
     {
         get
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, playerTransform.position - transform.position, out hit, 200f, 1 << 8 | 1 << 16))
+            if (Physics.Raycast(transform.position, 
+                playerTransform.position 
+                - transform.position, out hit, 200f, 1 << 8 | 1 << 16))
             {
                 //Debug.Log("Enemy saw " + hit.transform.name);
                 if (hit.transform == playerTransform) return true;
@@ -54,9 +56,6 @@ public class Enemy : MonoBehaviour
     bool isPhysicsObject = false;
     float physicsObjectTimer = 0f;
     [SerializeField] protected int _HP = 20; // Health points.
-    float colorLerp = 0f;
-    protected Color baseColor;
-    protected Color baseEmissionColor;
     int maxHP;
     public virtual int HP
     {
@@ -75,14 +74,18 @@ public class Enemy : MonoBehaviour
 
             else
             {
-                foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
-                {
+                //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
+                //{
                     //mr.material.color = Color.red;
-                    mr.material.SetColor("_EmissionColor", Color.red);
+                    //mr.material.SetColor("_EmissionColor", Color.red);
 
                     //mr.material.DOColor(Color.Lerp(baseColor, Color.red, MyMath.Map(HP, maxHP, 0, 0f, 1f)), 1.25f);
-                    mr.material.DOColor(baseEmissionColor, "_EmissionColor", 0.75f);
-                }
+                    //mr.material.DOColor(originalEmissionColor, "_EmissionColor", 0.75f);
+                //}
+
+                hurtColorCurrent = hurtColorMax;
+                hurtColorLerp = 1f;
+                hurtPulseRate = MyMath.Map((float)HP, 0f, (float)maxHP, 5f, MAX_HURT_PULSE_RATE);
 
                 vertexJitterRate += 1f;
 
@@ -92,6 +95,9 @@ public class Enemy : MonoBehaviour
             }
         }
     }
+    float hurtPulseTime = 0f;
+    float hurtPulseRate = 0f;
+    const float MAX_HURT_PULSE_RATE = 10f;
     [SerializeField] protected GameObject deathParticles;
     [SerializeField] protected AudioSource hurtAudio;
     protected bool isAlive = true;
@@ -101,11 +107,22 @@ public class Enemy : MonoBehaviour
     // AUDIO
     [SerializeField] protected AudioSource humAudio;
 
-
     // USED FOR MATERIAL MODIFICATION
     protected Material myMaterial;
     [SerializeField] protected GameObject myGeometry;
+
+    float colorLerp = 0f;
+    protected Color originalColor;
     protected Color originalEmissionColor;
+    protected Color currentColor;
+    protected Color currentEmissionColor;
+    protected Color attackingColorMax = new Color(0.5f, 1f, 1f, 0.9f);
+    protected Color attackingColorCurrent;
+    protected Color hurtColorMax = new Color(1f, 0f, 0f, 1f);
+    protected Color hurtColorCurrent;
+    float hurtColorLerp = 0f;
+    float attackingColorLerp = 0f;
+
     protected float noiseTime;
     [SerializeField] protected float noiseSpeed = 0.01f;
     protected float noiseRange = 100f;
@@ -128,9 +145,12 @@ public class Enemy : MonoBehaviour
         myMaterial = GetComponentInChildren<MeshRenderer>().material;
 
         // Remember my starting color.
-        baseColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.color;
-        baseEmissionColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.GetColor("_EmissionColor");
-        originalEmissionColor = baseEmissionColor;
+        originalColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.color;
+        originalEmissionColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.GetColor("_EmissionColor");
+        currentColor = originalColor;
+        currentEmissionColor = originalEmissionColor;
+        attackingColorCurrent = originalColor;
+        hurtColorCurrent = originalColor;
         //Debug.Log(baseColor);
 
         // Remember max hp.
@@ -155,7 +175,36 @@ public class Enemy : MonoBehaviour
         myMaterial.mainTextureScale = new Vector2(MyMath.Map(Mathf.PerlinNoise(noiseTime, 0), 0f, 1f, -noiseRange, noiseRange), 0);
         noiseTime += noiseSpeed;
 
-        foreach(MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.SetColor("_EmissionColor", baseEmissionColor);
+        hurtColorLerp -= 0.01f * Time.deltaTime;
+        hurtColorLerp = Mathf.Clamp01(hurtColorLerp);
+        hurtColorCurrent = Color.Lerp(hurtColorCurrent, originalColor, hurtColorLerp);
+        //attackingColorLerp -= 0.01f * Time.deltaTime;
+        //attackingColorLerp = Mathf.Clamp01(attackingColorLerp);
+        //attackingColorCurrent = Color.Lerp(attackingColorCurrent, originalColor, attackingColorLerp);
+
+        if (hurtPulseRate > 0)
+        {
+            hurtPulseTime += hurtPulseRate * Time.deltaTime;
+            if (Mathf.Sin(hurtPulseTime) > 0.75f || (Mathf.Sin(hurtPulseTime) > 1f && Mathf.Sin(hurtPulseTime) < 1.25f)) hurtColorCurrent = hurtColorMax;
+            else hurtColorCurrent = originalColor;
+            //hurtColorCurrent = Color.Lerp(originalColor, hurtColorMax, MyMath.Map(Mathf.Sin(hurtPulseTime), -1f, 1f, 0f, 1f));
+        }
+
+        currentColor = attackingColorCurrent + hurtColorCurrent;
+        currentEmissionColor = attackingColorCurrent + hurtColorCurrent;
+
+        foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
+        {
+            if (mr.transform.childCount > 0)
+            {
+                foreach (MeshRenderer mrs in mr.GetComponentsInChildren<MeshRenderer>())
+                {
+                    SetColor(mrs);
+                }
+            }
+
+            SetColor(mr);
+        }
 
         if (isPhysicsObject)
         {
@@ -167,8 +216,15 @@ public class Enemy : MonoBehaviour
         }
 
         vertexJitterRate -= 0.5f;
-        vertexJitterRate = Mathf.Clamp(vertexJitterRate, 0.1f, 20f);
+        vertexJitterRate = Mathf.Clamp(vertexJitterRate, 0f, 20f);
         if (vertexJitterRate > 0f) JitterVertices();
+    }
+
+
+    void SetColor(MeshRenderer mr)
+    {
+        mr.material.color = currentColor;
+        mr.material.SetColor("_EmissionColor", currentEmissionColor);
     }
 
 
@@ -177,6 +233,10 @@ public class Enemy : MonoBehaviour
         MeshFilter[] myMeshFilters = myGeometry.GetComponentsInChildren<MeshFilter>();
         for (int i = 0; i < myMeshFilters.Length; i++)
         {
+            //myMeshRenderers[i].material.SetFloat("_VertexJitterX", Random.Range(-1f, 1f) * vertexJitterRate * Time.deltaTime);
+            //myMeshRenderers[i].material.SetFloat("_VertexJitterY", Random.Range(-1f, 1f) * vertexJitterRate * Time.deltaTime);
+            //myMeshRenderers[i].material.SetFloat("_VertexJitterZ", Random.Range(-1f, 1f) * vertexJitterRate * Time.deltaTime);
+
             Vector3[] myVertices = myMeshFilters[i].mesh.vertices;
             for (int j = 0; j < myVertices.Length; j++)
             {
@@ -205,7 +265,7 @@ public class Enemy : MonoBehaviour
         if (isAlive)
         {
             Instantiate(deathParticles, transform.position, Quaternion.identity);
-            gameManager.KilledEnemy();
+            gameManager.PlayerKilledEnemy();
             isAlive = false;
             Destroy(gameObject);
         }

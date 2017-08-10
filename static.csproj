@@ -102,6 +102,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\CrossHair.cs" />
+    <Compile Include="Assets\CrossHairLines.cs" />
     <Compile Include="Assets\Examples\Scripts\AgentLinkMover.cs" />
     <Compile Include="Assets\Examples\Scripts\ClickToMove.cs" />
     <Compile Include="Assets\Examples\Scripts\DestroyOnTrigger.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Assets\Examples\Scripts\RandomInstancing.cs" />
     <Compile Include="Assets\Examples\Scripts\RandomWalk.cs" />
     <Compile Include="Assets\Examples\Scripts\SpawnPrefabOnKeyDown.cs" />
+    <Compile Include="Assets\GenerateNoise.cs" />
     <Compile Include="Assets\KeepBehind.cs" />
     <Compile Include="Assets\MoveAudioSourceCloseToPlayer.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshLink.cs" />
@@ -138,6 +141,8 @@
     <Compile Include="Assets\Prefabs\Enemy Shot\Laser Shot\LaserShot.cs" />
     <Compile Include="Assets\Prefabs\Enemy Shot\Normal Shot\NormalShot.cs" />
     <Compile Include="Assets\Prefabs\Player Missile\PlayerMissile.cs" />
+    <Compile Include="Assets\Revolver.cs" />
+    <Compile Include="Assets\Rotator.cs" />
     <Compile Include="Assets\Scripts\BatchBillboard.cs" />
     <Compile Include="Assets\Scripts\CameraResShifter.cs" />
     <Compile Include="Assets\Scripts\Explosion.cs" />
@@ -164,6 +169,8 @@
     <Compile Include="Assets\Scripts\ScreenShake.cs" />
     <Compile Include="Assets\Scripts\TextureOffsetChanger.cs" />
     <Compile Include="Assets\Scripts\Timer.cs" />
+    <Compile Include="Assets\ShotgunCharge.cs" />
+    <Compile Include="Assets\SpecialBarManager.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceAgentTests.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceLinkTests.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceModifierTests.cs" />
@@ -177,6 +184,9 @@
     <None Include="Assets\Asset Packages\DOTween\DOTween50.xml" />
     <None Include="Assets\Asset Packages\DOTween\Editor\DOTweenEditor.XML" />
     <None Include="Assets\Asset Packages\DOTween\readme.txt" />
+    <None Include="Assets\Prefabs\Bullet\Bullet Shader.shader" />
+    <None Include="Assets\Prefabs\Enemies\EnemyShader.shader" />
+    <None Include="Assets\Prefabs\Enemies\NewSurfaceShader.shader" />
     <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
     <None Include="Assets\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />

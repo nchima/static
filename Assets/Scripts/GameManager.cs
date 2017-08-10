@@ -8,7 +8,9 @@ using DG.Tweening;
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
-    [SerializeField] bool godMode;
+    [SerializeField] public bool godMode;
+    [SerializeField] float invincibilityTime = 0.5f;
+    float invincibilityTimer = 0f;
 
     // AUDIO
     [SerializeField] private AudioSource levelWinAudio;   // The audio source that plays when the player completes a level.
@@ -20,8 +22,8 @@ public class GameManager : MonoBehaviour {
     public LevelGenerator levelGenerator;  // A reference to the level generator script.
 
     // USED FOR FALLING INTO THE NEXT LEVEL
-    enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
-    PlayerState playerState = PlayerState.Normal;
+    [HideInInspector] public enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
+    [HideInInspector] public PlayerState playerState = PlayerState.Normal;
     float pauseAfterLevelCompleteLength = 1.5f;
     float fallingSequenceTimer;
     float lookUpSpeed = 0.25f;
@@ -45,7 +47,7 @@ public class GameManager : MonoBehaviour {
     public bool gameStarted = false;
 
     // USED FOR SINE TRACKER
-    public float currentSine;
+    [HideInInspector] public float currentSine;
     public float oscSpeed = 0.3f;
     [SerializeField] float bulletHitSineIncrease = 0.01f;
     float sineTime = 0.0f;
@@ -58,9 +60,12 @@ public class GameManager : MonoBehaviour {
     public static GameManager instance;
     Transform floor;    // The floor of the game environment.
     ScoreManager scoreManager;
+    SpecialBarManager specialBarManager;
     HealthManager healthManager;
-    Gun gun;
+    [HideInInspector] public Gun gun;
+    [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public GameObject player;
+    [SerializeField] GameObject gunSliderBorder;
 
 
     void Awake()
@@ -89,18 +94,25 @@ public class GameManager : MonoBehaviour {
         //currentSine = Mathf.Sin(Time.time * oscSpeed);
         currentSine = Mathf.Sin(sineTime);
 
+        savedGravity = Physics.gravity;
+
         // Get references
         floor = GameObject.Find("Floor").transform;
         scoreManager = GetComponent<ScoreManager>();
+        specialBarManager = GetComponent<SpecialBarManager>();
         healthManager = GetComponent<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
         gun = FindObjectOfType<Gun>();
+        noiseGenerator = GetComponent<GenerateNoise>();
         player = GameObject.Find("FPSController");
     }
 
 
     private void Update()
     {
+        // Debug Stuff
+        if (Input.GetKeyDown(KeyCode.M)) GetComponentInChildren<MusicManager>().dontPlayMusic = !GetComponentInChildren<MusicManager>().dontPlayMusic;
+
         // Keep track of player velocity.
         playerVelocity = (player.transform.position - playerPositionLast) / Time.deltaTime;
         playerPositionLast = player.transform.position;
@@ -108,13 +120,41 @@ public class GameManager : MonoBehaviour {
         // Update sine
         sineTime += Time.deltaTime;
         currentSine = Mathf.Sin(sineTime * oscSpeed);
-        //currentSine = Mathf.Sin(sineTime);
-        //currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.1f);
+
+        //currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.5f);
+
         //if (Input.GetAxis("Horizontal") != 0) currentSine += Input.GetAxis("Horizontal") * 0.05f;
+        
         //else currentSine = Mathf.Lerp(currentSine, 0f, 0.05f);
         //else if (currentSine > 0) currentSine -= 0.04f;
-        //currentSine = Mathf.Clamp(currentSine, -1f, 1f);
+
+        currentSine = Mathf.Clamp(currentSine, -1f, 1f);
+
         //currentSine = MyMath.Map(player.transform.rotation.eulerAngles.y, 0f, 360f, -1f, 1);
+
+        // See if a special move is ready to be fired.
+        bool sineInPosition = currentSine <= -1f + gun.specialMoveSineRange || currentSine >= 1f - gun.specialMoveSineRange;
+        if (sineInPosition)
+        {
+            Debug.Log("Sine in position.");
+            gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.Lerp(Color.red, Color.yellow, Random.value);
+            //Debug.Log(gunSliderBorder.GetComponent<MeshRenderer>().material);
+        }
+
+        else
+        {
+            gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
+        }
+
+        gun.shotgunChargeIsReady = currentSine <= -1f + gun.specialMoveSineRange && specialBarManager.barIsFull;
+        gun.missilesAreReady = currentSine >= 1f - gun.specialMoveSineRange && specialBarManager.barIsFull;
+
+        if (gun.shotgunChargeIsReady || gun.missilesAreReady)
+        {
+            specialBarManager.FlashBar();
+        }
+
+        //else gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
 
         // Run idle timer.
         if (gameStarted)
@@ -143,6 +183,15 @@ public class GameManager : MonoBehaviour {
             timeSinceLastInput += Time.deltaTime;
         }
 
+        // Check invincibility frames.
+        invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
+        if (invincibilityTimer > 0)
+        {
+            godMode = true;
+            invincibilityTimer -= Time.deltaTime;
+        }
+        else godMode = false;
+
         // Handle falling.
         if (playerState != PlayerState.Normal)
         {
@@ -162,6 +211,27 @@ public class GameManager : MonoBehaviour {
     }
 
 
+    public void PlayerUsedSpecialMove()
+    {
+        specialBarManager.PlayerUsedSpecialMove();
+    }
+
+
+    public void BeginShotgunCharge()
+    {
+        godMode = true;
+        player.GetComponentInChildren<ShotgunCharge>().BeginCharge();
+        player.GetComponent<FirstPersonController>().isDoingShotgunCharge = true;
+    }
+
+
+    public void CompleteShotgunCharge()
+    {
+        player.GetComponent<FirstPersonController>().isDoingShotgunCharge = false;
+        player.GetComponentInChildren<ShotgunCharge>().EndCharge();
+    }
+
+
     void PauseAfterLevelComplete()
     {
         fallingSequenceTimer += Time.deltaTime;
@@ -169,21 +239,28 @@ public class GameManager : MonoBehaviour {
 
         if (fallingSequenceTimer >= pauseAfterLevelCompleteLength)
         {
+            ReturnToFullSpeed();
+
+            Physics.gravity = savedGravity;
+
+            speedFallActivated = false;
+
+            godMode = false;
+
             // Generate new level.
             levelNumber += 1;
             levelGenerator.Generate();
 
             // Set up variables for falling.
             playerTouchedDown = false;
-            gun.canShoot = false;
             savedRegularMoveSpeed = player.GetComponent<FirstPersonController>().m_WalkSpeed;
             player.GetComponent<FirstPersonController>().m_WalkSpeed = playerMoveSpeedWhenFalling;
-            savedGravity = Physics.gravity;
 
             // Begin rotating player camera to face down.
             player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.2f, RotateMode.Fast);
 
             // Begin falling sequence.
+            specialBarManager.freezeDecay = true;
             playerState = PlayerState.FallingIntoLevel;
         }
     }
@@ -207,29 +284,43 @@ public class GameManager : MonoBehaviour {
             // Begin rotating camera back to regular position.
             player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed*0.6f, RotateMode.Fast);
 
-            // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
-            DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
-            FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
-
-            // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
-            gun.canShoot = true;
-            DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, gun.burstsPerSecondModifierMax, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
-
             // Reset movement variables.
             player.GetComponent<Rigidbody>().isKinematic = true;
             player.GetComponent<FirstPersonController>().m_WalkSpeed = savedRegularMoveSpeed;
 
-            // Fire shockwave.
-            if (speedFallActivated)
-            {
-                Vector3 shockwavePosition = player.transform.position;
-                shockwavePosition.y = 0f;
-                Instantiate(shockwavePrefab, shockwavePosition, Quaternion.identity);
-            }
-
             fallingSequenceTimer = 0f;
+
+            if (speedFallActivated) InstantiateShockwave(shockwavePrefab, gun.burstsPerSecondModifierMax);
+
+            specialBarManager.freezeDecay = true;
+
             playerState = PlayerState.FiringShockwave;
         }
+    }
+
+
+    public void InstantiateShockwave(GameObject prefab, float gunRate)
+    {
+        // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
+        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+        FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
+
+        // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
+        gun.canShoot = true;
+        DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+
+        Vector3 shockwavePosition = player.transform.position;
+        shockwavePosition.y = 0f;
+        Instantiate(prefab, shockwavePosition, Quaternion.identity);
+    }
+
+
+    public void ReturnToFullSpeed()
+    {
+        // Begin tweening time scale, gun burst rate, and music pitch back to normal.
+        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+        DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+        FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(1f, 1f).SetUpdate(true);
     }
 
 
@@ -238,16 +329,15 @@ public class GameManager : MonoBehaviour {
         fallingSequenceTimer += Time.deltaTime;
         if (fallingSequenceTimer >= lookUpSpeed)
         {
+            ReturnToFullSpeed();
+
+            gun.canShoot = true;
+
             // Allow enemies to start attacking.
             foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
             {
                 enemy.GetComponent<Enemy>().willAttack = true;
             }
-
-            // Begin tweening time scale, gun burst rate, and music pitch back to normal.
-            DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-            DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-            FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(1f, 1f).SetUpdate(true);
 
             // Destroy any obstacles that the player is touching.
             Collider[] overlappingSolids = Physics.OverlapCapsule(player.transform.position, -player.transform.up * 10f, player.GetComponent<CharacterController>().radius, 1 << 8);
@@ -273,10 +363,12 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void KilledEnemy()
+    public void PlayerKilledEnemy()
     {
         // See if the player has killed all the enemies in this level. If so, change the level.
-        scoreManager.KilledEnemy();
+        scoreManager.PlayerKilledEnemy();
+        specialBarManager.PlayerKilledEnemy();
+
         currentEnemyAmt -= 1;
 
         if (currentEnemyAmt <= 0)
@@ -288,9 +380,15 @@ public class GameManager : MonoBehaviour {
 
     public void LevelBeaten()
     {
+        if (playerState == PlayerState.PauseAfterLevelComplete) return;
+
         levelWinAudio.Play();
 
         scoreManager.LevelBeaten();
+
+        gun.canShoot = false;
+
+        //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
 
         // Disable the floor's collider so the player falls through it.
         floor.GetComponent<Collider>().enabled = false;
@@ -304,13 +402,15 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerHurt()
+    public void PlayerWasHurt()
     {
         if (godMode) return;
+        invincibilityTimer += invincibilityTime;
 
         scoreManager.GetHurt();
+        specialBarManager.PlayerWasHurt();
 
-        healthManager.playerHealth -= 1;
+        healthManager.playerHealth -= 4;
 
         // If health is now less than zero, trigger a game over.
         if (healthManager.playerHealth <= 0)
@@ -330,9 +430,10 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void BulletHit()
+    public void BulletHitEnemy()
     {
-        scoreManager.BulletHit();
+        scoreManager.BulletHitEnemy();
+        specialBarManager.BulletHitEnemy();
         //sineTime += bulletHitSineIncrease;
     }
 

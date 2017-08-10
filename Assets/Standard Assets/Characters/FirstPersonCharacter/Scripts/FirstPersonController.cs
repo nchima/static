@@ -42,6 +42,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private bool m_Jumping;
         private AudioSource m_AudioSource;
 
+        public bool isDoingShotgunCharge = false;
+        float shotGunChargeSpeed = 100f;
+        float shotGunChargeMouseSensitivity = 0.76f;
+
         // Use this for initialization
         private void Start()
         {
@@ -61,7 +65,11 @@ namespace UnityStandardAssets.Characters.FirstPerson
         // Update is called once per frame
         private void Update()
         {
+            if (isDoingShotgunCharge) m_MouseLook.XSensitivityRun = shotGunChargeMouseSensitivity;
+            else m_MouseLook.XSensitivityRun = 3.5f;
+
             RotateView();
+
             // the jump state needs to read here to make sure it is not missed
             if (!m_Jump)
             {
@@ -96,8 +104,17 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             float speed;
             GetInput(out speed);
+
             // always move along the camera forward as it is the direction that it being aimed at
-            Vector3 desiredMove = transform.forward*m_Input.y + transform.right*m_Input.x;
+            Vector3 desiredMove;
+
+            if (!isDoingShotgunCharge) desiredMove = transform.forward * m_Input.y + transform.right * m_Input.x;
+            else
+            {
+                desiredMove = transform.forward + transform.right * m_Input.x;
+                //Debug.Log(desiredMove);
+                speed = shotGunChargeSpeed;
+            }
 
             // get a normal for the surface that is being touched to move along it
             RaycastHit hitInfo;
@@ -105,9 +122,18 @@ namespace UnityStandardAssets.Characters.FirstPerson
                                m_CharacterController.height/2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
-            m_MoveDir.x = desiredMove.x*speed;
-            m_MoveDir.z = desiredMove.z*speed;
+            //if (!isDoingShotgunCharge)
+            //{
+                m_MoveDir.x = desiredMove.x * speed;
+                m_MoveDir.z = desiredMove.z * speed;
+            //}
 
+            //else
+            //{
+            //    m_MoveDir.x = desiredMove.x * m_WalkSpeed;
+            //    m_MoveDir.z = desiredMove.z * speed;
+            //    Debug.Log(m_MoveDir);
+            //}
 
             if (m_CharacterController.isGrounded)
             {
@@ -121,10 +147,12 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     m_Jumping = true;
                 }
             }
+
             else
             {
                 m_MoveDir += Physics.gravity*m_GravityMultiplier*Time.fixedDeltaTime;
             }
+
             m_CollisionFlags = m_CharacterController.Move(m_MoveDir*Time.fixedDeltaTime);
 
             ProgressStepCycle(speed);
@@ -208,6 +236,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             float vertical = CrossPlatformInputManager.GetAxis("Vertical");
 
             bool waswalking = m_IsWalking;
+            bool wasDoingShotgunCharge = isDoingShotgunCharge;
 
 #if !MOBILE_INPUT
             // On standalone builds, walk/run speed is modified by a key press.
@@ -226,10 +255,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             // handle speed change to give an fov kick
             // only if the player is going to a run, is running and the fovkick is to be used
-            if (m_IsWalking != waswalking && m_UseFovKick && m_CharacterController.velocity.sqrMagnitude > 0)
+            if (isDoingShotgunCharge != wasDoingShotgunCharge && m_UseFovKick && m_CharacterController.velocity.sqrMagnitude > 0)
             {
                 StopAllCoroutines();
-                StartCoroutine(!m_IsWalking ? m_FovKick.FOVKickUp() : m_FovKick.FOVKickDown());
+                StartCoroutine(!isDoingShotgunCharge ? m_FovKick.FOVKickUp() : m_FovKick.FOVKickDown());
             }
         }
 

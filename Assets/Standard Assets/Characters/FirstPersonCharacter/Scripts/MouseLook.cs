@@ -8,7 +8,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
     public class MouseLook
     {
         public float XSensitivityWalk = 2f;
-        public float XSensitivityRun = 4f;
+        public float XSensitivityRun = 3.5f;
         public float YSensitivity = 2f;
         public bool clampVerticalRotation = true;
         public float MinimumX = -90F;
@@ -32,7 +32,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         public void LookRotation(Transform character, Transform camera)
         {
             // Set sensitivity based on whether a controller button is being held down.
-            float XSensitivity = XSensitivityWalk;
+            float XSensitivity = XSensitivityRun;
             if (Input.GetAxisRaw("Run") != 0) XSensitivity = XSensitivityRun;
 
             float yRot = CrossPlatformInputManager.GetAxis("Mouse X") * XSensitivity;

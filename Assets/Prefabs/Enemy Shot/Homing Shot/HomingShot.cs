@@ -127,20 +127,20 @@ public class HomingShot : EnemyShot {
 
 
         // See if I should go dormant
-        if (transform.position.y < 1f)
-        {
-            GetComponent<Rigidbody>().isKinematic = true;
-            GetComponent<Rigidbody>().useGravity = true;
-            state = HomingShotState.Dormant;
-        }
+        //if (transform.position.y < 1f)
+        //{
+        //    GetComponent<Rigidbody>().isKinematic = true;
+        //    GetComponent<Rigidbody>().useGravity = true;
+        //    state = HomingShotState.Dormant;
+        //}
 
         // Lock on when I'm at the peak of my arc.
-        //if (velocity.y <= 0f)
-        //{
-        //    Debug.Log("Homing shot locking onto player.");
-        //    currentTarget = playerTransform.position;
-        //    state = HomingShotState.LockedOn;
-        //}
+        if (velocity.y <= 0f)
+        {
+            //Debug.Log("Homing shot locking onto player.");
+            currentTarget = playerTransform.position;
+            state = HomingShotState.LockedOn;
+        }
 
         MoveToTarget();
     }
@@ -164,7 +164,7 @@ public class HomingShot : EnemyShot {
             //    currentTarget = new Vector3(transform.position.x, 0f, transform.position.z);
             //}
 
-            Debug.Log("Homing shot lost target.");
+            //Debug.Log("Homing shot lost target.");
             currentTarget = gameManager.player.transform.position;
             state = HomingShotState.NotLockedOn;
             return;

@@ -74,7 +74,7 @@ public class Explosion : MonoBehaviour {
             {
                 if (hit.transform != collider.transform) return;
             }
-            gameManager.PlayerHurt();
+            gameManager.PlayerWasHurt();
         }
 
         else if (collider.tag == "Enemy")

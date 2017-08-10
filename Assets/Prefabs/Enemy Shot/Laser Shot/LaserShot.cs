@@ -10,7 +10,7 @@ public class LaserShot : EnemyShot {
     //const float PRE_DAMAGE_DURATION = 0.7f; Actually, this will be set by the firing enemy.
     public float preDamageDuration;
     const float DAMAGE_DURATION = 0.7f;
-    const float POST_DAMAGE_DURATION = 0.5f;
+    public  float postDamageDuration = 0.5f;
 
     float timer = 0f;
 
@@ -36,6 +36,8 @@ public class LaserShot : EnemyShot {
     // Values for the speed at which my material tiling settings change at various stages.
     const float MATERIAL_OFFSET_SPEED_DAMAGE_STATE_X = 0.1f;
     const float MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y = 0.5f;
+
+    [SerializeField] GameObject sphere1, sphere2;
 
     Vector2 currentMaterialOffsetSpeed = Vector2.zero;
 
@@ -70,17 +72,24 @@ public class LaserShot : EnemyShot {
         {
             // Scale me correctly.
             geometry.transform.localScale = new Vector3(INITIAL_BEAM_THICKNESS, Vector3.Distance(transform.position, hit.point) * 0.5f, INITIAL_BEAM_THICKNESS);
+            sphere1.transform.localScale = Vector3.one * INITIAL_BEAM_THICKNESS;
+            sphere2.transform.localScale = Vector3.one * INITIAL_BEAM_THICKNESS;
 
             // Move my position halfway down the ray.
             transform.position += (direction * Vector3.Distance(transform.position, hit.point)) * 0.5f;
 
             // Rotate me correctly.
             transform.rotation = Quaternion.LookRotation(Vector3.down, direction);
+
+            sphere1.transform.position = hit.point;
+            sphere2.transform.position = hit.point + (-direction * Vector3.Distance(transform.position, hit.point) * 2f);
         }
 
         // Begin tweening.
         geometry.transform.DOScaleX(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
         geometry.transform.DOScaleZ(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
+        sphere1.transform.DOScale(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
+        sphere2.transform.DOScale(MAX_PRE_DAMAGE_BEAM_THICKNESS, preDamageDuration * 0.8f);
 
         geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", preDamageDuration * 0.9f);
 
@@ -125,6 +134,8 @@ public class LaserShot : EnemyShot {
             // Tween to damage state values.
             geometry.transform.DOScaleX(DAMAGE_BEAM_THICKNESS, 0.05f);
             geometry.transform.DOScaleZ(DAMAGE_BEAM_THICKNESS, 0.05f);
+            sphere1.transform.DOScale(DAMAGE_BEAM_THICKNESS, 0.05f);
+            sphere2.transform.DOScale(DAMAGE_BEAM_THICKNESS, 0.05f);
 
             geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(damageColor, "_EmissionColor", 0.05f);
             geometry.transform.Find("Outer Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
@@ -160,6 +171,8 @@ public class LaserShot : EnemyShot {
         // Begin tweening to post damage values.
         geometry.transform.DOScaleX(INITIAL_BEAM_THICKNESS, 0.05f);
         geometry.transform.DOScaleZ(INITIAL_BEAM_THICKNESS, 0.05f);
+        sphere1.transform.DOScale(INITIAL_BEAM_THICKNESS, 0.05f);
+        sphere2.transform.DOScale(INITIAL_BEAM_THICKNESS, 0.05f);
 
         geometry.transform.Find("Inner Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
         geometry.transform.Find("Outer Tube").GetComponent<MeshRenderer>().material.DOColor(finalPreDamageBeamColor, "_EmissionColor", 0.05f);
@@ -170,7 +183,7 @@ public class LaserShot : EnemyShot {
     void PostDamage()
     {
         timer += Time.deltaTime;
-        if (timer >= POST_DAMAGE_DURATION)
+        if (timer >= postDamageDuration)
         {
             Destroy(gameObject);
         }
@@ -181,7 +194,7 @@ public class LaserShot : EnemyShot {
     {
         if (state == State.Damage && other.transform == GameManager.instance.player.transform)
         {
-            GameManager.instance.PlayerHurt();
+            GameManager.instance.PlayerWasHurt();
             GetComponentInChildren<Collider>().enabled = false;
         }
     }

@@ -12,10 +12,15 @@ public class LevelGenerator : MonoBehaviour {
     // Enemies
     int numberOfEnemies;
     [SerializeField] int basicEnemiesAddedPerLevel = 7;
-    [SerializeField] int firstLevelWithTankEnemies = 3;
+
+    [SerializeField] int firstLevelWithTankEnemies = 2;
     [SerializeField] int tankEnemiesAddedPerLevel = 1;
+
     [SerializeField] int firstLevelWithMeleeEnemies = 2;
     [SerializeField] int meleeEnemiesAddedPerLevel = 3;
+
+    [SerializeField] int firstLevelWithLaserEnemies = 5;
+    [SerializeField] int laserEnemiesAddedPerLevel = 1; 
 
     // Guaranteed Empty Space
     [SerializeField] FloatRange emptyAreaRange = new FloatRange(0.25f, 0.75f);   // Guaranteed empty space as percentage of level's total area.
@@ -37,6 +42,7 @@ public class LevelGenerator : MonoBehaviour {
     [SerializeField] private GameObject basicEnemyPrefab;
     [SerializeField] private GameObject tankEnemyPrefab;
     [SerializeField] private GameObject meleeEnemyPrefab;
+    [SerializeField] private GameObject laserEnemyPrefab;
     [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] GameObject emptySpacePrefab;
 
@@ -91,33 +97,42 @@ public class LevelGenerator : MonoBehaviour {
             PlaceObstacle();
         }
 
-        for (int i = 0; i < emptySpaces.Count * 2; i++)
+        for (int i = 0; i < Random.Range(5, emptySpaces.Count); i++)
         {
             PlaceColumn();
         }
 
         obstacleContainer.transform.position = new Vector3(0f, -19.59f, 0f);
 
-        for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++) {
-            PlaceEnemy(basicEnemyPrefab);
-        }
+        //for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++) {
+        //    PlaceEnemy(basicEnemyPrefab);
+        //}
 
-        GenerateNavMesh();
+        //GenerateNavMesh();
 
-        if (gameManager.levelNumber >= firstLevelWithTankEnemies)
+        //if (gameManager.levelNumber >= firstLevelWithTankEnemies)
+        //{
+        //    for (int i = 0; i < (gameManager.levelNumber - firstLevelWithTankEnemies + 1) * tankEnemiesAddedPerLevel; i++)
+        //    {
+        //        PlaceEnemy(tankEnemyPrefab);
+        //    }
+        //}
+
+        //if (gameManager.levelNumber >= firstLevelWithMeleeEnemies)
+        //{
+        //    for (int i = 0; i < (gameManager.levelNumber - firstLevelWithMeleeEnemies + 1) * meleeEnemiesAddedPerLevel; i++)
+        //    {
+        //        PlaceEnemy(meleeEnemyPrefab);
+        //    }
+        //}
+
+        for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++)
         {
-            for (int i = 0; i < (gameManager.levelNumber - firstLevelWithTankEnemies + 1) * tankEnemiesAddedPerLevel; i++)
-            {
-                PlaceEnemy(tankEnemyPrefab);
-            }
-        }
-
-        if (gameManager.levelNumber >= firstLevelWithMeleeEnemies)
-        {
-            for (int i = 0; i < (gameManager.levelNumber - firstLevelWithMeleeEnemies + 1) * meleeEnemiesAddedPerLevel; i++)
-            {
-                PlaceEnemy(meleeEnemyPrefab);
-            }
+            float rand = Random.value;
+            if (rand <= 0.25f) PlaceEnemy(basicEnemyPrefab);
+            else if (rand <= 0.5f) PlaceEnemy(tankEnemyPrefab);
+            else if (rand <= 0.75f) PlaceEnemy(meleeEnemyPrefab);
+            else PlaceEnemy(laserEnemyPrefab);
         }
 
         //Debug.Log("Number of enemies: " + numberOfEnemies);
@@ -183,8 +198,8 @@ public class LevelGenerator : MonoBehaviour {
                     plazaTransformChosen = true;
                 }
 
-                //loopSafeguard2++;
-                //if (loopSafeguard2 > 1000) break;
+                loopSafeguard2++;
+                if (loopSafeguard2 > 1000) break;
             }
 
             newPlaza.transform.localScale = newPlazaScale;
@@ -235,8 +250,8 @@ public class LevelGenerator : MonoBehaviour {
             //Debug.Log("Number of empty spaces: " + emptySpaces.Count);
             //Debug.Log("Total Empty Area: " + currentPlazaArea + ", Empty Area To Fill: " + emptyArea);
 
-            //loopSafeguard1++;
-            //if (loopSafeguard1 > 1000) break;
+            loopSafeguard1++;
+            if (loopSafeguard1 > 1000) break;
         }
     }
 

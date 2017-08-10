@@ -5,7 +5,7 @@ public class NormalShot : EnemyShot {
 
 	[SerializeField] private float speed = 2f;  // The speed at which I travel.
     private Vector3 direction;   // The direction in which I travel.
-    float inaccuracy = 45f;
+    float inaccuracy = 30f;
 
 
 	new void Start ()

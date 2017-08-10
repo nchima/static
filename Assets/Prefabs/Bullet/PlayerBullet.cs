@@ -9,6 +9,12 @@ public class PlayerBullet : MonoBehaviour
     private bool isOnScreen;    // Whether this bullet is being fired.
 
 
+    private void Start()
+    {
+        GetComponent<MeshRenderer>().material.mainTexture = GameManager.instance.noiseGenerator.noiseTex;
+    }
+
+
     private void Update()
     {
         // If this bullet is currently onscreen, track how long it has been on screen for.

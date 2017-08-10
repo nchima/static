@@ -105,6 +105,7 @@ public class ShootingEnemy : Enemy {
 
             else
             {
+                shotTimer = new Timer(Random.Range(shotTimerMin, shotTimerMax));
                 ReadyPreShoot();
                 return;
             }
@@ -135,7 +136,9 @@ public class ShootingEnemy : Enemy {
 
         // Begin the charging up animation.
         myAnimator.SetTrigger("ChargeUp");
-        DOTween.To(() => baseEmissionColor, x => baseEmissionColor = x, new Color(0.5f, 1f, 1f, 0.9f), 0.8f).SetEase(Ease.InCubic).SetUpdate(true);
+        //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.8f * Time.deltaTime);
+        DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, attackingColorMax, preShotDelay * 0.8f).SetEase(Ease.InCubic).SetUpdate(true);
+        transform.Find("Geometry").DOLookAt(playerTransform.position, preShotDelay * 0.8f).SetEase(Ease.InCubic);
 
         currentState = BehaviorState.PreShooting;
     }
@@ -143,6 +146,7 @@ public class ShootingEnemy : Enemy {
     protected virtual void PreShoot()
     {
         // Do nothing and wait for charge-up animation to finish.
+        //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.1f);
     }
 
     protected virtual void Attack()
@@ -151,7 +155,7 @@ public class ShootingEnemy : Enemy {
         GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 1.75f, transform.position.z), Quaternion.identity);
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
 
-        while (baseEmissionColor != originalEmissionColor) baseEmissionColor = originalEmissionColor;
+        DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, originalColor, postShotDelay * 0.1f).SetEase(Ease.Linear).SetUpdate(true);
 
         // Set the shot timer for the post shot delay.
         shotTimer = new Timer(postShotDelay);

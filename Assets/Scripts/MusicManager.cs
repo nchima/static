@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class MusicManager : MonoBehaviour {
 
-    [SerializeField] bool dontPlayMusic = false;
+    public bool dontPlayMusic = false;
 
 	[SerializeField] private AudioClip[] tracks;    // An array holding references to the music tracks I will choose from.
     Stack<AudioClip> trackStack;
@@ -37,7 +37,11 @@ public class MusicManager : MonoBehaviour {
 
     void Update()
     {
-        if (dontPlayMusic) return;
+        if (dontPlayMusic)
+        {
+            audioSource.Stop();
+            return;
+        }
 
         if (!audioSource.isPlaying)
         {

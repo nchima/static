@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityStandardAssets.Characters.FirstPerson;
 using System.Collections;
 
 public class Gun : MonoBehaviour
@@ -35,10 +36,19 @@ public class Gun : MonoBehaviour
     [SerializeField] Color bulletColor1;
     [SerializeField] Color bulletColor2;
 
+    [SerializeField] GameObject crosshair;
+
     // How quickly the gun oscillates between extremes.
     [SerializeField] float oscSpeed = 0.3f;
 
     [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
+
+    /* GENERAL SPECIAL MOVE STUFF */
+    public float specialMoveSineRange = 0.1f;
+    public bool shotgunChargeIsReady;
+    public bool missilesAreReady;
+    Color specialMoveReadyColor1 = Color.yellow;
+    Color specialMoveReadyColor2 = Color.red;
 
     /* MISSILE STUFF */
     [SerializeField] float missileCooldown = 0.15f;  // Time in between firing individual missiles.
@@ -47,7 +57,9 @@ public class Gun : MonoBehaviour
     float missileTimer;
     bool firingMissiles = false;
     bool firedMissiles = false;
-    float missileSineRange = 0f;  // The sine range during which the missile launcher is active.
+
+    /* SHOTGUN CHARGE STUFF */
+    bool isDoingShotgunCharge = false;
 
     // USED DURING SHOOTING
     int bulletsPerBurst;
@@ -62,7 +74,6 @@ public class Gun : MonoBehaviour
     public AudioSource bulletStrikeAudio;
     public GameObject muzzleFlash;
     [SerializeField] private GameObject missilePrefab;
-
 
     /* REFERENCES */
     GameManager gameManager;
@@ -108,19 +119,16 @@ public class Gun : MonoBehaviour
 
     void Update()
     {
-        // Get new firing variables based on current oscillation.
-        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
-        float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
-        float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
-
-        machineGunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        machineGunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
-
-        shotgunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        shotgunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
+        // Handle crosshair.
+        if (TestBurst())
+            crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = true;
+        else
+            crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = false;
 
         // Update gun animation state
         animator.SetFloat("Gun State", gameManager.currentSine);
+
+        bulletColor = Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(gameManager.currentSine, -1f, 1f, 0f, 1f));
 
         // Run shot timer.
         timeSinceLastShot += Time.deltaTime;
@@ -131,28 +139,37 @@ public class Gun : MonoBehaviour
             firedMissiles = false;
         }
 
-        /* Firing missile launcher */
-        if (canShoot && gameManager.currentSine >= missileSineRange && !firingMissiles && !firedMissiles)
+        /* Firing special moves */
+        foreach(MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
         {
-            if (Input.GetButton("Fire2") || Input.GetAxisRaw("Fire2") != 0)
+            if (shotgunChargeIsReady || missilesAreReady) mr.material.color = Color.Lerp(specialMoveReadyColor1, specialMoveReadyColor2, Random.Range(0f, 1f));
+            else mr.material.color = Color.black;
+        }
+
+        if (canShoot && (Input.GetButton("Fire2") || Input.GetAxisRaw("Fire2") != 0))
+        {
+            if (missilesAreReady && !firingMissiles && !firedMissiles)
             {
+                gameManager.PlayerUsedSpecialMove();
                 missilesFired = 0;
                 missileTimer = 0f;
                 firingMissiles = true;
             }
+
+            else if (shotgunChargeIsReady)
+            {
+                gameManager.PlayerUsedSpecialMove();
+                isDoingShotgunCharge = true;
+                gameManager.BeginShotgunCharge();
+            }
         }
 
+        // Perform special move if necessary.
         if (firingMissiles) FireMissiles();
+        else if (isDoingShotgunCharge) DoShotgunCharge();
 
         /* Firing normal bullets */
-        else if (canShoot && (Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) && timeSinceLastShot >= 1 / burstsPerSecond)
-        {
-            // Fire a burst
-            FireBurst(bulletsPerBurst, inaccuracy);
-
-            // Reset timer.
-            timeSinceLastShot = 0f;
-        }
+        if (Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) FireBurst();
     }
 
 
@@ -180,9 +197,81 @@ public class Gun : MonoBehaviour
     }
 
 
-    // Firing a burst of bullets.
-    void FireBurst(int numberOfBullets, float inaccuracy)
+    void DoShotgunCharge()
     {
+        if (Input.GetButtonUp("Fire2") || Input.GetAxisRaw("Fire2") == 0)
+        {
+            isDoingShotgunCharge = false;
+            gameManager.CompleteShotgunCharge();
+        }
+    }
+
+
+    bool TestBurst()
+    {
+        // Get new firing variables based on current oscillation.
+        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
+        float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
+        float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
+
+        machineGunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        machineGunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
+
+        shotgunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        shotgunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
+
+        bulletsHitThisBurst = 0;
+
+        // Fire the specified number of test bullets.
+        for (int i = 0; i < bulletsPerBurst; i++)
+        {
+            // Rotate bullet spawner to get the direction of the next bullet.
+            bulletSpawnTransform.localRotation = Quaternion.Euler(new Vector3(90 + Random.insideUnitCircle.x * inaccuracy, 0, Random.insideUnitCircle.y * inaccuracy));
+
+            // Raycast to see if the bullet hit an object and to see where it hit.
+            RaycastHit hit;
+            if (Physics.SphereCast(bulletSpawnTransform.position, 0.4f, bulletSpawnTransform.up, out hit, bulletRange, (1 << 8) | (1 << 13) | (1 << 14)))
+            {
+                // If the bullet hit an enemy...
+                if (hit.collider.tag == "Enemy")
+                {
+                    bulletsHitThisBurst++;
+                }
+            }
+        }
+
+        if (bulletsHitThisBurst >= bulletsPerBurst - 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    // Firing a burst of bullets.
+    public void FireBurst()
+    {
+        // Get new firing variables based on current oscillation.
+        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
+        float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
+        float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
+
+        machineGunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        machineGunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
+
+        shotgunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        shotgunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
+
+        //Debug.Log("Bursts Per Second: " + burstsPerSecond + ", 1 / burstsPerSecond: " + 1/burstsPerSecond + ", Time since last shot: " + timeSinceLastShot);
+        if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond)
+        {
+            Debug.Log("Returning");
+            return;
+        }
+
         bulletsHitThisBurst = 0;
 
         // Play shooting sound.
@@ -205,10 +294,12 @@ public class Gun : MonoBehaviour
         bulletColor = Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(gameManager.currentSine, -1f, 1f, 0f, 1f));
 
         // Fire the specified number of bullets.
-        for (int i = 0; i < numberOfBullets; i++)
+        for (int i = 0; i < bulletsPerBurst; i++)
         {
             FireBullet(inaccuracy);
         }
+
+        timeSinceLastShot = 0f;
     }
 
 
@@ -259,7 +350,7 @@ public class Gun : MonoBehaviour
                 hit.collider.GetComponent<Enemy>().HP -= Random.Range(bulletDamageMin, bulletDamageMax);
 
                 // Tell the score controller that the player hit an enemy with a bullet.
-                gameManager.BulletHit();
+                gameManager.BulletHitEnemy();
 
                 // We only want to play the bullet strike sound once, not once for every bullet that hit an enemy. So set a bool which tells the sound to play
                 // later on.
@@ -270,7 +361,6 @@ public class Gun : MonoBehaviour
             {
                 hit.collider.gameObject.GetComponent<HomingShot>().GotShot(hit.point);
             }
-
         }
 
         // If the bullet did not strike anything give it a generic size and position.
@@ -287,8 +377,8 @@ public class Gun : MonoBehaviour
         }
 
         // Set bullet color
-        //bullets[bulletIndex].GetComponent<MeshRenderer>().material.color = bulletColor;
-        //bullets[bulletIndex].GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", bulletColor);
+        bullets[bulletIndex].GetComponent<MeshRenderer>().material.color = bulletColor;
+        bullets[bulletIndex].GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", bulletColor);
 
         // Fire bullet.
         bullets[bulletIndex].GetComponent<PlayerBullet>().GetFired(

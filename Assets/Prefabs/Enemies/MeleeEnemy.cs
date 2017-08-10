@@ -23,13 +23,13 @@ public class MeleeEnemy : Enemy {
 
     // MOVING
     float flankingAngle = 70f;
-    FloatRange changeDirectionFrequencyRange = new FloatRange(3f, 10f);
+    FloatRange changeDirectionFrequencyRange = new FloatRange(5f, 8f);
     float nextDirectionChangeTime;
 
     // ATTACKING
     bool isAttacking; // Whether we are currently attacking.
     float attackRange = 10f; // We will begin attacking when we are this close to the player.
-    float attackDistance { get { return attackRange * 1; } }    // This is how far we 'charge' forward during our attack.
+    float attackDistance { get { return attackRange * 1.5f; } }    // This is how far we 'charge' forward during our attack.
     float chargeUpDuration = 1f;
     float distanceCharged = 0f; // Used to keep track of how far we have charged during our current attack.
     float attackSpeed { get { return moveSpeed * 5; } } // This is how quickly we travel during a charge attack.
@@ -38,10 +38,11 @@ public class MeleeEnemy : Enemy {
 
     float timer = 0f;
 
+
     new void Start()
     {
         base.Start();
-
+        
         // Choose whether to flank the player on their left or their right.
         GetNewFlankingAngle();
 
@@ -110,7 +111,8 @@ public class MeleeEnemy : Enemy {
                 navMeshAgent.isStopped = true;
                 DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, rotationSpeedMax, chargeUpDuration*0.9f).SetEase(Ease.InQuad).SetUpdate(true);
 
-                DOTween.To(() => baseEmissionColor, x => baseEmissionColor = x, attackingColor, chargeUpDuration * 0.75f).SetEase(Ease.InCubic).SetUpdate(true);
+                //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.75f * Time.deltaTime);
+                DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, attackingColorMax, chargeUpDuration * 0.75f).SetEase(Ease.InCubic).SetUpdate(true);
 
                 humAudio.DOPitch(3f, chargeUpDuration * 0.9f).SetEase(Ease.InQuad);
                 humAudio.DOFade(1f, chargeUpDuration * 0.9f);
@@ -207,7 +209,7 @@ public class MeleeEnemy : Enemy {
 
         DOTween.To(() => rotationSpeedCurrent, x => rotationSpeedCurrent = x, 0f, 1).SetEase(Ease.InQuad).SetUpdate(true);
 
-        DOTween.To(() => baseEmissionColor, x => baseEmissionColor = x, originalEmissionColor, afterAttackPauseTime * 0.9f).SetEase(Ease.InCubic).SetUpdate(true);
+        DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, originalColor, afterAttackPauseTime * 0.9f).SetEase(Ease.InCubic).SetUpdate(true);
 
         currentState = BehaviorState.FinishingAttack;
     }
@@ -229,13 +231,13 @@ public class MeleeEnemy : Enemy {
     private void OnCollisionEnter(Collision collision)
     {
         // See if we hit the player.
-        if (collision.collider.tag == "Player")
+        if (collision.collider.tag == "Player" && currentState == BehaviorState.Attacking)
         {
-            gameManager.PlayerHurt();
+            gameManager.PlayerWasHurt();
         }
 
         // See if we hit an obstacle.
-        else if ((collision.collider.tag == "Obstacle" || collision.collider.tag == "Wall") && currentState == BehaviorState.Attacking)
+        else if ((collision.collider.tag == "Obstacle" || collision.collider.tag == "Wall") && currentState == BehaviorState.Attacking || currentState == BehaviorState.FinishingAttack)
         {
             Debug.Log("Melee enemy hit obstacle.");
             GetComponent<Rigidbody>().MovePosition(transform.position);

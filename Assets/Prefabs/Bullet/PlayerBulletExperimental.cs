@@ -139,7 +139,7 @@ public class PlayerBulletExperimental : MonoBehaviour
                 //hit.transform.GetComponent<Enemy>().HP -= Random.Range(gun.bulletDamageMin, gun.bulletDamageMax);
 
                 // Tell the score controller that the player hit an enemy with a bullet.
-                gameManager.BulletHit();
+                gameManager.BulletHitEnemy();
             }
 
             else if (hit.transform.name.Contains("Homing Shot"))

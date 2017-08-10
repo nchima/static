@@ -61,7 +61,7 @@ public class EnemyShot : MonoBehaviour {
 
         else if (collider.tag == "Player")
         {
-            gameManager.PlayerHurt();
+            gameManager.PlayerWasHurt();
 
             // Destroy self.
             Detonate();
