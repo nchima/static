@@ -86,6 +86,11 @@ public class LevelGenerator : MonoBehaviour {
             Destroy(shot.gameObject);
         }
 
+        foreach (PlayerMissile playerMissile in FindObjectsOfType<PlayerMissile>())
+        {
+            Destroy(playerMissile.gameObject);
+        }
+
         SetupWallsAndFloor();
 
         SetupEmptySpace();

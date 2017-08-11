@@ -396,9 +396,6 @@ public class GameManager : MonoBehaviour {
         // Initiate falling sequence.
         fallingSequenceTimer = 0f;
         playerState = PlayerState.PauseAfterLevelComplete;
-
-        // Generate a new level.
-        //levelGenerator.Invoke("Generate", 1.4f);
     }
 
 
