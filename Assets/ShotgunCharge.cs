@@ -92,7 +92,7 @@ public class ShotgunCharge : MonoBehaviour {
     void FireShockwave()
     {
         GameManager.instance.InstantiateShockwave(shockwavePrefab, 50f);
-        GameManager.instance.godMode = false;
+        GameManager.instance.forceInvincibility = false;
         capturedEnemies.Clear();
         isFiringShockwave = true;
     }

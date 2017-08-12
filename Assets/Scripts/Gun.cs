@@ -146,6 +146,13 @@ public class Gun : MonoBehaviour
             else mr.material.color = Color.black;
         }
 
+        //if (Input.GetButton("Fire2"))
+        //{
+        //    missilesFired = 0;
+        //    missileTimer = 0f;
+        //    firingMissiles = true;
+        //}
+
         if (canShoot && (Input.GetButton("Fire2") || Input.GetAxisRaw("Fire2") != 0))
         {
             if (missilesAreReady && !firingMissiles && !firedMissiles)

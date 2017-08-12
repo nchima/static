@@ -231,7 +231,7 @@ public class MeleeEnemy : Enemy {
     private void OnCollisionEnter(Collision collision)
     {
         // See if we hit the player.
-        if (collision.collider.tag == "Player" && currentState == BehaviorState.Attacking)
+        if (collision.collider.tag == "Player" && (currentState == BehaviorState.Attacking || currentState == BehaviorState.FinishingAttack))
         {
             gameManager.PlayerWasHurt();
         }

@@ -8,7 +8,8 @@ using DG.Tweening;
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
-    [SerializeField] public bool godMode;
+    [HideInInspector] public bool invincible;
+    [SerializeField] public bool forceInvincibility;
     [SerializeField] float invincibilityTime = 0.5f;
     float invincibilityTimer = 0f;
 
@@ -124,7 +125,7 @@ public class GameManager : MonoBehaviour {
         //currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.5f);
 
         //if (Input.GetAxis("Horizontal") != 0) currentSine += Input.GetAxis("Horizontal") * 0.05f;
-        
+
         //else currentSine = Mathf.Lerp(currentSine, 0f, 0.05f);
         //else if (currentSine > 0) currentSine -= 0.04f;
 
@@ -184,13 +185,14 @@ public class GameManager : MonoBehaviour {
         }
 
         // Check invincibility frames.
+        if (forceInvincibility) invincible = true;
         invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
         if (invincibilityTimer > 0)
         {
-            godMode = true;
+            invincible = true;
             invincibilityTimer -= Time.deltaTime;
         }
-        else godMode = false;
+        else if (!forceInvincibility) invincible = false;
 
         // Handle falling.
         if (playerState != PlayerState.Normal)
@@ -219,7 +221,7 @@ public class GameManager : MonoBehaviour {
 
     public void BeginShotgunCharge()
     {
-        godMode = true;
+        invincible = true;
         player.GetComponentInChildren<ShotgunCharge>().BeginCharge();
         player.GetComponent<FirstPersonController>().isDoingShotgunCharge = true;
     }
@@ -245,7 +247,7 @@ public class GameManager : MonoBehaviour {
 
             speedFallActivated = false;
 
-            godMode = false;
+            forceInvincibility = false;
 
             // Generate new level.
             levelNumber += 1;
@@ -275,7 +277,7 @@ public class GameManager : MonoBehaviour {
             player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
             Physics.gravity *= speedFallGravityMultipier;
             speedFallActivated = true;
-            godMode = true;
+            forceInvincibility = true;
         }
 
         // See if the player has touched down.
@@ -356,7 +358,7 @@ public class GameManager : MonoBehaviour {
 
             speedFallActivated = false;
 
-            godMode = false;
+            forceInvincibility = false;
 
             playerState = PlayerState.Normal;
         }
@@ -401,7 +403,7 @@ public class GameManager : MonoBehaviour {
 
     public void PlayerWasHurt()
     {
-        if (godMode) return;
+        if (invincible) return;
         invincibilityTimer += invincibilityTime;
 
         scoreManager.GetHurt();
