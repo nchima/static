@@ -342,7 +342,12 @@ public class GameManager : MonoBehaviour {
             }
 
             // Destroy any obstacles that the player is touching.
-            Collider[] overlappingSolids = Physics.OverlapCapsule(player.transform.position, -player.transform.up * 10f, player.GetComponent<CharacterController>().radius, 1 << 8);
+            Collider[] overlappingSolids = Physics.OverlapCapsule(
+                player.transform.position, 
+                player.transform.position + Vector3.down * 10f, 
+                player.GetComponent<CharacterController>().radius, 
+                1 << 8);
+
             for (int i = 0; i < overlappingSolids.Length; i++)
             {
                 if (overlappingSolids[i].tag == "Obstacle")
