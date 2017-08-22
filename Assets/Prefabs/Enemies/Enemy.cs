@@ -33,13 +33,14 @@ public class Enemy : MonoBehaviour
         get
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, 4f) && hit.collider.name == "Floor")
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f) && hit.collider.name == "Floor")
             {
                 return true;
             }
 
             else
             {
+                Debug.Log("Ground check returned false. ");
                 return false;
             }
         }
@@ -208,9 +209,12 @@ public class Enemy : MonoBehaviour
 
         if (isPhysicsObject)
         {
+            //Debug.Log(gameObject.name + " is physics object.");
+
             physicsObjectTimer -= Time.deltaTime;
             if (physicsObjectTimer <= 0f && isOnGround)
             {
+                //Debug.Log(gameObject.name + " returning to kinematic.");
                 ReturnToKinematic();
             }
         }
@@ -276,7 +280,7 @@ public class Enemy : MonoBehaviour
     {
         if (immovable) return;
 
-        navMeshAgent.enabled = false;
+        if (navMeshAgent != null) navMeshAgent.enabled = false;
         willMove = false;
         GetComponent<Rigidbody>().isKinematic = false;
         physicsObjectTimer = duration;

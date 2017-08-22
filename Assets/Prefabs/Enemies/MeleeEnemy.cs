@@ -28,7 +28,7 @@ public class MeleeEnemy : Enemy {
 
     // ATTACKING
     bool isAttacking; // Whether we are currently attacking.
-    float attackRange = 10f; // We will begin attacking when we are this close to the player.
+    float attackRange = 15f; // We will begin attacking when we are this close to the player.
     float attackDistance { get { return attackRange * 1.5f; } }    // This is how far we 'charge' forward during our attack.
     float chargeUpDuration = 1f;
     float distanceCharged = 0f; // Used to keep track of how far we have charged during our current attack.

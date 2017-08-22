@@ -31,8 +31,9 @@ public class ScreenShake : MonoBehaviour {
         // Handle ambient drift.
         currentDriftPosition = new Vector3(
             originalPosition.x + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.x + driftNoiseOffset.x, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
-            originalPosition.y + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.y + driftNoiseOffset.y, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
-            originalPosition.z);
+            originalPosition.y + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.x + 18321231027373f, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
+            originalPosition.z + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.y + driftNoiseOffset.y, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax)
+            );
 
         driftNoiseTime.x += DRIFT_NOISE_SPEED;
         driftNoiseTime.y += DRIFT_NOISE_SPEED;
@@ -41,7 +42,7 @@ public class ScreenShake : MonoBehaviour {
         if (currentShake > 0f)
         {
             // Move around all randomly.
-			transform.position = currentDriftPosition + new Vector3(Random.insideUnitCircle.x, Random.insideUnitCircle.y, 0) * shakeAmount;
+			transform.position = currentDriftPosition + Random.insideUnitSphere * shakeAmount;
 
             // Decrease current shake.
 			currentShake -= Time.deltaTime * decreaseFactor;
@@ -53,14 +54,14 @@ public class ScreenShake : MonoBehaviour {
 			currentShake = 0.0f;
 
             // Move back towards original position.
-            if (Vector3.Distance(transform.position, currentDriftPosition) > 0.01f)
-            {
+            //if (Vector3.Distance(transform.position, currentDriftPosition) > 0.01f)
+            //{
                 Vector3 newPosition = Vector3.Lerp(transform.position, currentDriftPosition, moveBackSpeed * Time.deltaTime);
                 transform.position = newPosition;
-            }
+            //}
 
             // Vibrate to encourage z fighting.
-            transform.position = transform.position + new Vector3(Random.insideUnitCircle.x, Random.insideUnitCircle.y, 0) * vibrateAmount;
+            transform.position = transform.position + Random.insideUnitSphere * vibrateAmount;
         }
     }
 

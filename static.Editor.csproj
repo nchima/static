@@ -180,6 +180,8 @@
     <None Include="Assets\Prefabs\Bullet\Bullet Shader.shader" />
     <None Include="Assets\Prefabs\Enemies\EnemyShader.shader" />
     <None Include="Assets\Prefabs\Enemies\NewSurfaceShader.shader" />
+    <None Include="Assets\Shaders\ColorMask.shader" />
+    <None Include="Assets\Shaders\InvertFilter.shader" />
     <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
     <None Include="Assets\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
     <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />

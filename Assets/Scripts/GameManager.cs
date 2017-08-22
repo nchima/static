@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour {
         bool sineInPosition = currentSine <= -1f + gun.specialMoveSineRange || currentSine >= 1f - gun.specialMoveSineRange;
         if (sineInPosition)
         {
-            Debug.Log("Sine in position.");
+            //Debug.Log("Sine in position.");
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.Lerp(Color.red, Color.yellow, Random.value);
             //Debug.Log(gunSliderBorder.GetComponent<MeshRenderer>().material);
         }
@@ -259,7 +259,7 @@ public class GameManager : MonoBehaviour {
             player.GetComponent<FirstPersonController>().m_WalkSpeed = playerMoveSpeedWhenFalling;
 
             // Begin rotating player camera to face down.
-            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.2f, RotateMode.Fast);
+            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
 
             // Begin falling sequence.
             specialBarManager.freezeDecay = true;
@@ -372,6 +372,7 @@ public class GameManager : MonoBehaviour {
         specialBarManager.PlayerKilledEnemy();
 
         currentEnemyAmt -= 1;
+        Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
 
         if (currentEnemyAmt <= 0)
         {

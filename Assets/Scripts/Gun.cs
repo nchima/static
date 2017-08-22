@@ -275,7 +275,7 @@ public class Gun : MonoBehaviour
         //Debug.Log("Bursts Per Second: " + burstsPerSecond + ", 1 / burstsPerSecond: " + 1/burstsPerSecond + ", Time since last shot: " + timeSinceLastShot);
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond)
         {
-            Debug.Log("Returning");
+            //Debug.Log("Returning");
             return;
         }
 

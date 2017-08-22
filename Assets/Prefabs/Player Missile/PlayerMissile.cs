@@ -70,7 +70,7 @@ public class PlayerMissile : MonoBehaviour {
     void Update()
     {
         lifeTimer += Time.deltaTime;
-        if (lifeTimer >= stayAliveFor) Destroy(gameObject);
+        if (lifeTimer >= stayAliveFor) GetDestroyed();
 
         // Update position of lock on trigger (always keep it at ground level and in front of missile)
         float lockOnTriggerRadius = lockOnTriggerObject.GetComponent<SphereCollider>().radius;
@@ -139,13 +139,22 @@ public class PlayerMissile : MonoBehaviour {
     }
 
 
+    void GetDestroyed()
+    {
+        Destroy(gameObject);
+        if (GetComponentInChildren<TrailRenderer>() == null) return;
+        GetComponentInChildren<TrailRenderer>().autodestruct = true;
+        GetComponentInChildren<TrailRenderer>().transform.SetParent(null);
+    }
+
+
     void OnTriggerEnter(Collider collider)
     {
         if (collider.tag == "Obstacle") /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/
         {
             //Debug.Log("I bumped into an obstacle.");
             Detonate();
-            Destroy(gameObject);
+            GetDestroyed();
         }
 
         else if (collider.tag == "Enemy")

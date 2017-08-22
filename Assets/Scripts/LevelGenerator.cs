@@ -519,6 +519,7 @@ public class LevelGenerator : MonoBehaviour {
             if (loopSafeguard > 100)
             {
                 Debug.Log("Infinite Loop");
+                Destroy(newEnemy);
                 return;
             }
         }
