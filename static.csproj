@@ -102,7 +102,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\AlphaCutoffJitter.cs" />
     <Compile Include="Assets\Examples\Scripts\AgentLinkMover.cs" />
     <Compile Include="Assets\Examples\Scripts\ClickToMove.cs" />
     <Compile Include="Assets\Examples\Scripts\DestroyOnTrigger.cs" />
@@ -117,8 +116,6 @@
     <Compile Include="Assets\Examples\Scripts\RandomInstancing.cs" />
     <Compile Include="Assets\Examples\Scripts\RandomWalk.cs" />
     <Compile Include="Assets\Examples\Scripts\SpawnPrefabOnKeyDown.cs" />
-    <Compile Include="Assets\FloorScroller.cs" />
-    <Compile Include="Assets\ImageEffect.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshLink.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshModifier.cs" />
     <Compile Include="Assets\NavMeshComponents\Scripts\NavMeshModifierVolume.cs" />
@@ -137,12 +134,14 @@
     <Compile Include="Assets\Prefabs\Enemy Shot\Laser Shot\LaserShot.cs" />
     <Compile Include="Assets\Prefabs\Enemy Shot\Normal Shot\NormalShot.cs" />
     <Compile Include="Assets\Prefabs\Player Missile\PlayerMissile.cs" />
+    <Compile Include="Assets\Scripts\AlphaCutoffJitter.cs" />
     <Compile Include="Assets\Scripts\BatchBillboard.cs" />
     <Compile Include="Assets\Scripts\CameraResShifter.cs" />
     <Compile Include="Assets\Scripts\CrossHair.cs" />
     <Compile Include="Assets\Scripts\CrossHairLines.cs" />
     <Compile Include="Assets\Scripts\Explosion.cs" />
     <Compile Include="Assets\Scripts\FloatRange.cs" />
+    <Compile Include="Assets\Scripts\FloorScroller.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\GameOverScreen.cs" />
     <Compile Include="Assets\Scripts\GenerateNoise.cs" />
@@ -150,6 +149,7 @@
     <Compile Include="Assets\Scripts\GunExperimental.cs" />
     <Compile Include="Assets\Scripts\HealthManager.cs" />
     <Compile Include="Assets\Scripts\HighScoreScreen.cs" />
+    <Compile Include="Assets\Scripts\ImageEffect.cs" />
     <Compile Include="Assets\Scripts\Initial.cs" />
     <Compile Include="Assets\Scripts\InitialEntry.cs" />
     <Compile Include="Assets\Scripts\IntRange.cs" />

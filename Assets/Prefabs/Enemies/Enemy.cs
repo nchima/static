@@ -128,6 +128,11 @@ public class Enemy : MonoBehaviour
     [SerializeField] protected float noiseSpeed = 0.01f;
     protected float noiseRange = 100f;
 
+    // USED FOR SCORE CALCULATION
+    public int killValue;  // How many points the player gets for killing this enemy.
+    //[SerializeField] int timeBonusValue;    // How many points this enemy adds to the max time bonus value.
+    public float bonusTimeAdded;    // How much time this enemy adds to the bonus timer at level generation.
+
     // REFERENCES
     protected GameManager gameManager;
     protected Rigidbody myRigidbody;
@@ -269,7 +274,7 @@ public class Enemy : MonoBehaviour
         if (isAlive)
         {
             Instantiate(deathParticles, transform.position, Quaternion.identity);
-            gameManager.PlayerKilledEnemy();
+            gameManager.PlayerKilledEnemy(killValue);
             isAlive = false;
             Destroy(gameObject);
         }

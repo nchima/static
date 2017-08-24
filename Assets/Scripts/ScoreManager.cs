@@ -46,9 +46,24 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] public List<ScoreEntry> highScoreEntries;
     [SerializeField] Transform highScoreListText;
 
-    // SCORE/MULTIPLIER VALUE OF VARIOUS THINGS
-    [SerializeField] private int enemyScoreValue = 1000;  // How many points the player gets for killing an enemy (without multiplier applied)
-    [SerializeField] private int levelWinScoreValue = 3000;
+    // TIME BONUS STUFF
+    [SerializeField] GameObject levelCompletedScreen;
+    [SerializeField] TextMesh levelCompletedDisplay;
+    [SerializeField] TextMesh secondsDisplay;
+    [SerializeField] TextMesh bonusScoreDisplay;
+    [SerializeField] TextMesh nextLevelDisplay;
+
+    bool bonusTimerIsRunning;
+    int maxTimeBonus;
+    float maxBonusTime;
+    float bonusTimer = 0;
+    public int currentTimeBonus
+    {
+        get
+        {
+            return Mathf.Clamp(Mathf.RoundToInt(MyMath.Map(bonusTimer, 0f, maxBonusTime, maxTimeBonus, 0f)), 0, maxTimeBonus);
+        }
+    }
 
 
     void Start()
@@ -87,13 +102,38 @@ public class ScoreManager : MonoBehaviour
         //else if (specialBar.transform.localScale.y > 1.35f) multiplier = 3;
         //else if (specialBar.transform.localScale.y > 0.5f) multiplier = 2;
         //else multiplier = 1;
+
+        if (bonusTimerIsRunning)
+        {
+            bonusTimer += Time.deltaTime;
+            //Debug.Log(currentTimeBonus);
+        }
+    }
+
+
+    public void DetermineBonusTime()
+    {
+        maxBonusTime = 0;
+        maxTimeBonus = 0;
+
+        // Get all enemies and add their values to max values.
+        Enemy[] allEnemies = FindObjectsOfType<Enemy>();
+        for (int i = 0; i < allEnemies.Length; i++)
+        {
+            maxTimeBonus += allEnemies[i].killValue;
+            maxBonusTime += allEnemies[i].bonusTimeAdded;
+        }
+
+        // Reset bonus timer.
+        bonusTimer = 0f;
+        bonusTimerIsRunning = true;
     }
 
 
     /// <summary>
     /// Should be called when the player kills an enemy.
     /// </summary>
-    public void PlayerKilledEnemy()
+    public void PlayerKilledEnemy(int enemyKillValue)
     {
         // If value of the multiplier bar has gotten to 1, raise the player's multiplier and set the multiplier bar values for the new multiplier level.
         //if (multBarValueCurr >= 1f)
@@ -105,17 +145,36 @@ public class ScoreManager : MonoBehaviour
         //}
 
         // Round the score to an integer and update the score display.
-        score += enemyScoreValue;
+        score += enemyKillValue;
     }
 
 
     /// <summary>
     /// Is called when player beats the current level.
     /// </summary>
-    public void LevelBeaten()
+    public void LevelComplete()
     {
         // Give the player a score boost for beating the level.
-        score += levelWinScoreValue;
+        score += currentTimeBonus;
+        bonusTimerIsRunning = false;
+
+        ShowLevelCompleteScreen();
+    }
+
+
+    void ShowLevelCompleteScreen()
+    {
+        levelCompletedScreen.SetActive(true);
+        levelCompletedDisplay.text = "LEVEL " + GameManager.instance.levelNumber.ToString() + " COMPLETED";
+        secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
+        bonusScoreDisplay.text = currentTimeBonus.ToString();
+        nextLevelDisplay.text = "NOW ENTERING LEVEL " + (GameManager.instance.levelNumber + 1).ToString();
+    }
+
+
+    public void HideLevelCompleteScreen()
+    {
+        levelCompletedScreen.SetActive(false);
     }
     
 

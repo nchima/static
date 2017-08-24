@@ -106,6 +106,8 @@ public class GameManager : MonoBehaviour {
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
         player = GameObject.Find("FPSController");
+
+        scoreManager.DetermineBonusTime();
     }
 
 
@@ -253,6 +255,9 @@ public class GameManager : MonoBehaviour {
             levelNumber += 1;
             levelGenerator.Generate();
 
+            // Set up bonus time for next level.
+            scoreManager.DetermineBonusTime();
+
             // Set up variables for falling.
             playerTouchedDown = false;
             savedRegularMoveSpeed = player.GetComponent<FirstPersonController>().m_WalkSpeed;
@@ -273,6 +278,8 @@ public class GameManager : MonoBehaviour {
         // Player can activate speed fall by pressing fire.
         if (!speedFallActivated && Input.GetButtonDown("Fire1"))
         {
+            scoreManager.HideLevelCompleteScreen();
+
             player.GetComponent<Rigidbody>().isKinematic = false;
             player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
             Physics.gravity *= speedFallGravityMultipier;
@@ -283,6 +290,8 @@ public class GameManager : MonoBehaviour {
         // See if the player has touched down.
         if (player.transform.position.y <= 2.2f)
         {
+            scoreManager.HideLevelCompleteScreen();
+
             // Begin rotating camera back to regular position.
             player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed*0.6f, RotateMode.Fast);
 
@@ -370,29 +379,29 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerKilledEnemy()
+    public void PlayerKilledEnemy(int enemyKillValue)
     {
         // See if the player has killed all the enemies in this level. If so, change the level.
-        scoreManager.PlayerKilledEnemy();
+        scoreManager.PlayerKilledEnemy(enemyKillValue);
         specialBarManager.PlayerKilledEnemy();
 
         currentEnemyAmt -= 1;
-        Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
+        //Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
 
         if (currentEnemyAmt <= 0)
         {
-            LevelBeaten();
+            LevelComplete();
         }
     }
 
 
-    public void LevelBeaten()
+    public void LevelComplete()
     {
         if (playerState == PlayerState.PauseAfterLevelComplete) return;
 
         levelWinAudio.Play();
 
-        scoreManager.LevelBeaten();
+        scoreManager.LevelComplete();
 
         gun.canShoot = false;
 

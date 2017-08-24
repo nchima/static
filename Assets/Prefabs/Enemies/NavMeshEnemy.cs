@@ -234,7 +234,7 @@ public class NavMeshEnemy : MonoBehaviour {
         if (isAlive)
         {
             Instantiate(deathParticles, transform.position, Quaternion.identity);
-            gameManager.PlayerKilledEnemy();
+            //gameManager.PlayerKilledEnemy(enemyKillValue);
             isAlive = false;
             Destroy(gameObject);
         }
