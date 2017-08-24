@@ -6,21 +6,24 @@ using System.Collections.Generic;
 public class LevelGenerator : MonoBehaviour {
 
     // LEVEL GEN VARIABLES
-    public float levelSize; // The size of the level (the level is always square so this is the width and height.)
-    [SerializeField] float levelSizeIncrease;   // How much the size of each level increases.
+    public float baseLevelSize; // The size of the level (the level is always square so this is the width and height.)
+    [SerializeField] float levelSizeIncrease;   // How much the size of each level increases each level.
 
     // Enemies
-    int numberOfEnemies;
-    [SerializeField] int basicEnemiesAddedPerLevel = 7;
+    int currentNumberOfEnemies; // The number of enemies in the current level.
 
-    [SerializeField] int firstLevelWithTankEnemies = 2;
-    [SerializeField] int tankEnemiesAddedPerLevel = 1;
+    [SerializeField] EnemiesPerLevel[] enemiesPerLevel;
 
-    [SerializeField] int firstLevelWithMeleeEnemies = 2;
-    [SerializeField] int meleeEnemiesAddedPerLevel = 3;
+    //[SerializeField] int basicEnemiesAddedPerLevel = 7;
 
-    [SerializeField] int firstLevelWithLaserEnemies = 5;
-    [SerializeField] int laserEnemiesAddedPerLevel = 1; 
+    //[SerializeField] int firstLevelWithTankEnemies = 2;
+    //[SerializeField] int tankEnemiesAddedPerLevel = 1;
+
+    //[SerializeField] int firstLevelWithMeleeEnemies = 2;
+    //[SerializeField] int meleeEnemiesAddedPerLevel = 3;
+
+    //[SerializeField] int firstLevelWithLaserEnemies = 5;
+    //[SerializeField] int laserEnemiesAddedPerLevel = 1; 
 
     // Guaranteed Empty Space
     [SerializeField] FloatRange emptyAreaRange = new FloatRange(0.25f, 0.75f);   // Guaranteed empty space as percentage of level's total area.
@@ -42,7 +45,7 @@ public class LevelGenerator : MonoBehaviour {
     [SerializeField] private GameObject basicEnemyPrefab;
     [SerializeField] private GameObject tankEnemyPrefab;
     [SerializeField] private GameObject meleeEnemyPrefab;
-    [SerializeField] private GameObject laserEnemyPrefab;
+    [SerializeField] private GameObject snailEnemyPrefab;
     [SerializeField] private GameObject obstaclePrefab;
     [SerializeField] GameObject emptySpacePrefab;
 
@@ -65,9 +68,9 @@ public class LevelGenerator : MonoBehaviour {
 
     public void Generate()
     {
-        if (gameManager.levelNumber != 0) levelSize += levelSizeIncrease;
+        if (gameManager.levelNumber != 0) baseLevelSize += levelSizeIncrease;
 
-        numberOfEnemies = 0;
+        currentNumberOfEnemies = 0;
         numberOfObstacles = numberOfObstaclesRange.Random + gameManager.levelNumber * 4;
 
         // Clear level of all current obstacles and enemies.
@@ -95,8 +98,6 @@ public class LevelGenerator : MonoBehaviour {
 
         SetupEmptySpace();
 
-        //Debug.Break();
-
         // Put all things in the level.
         for (int i = 0; i < numberOfObstacles; i++) {
             PlaceObstacle();
@@ -109,39 +110,19 @@ public class LevelGenerator : MonoBehaviour {
 
         obstacleContainer.transform.position = new Vector3(0f, -19.59f, 0f);
 
-        //for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++) {
-        //    PlaceEnemy(basicEnemyPrefab);
-        //}
-
-        //GenerateNavMesh();
-
-        //if (gameManager.levelNumber >= firstLevelWithTankEnemies)
+        //for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++)
         //{
-        //    for (int i = 0; i < (gameManager.levelNumber - firstLevelWithTankEnemies + 1) * tankEnemiesAddedPerLevel; i++)
-        //    {
-        //        PlaceEnemy(tankEnemyPrefab);
-        //    }
+        //    float rand = Random.value;
+        //    if (rand <= 0.25f) PlaceEnemy(basicEnemyPrefab);
+        //    else if (rand <= 0.5f) PlaceEnemy(tankEnemyPrefab);
+        //    else if (rand <= 0.75f) PlaceEnemy(meleeEnemyPrefab);
+        //    else PlaceEnemy(snailEnemyPrefab);
         //}
 
-        //if (gameManager.levelNumber >= firstLevelWithMeleeEnemies)
-        //{
-        //    for (int i = 0; i < (gameManager.levelNumber - firstLevelWithMeleeEnemies + 1) * meleeEnemiesAddedPerLevel; i++)
-        //    {
-        //        PlaceEnemy(meleeEnemyPrefab);
-        //    }
-        //}
-
-        for (int i = 0; i < gameManager.levelNumber * basicEnemiesAddedPerLevel; i++)
-        {
-            float rand = Random.value;
-            if (rand <= 0.25f) PlaceEnemy(basicEnemyPrefab);
-            else if (rand <= 0.5f) PlaceEnemy(tankEnemyPrefab);
-            else if (rand <= 0.75f) PlaceEnemy(meleeEnemyPrefab);
-            else PlaceEnemy(laserEnemyPrefab);
-        }
+        AddEnemies();
 
         //Debug.Log("Number of enemies: " + numberOfEnemies);
-        gameManager.currentEnemyAmt = numberOfEnemies;
+        gameManager.currentEnemyAmt = currentNumberOfEnemies;
 
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
@@ -163,10 +144,22 @@ public class LevelGenerator : MonoBehaviour {
     }
 
 
+    void AddEnemies()
+    {
+        EnemiesPerLevel enemiesPerCurrentLevel = enemiesPerLevel[gameManager.levelNumber];
+
+        for (int i = 0; i < enemiesPerCurrentLevel.basicEnemies; i++) PlaceEnemy(basicEnemyPrefab);
+        for (int i = 0; i < enemiesPerCurrentLevel.meleeEnemies; i++) PlaceEnemy(meleeEnemyPrefab);
+        for (int i = 0; i < enemiesPerCurrentLevel.tankEnemies; i++) PlaceEnemy(tankEnemyPrefab);
+        for (int i = 0; i < enemiesPerCurrentLevel.snailEnemies; i++) PlaceEnemy(snailEnemyPrefab);
+        currentNumberOfEnemies = enemiesPerCurrentLevel.total;
+    }
+
+
     void SetupEmptySpace()
     {
         // Get the area of space (in square units) which should be guaranteed empty.
-        float emptyArea = ((levelSize*2) * (levelSize*2)) * emptyAreaRange.Random;
+        float emptyArea = ((baseLevelSize*2) * (baseLevelSize*2)) * emptyAreaRange.Random;
         float currentPlazaArea = 0f;
 
         if (emptySpaces.Count > 0) emptySpaces.Clear();
@@ -193,9 +186,9 @@ public class LevelGenerator : MonoBehaviour {
                     );
 
                 newPlazaPosition = new Vector3(
-                        Random.Range(-levelSize + newPlaza.transform.localScale.x / 2, levelSize - newPlaza.transform.localScale.x / 2),
+                        Random.Range(-baseLevelSize + newPlaza.transform.localScale.x / 2, baseLevelSize - newPlaza.transform.localScale.x / 2),
                         1f,
-                        Random.Range(-levelSize + newPlaza.transform.localScale.z / 2, levelSize - newPlaza.transform.localScale.z / 2)
+                        Random.Range(-baseLevelSize + newPlaza.transform.localScale.z / 2, baseLevelSize - newPlaza.transform.localScale.z / 2)
                     );
 
                 if (Physics.OverlapBox(newPlazaPosition, newPlazaScale * 0.5f, Quaternion.identity, 1<<15).Length == 0)
@@ -265,23 +258,23 @@ public class LevelGenerator : MonoBehaviour {
     {
         // Give the correct size and position to the floor and walls.
         floor.localScale = new Vector3(
-            levelSize * 0.2f,
+            baseLevelSize * 0.2f,
             1f,
-            levelSize * 0.2f
+            baseLevelSize * 0.2f
             );
 
         for (int i = 0; i < walls.Length; i++)
         {
             walls[i].localScale = new Vector3(
-                levelSize * 2f,
+                baseLevelSize * 2f,
                 walls[i].localScale.y,
                 walls[i].localScale.z
                 );
 
-            if (walls[i].position.z > 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, levelSize);
-            else if (walls[i].position.z < 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, -levelSize);
-            else if (walls[i].position.x > 0) walls[i].position = new Vector3(levelSize, walls[i].transform.position.y, 0f);
-            else walls[i].position = new Vector3(-levelSize, walls[i].transform.position.y, 0f);
+            if (walls[i].position.z > 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, baseLevelSize);
+            else if (walls[i].position.z < 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, -baseLevelSize);
+            else if (walls[i].position.x > 0) walls[i].position = new Vector3(baseLevelSize, walls[i].transform.position.y, 0f);
+            else walls[i].position = new Vector3(-baseLevelSize, walls[i].transform.position.y, 0f);
         }
     }
 
@@ -306,9 +299,9 @@ public class LevelGenerator : MonoBehaviour {
 
             // Get my position
             newPosition = new Vector3(
-                Random.Range(-levelSize + newScale.x / 2, levelSize - newScale.x / 2),
+                Random.Range(-baseLevelSize + newScale.x / 2, baseLevelSize - newScale.x / 2),
                 newScale.y * 0.5f,
-                Random.Range(-levelSize + newScale.z / 2, levelSize - newScale.z / 2)
+                Random.Range(-baseLevelSize + newScale.z / 2, baseLevelSize - newScale.z / 2)
             );
 
             // Get a random rotation.
@@ -419,9 +412,9 @@ public class LevelGenerator : MonoBehaviour {
 
             // Get my position
             newPosition = new Vector3(
-                Random.Range(-levelSize + newScale.x / 2, levelSize - newScale.x / 2),
+                Random.Range(-baseLevelSize + newScale.x / 2, baseLevelSize - newScale.x / 2),
                 newScale.y * 0.5f,
-                Random.Range(-levelSize + newScale.z / 2, levelSize - newScale.z / 2)
+                Random.Range(-baseLevelSize + newScale.z / 2, baseLevelSize - newScale.z / 2)
             );
 
             // Get a random rotation.
@@ -479,6 +472,8 @@ public class LevelGenerator : MonoBehaviour {
         GameObject newEnemy = Instantiate(enemyToPlace);
         Vector3 newPosition = Vector3.zero;
 
+        //Debug.Log(newEnemy.name);
+
         bool placed = false;
         int loopSafeguard = 0;
 
@@ -486,9 +481,9 @@ public class LevelGenerator : MonoBehaviour {
         {
             // Get my position
             newPosition = new Vector3(
-                Random.Range(-levelSize + newEnemy.GetComponent<Collider>().bounds.extents.x, levelSize - newEnemy.GetComponent<Collider>().bounds.extents.x),
+                Random.Range(-baseLevelSize + newEnemy.GetComponent<Collider>().bounds.extents.x, baseLevelSize - newEnemy.GetComponent<Collider>().bounds.extents.x),
                 2f,
-                Random.Range(-levelSize + newEnemy.GetComponent<Collider>().bounds.extents.z, levelSize - newEnemy.GetComponent<Collider>().bounds.extents.z)
+                Random.Range(-baseLevelSize + newEnemy.GetComponent<Collider>().bounds.extents.z, baseLevelSize - newEnemy.GetComponent<Collider>().bounds.extents.z)
             );
 
             // Test this location
@@ -499,9 +494,9 @@ public class LevelGenerator : MonoBehaviour {
             {
                 if (c.tag == "Player" || c.tag == "Enemy" || c.tag == "Obstacle" || c.tag == "Wall")
                 {
-                    //Debug.Log("Tried to place enemy on " + c.tag);
+                    Debug.Log("Tried to place enemy on " + c.tag);
                     collidingWithObject = true;
-                    break;
+                    continue;
                 }
 
                 if (c.tag == "Empty Space")
@@ -526,7 +521,7 @@ public class LevelGenerator : MonoBehaviour {
 
         newEnemy.transform.position = newPosition;
 
-        numberOfEnemies++;
+        //currentNumberOfEnemies++;
         //Debug.Log("Number of enemies in this level: " + numberOfEnemies);
     }
 }
@@ -538,7 +533,7 @@ public class LevelGenerator : MonoBehaviour {
 
     /*
      * 
-     * christmas was ringing
+     * christmas bells were ringing
      * in the idea of all that i've lost
      * if you ever see that big picture
      * i bet a mirror isn't that robust
@@ -558,7 +553,7 @@ public class LevelGenerator : MonoBehaviour {
      * i've become such a bad singer
      * my girlfriend called me by my last name
      * 
-     * they say when you're back where you come from
+     * they say when you go back to where you come from
      * you're bound to lose that self control
      * 
      * now i'm a believer

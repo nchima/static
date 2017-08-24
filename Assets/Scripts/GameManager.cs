@@ -18,7 +18,7 @@ public class GameManager : MonoBehaviour {
 
     // USED FOR LEVEL GENERATION
     public int levelNumber = 0;    // The current level.
-    int numberOfEnemies = 4;    // The number of enemies that spawned in the current level.
+    int numberOfEnemies = 2;    // The number of enemies that spawned in the current level.
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
     public LevelGenerator levelGenerator;  // A reference to the level generator script.
 
@@ -501,10 +501,10 @@ public class GameManager : MonoBehaviour {
 
     public bool PositionIsInLevelBoundaries(Vector3 position)
     {
-        if (position.x > levelGenerator.levelSize / 2 ||
-            position.x < -levelGenerator.levelSize / 2 ||
-            position.z > levelGenerator.levelSize / 2 ||
-            position.z < -levelGenerator.levelSize / 2)
+        if (position.x > levelGenerator.baseLevelSize / 2 ||
+            position.x < -levelGenerator.baseLevelSize / 2 ||
+            position.z > levelGenerator.baseLevelSize / 2 ||
+            position.z < -levelGenerator.baseLevelSize / 2)
         {
             return false;
         }

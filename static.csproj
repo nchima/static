@@ -139,6 +139,7 @@
     <Compile Include="Assets\Scripts\CameraResShifter.cs" />
     <Compile Include="Assets\Scripts\CrossHair.cs" />
     <Compile Include="Assets\Scripts\CrossHairLines.cs" />
+    <Compile Include="Assets\Scripts\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Explosion.cs" />
     <Compile Include="Assets\Scripts\FloatRange.cs" />
     <Compile Include="Assets\Scripts\FloorScroller.cs" />
