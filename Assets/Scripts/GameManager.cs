@@ -278,13 +278,16 @@ public class GameManager : MonoBehaviour {
         // Player can activate speed fall by pressing fire.
         if (!speedFallActivated && Input.GetButtonDown("Fire1"))
         {
-            scoreManager.HideLevelCompleteScreen();
-
             player.GetComponent<Rigidbody>().isKinematic = false;
             player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
             Physics.gravity *= speedFallGravityMultipier;
             speedFallActivated = true;
             forceInvincibility = true;
+        }
+
+        if (player.transform.position.y <= 600f)
+        {
+            scoreManager.HideLevelCompleteScreen();
         }
 
         // See if the player has touched down.

@@ -58,7 +58,7 @@ public class PlayerMissile : MonoBehaviour {
         noiseOffsetY = Random.Range(-100f, 100f);
 
         transform.rotation = GameManager.instance.player.transform.rotation;
-        transform.Rotate(new Vector3(Random.Range(-2f, -15f), Random.Range(-20f, 20f), 0f));
+        transform.Rotate(new Vector3(Random.Range(-2f, -15f), Random.Range(-40f, 40f), 0f));
 
         initialDirection = transform.forward;
         //initialDirection.y = 1f;
