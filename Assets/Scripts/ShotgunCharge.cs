@@ -17,6 +17,7 @@ public class ShotgunCharge : MonoBehaviour {
 
     List<GameObject> capturedEnemies = new List<GameObject>();
 
+    bool isReturningToFullSpeed;
     bool isFiringShockwave = false;
     float slowMoDuration = 0.25f;
     float sloMoTimer = 0f;
@@ -63,10 +64,16 @@ public class ShotgunCharge : MonoBehaviour {
             GameManager.instance.gun.FireBurst();
 
             sloMoTimer += Time.deltaTime;
-            if (sloMoTimer >= slowMoDuration)
+            if (sloMoTimer >= slowMoDuration && !isReturningToFullSpeed)
             {
                 GameManager.instance.ReturnToFullSpeed();
+                isReturningToFullSpeed = true;
+            }
+
+            else if (sloMoTimer >= slowMoDuration + 0.25f)
+            {
                 isFiringShockwave = false;
+                isReturningToFullSpeed = false;
                 GameManager.instance.forceInvincibility = false;
                 sloMoTimer = 0f;
             }
