@@ -30,11 +30,11 @@ public class MeleeEnemy : Enemy {
     bool isAttacking; // Whether we are currently attacking.
     float attackRange = 15f; // We will begin attacking when we are this close to the player.
     float attackDistance { get { return attackRange * 1.5f; } }    // This is how far we 'charge' forward during our attack.
-    float chargeUpDuration = 1f;
+    float chargeUpDuration = 1.5f;
     float distanceCharged = 0f; // Used to keep track of how far we have charged during our current attack.
     float attackSpeed { get { return moveSpeed * 5; } } // This is how quickly we travel during a charge attack.
     Vector3 attackFinishPoint;  // This is point towards which we charge. (No longer necessary?)
-    float afterAttackPauseTime = 1f;  // How long we pause after attacking.
+    float afterAttackPauseTime = 1.5f;  // How long we pause after attacking.
 
     float timer = 0f;
 
