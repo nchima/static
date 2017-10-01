@@ -7,6 +7,13 @@ public class FloatRange {
 
     public float min;
     public float max;
+    public float size
+    {
+        get
+        {
+            return max - min;
+        }
+    }
 
     public FloatRange(float _min, float _max)
     {

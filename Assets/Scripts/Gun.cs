@@ -16,7 +16,6 @@ public class Gun : MonoBehaviour
     [HideInInspector] public float burstsPerSecondModifier = 1f;
     [SerializeField] public float burstsPerSecondModifierMax = 2f;   // Your rate of fire increases by this multiplier during slow motion.
 
-
     // Bullet spread.
     [SerializeField] float inaccuracyMin = 1f;
     [SerializeField] float inaccuracyMax = 10f;
@@ -31,6 +30,8 @@ public class Gun : MonoBehaviour
     // Force per bullet
     [SerializeField] int minBulletsForce = 10;  // The number of bullets which must hit before force is applied.
     [SerializeField] float forcePerBullet = 0.2f;
+
+    [SerializeField] float bulletRecoil = 0.2f; // Recoil per bullet
 
     // Bullet Color
     [SerializeField] Color bulletColor1;
@@ -89,6 +90,7 @@ public class Gun : MonoBehaviour
     Color bulletColor = Color.yellow;  // The current color of the bullets.
     Vector3 originalPosition;   // The original position of the gun (used for recoil).
     Vector3 recoilPosition;
+
 
     void Start()
     {
@@ -285,7 +287,7 @@ public class Gun : MonoBehaviour
         machineGunAudio.Play();
         shotgunAudio.Play();
 
-        transform.parent.SendMessage("IncreaseShake", 0.1f);
+        //transform.parent.SendMessage("IncreaseShake", 0.1f);
 
         // Show muzzle flash.
         GameObject _muzzleFlash = Instantiate(muzzleFlash);
@@ -305,6 +307,9 @@ public class Gun : MonoBehaviour
         {
             FireBullet(inaccuracy);
         }
+
+        // Add recoil to player controller.
+        gameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
 
         timeSinceLastShot = 0f;
     }

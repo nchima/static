@@ -19,10 +19,10 @@ public class GameOverScreen : MonoBehaviour
 
         // Disable player controls.
         player = GameObject.Find("FPSController");
-        player.GetComponent<FirstPersonController>().m_MouseLook.lockCursor = false;
-        player.GetComponent<CharacterController>().center = new Vector3(player.GetComponent<CharacterController>().center.x, player.GetComponent<CharacterController>().center.y - 0.5f, player.GetComponent<CharacterController>().center.z);
-        player.GetComponent<FirstPersonController>().m_WalkSpeed = 0;
-        player.GetComponent<FirstPersonController>().m_RunSpeed = 0;
+        player.GetComponent<PlayerController>().UnlockCursor();
+        player.GetComponent<CapsuleCollider>().center = new Vector3(player.GetComponent<CapsuleCollider>().center.x, player.GetComponent<CapsuleCollider>().center.y - 0.5f, player.GetComponent<CapsuleCollider>().center.z);
+        player.GetComponent<PlayerController>().maxSpeed = 0;
+        //player.GetComponent<PlayerController>(). = 0;
 
         // Disable gun object.
         foreach (Gun gun in FindObjectsOfType<Gun>())

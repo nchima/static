@@ -8,6 +8,8 @@ using DG.Tweening;
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
+    [SerializeField] bool dontChangeLevel;
+    [SerializeField] bool startMidFall;
     [HideInInspector] public bool invincible;
     [SerializeField] public bool forceInvincibility;
     [SerializeField] float invincibilityTime = 0.5f;
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour {
     bool speedFallActivated = false;
     [SerializeField] GameObject shockwavePrefab;
     [HideInInspector] public bool playerTouchedDown = false;
+    Transform playerSpawnPoint;
 
     // MENU SCREENS
     [SerializeField] GameObject highScoreScreen;
@@ -48,10 +51,20 @@ public class GameManager : MonoBehaviour {
     public bool gameStarted = false;
 
     // USED FOR SINE TRACKER
+    public enum GunMethod { TimeBased, MovementBasedQuick, MovementBasedGradual, FloorBased, RotationBased, TuningBased };
+    public GunMethod gunMethod;
     [HideInInspector] public float currentSine;
     public float oscSpeed = 0.3f;
     [SerializeField] float bulletHitSineIncrease = 0.01f;
     float sineTime = 0.0f;
+
+    // Used only for tuning method:
+    [SerializeField] float idealTuningSize = 0.3f;  // How 'big' the range will be in which the gun is considered to be ideally tuned.
+    FloatRange currentIdealRange;   // A gun value in this range will be considered 'in tune'.
+    float tuningSpeed = 0.01f;  // How quickly the player can tune the gun. (Not used in case of mouse)
+    float newTuningTimer = 0f;
+    FloatRange newTuningTimeRange = new FloatRange(7f, 16f);
+    float nextTuningTime;
 
     // RANDOM USEFUL STUFF
     Vector3 playerPositionLast;
@@ -79,7 +92,7 @@ public class GameManager : MonoBehaviour {
             enemy.GetComponent<Enemy>().enabled = false;
         }
 
-        GameObject.Find("FPSController").GetComponent<FirstPersonController>().enabled = false;
+        GameObject.Find("FPSController").GetComponent<PlayerController>().enabled = false;
         foreach(Gun gun in FindObjectsOfType<Gun>())
         {
             gun.enabled = false;
@@ -89,6 +102,8 @@ public class GameManager : MonoBehaviour {
 
     private void Start()
     {
+        playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
+
         // Set up the current number of enemies.
         currentEnemyAmt = numberOfEnemies;
 
@@ -108,32 +123,29 @@ public class GameManager : MonoBehaviour {
         player = GameObject.Find("FPSController");
 
         scoreManager.DetermineBonusTime();
+
+        if (gunMethod == GunMethod.TuningBased)
+        {
+            FindObjectOfType<CrossHair>().tuningTarget.gameObject.SetActive(true);
+            GetNewTuningTarget();
+        }
+
+        if (startMidFall)
+        {
+            fallingSequenceTimer = 0f;
+            playerState = PlayerState.PauseAfterLevelComplete;
+
+        }
     }
 
 
     private void Update()
     {
-        // Debug Stuff
-        if (Input.GetKeyDown(KeyCode.M)) GetComponentInChildren<MusicManager>().dontPlayMusic = !GetComponentInChildren<MusicManager>().dontPlayMusic;
-
         // Keep track of player velocity.
         playerVelocity = (player.transform.position - playerPositionLast) / Time.deltaTime;
         playerPositionLast = player.transform.position;
 
-        // Update sine
-        sineTime += Time.deltaTime;
-        currentSine = Mathf.Sin(sineTime * oscSpeed);
-
-        //currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.5f);
-
-        //if (Input.GetAxis("Horizontal") != 0) currentSine += Input.GetAxis("Horizontal") * 0.05f;
-
-        //else currentSine = Mathf.Lerp(currentSine, 0f, 0.05f);
-        //else if (currentSine > 0) currentSine -= 0.04f;
-
-        currentSine = Mathf.Clamp(currentSine, -1f, 1f);
-
-        //currentSine = MyMath.Map(player.transform.rotation.eulerAngles.y, 0f, 360f, -1f, 1);
+        UpdateGunSine();
 
         // See if a special move is ready to be fired.
         bool sineInPosition = currentSine <= -1f + gun.specialMoveSineRange || currentSine >= 1f - gun.specialMoveSineRange;
@@ -152,8 +164,14 @@ public class GameManager : MonoBehaviour {
         gun.shotgunChargeIsReady = currentSine <= -1f + gun.specialMoveSineRange && specialBarManager.barIsFull;
         gun.missilesAreReady = currentSine >= 1f - gun.specialMoveSineRange && specialBarManager.barIsFull;
 
-        if (gun.shotgunChargeIsReady || gun.missilesAreReady)
+        if ((gun.shotgunChargeIsReady || gun.missilesAreReady))
         {
+            specialBarManager.FlashBar();
+        }
+
+        if (gunMethod == GunMethod.TuningBased && specialBarManager.barIsFull)
+        {
+            gun.missilesAreReady = true;
             specialBarManager.FlashBar();
         }
 
@@ -218,6 +236,8 @@ public class GameManager : MonoBehaviour {
     public void PlayerUsedSpecialMove()
     {
         specialBarManager.PlayerUsedSpecialMove();
+
+        if (gunMethod == GunMethod.TuningBased) GetNewTuningTarget();
     }
 
 
@@ -245,6 +265,8 @@ public class GameManager : MonoBehaviour {
         {
             ReturnToFullSpeed();
 
+            player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
+
             Physics.gravity = savedGravity;
 
             speedFallActivated = false;
@@ -252,23 +274,35 @@ public class GameManager : MonoBehaviour {
             forceInvincibility = false;
 
             // Generate new level.
-            levelNumber += 1;
-            levelGenerator.Generate();
+            if (!dontChangeLevel)
+            {
+                levelNumber += 1;
+                levelGenerator.Generate();
+            }
+
+            // Place the player in the correct spot above the level.
+            player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
+
+            // Re-enable the floor's collision (since it is disabled when the player completes a level.)
+            floor.GetComponent<Collider>().enabled = true;
+
+            // Update billboards.
+            GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
 
             // Set up bonus time for next level.
             scoreManager.DetermineBonusTime();
 
             // Set up variables for falling.
             playerTouchedDown = false;
-            savedRegularMoveSpeed = player.GetComponent<FirstPersonController>().m_WalkSpeed;
-            player.GetComponent<FirstPersonController>().m_WalkSpeed = playerMoveSpeedWhenFalling;
+            savedRegularMoveSpeed = player.GetComponent<PlayerController>().maxSpeed;
+            player.GetComponent<PlayerController>().maxSpeed = playerMoveSpeedWhenFalling;
+            playerState = PlayerState.FallingIntoLevel;
 
             // Begin rotating player camera to face down.
             player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
 
             // Begin falling sequence.
             specialBarManager.freezeDecay = true;
-            playerState = PlayerState.FallingIntoLevel;
         }
     }
 
@@ -278,7 +312,7 @@ public class GameManager : MonoBehaviour {
         // Player can activate speed fall by pressing fire.
         if (!speedFallActivated && Input.GetButtonDown("Fire1"))
         {
-            player.GetComponent<Rigidbody>().isKinematic = false;
+            //player.GetComponent<Rigidbody>().isKinematic = false;
             player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
             Physics.gravity *= speedFallGravityMultipier;
             speedFallActivated = true;
@@ -288,6 +322,7 @@ public class GameManager : MonoBehaviour {
         if (player.transform.position.y <= 600f)
         {
             scoreManager.HideLevelCompleteScreen();
+            floor.GetComponent<Collider>().enabled = true;
         }
 
         // See if the player has touched down.
@@ -295,12 +330,15 @@ public class GameManager : MonoBehaviour {
         {
             scoreManager.HideLevelCompleteScreen();
 
+            player.transform.position = new Vector3(player.transform.position.x, 2.11f, player.transform.position.z);
+
             // Begin rotating camera back to regular position.
             player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed*0.6f, RotateMode.Fast);
 
             // Reset movement variables.
-            player.GetComponent<Rigidbody>().isKinematic = true;
-            player.GetComponent<FirstPersonController>().m_WalkSpeed = savedRegularMoveSpeed;
+            //player.GetComponent<Rigidbody>().isKinematic = true;
+            player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
+            player.GetComponent<PlayerController>().maxSpeed = savedRegularMoveSpeed;
 
             fallingSequenceTimer = 0f;
 
@@ -357,7 +395,7 @@ public class GameManager : MonoBehaviour {
             Collider[] overlappingSolids = Physics.OverlapCapsule(
                 player.transform.position, 
                 player.transform.position + Vector3.down * 10f, 
-                player.GetComponent<CharacterController>().radius, 
+                player.GetComponent<CapsuleCollider>().radius, 
                 1 << 8);
 
             for (int i = 0; i < overlappingSolids.Length; i++)
@@ -385,8 +423,12 @@ public class GameManager : MonoBehaviour {
     public void PlayerKilledEnemy(int enemyKillValue)
     {
         // See if the player has killed all the enemies in this level. If so, change the level.
-        scoreManager.PlayerKilledEnemy(enemyKillValue);
-        specialBarManager.PlayerKilledEnemy();
+        //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) { }
+        //else
+        //{
+            scoreManager.PlayerKilledEnemy(enemyKillValue);
+            specialBarManager.PlayerKilledEnemy();
+        //}
 
         currentEnemyAmt -= 1;
         //Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
@@ -401,6 +443,7 @@ public class GameManager : MonoBehaviour {
     public void LevelComplete()
     {
         if (playerState == PlayerState.PauseAfterLevelComplete) return;
+        if (dontChangeLevel) return;
 
         levelWinAudio.Play();
 
@@ -449,6 +492,7 @@ public class GameManager : MonoBehaviour {
 
     public void BulletHitEnemy()
     {
+        //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) return;
         scoreManager.BulletHitEnemy();
         specialBarManager.BulletHitEnemy();
         //sineTime += bulletHitSineIncrease;
@@ -471,7 +515,7 @@ public class GameManager : MonoBehaviour {
         }
 
         // Enable player movement and shooting.
-        GameObject.Find("FPSController").GetComponent<FirstPersonController>().enabled = true;
+        GameObject.Find("FPSController").GetComponent<PlayerController>().enabled = true;
         foreach (Gun gun in FindObjectsOfType<Gun>())
         {
             gun.enabled = true;
@@ -483,13 +527,86 @@ public class GameManager : MonoBehaviour {
 
     public void RestartGame()
     {
-        SceneManager.LoadScene("mainScene");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
 
     public void SpecialMoveReady()
     {
         
+    }
+
+    
+    void UpdateGunSine()
+    {
+        // Update sine
+        if (gunMethod == GunMethod.TimeBased)
+        {
+            sineTime += Time.deltaTime;
+            currentSine = Mathf.Sin(sineTime * oscSpeed);
+        }
+
+        else if (gunMethod == GunMethod.MovementBasedQuick)
+            currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.5f);
+
+        else if (gunMethod == GunMethod.MovementBasedGradual)
+        {
+            if (Input.GetAxis("Horizontal") != 0) currentSine += Input.GetAxis("Horizontal") * 0.05f;
+            else currentSine = Mathf.Lerp(currentSine, 0f, 0.05f);
+            //else if (currentSine > 0) currentSine -= 0.04f;
+            currentSine = Mathf.Clamp(currentSine, -1f, 1f);
+        }
+
+        else if (gunMethod == GunMethod.RotationBased)
+            currentSine = MyMath.Map(player.transform.rotation.eulerAngles.y, 0f, 360f, -1f, 1);
+
+        else if (gunMethod == GunMethod.FloorBased)
+        {
+            // Raycast from player downwards to floor.
+            RaycastHit hit;
+            if (Physics.Raycast(player.transform.position, Vector3.down, out hit, 500f, 1 << 20))
+            {
+                //Debug.Log("Down ray: " + hit.collider.name);
+                if (hit.collider.GetComponent<FloorTile>() != null)
+                {
+                    currentSine = hit.collider.GetComponent<FloorTile>().shotgunValue;
+                }
+            }
+        }
+
+        else if (gunMethod == GunMethod.TuningBased)
+        {
+            // Control tuning via my penis.
+            //if (Input.GetButton("Gun Tuning"))
+            //{
+            //currentSine += Input.GetAxis("Mouse X") * 0.1f;
+
+            //currentSine += Input.GetAxis("Vertical") * -0.05f;
+
+            currentSine += Input.GetAxis("Mouse Y") * 0.1f;
+
+                currentSine = Mathf.Clamp(currentSine, -1f, 1f);
+            //}
+
+            newTuningTimer += Time.deltaTime;
+            if (newTuningTimer > nextTuningTime)
+            {
+                GetNewTuningTarget();
+                nextTuningTime = newTuningTimeRange.Random;
+                newTuningTimer = 0f;
+            }
+        }
+
+        player.GetComponent<PlayerController>().SetFieldOfView(currentSine);
+    }
+
+
+    void GetNewTuningTarget()
+    {
+        float newIdealCenter = Random.Range(-1 + idealTuningSize*0.5f, 1 - idealTuningSize*0.5f);
+        currentIdealRange = new FloatRange(newIdealCenter - idealTuningSize * 0.5f, newIdealCenter + idealTuningSize * 0.5f);
+
+        FindObjectOfType<CrossHair>().UpdateTuningTarget(newIdealCenter);
     }
 
 

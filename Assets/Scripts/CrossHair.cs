@@ -1,16 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class CrossHair : MonoBehaviour {
-
-    //private void Update()
-    //{
-    //    GetComponent<MeshRenderer>().material.mainTexture = GameManager.instance.noiseGenerator.noiseTex;
-
-    //    float newScale = MyMath.Map(GameManager.instance.currentSine, -1f, 1f, 3f, 0.6696f);
-    //    transform.localScale = new Vector3(newScale, transform.localScale.y, newScale);
-    //}
 
     public int segments;
     [SerializeField] float maxRadius = 1.25f;
@@ -19,6 +12,10 @@ public class CrossHair : MonoBehaviour {
     float yradius;
     LineRenderer line;
 
+    public LineRenderer tuningTarget;
+    float ttXRadius = 0.5f;
+    float ttYRadius = 0.5f;
+
 
     void Start()
     {
@@ -26,7 +23,19 @@ public class CrossHair : MonoBehaviour {
 
         line.positionCount = segments + 1;
         line.useWorldSpace = false;
-        CreatePoints();
+        CreatePoints(line, xradius, yradius);
+
+        if (GameManager.instance.gunMethod == GameManager.GunMethod.TuningBased)
+        {
+            tuningTarget.positionCount = segments + 1;
+            tuningTarget.useWorldSpace = false;
+            CreatePoints(tuningTarget, ttXRadius, ttYRadius);
+        }
+
+        else
+        {
+            tuningTarget.gameObject.SetActive(false);
+        }
     }
 
 
@@ -35,11 +44,16 @@ public class CrossHair : MonoBehaviour {
         xradius = MyMath.Map(GameManager.instance.currentSine, -1f, 1f, maxRadius, minRadius);
         yradius = MyMath.Map(GameManager.instance.currentSine, -1f, 1f, maxRadius, minRadius);
         transform.Rotate(new Vector3(0f, Random.Range(-180f, 180f), 0f));
-        CreatePoints();
+        CreatePoints(line, xradius, yradius);
+
+        if (tuningTarget.gameObject.activeSelf)
+        {
+            CreatePoints(tuningTarget, ttXRadius, ttYRadius);
+        }
     }
 
 
-    void CreatePoints()
+    void CreatePoints(LineRenderer target, float xRadius, float yRadius)
     {
         float x;
         float y;
@@ -49,14 +63,26 @@ public class CrossHair : MonoBehaviour {
 
         for (int i = 0; i < (segments + 1); i++)
         {
-            x = Mathf.Sin(Mathf.Deg2Rad * angle) * xradius;
+            x = Mathf.Sin(Mathf.Deg2Rad * angle) * xRadius;
             y = 0f;
-            z = Mathf.Cos(Mathf.Deg2Rad * angle) * yradius;
+            z = Mathf.Cos(Mathf.Deg2Rad * angle) * yRadius;
 
-            line.SetPosition(i, new Vector3(x, y, z));
+            target.SetPosition(i, new Vector3(x, y, z));
 
             angle += (360f / segments);
         }
     }
 
+    
+    public void UpdateTuningTarget(float value)
+    {
+        tuningTarget.gameObject.SetActive(true);
+
+        float newRad = MyMath.Map(value, -1f, 1f, maxRadius, minRadius);
+
+        Debug.Log("Updating tuning target: " + newRad);
+
+        DOTween.To(() => ttXRadius, x => ttXRadius = x, newRad, 0.2f).SetEase(Ease.InQuad).SetUpdate(true);
+        DOTween.To(() => ttYRadius, x => ttYRadius = x, newRad, 0.2f).SetEase(Ease.InQuad).SetUpdate(true);
+    }
 }

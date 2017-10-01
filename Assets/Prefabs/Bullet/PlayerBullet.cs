@@ -11,10 +11,10 @@ public class PlayerBullet : MonoBehaviour
 
     private void Start()
     {
-//            GetComponent<MeshRenderer>().
-//                material.
-//                mainTexture =
-//                GameManager.instance.noiseGenerator.noiseTex;
+        GetComponent<MeshRenderer>().
+            material.
+            mainTexture =
+            GameManager.instance.noiseGenerator.noiseTex;
     }
 
 

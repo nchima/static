@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class LevelGenerator : MonoBehaviour {
 
+    [SerializeField] bool dontGenerate = false;  // Debug: used for testing layouts.
+
     // LEVEL GEN VARIABLES
     public float baseLevelSize; // The size of the level (the level is always square so this is the width and height.)
     [SerializeField] float levelSizeIncrease;   // How much the size of each level increases each level.
@@ -50,7 +52,6 @@ public class LevelGenerator : MonoBehaviour {
     [SerializeField] GameObject emptySpacePrefab;
 
     GameManager gameManager;
-    Transform playerSpawnPoint;
     Transform player;
     [SerializeField] Transform floor;
     [SerializeField] Transform[] walls;
@@ -59,15 +60,18 @@ public class LevelGenerator : MonoBehaviour {
     private void Awake()
     {
         gameManager = FindObjectOfType<GameManager>();
-        playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
         player = GameObject.FindGameObjectWithTag("Player").transform;
         floor = GameObject.Find("Floor").transform;
         emptySpaces = new List<GameObject>();
+
+        //GetComponent<FloorCreator>().CreateGrid(baseLevelSize);
     }
 
 
     public void Generate()
     {
+        if (dontGenerate) return;
+
         if (gameManager.levelNumber != 0) baseLevelSize += levelSizeIncrease;
 
         currentNumberOfEnemies = 0;
@@ -128,15 +132,6 @@ public class LevelGenerator : MonoBehaviour {
         {
             enemy.GetComponent<Enemy>().willAttack = false;
         }
-
-        // Place the player in the correct spot above the level.
-        player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
-
-        // Re-enable the floor's collision (since it is disabled when the player completes a level.)
-        floor.GetComponent<Collider>().enabled = true;
-
-        // Update billboards.
-        GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
 
         // Delete all empty space.
         for (int i = 0; i < emptySpaces.Count; i++) Destroy(emptySpaces[i]);
@@ -256,25 +251,30 @@ public class LevelGenerator : MonoBehaviour {
 
     public void SetupWallsAndFloor()
     {
-        // Give the correct size and position to the floor and walls.
-        floor.localScale = new Vector3(
-            baseLevelSize * 0.2f,
-            1f,
-            baseLevelSize * 0.2f
-            );
+       // Give the correct size and position to the floor and walls.
+       floor.localScale = new Vector3(
+           baseLevelSize * 0.2f,
+           1f,
+           baseLevelSize * 0.2f
+           );
+
+        FloorTile[] floorTiles = FindObjectsOfType<FloorTile>();
+        for (int i = 0; i < floorTiles.Length; i++) Destroy(floorTiles[i].gameObject);
+
+        //GetComponent<FloorCreator>().CreateGrid(baseLevelSize);
 
         for (int i = 0; i < walls.Length; i++)
         {
             walls[i].localScale = new Vector3(
-                baseLevelSize * 2f,
+                baseLevelSize,
                 walls[i].localScale.y,
                 walls[i].localScale.z
                 );
 
-            if (walls[i].position.z > 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, baseLevelSize);
-            else if (walls[i].position.z < 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, -baseLevelSize);
-            else if (walls[i].position.x > 0) walls[i].position = new Vector3(baseLevelSize, walls[i].transform.position.y, 0f);
-            else walls[i].position = new Vector3(-baseLevelSize, walls[i].transform.position.y, 0f);
+            if (walls[i].position.z > 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, baseLevelSize * 0.5f);
+            else if (walls[i].position.z < 0) walls[i].position = new Vector3(0f, walls[i].transform.position.y, -baseLevelSize * 0.5f);
+            else if (walls[i].position.x > 0) walls[i].position = new Vector3(baseLevelSize * 0.5f, walls[i].transform.position.y, 0f);
+            else walls[i].position = new Vector3(-baseLevelSize * 0.5f, walls[i].transform.position.y, 0f);
         }
     }
 
@@ -330,9 +330,9 @@ public class LevelGenerator : MonoBehaviour {
                 // Make sure the obstacle is not too close to another one so as to create tempting but impassible gap.
                 // See if there are any obstacles around me.
                 Vector3 overlapBoxExtents = new Vector3(
-                        (newScale.x / 2) + player.GetComponent<CharacterController>().radius * 3f,
+                        (newScale.x / 2) + player.GetComponent<CapsuleCollider>().radius * 3f,
                         newScale.y / 2,
-                        (newScale.z / 2) + player.GetComponent<CharacterController>().radius * 3f
+                        (newScale.z / 2) + player.GetComponent<CapsuleCollider>().radius * 3f
                     );
 
                 foreach (Collider nearbySolid in Physics.OverlapBox(newPosition, overlapBoxExtents, newRotation))

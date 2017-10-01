@@ -22,7 +22,7 @@ public class HealthManager : MonoBehaviour {
             {
                 getHurtAudio.Play();
                 GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 0.3f);
-                GameObject.Find("Screen").BroadcastMessage("IncreaseResShift", 0.5f);
+                //GameObject.Find("Screen").BroadcastMessage("IncreaseResShift", 0.5f);
                 GameObject.Find("Pain Flash").GetComponent<Animator>().SetTrigger("Pain Flash");
 
                 // Delete health box.

@@ -60,7 +60,7 @@ public class ShootingEnemy : Enemy {
     {
         if (!willMove) return;
 
-        if (navMeshAgent.isStopped) navMeshAgent.isStopped = false;
+        if (!navMeshAgent.enabled) navMeshAgent.enabled = true;
 
         // Get a random point in a circle around the player.
         Vector3 nearPlayer = playerTransform.position + Random.insideUnitSphere * moveRandomness;
@@ -132,13 +132,14 @@ public class ShootingEnemy : Enemy {
         // Set timer for pre shot delay
         shotTimer = new Timer(preShotDelay);
 
-        navMeshAgent.isStopped = true;
+        //navMeshAgent.isStopped = true;
+        navMeshAgent.enabled = false;
 
         // Begin the charging up animation.
         myAnimator.SetTrigger("ChargeUp");
         //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.8f * Time.deltaTime);
         DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, attackingColorMax, preShotDelay * 0.8f).SetEase(Ease.InCubic).SetUpdate(true);
-        transform.Find("Geometry").DOLookAt(playerTransform.position, preShotDelay * 0.8f).SetEase(Ease.InCubic);
+        //transform.Find("Geometry").DOLookAt(playerTransform.position, preShotDelay * 0.8f).SetEase(Ease.InCubic);
 
         currentState = BehaviorState.PreShooting;
     }
@@ -163,9 +164,9 @@ public class ShootingEnemy : Enemy {
         currentState = BehaviorState.PostShooting;
     }
 
-    void PostShoot()
+    protected virtual void PostShoot()
     {
-        // Se if we've waited long enough.
+        // See if we've waited long enough.
         shotTimer.Run();
         if (shotTimer.finished)
         {
