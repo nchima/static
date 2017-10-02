@@ -1,5 +1,6 @@
 Library/*
 Temp/*
+Builds/*
 Assembly-CSharp-Editor.csproj
 Assembly-CSharp.csproj
 NavMeshComponents.sln
