@@ -74,9 +74,9 @@ public class ScreenShake : MonoBehaviour {
 
             // Vibrate to encourage z fighting.
             Vector3 vibratePosition = new Vector3(
-                    transform.position.x + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.x,
-                    transform.position.y + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.y,
-                    transform.position.z + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.z
+                    originalPosition.x + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.x,
+                    originalPosition.y + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.y,
+                    originalPosition.z + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.z
                 );
 
             // If this object is set to not move on certain axes, reset those axes to their current position.

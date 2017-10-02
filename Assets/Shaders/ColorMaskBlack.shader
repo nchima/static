@@ -3,9 +3,8 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		//_ColorMask ("Color Mask", Vector) = (0, 1, 0, 1)
-		//_AlphaCutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
 		_BrightnessCutoff ("Brightness Cutoff", Range(0, 1)) = 0.5
+		_FinalColor ("Final Color", Color) = (0, 0, 0, 1)
 	}
 
 	SubShader
@@ -48,19 +47,17 @@
 				return o;
 			}
 
-			//fixed4 _ColorMask;
-			//float _AlphaCutoff;
 			float _BrightnessCutoff;
+			fixed4 _FinalColor;
 			
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
 				
-				clip(_BrightnessCutoff - (1 - (0.299*col.r + 0.587*col.g + 0.114*col.b)));
-				//clip(_BrightnessCutoff - (1 - ((col.r + col.g + col.b) / 3)));
-
-				col = fixed4(0.0, 0.0, 0.0, 1.0);
+				float brightness = 0.299*col.r + 0.587*col.g + 0.114*col.b;
+				clip(_BrightnessCutoff - (1 - brightness));
+				col = _FinalColor;
 
 				// apply fog
 				UNITY_APPLY_FOG(i.fogCoord, col);
