@@ -26,7 +26,6 @@ public class PlayerController : MonoBehaviour {
     public enum State { Normal, ShotgunCharge, Falling }
     public State state;
 
-
     // MISC
     Rigidbody rigidBody;
 
@@ -54,22 +53,23 @@ public class PlayerController : MonoBehaviour {
     {
         /* HANDLE MOVEMENT */
 
+        // Get input.
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         if (input.sqrMagnitude > 1) input.Normalize();
 
+        // Get desired movement direction.
         Vector3 desiredMove = desiredMove = transform.forward * input.y + transform.right * input.x;
         desiredMove.Normalize();
 
-        // Add movement kick.
-        if (rigidBody.velocity.magnitude < minSpeed && input.magnitude != 0) rigidBody.velocity = desiredMove * minSpeed;
-
         // Apply movement force to rigidbody.
-        rigidBody.AddForce(desiredMove * accelerationSpeed, ForceMode.Acceleration);
+        rigidBody.AddForce(desiredMove * accelerationSpeed, ForceMode.VelocityChange);
+
+        // Add movement kick if player is pressing a direction and the controller is not moving at it's minimum speed.
+        //if (input.magnitude != 0 && rigidBody.velocity.magnitude < minSpeed) rigidBody.velocity = desiredMove * minSpeed;
 
         // Limit speed if player is not currently falling.
         if (state != State.Falling)
         {
-            //Debug.Log("Limiting player velocity.");
             rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
         }
 
