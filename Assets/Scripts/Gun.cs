@@ -66,12 +66,16 @@ public class Gun : MonoBehaviour
     int bulletsPerBurst;
     int bulletsHitThisBurst = 0;
 
+    /* AUDIO STUFF */
+    public AudioSource rifleAudioSource;
+    [SerializeField] AudioClip[] rifleAudioClips;
+    [SerializeField] AudioSource shotgunAudioSource;
+
+
     /* PREFABS */
     public GameObject bulletPrefab;
     public GameObject bulletStrikePrefab;
     [SerializeField] GameObject bulletStrikeEnemyPrefab;
-    public AudioSource machineGunAudio;
-    [SerializeField] AudioSource shotgunAudio;
     public AudioSource bulletStrikeAudio;
     public GameObject muzzleFlash;
     [SerializeField] private GameObject missilePrefab;
@@ -222,13 +226,7 @@ public class Gun : MonoBehaviour
         bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstMax, bulletsPerBurstMin));
         float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
         float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
-
-        machineGunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        machineGunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
-
-        shotgunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        shotgunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
-
+        
         bulletsHitThisBurst = 0;
 
         // Fire the specified number of test bullets.
@@ -268,11 +266,12 @@ public class Gun : MonoBehaviour
         float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondMin, burstsPerSecondMax) * burstsPerSecondModifier;
         float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, inaccuracyMax, inaccuracyMin);
 
-        machineGunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        machineGunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
+        rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
+        rifleAudioSource.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
+        rifleAudioSource.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
 
-        shotgunAudio.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        shotgunAudio.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
+        shotgunAudioSource.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
+        shotgunAudioSource.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
 
         //Debug.Log("Bursts Per Second: " + burstsPerSecond + ", 1 / burstsPerSecond: " + 1/burstsPerSecond + ", Time since last shot: " + timeSinceLastShot);
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond)
@@ -284,8 +283,8 @@ public class Gun : MonoBehaviour
         bulletsHitThisBurst = 0;
 
         // Play shooting sound.
-        machineGunAudio.Play();
-        shotgunAudio.Play();
+        rifleAudioSource.Play();
+        shotgunAudioSource.Play();
 
         //transform.parent.SendMessage("IncreaseShake", 0.1f);
 
