@@ -5,8 +5,8 @@ using UnityEngine;
 public class CrossHairLines : MonoBehaviour {
 
 	[SerializeField] GameObject leftLine, rightLine;
-    [SerializeField] const float MAX_GAP = 3f;
-    [SerializeField] const float MIN_GAP = 0.01f;
+    [SerializeField] float MAX_GAP = 2f;
+    [SerializeField] float MIN_GAP = 0.2f;
     [SerializeField] GameObject crosshairCircle;
     Color currentColor;
     [SerializeField] Color noTargetColor;

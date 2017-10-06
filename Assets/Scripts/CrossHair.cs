@@ -27,14 +27,14 @@ public class CrossHair : MonoBehaviour {
 
         if (GameManager.instance.gunMethod == GameManager.GunMethod.TuningBased)
         {
-            tuningTarget.positionCount = segments + 1;
-            tuningTarget.useWorldSpace = false;
-            CreatePoints(tuningTarget, ttXRadius, ttYRadius);
+            //tuningTarget.positionCount = segments + 1;
+            //tuningTarget.useWorldSpace = false;
+            //CreatePoints(tuningTarget, ttXRadius, ttYRadius);
         }
 
         else
         {
-            tuningTarget.gameObject.SetActive(false);
+            //tuningTarget.gameObject.SetActive(false);
         }
     }
 
@@ -46,10 +46,10 @@ public class CrossHair : MonoBehaviour {
         transform.Rotate(new Vector3(0f, Random.Range(-180f, 180f), 0f));
         CreatePoints(line, xradius, yradius);
 
-        if (tuningTarget.gameObject.activeSelf)
-        {
-            CreatePoints(tuningTarget, ttXRadius, ttYRadius);
-        }
+        //if (tuningTarget.gameObject.activeSelf)
+        //{
+        //    CreatePoints(tuningTarget, ttXRadius, ttYRadius);
+        //}
     }
 
 
@@ -76,11 +76,9 @@ public class CrossHair : MonoBehaviour {
     
     public void UpdateTuningTarget(float value)
     {
-        tuningTarget.gameObject.SetActive(true);
+        //tuningTarget.gameObject.SetActive(true);
 
         float newRad = MyMath.Map(value, -1f, 1f, maxRadius, minRadius);
-
-        Debug.Log("Updating tuning target: " + newRad);
 
         DOTween.To(() => ttXRadius, x => ttXRadius = x, newRad, 0.2f).SetEase(Ease.InQuad).SetUpdate(true);
         DOTween.To(() => ttYRadius, x => ttYRadius = x, newRad, 0.2f).SetEase(Ease.InQuad).SetUpdate(true);

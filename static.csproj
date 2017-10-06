@@ -178,6 +178,7 @@
     <Compile Include="Assets\Scripts\SubtleRandomRotation.cs" />
     <Compile Include="Assets\Scripts\TextureOffsetChanger.cs" />
     <Compile Include="Assets\Scripts\Timer.cs" />
+    <Compile Include="Assets\Scripts\Util\DebugUtil.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceAgentTests.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceLinkTests.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceModifierTests.cs" />

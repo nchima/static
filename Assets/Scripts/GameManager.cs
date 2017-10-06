@@ -87,9 +87,9 @@ public class GameManager : MonoBehaviour {
         instance = this;
 
         // Pause everything for the main menu.
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        foreach (Enemy enemy in FindObjectsOfType<Enemy>())
         {
-            enemy.GetComponent<Enemy>().enabled = false;
+            enemy.enabled = false;
         }
 
         GameObject.Find("FPSController").GetComponent<PlayerController>().enabled = false;
@@ -508,10 +508,10 @@ public class GameManager : MonoBehaviour {
     public void StartGame()
     {
         // Unpause enemies in the background.
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        foreach (Enemy enemy in FindObjectsOfType<Enemy>())
         {
-            enemy.GetComponent<Enemy>().enabled = true;
-            enemy.GetComponent<Enemy>().willAttack = true;
+            enemy.enabled = true;
+            enemy.willAttack = true;
         }
 
         // Enable player movement and shooting.
@@ -606,7 +606,7 @@ public class GameManager : MonoBehaviour {
         float newIdealCenter = Random.Range(-1 + idealTuningSize*0.5f, 1 - idealTuningSize*0.5f);
         currentIdealRange = new FloatRange(newIdealCenter - idealTuningSize * 0.5f, newIdealCenter + idealTuningSize * 0.5f);
 
-        FindObjectOfType<CrossHair>().UpdateTuningTarget(newIdealCenter);
+        //FindObjectOfType<CrossHair>().UpdateTuningTarget(newIdealCenter);
     }
 
 

@@ -11,7 +11,7 @@ public class PlayerBullet : MonoBehaviour
 
     private void Start()
     {
-        GetComponent<MeshRenderer>().
+        GetComponentInChildren<MeshRenderer>().
             material.
             mainTexture =
             GameManager.instance.noiseGenerator.noiseTex;
@@ -49,7 +49,7 @@ public class PlayerBullet : MonoBehaviour
         // Get proper transform values.
         transform.position = _position;
         transform.rotation = _rotation;
-        transform.localScale = _scale;
+        transform.transform.localScale = _scale;
 
         // Set this bullet to active.
         isOnScreen = true;

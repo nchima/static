@@ -88,6 +88,8 @@ public class Gun : MonoBehaviour
     Animator parentAnimator;
 
     /* MISC */
+    Quaternion baseBulletSpawnRotation;
+    Vector3 nearestEnemyPosition;
     float timeSinceLastShot;
     GameObject[] bullets;    // Holds references to all bullets.
     int bulletIndex = 0;
@@ -126,10 +128,10 @@ public class Gun : MonoBehaviour
     void Update()
     {
         // Handle crosshair.
-        if (TestBurst())
-            crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = true;
-        else
-            crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = false;
+        //if (TestBurst())
+        //    crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = true;
+        //else
+        //    crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = false;
 
         // Update gun animation state
         animator.SetFloat("Gun State", gameManager.currentSine);
@@ -273,12 +275,8 @@ public class Gun : MonoBehaviour
         shotgunAudioSource.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
         shotgunAudioSource.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
 
-        //Debug.Log("Bursts Per Second: " + burstsPerSecond + ", 1 / burstsPerSecond: " + 1/burstsPerSecond + ", Time since last shot: " + timeSinceLastShot);
-        if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond)
-        {
-            //Debug.Log("Returning");
-            return;
-        }
+        // Make sure enough time has passed since the last shot.
+        if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
 
         bulletsHitThisBurst = 0;
 
@@ -286,7 +284,7 @@ public class Gun : MonoBehaviour
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
 
-        //transform.parent.SendMessage("IncreaseShake", 0.1f);
+        transform.parent.SendMessage("IncreaseShake", 0.01f);
 
         // Show muzzle flash.
         GameObject _muzzleFlash = Instantiate(muzzleFlash);
@@ -301,6 +299,47 @@ public class Gun : MonoBehaviour
         // Get a new bullet color based on current sine
         bulletColor = Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(gameManager.currentSine, -1f, 1f, 0f, 1f));
 
+        /* SEE IF WE NEED TO AIM UP OR DOWN AT ENEMIES */
+
+        // Box cast forward in a line across the center of the screen to grab all enemies in the player's line of fire.
+        float boxCastLength = 100f;
+        float boxCastHeight = 75f;
+        float boxCastWidth = 1f;
+        RaycastHit[] boxCastHits = Physics.BoxCastAll(
+            GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 2f,
+            new Vector3(boxCastWidth, boxCastHeight, 1f),
+            GameManager.instance.player.transform.forward,
+            GameManager.instance.player.transform.rotation,
+            boxCastLength,
+            (1 << 13) | (1 << 14)
+            );
+
+        // Figure out which of those enemies is closest to the player.
+        nearestEnemyPosition = GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 100f;
+        foreach (RaycastHit hit in boxCastHits)
+        {
+            // For the enemies's position, use the center of its renderer.
+            Vector3 thisEnemyPosition = hit.collider.GetComponentInChildren<MeshRenderer>().bounds.center;
+
+            // See if the distance to this enemy is less than the distance to the previous nearest enemy.
+            if (Vector3.Distance(GameManager.instance.player.transform.position, thisEnemyPosition) 
+                < Vector3.Distance(GameManager.instance.player.transform.position, nearestEnemyPosition))
+            {
+                nearestEnemyPosition = thisEnemyPosition;
+            }
+        }
+
+        Debug.DrawLine(bulletSpawnTransform.position, nearestEnemyPosition, Color.cyan, 5f);
+
+        // Rotate the base transform of the bullet spawner towards the nearest enemy's position.
+        baseBulletSpawnRotation = Quaternion.LookRotation(
+            Vector3.Normalize(nearestEnemyPosition - bulletSpawnTransform.position),
+            Vector3.up
+            //GameManager.instance.player.transform.up
+            );
+
+        Debug.DrawRay(bulletSpawnTransform.position, (baseBulletSpawnRotation * Vector3.forward) - bulletSpawnTransform.position * 100f, Color.yellow, 5f);
+
         // Fire the specified number of bullets.
         for (int i = 0; i < bulletsPerBurst; i++)
         {
@@ -311,14 +350,18 @@ public class Gun : MonoBehaviour
         gameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
 
         timeSinceLastShot = 0f;
-    }
 
+        //Debug.Break();
+    }
 
     // Firing an individual bullet.
     void FireBullet(float inaccuracy)
     {
         // Rotate bullet spawner to get the direction of the next bullet.
-        bulletSpawnTransform.localRotation = Quaternion.Euler(new Vector3(90 + Random.insideUnitCircle.x * inaccuracy, 0, Random.insideUnitCircle.y * inaccuracy));
+        bulletSpawnTransform.LookAt(nearestEnemyPosition);
+        bulletSpawnTransform.localRotation = Quaternion.Euler(
+            new Vector3(bulletSpawnTransform.localRotation.eulerAngles.x + Random.insideUnitCircle.y * inaccuracy, Random.insideUnitCircle.x * inaccuracy, 0)
+            );
 
         // Declare variables for bullet size & position.
         float bulletScale;
@@ -329,8 +372,9 @@ public class Gun : MonoBehaviour
 
         // Raycast to see if the bullet hit an object and to see where it hit.
         RaycastHit hit;
-        if (Physics.SphereCast(bulletSpawnTransform.position, 0.4f, bulletSpawnTransform.up, out hit, bulletRange, (1 << 8) | (1 << 13) | (1 << 14)))
+        if (Physics.SphereCast(bulletSpawnTransform.position, 0.4f, bulletSpawnTransform.forward, out hit, bulletRange, (1 << 8) | (1 << 13) | (1 << 14)))
         {
+            Debug.DrawRay(bulletSpawnTransform.position, bulletSpawnTransform.forward * 100f, Color.red, 1f);
             // Show particle effect
             Instantiate(bulletStrikePrefab, hit.point, Quaternion.identity);
 
@@ -338,10 +382,10 @@ public class Gun : MonoBehaviour
             bulletScale = hit.distance / 2;
 
             // The new bullet's position will be halfway down the ray
-            bulletPosition = bulletSpawnTransform.up.normalized * (hit.distance / 2);
+            bulletPosition = bulletSpawnTransform.forward.normalized * (hit.distance / 2);
 
             // If the bullet hit an enemy...
-            if (hit.collider.tag == "Enemy")
+            if (hit.transform.GetComponent<Enemy>() != null)
             {
                 bulletsHitThisBurst++;
 
@@ -388,14 +432,14 @@ public class Gun : MonoBehaviour
         }
 
         // Set bullet color
-        bullets[bulletIndex].GetComponent<MeshRenderer>().material.color = bulletColor;
-        bullets[bulletIndex].GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", bulletColor);
+        bullets[bulletIndex].GetComponentInChildren<MeshRenderer>().material.color = bulletColor;
+        bullets[bulletIndex].GetComponentInChildren<MeshRenderer>().material.SetColor("_EmissionColor", bulletColor);
 
         // Fire bullet.
         bullets[bulletIndex].GetComponent<PlayerBullet>().GetFired(
             bulletSpawnTransform.position + bulletPosition,
             bulletSpawnTransform.rotation,
-            new Vector3(bulletPrefab.transform.localScale.x, bulletScale, bulletPrefab.transform.localScale.z)
+            new Vector3(bulletPrefab.transform.localScale.x, bulletPrefab.transform.localScale.y, bulletScale)
         );
 
         // Get a new bullet index.
