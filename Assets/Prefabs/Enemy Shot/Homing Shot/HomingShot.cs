@@ -46,7 +46,7 @@ public class HomingShot : EnemyShot {
         state = HomingShotState.NotLockedOn;
 
         gameManager.UpdateBillboards();
-        playerTransform = GameObject.Find("FPSController").transform;
+        playerTransform = GameObject.Find("Player").transform;
 
         // Get an initial target position on the floor within a certain distance from the player.
         //Debug.Log(gameManager.playerVelocity);

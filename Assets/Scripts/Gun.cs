@@ -311,7 +311,7 @@ public class Gun : MonoBehaviour
             GameManager.instance.player.transform.forward,
             GameManager.instance.player.transform.rotation,
             boxCastLength,
-            (1 << 13) | (1 << 14)
+            (1 << 14)
             );
 
         // Figure out which of those enemies is closest to the player.

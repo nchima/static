@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour {
 
     // MISC REFERENCES
     public static GameManager instance;
-    Transform floor;    // The floor of the game environment.
+    Collider[] floorColliders;    // The floor colliders of the game environment.
     ScoreManager scoreManager;
     SpecialBarManager specialBarManager;
     HealthManager healthManager;
@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour {
             enemy.enabled = false;
         }
 
-        GameObject.Find("FPSController").GetComponent<PlayerController>().enabled = false;
+        GameObject.Find("Player").GetComponent<PlayerController>().enabled = false;
         foreach(Gun gun in FindObjectsOfType<Gun>())
         {
             gun.enabled = false;
@@ -113,14 +113,14 @@ public class GameManager : MonoBehaviour {
         savedGravity = Physics.gravity;
 
         // Get references
-        floor = GameObject.Find("Floor").transform;
+        floorColliders = GameObject.Find("Floor Planes").GetComponentsInChildren<Collider>();
         scoreManager = GetComponent<ScoreManager>();
         specialBarManager = GetComponent<SpecialBarManager>();
         healthManager = GetComponent<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
-        player = GameObject.Find("FPSController");
+        player = GameObject.Find("Player");
 
         scoreManager.DetermineBonusTime();
 
@@ -284,7 +284,8 @@ public class GameManager : MonoBehaviour {
             player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
 
             // Re-enable the floor's collision (since it is disabled when the player completes a level.)
-            floor.GetComponent<Collider>().enabled = true;
+            //floor.GetComponent<Collider>().enabled = true;
+            foreach (Collider collider in floorColliders) collider.enabled = true;
 
             // Update billboards.
             GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
@@ -322,7 +323,7 @@ public class GameManager : MonoBehaviour {
         if (player.transform.position.y <= 600f)
         {
             scoreManager.HideLevelCompleteScreen();
-            floor.GetComponent<Collider>().enabled = true;
+            foreach (Collider collider in floorColliders) collider.enabled = true;
         }
 
         // See if the player has touched down.
@@ -454,7 +455,7 @@ public class GameManager : MonoBehaviour {
         //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
 
         // Disable the floor's collider so the player falls through it.
-        floor.GetComponent<Collider>().enabled = false;
+        foreach (Collider collider in floorColliders) collider.enabled = true;
 
         // Initiate falling sequence.
         fallingSequenceTimer = 0f;
@@ -515,7 +516,7 @@ public class GameManager : MonoBehaviour {
         }
 
         // Enable player movement and shooting.
-        GameObject.Find("FPSController").GetComponent<PlayerController>().enabled = true;
+        GameObject.Find("Player").GetComponent<PlayerController>().enabled = true;
         foreach (Gun gun in FindObjectsOfType<Gun>())
         {
             gun.enabled = true;

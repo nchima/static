@@ -61,7 +61,7 @@ public class LevelGenerator : MonoBehaviour {
     {
         gameManager = FindObjectOfType<GameManager>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        floor = GameObject.Find("Floor").transform;
+        //floor = GameObject.Find("Floor").transform;
         emptySpaces = new List<GameObject>();
 
         //GetComponent<FloorCreator>().CreateGrid(baseLevelSize);
