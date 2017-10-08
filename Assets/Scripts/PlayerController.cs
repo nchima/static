@@ -6,10 +6,12 @@ using DG.Tweening;
 public class PlayerController : MonoBehaviour {
 
     // MOVEMENT
-    [SerializeField] float accelerationSpeed;
-    [SerializeField] float deceleration;
+    [SerializeField] float accelerationSpeedGround;
+    [SerializeField] float accelerationSpeedFalling;
     [SerializeField] float minSpeed;
-    public float maxSpeed;
+    public float maxGroundSpeed;
+    public float maxAirSpeed;
+    [SerializeField] float maxFallingSpeed;
     private Vector3 velocity;
 
     // FOV
@@ -52,6 +54,14 @@ public class PlayerController : MonoBehaviour {
     private void FixedUpdate()
     {
         /* HANDLE MOVEMENT */
+        float _accelerationSpeed = accelerationSpeedGround;
+        float _maxSpeed = maxGroundSpeed;
+
+        if (state == State.Falling)
+        {
+            _accelerationSpeed = accelerationSpeedFalling;
+            _maxSpeed = maxAirSpeed;
+        }
 
         // Get input.
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -62,26 +72,17 @@ public class PlayerController : MonoBehaviour {
         desiredMove.Normalize();
 
         // Apply movement force to rigidbody.
-        rigidBody.AddForce(desiredMove * accelerationSpeed, ForceMode.VelocityChange);
+        if (desiredMove.magnitude != 0)
+            rigidBody.AddForce(desiredMove * _accelerationSpeed, ForceMode.VelocityChange);
 
         // Add movement kick if player is pressing a direction and the controller is not moving at it's minimum speed.
-        //if (input.magnitude != 0 && rigidBody.velocity.magnitude < minSpeed) rigidBody.velocity = desiredMove * minSpeed;
+        if (input.magnitude != 0 && rigidBody.velocity.magnitude < minSpeed) rigidBody.velocity = desiredMove.normalized * minSpeed;
 
-        // Limit speed if player is not currently falling.
-        if (state != State.Falling)
-        {
-            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
-        }
-
-        //Vector3 acceleration = desiredMove * accelerationSpeed;
-
-        //if (acceleration == Vector3.zero) velocity *= deceleration * Time.deltaTime;
-        //else velocity += acceleration * Time.deltaTime;
-
-        //velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
-        //if (velocity.magnitude < minSpeed && input.magnitude != 0) velocity = velocity.normalized * minSpeed;
-
-        //GetComponent<Rigidbody>().MovePosition(transform.position + velocity * Time.deltaTime);
+        rigidBody.velocity = new Vector3(
+                    Mathf.Clamp(rigidBody.velocity.x, -_maxSpeed, _maxSpeed),
+                    Mathf.Clamp(rigidBody.velocity.y, -maxFallingSpeed, maxFallingSpeed),
+                    Mathf.Clamp(rigidBody.velocity.z, -_maxSpeed, _maxSpeed)
+                );
     }
 
 

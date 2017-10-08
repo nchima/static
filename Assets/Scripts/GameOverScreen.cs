@@ -21,7 +21,7 @@ public class GameOverScreen : MonoBehaviour
         player = GameObject.Find("FPSController");
         player.GetComponent<PlayerController>().UnlockCursor();
         player.GetComponent<CapsuleCollider>().center = new Vector3(player.GetComponent<CapsuleCollider>().center.x, player.GetComponent<CapsuleCollider>().center.y - 0.5f, player.GetComponent<CapsuleCollider>().center.z);
-        player.GetComponent<PlayerController>().maxSpeed = 0;
+        player.GetComponent<PlayerController>().maxAirSpeed = 0;
         //player.GetComponent<PlayerController>(). = 0;
 
         // Disable gun object.

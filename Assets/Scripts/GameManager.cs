@@ -295,8 +295,8 @@ public class GameManager : MonoBehaviour {
 
             // Set up variables for falling.
             playerTouchedDown = false;
-            savedRegularMoveSpeed = player.GetComponent<PlayerController>().maxSpeed;
-            player.GetComponent<PlayerController>().maxSpeed = playerMoveSpeedWhenFalling;
+            savedRegularMoveSpeed = player.GetComponent<PlayerController>().maxAirSpeed;
+            player.GetComponent<PlayerController>().maxAirSpeed = playerMoveSpeedWhenFalling;
             playerState = PlayerState.FallingIntoLevel;
 
             // Begin rotating player camera to face down.
@@ -339,7 +339,7 @@ public class GameManager : MonoBehaviour {
             // Reset movement variables.
             //player.GetComponent<Rigidbody>().isKinematic = true;
             player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
-            player.GetComponent<PlayerController>().maxSpeed = savedRegularMoveSpeed;
+            player.GetComponent<PlayerController>().maxAirSpeed = savedRegularMoveSpeed;
 
             fallingSequenceTimer = 0f;
 
