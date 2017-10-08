@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float maxFallingSpeed;
     private Vector3 velocity;
 
+    // PHYSICS MATERIAL STUFF
+    float normalBounciness;
+
     // FOV
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
     FloatRange orthographicSizeRange = new FloatRange(23f, 40f);
@@ -36,6 +39,7 @@ public class PlayerController : MonoBehaviour {
     {
         targetRotation = transform.localRotation;
         rigidBody = GetComponent<Rigidbody>();
+        normalBounciness = GetComponent<Collider>().material.bounciness;
     }
 
 

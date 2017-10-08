@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject shockwavePrefab;
     [HideInInspector] public bool playerTouchedDown = false;
     Transform playerSpawnPoint;
+    float normalPlayerBounciness;
 
     // MENU SCREENS
     [SerializeField] GameObject highScoreScreen;
@@ -121,6 +122,8 @@ public class GameManager : MonoBehaviour {
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
         player = GameObject.Find("Player");
+
+        normalPlayerBounciness = player.GetComponent<Collider>().material.bounciness;
 
         scoreManager.DetermineBonusTime();
 
@@ -267,6 +270,8 @@ public class GameManager : MonoBehaviour {
 
             player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
 
+            player.GetComponent<Collider>().material.bounciness = 0f;
+
             Physics.gravity = savedGravity;
 
             speedFallActivated = false;
@@ -327,7 +332,7 @@ public class GameManager : MonoBehaviour {
         }
 
         // See if the player has touched down.
-        if (player.transform.position.y <= 2.2f)
+        if (player.transform.position.y <= 5f)
         {
             scoreManager.HideLevelCompleteScreen();
 
@@ -415,6 +420,8 @@ public class GameManager : MonoBehaviour {
             speedFallActivated = false;
 
             forceInvincibility = false;
+
+            player.GetComponent<Collider>().material.bounciness = normalPlayerBounciness;
 
             playerState = PlayerState.Normal;
         }
