@@ -7,6 +7,7 @@ public class HoveringEnemy : ShootingEnemy {
 
     [SerializeField] float meanderMaximum = 10f;
     [SerializeField] float meanderNoiseSpeed = 0.01f;
+    [SerializeField] float hoverHeight = 4f;
     PerlinNoise movementNoise;
 
 
@@ -62,7 +63,10 @@ public class HoveringEnemy : ShootingEnemy {
         // Move towards player in a meandering pattern.
         Vector3 moveDirection = Vector3.Normalize(playerTransform.position - transform.position);
         moveDirection.x += movementNoise.MapValue(-meanderMaximum, meanderMaximum).x;
-        moveDirection.y = 0f;
+
+        // Move towards hover height on the y axis.
+        if (transform.position.y > hoverHeight) moveDirection.y = -1;
+        else moveDirection.y = 1;
 
         myRigidbody.MovePosition(transform.position + moveDirection.normalized * moveSpeed * Time.deltaTime);
 
@@ -73,7 +77,7 @@ public class HoveringEnemy : ShootingEnemy {
     protected override void Attack()
     {
         // Fire a shot.
-        GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 1.75f, transform.position.z), Quaternion.identity);
+        GameObject newShot = Instantiate(shotPrefab, transform.position, Quaternion.identity);
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
         Vector3 shotDirection = Vector3.Normalize(playerTransform.position - newShot.transform.position);
         newShot.GetComponent<NormalShot>().direction = shotDirection;

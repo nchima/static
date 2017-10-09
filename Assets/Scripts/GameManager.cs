@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour {
         playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
 
         // Set up the current number of enemies.
-        currentEnemyAmt = numberOfEnemies;
+        currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
 
         //currentSine = Mathf.Sin(Time.time * oscSpeed);
         currentSine = Mathf.Sin(sineTime);

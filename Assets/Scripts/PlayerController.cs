@@ -14,6 +14,12 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float maxFallingSpeed;
     private Vector3 velocity;
 
+    [SerializeField] float movementKickForce = 5f;
+    Vector2 lastKickDirection = new Vector3(0f, 0f, 1f);
+    bool movementKickReady = true;
+    float movementKickTimer = 0f;
+    float movementKickCooldown = 0.6f;
+
     // PHYSICS MATERIAL STUFF
     float normalBounciness;
 
@@ -31,6 +37,10 @@ public class PlayerController : MonoBehaviour {
     public enum State { Normal, ShotgunCharge, Falling }
     public State state;
 
+    // INPUT
+    Vector2 directionalInput;
+    float mouseInput;
+
     // MISC
     Rigidbody rigidBody;
 
@@ -45,9 +55,12 @@ public class PlayerController : MonoBehaviour {
 
     private void Update()
     {
-        /* HANDLE VIEW ROTATION */
+        /* GET INPUT */
+        directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        mouseInput = Input.GetAxis("Mouse X") * mouseSensitivity;
 
-        float rotation = Input.GetAxis("Mouse X") * mouseSensitivity;
+        /* HANDLE VIEW ROTATION */
+        float rotation = mouseInput;
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;
 
@@ -67,26 +80,47 @@ public class PlayerController : MonoBehaviour {
             _maxSpeed = maxAirSpeed;
         }
 
-        // Get input.
-        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        if (input.sqrMagnitude > 1) input.Normalize();
+        if (directionalInput.sqrMagnitude > 1) directionalInput.Normalize();
 
         // Get desired movement direction.
-        Vector3 desiredMove = transform.forward * input.y + transform.right * input.x;
-        desiredMove.Normalize();
+        Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
+        //Vector3 desiredMove = transform.TransformDirection(new Vector3(directionalInput.x, 0f, directionalInput.y));
+        //Debug.Log("Direction Input X: " + directionalInput.x + ", Direction input Y: " + directionalInput.y + "Desired move: " + transform.InverseTransformDirection(desiredMove));
 
         // Apply movement force to rigidbody.
         if (desiredMove.magnitude != 0)
-            rigidBody.AddForce(desiredMove * _accelerationSpeed, ForceMode.VelocityChange);
+            rigidBody.AddForce(desiredMove.normalized * _accelerationSpeed, ForceMode.VelocityChange);
 
-        // Add movement kick if player is pressing a direction and the controller is not moving at it's minimum speed.
-        if (input.magnitude != 0 && rigidBody.velocity.magnitude < minSpeed) rigidBody.velocity = desiredMove.normalized * minSpeed;
+        // Add movement kick.
+        movementKickTimer += Time.deltaTime;
+        if (!movementKickReady)
+        {
+            if (directionalInput == Vector2.zero && movementKickTimer >= movementKickCooldown) movementKickReady = true;
+            else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
+        }
 
-        rigidBody.velocity = new Vector3(
-                    Mathf.Clamp(rigidBody.velocity.x, -_maxSpeed, _maxSpeed),
-                    Mathf.Clamp(rigidBody.velocity.y, -maxFallingSpeed, maxFallingSpeed),
-                    Mathf.Clamp(rigidBody.velocity.z, -_maxSpeed, _maxSpeed)
-                );
+        if (directionalInput != Vector2.zero)
+        {
+            if (movementKickReady)
+            {
+                Debug.Log("doing this.");
+                lastKickDirection = directionalInput;
+                movementKickTimer = 0f;
+                movementKickReady = false;
+                rigidBody.AddForce(desiredMove.normalized * movementKickForce, ForceMode.Impulse);
+            }
+        }
+
+        // Clamp velocity to max speed.
+        if (state == State.Falling)
+        {
+            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxFallingSpeed);
+        }
+
+        else
+        {
+            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxGroundSpeed);
+        }
     }
 
 

@@ -302,7 +302,7 @@ public class Gun : MonoBehaviour
         /* SEE IF WE NEED TO AIM UP OR DOWN AT ENEMIES */
 
         // Box cast forward in a line across the center of the screen to grab all enemies in the player's line of fire.
-        float boxCastLength = 100f;
+        float boxCastLength = 500f;
         float boxCastHeight = 75f;
         float boxCastWidth = 1f;
         RaycastHit[] boxCastHits = Physics.BoxCastAll(

@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour
 
             else
             {
-                Debug.Log("Ground check returned false. ");
+                //Debug.Log("Ground check returned false. ");
                 return false;
             }
         }
@@ -295,7 +295,7 @@ public class Enemy : MonoBehaviour
 
     protected void ReturnToKinematic()
     {
-        navMeshAgent.enabled = true;
+        if (navMeshAgent != null) navMeshAgent.enabled = true;
         willMove = true;
         GetComponent<Rigidbody>().isKinematic = true;
         isPhysicsObject = false;
