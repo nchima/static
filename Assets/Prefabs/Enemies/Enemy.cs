@@ -140,7 +140,7 @@ public class Enemy : MonoBehaviour
     protected Transform playerTransform;
 
 
-    protected void Start()
+    protected virtual void Start()
     {
         // Hook up references
         navMeshAgent = GetComponent<NavMeshAgent>();
@@ -175,7 +175,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    protected void Update()
+    protected virtual void Update()
     {
         // Change material tiling using Perlin noise. (For the static effect).
         myMaterial.mainTextureScale = new Vector2(MyMath.Map(Mathf.PerlinNoise(noiseTime, 0), 0f, 1f, -noiseRange, noiseRange), 0);

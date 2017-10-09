@@ -68,11 +68,11 @@ public class PlayerController : MonoBehaviour {
         }
 
         // Get input.
-        Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        Vector2 input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         if (input.sqrMagnitude > 1) input.Normalize();
 
         // Get desired movement direction.
-        Vector3 desiredMove = desiredMove = transform.forward * input.y + transform.right * input.x;
+        Vector3 desiredMove = transform.forward * input.y + transform.right * input.x;
         desiredMove.Normalize();
 
         // Apply movement force to rigidbody.

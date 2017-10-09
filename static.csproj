@@ -118,6 +118,7 @@
     <Compile Include="Assets\Prefabs\Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Basic Enemy\BasicEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Enemy.cs" />
+    <Compile Include="Assets\Prefabs\Enemies\Hovering Enemy\HoveringEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Laser Enemy\LaserEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\MeleeEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\NavMeshEnemy.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="Assets\Scripts\TextureOffsetChanger.cs" />
     <Compile Include="Assets\Scripts\Timer.cs" />
     <Compile Include="Assets\Scripts\Util\DebugUtil.cs" />
+    <Compile Include="Assets\Scripts\Util\PerlinNoise.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceAgentTests.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceLinkTests.cs" />
     <Compile Include="Assets\Tests\NavMeshSurfaceModifierTests.cs" />

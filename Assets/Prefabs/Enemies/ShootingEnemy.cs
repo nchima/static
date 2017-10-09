@@ -11,20 +11,20 @@ public class ShootingEnemy : Enemy {
     [SerializeField] protected float preShotDelay = 0.7f; // How long I pause motionless before firing a shot.
     [SerializeField] protected float postShotDelay = 0.4f;    // How long I pause motionless after firing a shot.
     [SerializeField] protected GameObject shotPrefab;
-    [SerializeField] bool requireLineOfSight;
+    [SerializeField] protected bool requireLineOfSight;   // Whether we require a clear shot before we fire at the player.
     protected Timer shotTimer;    // Keeps track of how long it's been since I last fired a shot.
-
 
     // BEHAVIOR STATES
     protected enum BehaviorState { PreparingToMove, Moving, PreShooting, Shooting, PostShooting };
     protected BehaviorState currentState;
 
-    new void Start ()
+
+    protected override void Start ()
     {
         base.Start();
 
         // Not sure why I'm doing this - look into it later. (Does it have to do with the enemies firing shots at the wrong point during their animation?)
-        myAnimator.speed = 1.0f / preShotDelay;
+        if (myAnimator != null) myAnimator.speed = 1.0f / preShotDelay;
 
         // Get a random time to fire the next shot.
         shotTimer = new Timer(Random.Range(shotTimerMin, shotTimerMax));
@@ -32,7 +32,7 @@ public class ShootingEnemy : Enemy {
         currentState = BehaviorState.PreparingToMove;
     }
 	
-	new void Update ()
+	protected override void Update ()
     {
         base.Update();
 
@@ -80,7 +80,7 @@ public class ShootingEnemy : Enemy {
         currentState = BehaviorState.Moving;
     }
 
-    void Move()
+    protected virtual void Move()
     {
         // See if it's time to shoot at the player
         shotTimer.Run();
@@ -133,10 +133,10 @@ public class ShootingEnemy : Enemy {
         shotTimer = new Timer(preShotDelay);
 
         //navMeshAgent.isStopped = true;
-        navMeshAgent.enabled = false;
+        if (navMeshAgent != null) navMeshAgent.enabled = false;
 
         // Begin the charging up animation.
-        myAnimator.SetTrigger("ChargeUp");
+        if (myAnimator != null) myAnimator.SetTrigger("ChargeUp");
         //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.8f * Time.deltaTime);
         DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, attackingColorMax, preShotDelay * 0.8f).SetEase(Ease.InCubic).SetUpdate(true);
         //transform.Find("Geometry").DOLookAt(playerTransform.position, preShotDelay * 0.8f).SetEase(Ease.InCubic);
@@ -163,6 +163,7 @@ public class ShootingEnemy : Enemy {
 
         currentState = BehaviorState.PostShooting;
     }
+
 
     protected virtual void PostShoot()
     {
