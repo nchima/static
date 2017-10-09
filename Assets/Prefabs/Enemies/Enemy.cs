@@ -12,6 +12,7 @@ public class Enemy : MonoBehaviour
     // USED FOR MOVING
     [HideInInspector] public bool willAttack = false;
     protected bool willMove = true;
+    [SerializeField] bool isFlyingEnemy;
     public bool canSeePlayer
     {
         get
@@ -217,7 +218,7 @@ public class Enemy : MonoBehaviour
             //Debug.Log(gameObject.name + " is physics object.");
 
             physicsObjectTimer -= Time.deltaTime;
-            if (physicsObjectTimer <= 0f && isOnGround)
+            if (physicsObjectTimer <= 0f && (isFlyingEnemy || isOnGround))
             {
                 //Debug.Log(gameObject.name + " returning to kinematic.");
                 ReturnToKinematic();
