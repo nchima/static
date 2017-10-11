@@ -118,6 +118,7 @@
     <Compile Include="Assets\Prefabs\Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Basic Enemy\BasicEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Enemy.cs" />
+    <Compile Include="Assets\Prefabs\Enemies\EnemySpawner\EnemySpawner.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Hovering Enemy\HoveringEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\Laser Enemy\LaserEnemy.cs" />
     <Compile Include="Assets\Prefabs\Enemies\MeleeEnemy.cs" />
