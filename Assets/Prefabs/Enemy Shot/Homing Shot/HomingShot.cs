@@ -63,11 +63,11 @@ public class HomingShot : EnemyShot {
             leading -= 1f;
             leading = Mathf.Clamp(leading, 0f, 99f);
 
-            if (GameManager.instance.PositionIsInLevelBoundaries(currentTarget))
-            {
+            //if (GameManager.instance.PositionIsInLevelBoundaries(currentTarget))
+            //{
                 foundTarget = true;
-                break;
-            }
+            //    break;
+            //}
         }
 
         //velocity = Vector3.Normalize(playerTransform.position - transform.position) * minSpeed;

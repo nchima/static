@@ -5,8 +5,8 @@ using UnityEngine;
 public class TankEnemy : ShootingEnemy {
 
     /*
-     * I wish I never learned how to talk
-     * or unreeled from the reel
+     * I wish I never learned how to tell
+     * the unreal from the real
      * but the genius of this beastly life is everybody congeals
      * 
      * let me down let me down when you're done
@@ -21,8 +21,8 @@ public class TankEnemy : ShootingEnemy {
      * 
      * that's it for the wet dream, now it's on to the dry dreams
      * 
-     * I wish I never learned how to talk
-     * or untold from the told
+     * I wish I never learned how to tell
+     * the untold from the told
      * 
      * but the genius of the content of love
      * is such a dispenser of gold
