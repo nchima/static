@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour {
     int numberOfEnemies = 2;    // The number of enemies that spawned in the current level.
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
     public LevelGenerator levelGenerator;  // A reference to the level generator script.
+    LevelManager levelManager;
 
     // USED FOR FALLING INTO THE NEXT LEVEL
     [HideInInspector] public enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
@@ -73,7 +74,6 @@ public class GameManager : MonoBehaviour {
 
     // MISC REFERENCES
     public static GameManager instance;
-    Collider[] floorColliders;    // The floor colliders of the game environment.
     ScoreManager scoreManager;
     SpecialBarManager specialBarManager;
     HealthManager healthManager;
@@ -114,11 +114,11 @@ public class GameManager : MonoBehaviour {
         savedGravity = Physics.gravity;
 
         // Get references
-        floorColliders = GameObject.Find("Floor Planes").GetComponentsInChildren<Collider>();
         scoreManager = GetComponent<ScoreManager>();
         specialBarManager = GetComponent<SpecialBarManager>();
         healthManager = GetComponent<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
+        levelManager = GetComponentInChildren<LevelManager>();
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
         player = GameObject.Find("Player");
@@ -126,6 +126,8 @@ public class GameManager : MonoBehaviour {
         normalPlayerBounciness = player.GetComponent<Collider>().material.bounciness;
 
         scoreManager.DetermineBonusTime();
+
+        levelManager.LoadLevel(levelManager.currentLevelNumber);
 
         if (gunMethod == GunMethod.TuningBased)
         {
@@ -279,10 +281,9 @@ public class GameManager : MonoBehaviour {
             forceInvincibility = false;
 
             // Generate new level.
-            if (!dontChangeLevel)
+            if (!dontChangeLevel && !startMidFall)
             {
-                levelNumber += 1;
-                levelGenerator.Generate();
+                levelManager.LoadNextLevel();
             }
 
             // Place the player in the correct spot above the level.
@@ -290,7 +291,6 @@ public class GameManager : MonoBehaviour {
 
             // Re-enable the floor's collision (since it is disabled when the player completes a level.)
             //floor.GetComponent<Collider>().enabled = true;
-            foreach (Collider collider in floorColliders) collider.enabled = true;
 
             // Update billboards.
             GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
@@ -328,7 +328,6 @@ public class GameManager : MonoBehaviour {
         if (player.transform.position.y <= 600f)
         {
             scoreManager.HideLevelCompleteScreen();
-            foreach (Collider collider in floorColliders) collider.enabled = true;
         }
 
         // See if the player has touched down.
@@ -462,7 +461,7 @@ public class GameManager : MonoBehaviour {
         //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
 
         // Disable the floor's collider so the player falls through it.
-        foreach (Collider collider in floorColliders) collider.enabled = true;
+        levelManager.SetFloorCollidersActive(false);
 
         // Initiate falling sequence.
         fallingSequenceTimer = 0f;

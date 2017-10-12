@@ -52,9 +52,10 @@ public class MusicManager : MonoBehaviour {
 
     void ChooseNewClip()
     {
+
         // Make sure the same track does not play twice in a row.
         int clipIndex = previousTrackIndex;
-        while (clipIndex == previousTrackIndex)
+        while (tracks.Length > 1 && clipIndex == previousTrackIndex)
         {
             clipIndex = Random.Range(0, tracks.Length);
         }

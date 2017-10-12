@@ -29,5 +29,7 @@ public class EnemySpawner : Enemy {
 
         GameObject newEnemy = Instantiate(enemyToSpawn);
         newEnemy.transform.position = newPosition;
+
+        gameManager.currentEnemyAmt++;
     }
 }

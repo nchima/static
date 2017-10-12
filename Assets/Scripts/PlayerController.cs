@@ -86,7 +86,7 @@ public class PlayerController : MonoBehaviour {
         Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
         //Vector3 desiredMove = transform.TransformDirection(new Vector3(directionalInput.x, 0f, directionalInput.y));
         //Debug.Log("Direction Input X: " + directionalInput.x + ", Direction input Y: " + directionalInput.y + "Desired move: " + transform.InverseTransformDirection(desiredMove));
-
+        rigidBody.AddForce(rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1.12f, ForceMode.Force);
         // Apply movement force to rigidbody.
         if (desiredMove.magnitude != 0)
             rigidBody.AddForce(desiredMove.normalized * _accelerationSpeed, ForceMode.VelocityChange);
@@ -99,11 +99,12 @@ public class PlayerController : MonoBehaviour {
             else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
         }
 
+        Debug.Log(Vector2.Angle(lastKickDirection, directionalInput));
+
         if (directionalInput != Vector2.zero)
         {
             if (movementKickReady)
             {
-                Debug.Log("doing this.");
                 lastKickDirection = directionalInput;
                 movementKickTimer = 0f;
                 movementKickReady = false;

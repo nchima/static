@@ -157,6 +157,7 @@
     <Compile Include="Assets\Scripts\KeepBehind.cs" />
     <Compile Include="Assets\Scripts\KeepUpright.cs" />
     <Compile Include="Assets\Scripts\LevelGenerator.cs" />
+    <Compile Include="Assets\Scripts\LevelManager.cs" />
     <Compile Include="Assets\Scripts\MainMenuUI.cs" />
     <Compile Include="Assets\Scripts\MakeAllPixelsBlack.cs" />
     <Compile Include="Assets\Scripts\MonitorSliderScript.cs" />

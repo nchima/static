@@ -79,6 +79,12 @@ public class ScreenShake : MonoBehaviour {
                     originalPosition.z + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.z
                 );
 
+            vibratePosition = new Vector3(
+                   originalPosition.x + Mathf.Sin(Time.time*1.11f) *vibrateAmount * shakeScale.x*10f,
+                   originalPosition.y + Mathf.Sin(Time.time)  * vibrateAmount  * shakeScale.y * 10f,
+                   originalPosition.z + Mathf.Sin(Time.time*0.92f)  * vibrateAmount * shakeScale.z * 10f
+               );
+
             // If this object is set to not move on certain axes, reset those axes to their current position.
             //if (!shakeOnXAxis) vibratePosition.x = transform.position.x;
             //if (!shakeOnYAxis) vibratePosition.y = transform.position.y;

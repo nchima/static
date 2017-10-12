@@ -303,10 +303,10 @@ public class Gun : MonoBehaviour
 
         // Box cast forward in a line across the center of the screen to grab all enemies in the player's line of fire.
         float boxCastLength = 1000f;
-        float boxCastHeight = 75f;
-        float boxCastWidth = 1f;
+        float boxCastHeight = 100f;
+        float boxCastWidth = 3f;
         RaycastHit[] boxCastHits = Physics.BoxCastAll(
-            GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 2f,
+            GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 2f + GameManager.instance.player.transform.up * boxCastHeight * 0.5f,
             new Vector3(boxCastWidth, boxCastHeight, 1f),
             GameManager.instance.player.transform.forward,
             GameManager.instance.player.transform.rotation,
