@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Gun : MonoBehaviour
 {
@@ -302,30 +303,36 @@ public class Gun : MonoBehaviour
         /* SEE IF WE NEED TO AIM UP OR DOWN AT ENEMIES */
 
         // Box cast forward in a line across the center of the screen to grab all enemies in the player's line of fire.
-        float boxCastLength = 1000f;
-        float boxCastHeight = 100f;
-        float boxCastWidth = 3f;
-        RaycastHit[] boxCastHits = Physics.BoxCastAll(
-            GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 2f + GameManager.instance.player.transform.up * boxCastHeight * 0.5f,
-            new Vector3(boxCastWidth, boxCastHeight, 1f),
-            GameManager.instance.player.transform.forward,
-            GameManager.instance.player.transform.rotation,
-            boxCastLength,
-            (1 << 14)
-            );
+        //float boxCastLength = 1000f;
+        //float boxCastHeight = 100f;
+        //float boxCastWidth = 3f;
+        //RaycastHit[] boxCastHits = Physics.BoxCastAll(
+        //    GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 2f + GameManager.instance.player.transform.up * boxCastHeight * 0.5f,
+        //    new Vector3(boxCastWidth, boxCastHeight, 1f),
+        //    GameManager.instance.player.transform.forward,
+        //    GameManager.instance.player.transform.rotation,
+        //    boxCastLength,
+        //    (1 << 14)
+        //    );
 
-        // Figure out which of those enemies is closest to the player.
-        nearestEnemyPosition = GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 100f;
-        foreach (RaycastHit hit in boxCastHits)
+        nearestEnemyPosition = GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 1000f;
+        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            // For the enemies's position, use the center of its renderer.
-            Vector3 thisEnemyPosition = hit.collider.GetComponentInChildren<MeshRenderer>().bounds.center;
+            float bandSize = 0.025f;
 
-            // See if the distance to this enemy is less than the distance to the previous nearest enemy.
-            if (Vector3.Distance(GameManager.instance.player.transform.position, thisEnemyPosition) 
-                < Vector3.Distance(GameManager.instance.player.transform.position, nearestEnemyPosition))
+            // See if this enemy is near the middle of the screen.
+            Vector3 viewportPosition = Camera.main.WorldToViewportPoint(enemy.transform.position);
+            if ((viewportPosition.x >= 0.5f-bandSize && viewportPosition.x <= 0.5f+bandSize) && (viewportPosition.y >= 0f && viewportPosition.y <= 1f))
             {
-                nearestEnemyPosition = thisEnemyPosition;
+                // For the enemies's position, use the center of its renderer.
+                Vector3 thisEnemyPosition = enemy.GetComponentInChildren<MeshRenderer>().bounds.center;
+
+                // See if the distance to this enemy is less than the distance to the previous nearest enemy.
+                if (Vector3.Distance(GameManager.instance.player.transform.position, thisEnemyPosition)
+                    < Vector3.Distance(GameManager.instance.player.transform.position, nearestEnemyPosition))
+                {
+                    nearestEnemyPosition = thisEnemyPosition;
+                }
             }
         }
 
