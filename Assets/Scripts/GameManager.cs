@@ -320,7 +320,8 @@ public class GameManager : MonoBehaviour {
         {
             //player.GetComponent<Rigidbody>().isKinematic = false;
             player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
-            Physics.gravity *= speedFallGravityMultipier;
+            player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
+            //Physics.gravity *= speedFallGravityMultipier;
             speedFallActivated = true;
             forceInvincibility = true;
         }

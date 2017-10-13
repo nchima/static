@@ -49,7 +49,7 @@
 
 			float nrand(float2 n)
 			{
-				float scale = 0.35;
+				float scale = 0.1;
 				return frac(sin(dot(n.xy, float2(12.9898, 78.233)))* 43758.453) * (1+scale) - scale;
 			}
 

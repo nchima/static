@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour {
 
     // MOVEMENT
     [SerializeField] float accelerationSpeedGround;
-    [SerializeField] float accelerationSpeedFalling;
+    [SerializeField] float accelerationSpeedAir;
     [SerializeField] float minSpeed;
     public float maxGroundSpeed;
     public float maxAirSpeed;
@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour {
     private Quaternion targetRotation;
 
     // STATE
-    public enum State { Normal, ShotgunCharge, Falling }
+    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling }
     public State state;
 
     // INPUT
@@ -56,10 +56,13 @@ public class PlayerController : MonoBehaviour {
     private void Update()
     {
         /* GET INPUT */
-        directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        mouseInput = Input.GetAxis("Mouse X") * mouseSensitivity;
+        //if (state != State.SpeedFalling)
+        //{
+            directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        //}
 
         /* HANDLE VIEW ROTATION */
+        mouseInput = Input.GetAxis("Mouse X") * mouseSensitivity;
         float rotation = mouseInput;
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;
@@ -76,7 +79,7 @@ public class PlayerController : MonoBehaviour {
 
         if (state == State.Falling)
         {
-            _accelerationSpeed = accelerationSpeedFalling;
+            _accelerationSpeed = accelerationSpeedAir;
             _maxSpeed = maxAirSpeed;
         }
 
@@ -89,10 +92,9 @@ public class PlayerController : MonoBehaviour {
         //Debug.Log("Direction Input X: " + directionalInput.x + ", Direction input Y: " + directionalInput.y + "Desired move: " + transform.InverseTransformDirection(desiredMove));
 
         // Deccelerate.
-        if (state != State.Falling)
-        {
-            rigidBody.AddForce(rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1.12f, ForceMode.Force);
-        }
+        Vector3 deccelerateForce = rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1.12f;
+        deccelerateForce.y = 0;
+        rigidBody.AddForce(deccelerateForce, ForceMode.Force);
 
         // Apply movement force to rigidbody.
         if (desiredMove.magnitude != 0)
@@ -120,9 +122,14 @@ public class PlayerController : MonoBehaviour {
         }
 
         // Clamp velocity to max speed.
-        if (state == State.Falling)
+        if (state == State.Falling || state == State.SpeedFalling)
         {
-            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxFallingSpeed);
+            //rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxFallingSpeed);
+            rigidBody.velocity = new Vector3(
+                Mathf.Clamp(rigidBody.velocity.x, -maxAirSpeed*0.5f, maxAirSpeed*0.5f),
+                Mathf.Clamp(rigidBody.velocity.y, -maxFallingSpeed, maxFallingSpeed),
+                Mathf.Clamp(rigidBody.velocity.z, -maxAirSpeed*0.5f, maxAirSpeed*0.5f)
+                );
         }
 
         else
