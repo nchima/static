@@ -8,8 +8,7 @@ using DG.Tweening;
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
-    [SerializeField] bool dontChangeLevel;
-    [SerializeField] bool startMidFall;
+    public bool dontChangeLevel;
     [HideInInspector] public bool invincible;
     [SerializeField] public bool forceInvincibility;
     [SerializeField] float invincibilityTime = 0.5f;
@@ -24,22 +23,6 @@ public class GameManager : MonoBehaviour {
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
     public LevelGenerator levelGenerator;  // A reference to the level generator script.
     LevelManager levelManager;
-
-    // USED FOR FALLING INTO THE NEXT LEVEL
-    [HideInInspector] public enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
-    [HideInInspector] public PlayerState playerState = PlayerState.Normal;
-    float pauseAfterLevelCompleteLength = 1.5f;
-    float fallingSequenceTimer;
-    float lookUpSpeed = 0.25f;
-    float playerMoveSpeedWhenFalling = 50f;
-    float savedRegularMoveSpeed;
-    Vector3 savedGravity;
-    float speedFallGravityMultipier = 10f;
-    bool speedFallActivated = false;
-    [SerializeField] GameObject shockwavePrefab;
-    [HideInInspector] public bool playerTouchedDown = false;
-    Transform playerSpawnPoint;
-    float normalPlayerBounciness;
 
     // MENU SCREENS
     [SerializeField] GameObject highScoreScreen;
@@ -73,10 +56,11 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public Vector3 playerVelocity;
 
     // MISC REFERENCES
-    public static GameManager instance;
-    ScoreManager scoreManager;
-    SpecialBarManager specialBarManager;
-    HealthManager healthManager;
+    [HideInInspector] public static GameManager instance;
+    [HideInInspector] public ScoreManager scoreManager;
+    [HideInInspector] public SpecialBarManager specialBarManager;
+    [HideInInspector] public HealthManager healthManager;
+    [HideInInspector] public FallingSequenceManager fallingSequenceManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public GameObject player;
@@ -93,8 +77,10 @@ public class GameManager : MonoBehaviour {
             enemy.enabled = false;
         }
 
-        GameObject.Find("Player").GetComponent<PlayerController>().enabled = false;
-        foreach(Gun gun in FindObjectsOfType<Gun>())
+        player = GameObject.Find("Player");
+        player.GetComponent<PlayerController>().enabled = false;
+
+        foreach (Gun gun in FindObjectsOfType<Gun>())
         {
             gun.enabled = false;
         }
@@ -103,15 +89,11 @@ public class GameManager : MonoBehaviour {
 
     private void Start()
     {
-        playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
-
         // Set up the current number of enemies.
         currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
 
         //currentSine = Mathf.Sin(Time.time * oscSpeed);
         currentSine = Mathf.Sin(sineTime);
-
-        savedGravity = Physics.gravity;
 
         // Get references
         scoreManager = GetComponent<ScoreManager>();
@@ -119,11 +101,9 @@ public class GameManager : MonoBehaviour {
         healthManager = GetComponent<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
         levelManager = GetComponentInChildren<LevelManager>();
+        fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
-        player = GameObject.Find("Player");
-
-        normalPlayerBounciness = player.GetComponent<Collider>().material.bounciness;
 
         scoreManager.DetermineBonusTime();
 
@@ -133,13 +113,6 @@ public class GameManager : MonoBehaviour {
         {
             FindObjectOfType<CrossHair>().tuningTarget.gameObject.SetActive(true);
             GetNewTuningTarget();
-        }
-
-        if (startMidFall)
-        {
-            fallingSequenceTimer = 0f;
-            playerState = PlayerState.PauseAfterLevelComplete;
-
         }
     }
 
@@ -218,23 +191,12 @@ public class GameManager : MonoBehaviour {
             invincibilityTimer -= Time.deltaTime;
         }
         else if (!forceInvincibility) invincible = false;
+    }
 
-        // Handle falling.
-        if (playerState != PlayerState.Normal)
-        {
-            switch (playerState)
-            {
-                case PlayerState.PauseAfterLevelComplete:
-                    PauseAfterLevelComplete();
-                    break;
-                case PlayerState.FallingIntoLevel:
-                    FallIntoLevel();
-                    break;
-                case PlayerState.FiringShockwave:
-                    FireShockwave();
-                    break;
-            }
-        }
+
+    public void LoadNextLevel()
+    {
+        levelManager.LoadNextLevel();
     }
 
 
@@ -261,170 +223,12 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    void PauseAfterLevelComplete()
-    {
-        fallingSequenceTimer += Time.deltaTime;
-        //Debug.Log(fallingTimer);
-
-        if (fallingSequenceTimer >= pauseAfterLevelCompleteLength)
-        {
-            ReturnToFullSpeed();
-
-            player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
-
-            player.GetComponent<Collider>().material.bounciness = 0f;
-
-            Physics.gravity = savedGravity;
-
-            speedFallActivated = false;
-
-            forceInvincibility = false;
-
-            // Generate new level.
-            if (!dontChangeLevel && !startMidFall)
-            {
-                levelManager.LoadNextLevel();
-            }
-
-            // Place the player in the correct spot above the level.
-            player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
-
-            // Re-enable the floor's collision (since it is disabled when the player completes a level.)
-            //floor.GetComponent<Collider>().enabled = true;
-
-            // Update billboards.
-            GameObject.Find("Game Manager").GetComponent<BatchBillboard>().UpdateBillboards();
-
-            // Set up bonus time for next level.
-            scoreManager.DetermineBonusTime();
-
-            // Set up variables for falling.
-            playerTouchedDown = false;
-            savedRegularMoveSpeed = player.GetComponent<PlayerController>().maxAirSpeed;
-            player.GetComponent<PlayerController>().maxAirSpeed = playerMoveSpeedWhenFalling;
-            playerState = PlayerState.FallingIntoLevel;
-
-            // Begin rotating player camera to face down.
-            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
-
-            // Begin falling sequence.
-            specialBarManager.freezeDecay = true;
-        }
-    }
-
-
-    void FallIntoLevel()
-    {
-        // Player can activate speed fall by pressing fire.
-        if (!speedFallActivated && Input.GetButtonDown("Fire1"))
-        {
-            //player.GetComponent<Rigidbody>().isKinematic = false;
-            player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
-            player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
-            //Physics.gravity *= speedFallGravityMultipier;
-            speedFallActivated = true;
-            forceInvincibility = true;
-        }
-
-        if (player.transform.position.y <= 600f)
-        {
-            scoreManager.HideLevelCompleteScreen();
-        }
-
-        // See if the player has touched down.
-        if (player.transform.position.y <= 5f)
-        {
-            scoreManager.HideLevelCompleteScreen();
-
-            player.transform.position = new Vector3(player.transform.position.x, 2.11f, player.transform.position.z);
-
-            // Begin rotating camera back to regular position.
-            player.transform.Find("FirstPersonCharacter").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), lookUpSpeed*0.6f, RotateMode.Fast);
-
-            // Reset movement variables.
-            //player.GetComponent<Rigidbody>().isKinematic = true;
-            player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
-            player.GetComponent<PlayerController>().maxAirSpeed = savedRegularMoveSpeed;
-
-            fallingSequenceTimer = 0f;
-
-            if (speedFallActivated) InstantiateShockwave(shockwavePrefab, gun.burstsPerSecondModifierMax);
-
-            specialBarManager.freezeDecay = true;
-
-            playerState = PlayerState.FiringShockwave;
-        }
-    }
-
-
-    public void InstantiateShockwave(GameObject prefab, float gunRate)
-    {
-        // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
-        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
-        FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
-
-        // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
-        gun.canShoot = true;
-        DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
-
-        Vector3 shockwavePosition = player.transform.position;
-        shockwavePosition.y = 0f;
-        Instantiate(prefab, shockwavePosition, Quaternion.identity);
-    }
-
-
     public void ReturnToFullSpeed()
     {
         // Begin tweening time scale, gun burst rate, and music pitch back to normal.
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
         DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
         FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(1f, 1f).SetUpdate(true);
-    }
-
-
-    void FireShockwave()
-    {
-        fallingSequenceTimer += Time.deltaTime;
-        if (fallingSequenceTimer >= lookUpSpeed)
-        {
-            ReturnToFullSpeed();
-
-            gun.canShoot = true;
-
-            // Allow enemies to start attacking.
-            foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-            {
-                enemy.GetComponent<Enemy>().willAttack = true;
-            }
-
-            // Destroy any obstacles that the player is touching.
-            Collider[] overlappingSolids = Physics.OverlapCapsule(
-                player.transform.position, 
-                player.transform.position + Vector3.down * 10f, 
-                player.GetComponent<CapsuleCollider>().radius, 
-                1 << 8);
-
-            for (int i = 0; i < overlappingSolids.Length; i++)
-            {
-                if (overlappingSolids[i].tag == "Obstacle")
-                {
-                    overlappingSolids[i].GetComponent<Obstacle>().DestroyByPlayerFalling();
-                }
-            }
-
-            // Begin moving obstacles to their full height.
-            GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
-
-            Physics.gravity = savedGravity;
-
-            speedFallActivated = false;
-
-            forceInvincibility = false;
-
-            player.GetComponent<Collider>().material.bounciness = normalPlayerBounciness;
-
-            playerState = PlayerState.Normal;
-        }
     }
 
 
@@ -450,7 +254,7 @@ public class GameManager : MonoBehaviour {
 
     public void LevelComplete()
     {
-        if (playerState == PlayerState.PauseAfterLevelComplete) return;
+        if (fallingSequenceManager.playerState == FallingSequenceManager.PlayerState.PauseAfterLevelComplete) return;
         if (dontChangeLevel) return;
 
         levelWinAudio.Play();
@@ -462,11 +266,36 @@ public class GameManager : MonoBehaviour {
         //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
 
         // Disable the floor's collider so the player falls through it.
-        levelManager.SetFloorCollidersActive(false);
+        SetFloorCollidersActive(false);
 
         // Initiate falling sequence.
-        fallingSequenceTimer = 0f;
-        playerState = PlayerState.PauseAfterLevelComplete;
+        fallingSequenceManager.fallingSequenceTimer = 0f;
+        fallingSequenceManager.playerState = FallingSequenceManager.PlayerState.PauseAfterLevelComplete;
+    }
+
+
+    public void CountEnemies()
+    {
+        currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
+        currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
+    }
+
+
+    public void FreezeSpecialBarDecay(bool value)
+    {
+        specialBarManager.freezeDecay = value;
+    }
+
+
+    public void DetermineBonusTime()
+    {
+        scoreManager.DetermineBonusTime();
+    }
+
+
+    public void SetFloorCollidersActive(bool value)
+    {
+        levelManager.SetFloorCollidersActive(value);
     }
 
 

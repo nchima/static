@@ -9,7 +9,7 @@ public class PlayerCollisionMonitor : MonoBehaviour {
         if (collision.collider.tag == "Player")
         {
             Debug.Log("Player hit floor.");
-            GameManager.instance.playerTouchedDown = true;
+            GameManager.instance.fallingSequenceManager.playerTouchedDown = true;
         }
     }
 }

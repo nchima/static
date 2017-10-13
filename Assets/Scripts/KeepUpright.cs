@@ -11,7 +11,7 @@ public class KeepUpright : MonoBehaviour {
 
 	private void Update ()
     {
-		if (GameManager.instance.playerState == GameManager.PlayerState.FallingIntoLevel) {
+		if (GameManager.instance.fallingSequenceManager.playerState == FallingSequenceManager.PlayerState.FallingIntoLevel) {
 			transform.localScale = new Vector3 (widthAtMaxDistance * 0.1f, transform.localScale.y, widthAtMaxDistance * 0.1f);
 		} else {
 			ChangeScaleBasedOnPlayerDistance ();

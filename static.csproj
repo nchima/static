@@ -138,6 +138,7 @@
     <Compile Include="Assets\Scripts\DebugManager.cs" />
     <Compile Include="Assets\Scripts\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Explosion.cs" />
+    <Compile Include="Assets\Scripts\FallingSequenceManager.cs" />
     <Compile Include="Assets\Scripts\FloatRange.cs" />
     <Compile Include="Assets\Scripts\FloorCreator.cs" />
     <Compile Include="Assets\Scripts\FloorScroller.cs" />

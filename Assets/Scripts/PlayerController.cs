@@ -108,8 +108,6 @@ public class PlayerController : MonoBehaviour {
             else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
         }
 
-        Debug.Log(Vector2.Angle(lastKickDirection, directionalInput));
-
         if (directionalInput != Vector2.zero)
         {
             if (movementKickReady)

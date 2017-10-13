@@ -25,7 +25,6 @@ public class LevelManager : MonoBehaviour {
 
     public void LoadLevel(int levelNumber)
     {
-        Debug.Log(isLevelLoaded);
         if (isLevelLoaded) { SceneManager.UnloadSceneAsync(currentLevelNumber); }
         SceneManager.LoadScene(levelNumber, LoadSceneMode.Additive);
     }
