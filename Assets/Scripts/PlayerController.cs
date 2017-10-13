@@ -84,9 +84,16 @@ public class PlayerController : MonoBehaviour {
 
         // Get desired movement direction.
         Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
+
         //Vector3 desiredMove = transform.TransformDirection(new Vector3(directionalInput.x, 0f, directionalInput.y));
         //Debug.Log("Direction Input X: " + directionalInput.x + ", Direction input Y: " + directionalInput.y + "Desired move: " + transform.InverseTransformDirection(desiredMove));
-        rigidBody.AddForce(rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1.12f, ForceMode.Force);
+
+        // Deccelerate.
+        if (state != State.Falling)
+        {
+            rigidBody.AddForce(rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1.12f, ForceMode.Force);
+        }
+
         // Apply movement force to rigidbody.
         if (desiredMove.magnitude != 0)
             rigidBody.AddForce(desiredMove.normalized * _accelerationSpeed, ForceMode.VelocityChange);

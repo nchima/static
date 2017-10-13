@@ -422,7 +422,7 @@ public class Gun : MonoBehaviour
         else
         {
             bulletScale = bulletRange / 2;
-            bulletPosition = bulletSpawnTransform.up.normalized * (bulletRange / 2);
+            bulletPosition = bulletSpawnTransform.forward.normalized * (bulletRange / 2);
         }
 
         // If a bullet hit an enemy, play the bullet strike audio.
