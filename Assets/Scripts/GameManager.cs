@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public ScoreManager scoreManager;
     [HideInInspector] public SpecialBarManager specialBarManager;
     [HideInInspector] public HealthManager healthManager;
-    [HideInInspector] public FallingSequenceManager fallingSequenceManager;
+    [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public GameObject player;
@@ -269,8 +269,7 @@ public class GameManager : MonoBehaviour {
         SetFloorCollidersActive(false);
 
         // Initiate falling sequence.
-        fallingSequenceManager.fallingSequenceTimer = 0f;
-        fallingSequenceManager.playerState = FallingSequenceManager.PlayerState.PauseAfterLevelComplete;
+        fallingSequenceManager.BeginFalling();
     }
 
 

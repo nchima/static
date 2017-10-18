@@ -302,19 +302,6 @@ public class Gun : MonoBehaviour
 
         /* SEE IF WE NEED TO AIM UP OR DOWN AT ENEMIES */
 
-        // Box cast forward in a line across the center of the screen to grab all enemies in the player's line of fire.
-        //float boxCastLength = 1000f;
-        //float boxCastHeight = 100f;
-        //float boxCastWidth = 3f;
-        //RaycastHit[] boxCastHits = Physics.BoxCastAll(
-        //    GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 2f + GameManager.instance.player.transform.up * boxCastHeight * 0.5f,
-        //    new Vector3(boxCastWidth, boxCastHeight, 1f),
-        //    GameManager.instance.player.transform.forward,
-        //    GameManager.instance.player.transform.rotation,
-        //    boxCastLength,
-        //    (1 << 14)
-        //    );
-
         nearestEnemyPosition = GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 1000f;
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
@@ -379,7 +366,7 @@ public class Gun : MonoBehaviour
 
         // Raycast to see if the bullet hit an object and to see where it hit.
         RaycastHit hit;
-        if (Physics.SphereCast(bulletSpawnTransform.position, 0.4f, bulletSpawnTransform.forward, out hit, bulletRange, (1 << 8) | (1 << 13) | (1 << 14)))
+        if (Physics.SphereCast(bulletSpawnTransform.position, 0.4f, bulletSpawnTransform.forward, out hit, bulletRange, (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23)))
         {
             Debug.DrawRay(bulletSpawnTransform.position, bulletSpawnTransform.forward * 100f, Color.red, 1f);
             // Show particle effect

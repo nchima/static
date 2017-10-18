@@ -143,6 +143,5 @@ public class SpecialBarManager : MonoBehaviour {
     public void PlayerUsedSpecialMove()
     {
         currentValue = 0f;
-        Debug.Log(currentValue);
     }
 }

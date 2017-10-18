@@ -186,4 +186,14 @@ public class PlayerController : MonoBehaviour {
         for (int i = 0; i < orthographicCams.Length; i++)
             orthographicCams[i].orthographicSize = newSize;
     }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name.Contains("Player Fall Catcher"))
+        {
+            GameManager.instance.dontChangeLevel = true;
+            GameManager.fallingSequenceManager.playerState = FallingSequenceManager.PlayerState.PauseAfterLevelComplete;            
+        }
+    }
 }

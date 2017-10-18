@@ -67,10 +67,10 @@
 				//clip(((col.r + col.g + col.b) / 3) - _AlphaCutoff);
 				//clip(col.a - _AlphaCutoff);
 
-				clip(col.r - (_ColorMask.r + nrand(unity_DeltaTime.yz)));
-				clip(col.g - (_ColorMask.g + nrand(_SinTime.xy)));
-				clip(col.b - (_ColorMask.b + nrand(_CosTime.xy)));
-				clip(col.a - (_ColorMask.a + nrand(_Time.xy)));
+				clip(col.r - (_ColorMask.r + nrand(i.uv)));
+				clip(col.g - (_ColorMask.g + nrand(i.uv)));
+				clip(col.b - (_ColorMask.b + nrand(i.uv)));
+				clip(col.a - (_ColorMask.a + nrand(i.uv)));
 
 				col.r = _ColorMask.r * 2;
 				col.g = _ColorMask.g * 2;

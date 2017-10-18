@@ -78,18 +78,11 @@ public class FallingSequenceManager : MonoBehaviour {
 
         if (fallingSequenceTimer >= pauseAfterLevelCompleteLength)
         {
-            Debug.Log("Doing this.");
-
             GameManager.instance.ReturnToFullSpeed();
-
             player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
-
             player.GetComponent<Collider>().material.bounciness = 0f;
-
             Physics.gravity = savedGravity;
-
             speedFallActivated = false;
-
             GameManager.instance.forceInvincibility = false;
 
             // Generate new level.
@@ -127,12 +120,7 @@ public class FallingSequenceManager : MonoBehaviour {
         // Player can activate speed fall by pressing fire.
         if (!speedFallActivated && Input.GetButtonDown("Fire1"))
         {
-            //player.GetComponent<Rigidbody>().isKinematic = false;
-            player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
-            player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
-            //Physics.gravity *= speedFallGravityMultipier;
-            speedFallActivated = true;
-            GameManager.instance.forceInvincibility = true;
+            ActivateSpeedFall();
         }
 
         if (player.transform.position.y <= 600f)
@@ -141,7 +129,7 @@ public class FallingSequenceManager : MonoBehaviour {
         }
 
         // See if the player has touched down.
-        if (player.transform.position.y <= 5f)
+        if (Physics.Raycast(player.transform.position, Vector3.down, 7f))
         {
             GameManager.instance.scoreManager.HideLevelCompleteScreen();
             GameManager.instance.CountEnemies();
@@ -208,6 +196,8 @@ public class FallingSequenceManager : MonoBehaviour {
 
             player.GetComponent<Collider>().material.bounciness = normalPlayerBounciness;
 
+            GameManager.instance.dontChangeLevel = false;
+
             playerState = PlayerState.Normal;
         }
     }
@@ -227,5 +217,23 @@ public class FallingSequenceManager : MonoBehaviour {
         Vector3 shockwavePosition = player.transform.position;
         shockwavePosition.y = 0f;
         Instantiate(prefab, shockwavePosition, Quaternion.identity);
+    }
+
+
+    void ActivateSpeedFall()
+    {
+        //player.GetComponent<Rigidbody>().isKinematic = false;
+        player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
+        player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
+        //Physics.gravity *= speedFallGravityMultipier;
+        speedFallActivated = true;
+        GameManager.instance.forceInvincibility = true;
+    }
+
+
+    public void BeginFalling()
+    {
+        fallingSequenceTimer = 0f;
+        playerState = PlayerState.PauseAfterLevelComplete;
     }
 }
