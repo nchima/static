@@ -57,8 +57,8 @@ public class Enemy : MonoBehaviour
     protected bool immovable = false; // Whether I can currently be turned into a physics object.
     bool isPhysicsObject = false;
     float physicsObjectTimer = 0f;
-    [SerializeField] protected int _HP = 20; // Health points.
-    int maxHP;
+    [SerializeField] protected int _HP = 20; // Max health points (set in iinspector)
+    [HideInInspector] public int maxHP;  // Max health (is a different variable from the one set in the inspector for ....... a reason?
     public virtual int HP
     {
         get

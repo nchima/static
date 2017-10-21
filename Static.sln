@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2015
+# Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "static", "static.csproj", "{8DAEA302-C887-B750-1344-15B88EA25163}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "static.Plugins", "static.Plugins.csproj", "{FC28CEB1-47FC-0CD4-8C8C-31D2090CB2A6}"

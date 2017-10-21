@@ -422,6 +422,10 @@ public class Gun : MonoBehaviour
         // If a bullet hit an enemy, play the bullet strike audio.
         if (playAudio)
         {
+            // Get sound effect pitch based on enemies current vs max health.
+            Enemy theEnemyIHit = hit.collider.GetComponent<Enemy>();
+            float newPitch = MyMath.Map(theEnemyIHit.HP, 0f, theEnemyIHit.maxHP, 1f, 0.75f);
+            bulletStrikeAudio.pitch = newPitch;
             bulletStrikeAudio.Play();
         }
 
