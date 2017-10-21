@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour {
 
     // FOV
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
-    FloatRange orthographicSizeRange = new FloatRange(23f, 40f);
+    FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
     [SerializeField] Camera[] perspectiveCams;
     [SerializeField] Camera[] orthographicCams;
 

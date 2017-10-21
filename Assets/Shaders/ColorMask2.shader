@@ -61,16 +61,16 @@
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
 				
-				//col.rgb *= _ColorMask.rgb;
+				col.rgb *= _ColorMask.rgb;
 
-				//clip(((col.r + col.g + col.b) / 3) - ((_ColorMask.r + _ColorMask.g + _ColorMask.b) / 3));
-				//clip(((col.r + col.g + col.b) / 3) - _AlphaCutoff);
-				//clip(col.a - _AlphaCutoff);
+				clip(((col.r + col.g + col.b) / 3) - ((_ColorMask.r + _ColorMask.g + _ColorMask.b) / 3));
+				clip(((col.r + col.g + col.b) / 3) - _AlphaCutoff);
+				clip(col.a - _AlphaCutoff);
 
-				clip(col.r - (_ColorMask.r + nrand(i.uv)));
-				clip(col.g - (_ColorMask.g + nrand(i.uv)));
-				clip(col.b - (_ColorMask.b + nrand(i.uv)));
-				clip(col.a - (_ColorMask.a + nrand(i.uv)));
+				//clip(col.r - (_ColorMask.r + nrand(i.uv)));
+				//clip(col.g - (_ColorMask.g + nrand(i.uv)));
+				//clip(col.b - (_ColorMask.b + nrand(i.uv)));
+				//clip(col.a - (_ColorMask.a + nrand(i.uv)));
 
 				col.r = _ColorMask.r * 2;
 				col.g = _ColorMask.g * 2;
