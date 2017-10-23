@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour {
 
         if (directionalInput != Vector2.zero)
         {
-            if (movementKickReady)
+            if (movementKickReady && state != State.Falling && state != State.SpeedFalling)
             {
                 lastKickDirection = directionalInput;
                 movementKickTimer = 0f;
