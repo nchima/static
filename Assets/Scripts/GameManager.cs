@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityStandardAssets.Characters.FirstPerson;
 using DG.Tweening;
-
+using UnityEngine.Audio;
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
@@ -18,11 +18,10 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private AudioSource levelWinAudio;   // The audio source that plays when the player completes a level.
 
     // USED FOR LEVEL GENERATION
-    public int levelNumber = 0;    // The current level.
     int numberOfEnemies = 2;    // The number of enemies that spawned in the current level.
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
     public LevelGenerator levelGenerator;  // A reference to the level generator script.
-    LevelManager levelManager;
+    public static LevelManager levelManager;
 
     // MENU SCREENS
     [SerializeField] GameObject highScoreScreen;
@@ -61,6 +60,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public SpecialBarManager specialBarManager;
     [HideInInspector] public HealthManager healthManager;
     [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
+    [HideInInspector] public static MusicManager musicManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public GameObject player;
@@ -102,6 +102,7 @@ public class GameManager : MonoBehaviour {
         levelGenerator = GetComponent<LevelGenerator>();
         levelManager = GetComponentInChildren<LevelManager>();
         fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
+        musicManager = GetComponentInChildren<MusicManager>();
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
 
@@ -243,7 +244,7 @@ public class GameManager : MonoBehaviour {
         //}
 
         currentEnemyAmt -= 1;
-        //Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
+        Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
 
         if (currentEnemyAmt <= 0)
         {
@@ -260,6 +261,7 @@ public class GameManager : MonoBehaviour {
         levelWinAudio.Play();
 
         scoreManager.LevelComplete();
+        levelManager.isLevelCompleted = true;
 
         gun.canShoot = false;
 
@@ -277,6 +279,7 @@ public class GameManager : MonoBehaviour {
     {
         currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
         currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        Debug.Log("Number of enemies: " + currentEnemyAmt);
     }
 
 
@@ -432,6 +435,8 @@ public class GameManager : MonoBehaviour {
                 newTuningTimer = 0f;
             }
         }
+
+        musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", (currentSine + 1f) * 11000f + 200f);
 
         player.GetComponent<PlayerController>().SetFieldOfView(currentSine);
     }

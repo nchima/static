@@ -150,6 +150,7 @@
     <None Include="Assets\Shaders\ColorMask.shader" />
     <None Include="Assets\Shaders\ColorMask2.shader" />
     <None Include="Assets\Shaders\ColorMaskBlack.shader" />
+    <None Include="Assets\Shaders\Dennis.shader" />
     <None Include="Assets\Shaders\Flash.shader" />
     <None Include="Assets\Shaders\InvertFilter.shader" />
     <None Include="Assets\Shaders\MakePixelsBlack.shader" />

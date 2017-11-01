@@ -192,7 +192,6 @@ public class PlayerController : MonoBehaviour {
     {
         if (other.name.Contains("Player Fall Catcher"))
         {
-            GameManager.instance.dontChangeLevel = true;
             GameManager.fallingSequenceManager.playerState = FallingSequenceManager.PlayerState.PauseAfterLevelComplete;            
         }
     }

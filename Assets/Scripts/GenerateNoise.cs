@@ -15,9 +15,13 @@ public class GenerateNoise : MonoBehaviour {
 
     private void FixedUpdate()
     {
+        //GenNoise();
+    }
+
+
+    void GenNoise() {
         pixels = noiseTex.GetPixels(0, 0, noiseTex.width, noiseTex.height);
-        for (int i = 0; i < pixels.Length; i++)
-        {
+        for (int i = 0; i < pixels.Length; i++) {
             float pixelColor = Random.value;
             pixels[i] = new Color(pixelColor, pixelColor, pixelColor, 1);
             //pixels[i] = Random.ColorHSV();

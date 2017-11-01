@@ -72,10 +72,10 @@ public class LevelGenerator : MonoBehaviour {
     {
         if (dontGenerate) return;
 
-        if (gameManager.levelNumber != 0) baseLevelSize += levelSizeIncrease;
+        if (GameManager.levelManager.currentLevelNumber != 0) baseLevelSize += levelSizeIncrease;
 
         currentNumberOfEnemies = 0;
-        numberOfObstacles = numberOfObstaclesRange.Random + gameManager.levelNumber * 4;
+        numberOfObstacles = numberOfObstaclesRange.Random + GameManager.levelManager.currentLevelNumber * 4;
 
         // Clear level of all current obstacles and enemies.
         foreach (GameObject go in GameObject.FindGameObjectsWithTag("Enemy"))
@@ -141,7 +141,7 @@ public class LevelGenerator : MonoBehaviour {
 
     void AddEnemies()
     {
-        EnemiesPerLevel enemiesPerCurrentLevel = enemiesPerLevel[gameManager.levelNumber];
+        EnemiesPerLevel enemiesPerCurrentLevel = enemiesPerLevel[GameManager.levelManager.currentLevelNumber];
 
         for (int i = 0; i < enemiesPerCurrentLevel.basicEnemies; i++) PlaceEnemy(basicEnemyPrefab);
         for (int i = 0; i < enemiesPerCurrentLevel.meleeEnemies; i++) PlaceEnemy(meleeEnemyPrefab);

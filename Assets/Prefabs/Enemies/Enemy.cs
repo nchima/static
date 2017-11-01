@@ -151,9 +151,11 @@ public class Enemy : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         myMaterial = GetComponentInChildren<MeshRenderer>().material;
 
+        GetComponent<EnemyPropertyBlockControl>()._renderers = myGeometry.GetComponentsInChildren<Renderer>();
+
         // Remember my starting color.
-        originalColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.color;
-        originalEmissionColor = myGeometry.GetComponentInChildren<MeshRenderer>().material.GetColor("_EmissionColor");
+        originalColor = Color.black;
+        originalEmissionColor = Color.black;
         currentColor = originalColor;
         currentEmissionColor = originalEmissionColor;
         attackingColorCurrent = originalColor;
@@ -200,18 +202,21 @@ public class Enemy : MonoBehaviour
         currentColor = attackingColorCurrent + hurtColorCurrent;
         currentEmissionColor = attackingColorCurrent + hurtColorCurrent;
 
-        foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
-        {
-            if (mr.transform.childCount > 0)
-            {
-                foreach (MeshRenderer mrs in mr.GetComponentsInChildren<MeshRenderer>())
-                {
-                    SetColor(mrs);
-                }
-            }
+        GetComponent<EnemyPropertyBlockControl>().MainColor = currentColor;
+        GetComponent<EnemyPropertyBlockControl>().EmissionColor = currentEmissionColor;
 
-            SetColor(mr);
-        }
+        //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>())
+        //{
+        //    if (mr.transform.childCount > 0)
+        //    {
+        //        foreach (MeshRenderer mrs in mr.GetComponentsInChildren<MeshRenderer>())
+        //        {
+        //            SetColor(mrs);
+        //        }
+        //    }
+
+        //    SetColor(mr);
+        //}
 
         if (isPhysicsObject)
         {
@@ -225,9 +230,9 @@ public class Enemy : MonoBehaviour
             }
         }
 
-        vertexJitterRate -= 0.5f;
-        vertexJitterRate = Mathf.Clamp(vertexJitterRate, 0f, 20f);
-        if (vertexJitterRate > 0f) JitterVertices();
+        //vertexJitterRate -= 0.5f;
+        //vertexJitterRate = Mathf.Clamp(vertexJitterRate, 0f, 20f);
+        //if (vertexJitterRate > 0f) JitterVertices();
     }
 
 
@@ -300,5 +305,12 @@ public class Enemy : MonoBehaviour
         willMove = true;
         GetComponent<Rigidbody>().isKinematic = true;
         isPhysicsObject = false;
+    }
+
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.name.ToLower().Contains("player fall catcher")) {
+            Die();
+        }
     }
 }

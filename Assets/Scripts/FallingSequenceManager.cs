@@ -86,7 +86,7 @@ public class FallingSequenceManager : MonoBehaviour {
             GameManager.instance.forceInvincibility = false;
 
             // Generate new level.
-            if (!GameManager.instance.dontChangeLevel && !startMidFall) { GameManager.instance.LoadNextLevel(); }
+            if (!GameManager.instance.dontChangeLevel && GameManager.levelManager.isLevelCompleted /* && !startMidFall*/) { Debug.Log("Generating");  GameManager.instance.LoadNextLevel(); }
 
             // Place the player in the correct spot above the level.
             player.transform.position = new Vector3(player.transform.position.x, playerSpawnPoint.position.y, player.transform.position.z);
@@ -195,8 +195,6 @@ public class FallingSequenceManager : MonoBehaviour {
             GameManager.instance.forceInvincibility = false;
 
             player.GetComponent<Collider>().material.bounciness = normalPlayerBounciness;
-
-            GameManager.instance.dontChangeLevel = false;
 
             playerState = PlayerState.Normal;
         }
