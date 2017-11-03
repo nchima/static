@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class FloorScroller : MonoBehaviour {
 
-    // Poop on top of my volcano, por favor. Thank you!
-
     Material material;
     [SerializeField] float scrollRate = 0.01f;
 
@@ -18,8 +16,10 @@ public class FloorScroller : MonoBehaviour {
 
     void Update()
     {
-        Vector2 newOffset = material.mainTextureOffset;
-        newOffset.y += scrollRate;
-        material.mainTextureOffset = newOffset;
+        if (GetComponent<OffsetPropertyBlockControl>()) {
+            Vector2 newOffset = material.mainTextureOffset;
+            newOffset.y += scrollRate;
+            GetComponent<OffsetPropertyBlockControl>().Offset = newOffset;
+        }
     }
 }

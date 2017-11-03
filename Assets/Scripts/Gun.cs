@@ -3,8 +3,7 @@ using UnityStandardAssets.Characters.FirstPerson;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Gun : MonoBehaviour
-{
+public class Gun : MonoBehaviour {
     /* TWEAKABLE VARIABLES */
 
     // How many bullets are fired per shot.
@@ -99,20 +98,16 @@ public class Gun : MonoBehaviour
     Vector3 recoilPosition;
 
 
-    void Start()
-    {
-        // Instantiate all bullet prefabs. (Just make 100 for now so I don't have to do math to figure out how many could potentially be on screen at once.)
-        // Then, move them all to a far away place so the player doesn't see them.
+    void Start() {
+        // Instantiate all bullet prefabs. Then, move them all to a far away place so the player doesn't see them.
         bullets = new GameObject[200];
-        for (int i = 0; i < bullets.Length; i++)
-        {
+        for (int i = 0; i < bullets.Length; i++) {
             bullets[i] = Instantiate(bulletPrefab);
             bullets[i].transform.position = new Vector3(0, -500, 0);
         }
 
         // Get the point from which bullets will spawn.
         bulletSpawnTransform = GameObject.Find("BulletSpawnPoint").transform;
-
         gunTipTransform = GameObject.Find("Tip").transform;
 
         // Get a reference to the score controller.
@@ -126,8 +121,7 @@ public class Gun : MonoBehaviour
     }
 
 
-    void Update()
-    {
+    void Update() {
         // Handle crosshair.
         //if (TestBurst())
         //    crosshair.GetComponent<CrossHairLines>().targetAllGoodAndStuff = true;
@@ -143,14 +137,12 @@ public class Gun : MonoBehaviour
         timeSinceLastShot += Time.deltaTime;
 
         // Reset special moves if sine is in middle of bar.
-        if (gameManager.currentSine < 0.1f && gameManager.currentSine > -0.1f)
-        {
+        if (gameManager.currentSine < 0.1f && gameManager.currentSine > -0.1f) {
             firedMissiles = false;
         }
 
         /* Firing special moves */
-        foreach(MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
-        {
+        foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>()) {
             if (shotgunChargeIsReady || missilesAreReady) mr.material.color = Color.Lerp(specialMoveReadyColor1, specialMoveReadyColor2, Random.Range(0f, 1f));
             else mr.material.color = Color.black;
         }
@@ -162,18 +154,13 @@ public class Gun : MonoBehaviour
         //    firingMissiles = true;
         //}
 
-        if (canShoot && (Input.GetButton("Fire2") || Input.GetAxisRaw("Fire2") != 0))
-        {
-            if (missilesAreReady && !firingMissiles && !firedMissiles)
-            {
+        if (canShoot && (Input.GetButton("Fire2") || Input.GetAxisRaw("Fire2") != 0)) {
+            if (missilesAreReady && !firingMissiles && !firedMissiles) {
                 gameManager.PlayerUsedSpecialMove();
                 missilesFired = 0;
                 missileTimer = 0f;
                 firingMissiles = true;
-            }
-
-            else if (shotgunChargeIsReady)
-            {
+            } else if (shotgunChargeIsReady) {
                 gameManager.PlayerUsedSpecialMove();
                 isDoingShotgunCharge = true;
                 gameManager.BeginShotgunCharge();
@@ -189,37 +176,35 @@ public class Gun : MonoBehaviour
     }
 
 
-    void FireMissiles()
-    {
+    void FireMissiles() {
         if (!firingMissiles) return;
 
-        if (missileTimer >= missileCooldown)
-        {
+        if (missileTimer >= missileCooldown) {
             missilesFired++;
             missileTimer = 0;
             Instantiate(missilePrefab, gunTipTransform.position, gameManager.player.transform.rotation);
-        }
-
-        else
-        {
+        } else {
             missileTimer += Time.deltaTime;
         }
 
-        if (missilesFired >= missilesPerBurst)
-        {
+        if (missilesFired >= missilesPerBurst) {
             firingMissiles = false;
             firedMissiles = true;
         }
     }
 
 
-    void DoShotgunCharge()
-    {
-        if (Input.GetButtonUp("Fire2") || Input.GetAxisRaw("Fire2") == 0)
-        {
-            isDoingShotgunCharge = false;
-            gameManager.CompleteShotgunCharge();
+    void DoShotgunCharge() {
+        // See if the player has released the button.
+        if ((Input.GetButtonUp("Fire2") || Input.GetAxisRaw("Fire2") == 0) && FindObjectOfType<ShotgunCharge>().isReadyToEndCharge) {
+            EndShotgunCharge();
         }
+    }
+
+
+    public void EndShotgunCharge() {
+        isDoingShotgunCharge = false;
+        gameManager.CompleteShotgunCharge();
     }
 
 
@@ -430,8 +415,8 @@ public class Gun : MonoBehaviour
         }
 
         // Set bullet color
-        bullets[bulletIndex].GetComponentInChildren<MeshRenderer>().material.color = bulletColor;
-        bullets[bulletIndex].GetComponentInChildren<MeshRenderer>().material.SetColor("_EmissionColor", bulletColor);
+        //bullets[bulletIndex].GetComponentInChildren<MeshRenderer>().material.color = bulletColor;
+        //bullets[bulletIndex].GetComponentInChildren<MeshRenderer>().material.SetColor("_EmissionColor", bulletColor);
 
         // Fire bullet.
         bullets[bulletIndex].GetComponent<PlayerBullet>().GetFired(

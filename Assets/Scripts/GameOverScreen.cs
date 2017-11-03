@@ -18,7 +18,7 @@ public class GameOverScreen : MonoBehaviour
         Cursor.visible = true;
 
         // Disable player controls.
-        player = GameObject.Find("FPSController");
+        player = FindObjectOfType<PlayerController>().gameObject;
         player.GetComponent<PlayerController>().UnlockCursor();
         player.GetComponent<CapsuleCollider>().center = new Vector3(player.GetComponent<CapsuleCollider>().center.x, player.GetComponent<CapsuleCollider>().center.y - 0.5f, player.GetComponent<CapsuleCollider>().center.z);
         player.GetComponent<PlayerController>().maxAirSpeed = 0;
@@ -31,7 +31,8 @@ public class GameOverScreen : MonoBehaviour
         }
 
         // Disable floor
-        GameObject.Find("Floor").SetActive(false);
+        GameManager.instance.SetFloorCollidersActive(false);
+        //GameObject.Find("Floor").SetActive(false);
 
         // Turn background red.
         GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color = new Color(GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.r + 0.1f, GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.g, GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.b);

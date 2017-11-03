@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static GameManager instance;
     [HideInInspector] public ScoreManager scoreManager;
     [HideInInspector] public SpecialBarManager specialBarManager;
-    [HideInInspector] public HealthManager healthManager;
+    [HideInInspector] public static HealthManager healthManager;
     [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
     [HideInInspector] public static MusicManager musicManager;
     [HideInInspector] public Gun gun;
@@ -140,8 +140,8 @@ public class GameManager : MonoBehaviour {
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
         }
 
-        gun.shotgunChargeIsReady = currentSine <= -1f + gun.specialMoveSineRange && specialBarManager.barIsFull;
-        gun.missilesAreReady = currentSine >= 1f - gun.specialMoveSineRange && specialBarManager.barIsFull;
+        gun.shotgunChargeIsReady = currentSine <= 0f && specialBarManager.barIsFull;
+        gun.missilesAreReady = currentSine >= 0f && specialBarManager.barIsFull;
 
         if ((gun.shotgunChargeIsReady || gun.missilesAreReady))
         {
@@ -150,7 +150,6 @@ public class GameManager : MonoBehaviour {
 
         if (gunMethod == GunMethod.TuningBased && specialBarManager.barIsFull)
         {
-            gun.missilesAreReady = true;
             specialBarManager.FlashBar();
         }
 
@@ -201,25 +200,22 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerUsedSpecialMove()
-    {
+    public void PlayerUsedSpecialMove() {
         specialBarManager.PlayerUsedSpecialMove();
-
         if (gunMethod == GunMethod.TuningBased) GetNewTuningTarget();
     }
 
 
-    public void BeginShotgunCharge()
-    {
+    public void BeginShotgunCharge() {
         invincible = true;
         player.GetComponentInChildren<ShotgunCharge>().BeginCharge();
-        player.GetComponent<FirstPersonController>().isDoingShotgunCharge = true;
+        player.GetComponent<PlayerController>().state = PlayerController.State.ShotgunCharge;
     }
 
 
     public void CompleteShotgunCharge()
     {
-        player.GetComponent<FirstPersonController>().isDoingShotgunCharge = false;
+        player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
         player.GetComponentInChildren<ShotgunCharge>().EndCharge();
     }
 
@@ -235,21 +231,13 @@ public class GameManager : MonoBehaviour {
 
     public void PlayerKilledEnemy(int enemyKillValue)
     {
-        // See if the player has killed all the enemies in this level. If so, change the level.
-        //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) { }
-        //else
-        //{
-            scoreManager.PlayerKilledEnemy(enemyKillValue);
-            specialBarManager.PlayerKilledEnemy();
-        //}
+        // Add score and special bar values.
+        scoreManager.PlayerKilledEnemy(enemyKillValue);
+        specialBarManager.PlayerKilledEnemy();
 
+        // If player has killed all the enemies in the current level, begin the level completion sequence.
         currentEnemyAmt -= 1;
-        Debug.Log("Current enemy amount: " + currentEnemyAmt + ". Time: " + Time.time);
-
-        if (currentEnemyAmt <= 0)
-        {
-            LevelComplete();
-        }
+        if (currentEnemyAmt <= 0) { LevelComplete(); }
     }
 
 
@@ -437,6 +425,8 @@ public class GameManager : MonoBehaviour {
         }
 
         musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", (currentSine + 1f) * 11000f + 200f);
+        musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer
+            .SetFloat("FilterCutoff", MyMath.Map(currentSine, -1f, 1f, 10000f, 20000f));
 
         player.GetComponent<PlayerController>().SetFieldOfView(currentSine);
     }

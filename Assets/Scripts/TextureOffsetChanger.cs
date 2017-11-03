@@ -12,10 +12,11 @@ public class TextureOffsetChanger : MonoBehaviour {
 	}
 
 	void Update () {
-
-		mat.mainTextureOffset = new Vector2 (
-			mat.mainTextureOffset.x + MyMath.Map(Input.GetAxis("Mouse X"), -1f, 1f, -relativeSpeed, relativeSpeed),
-			MyMath.Map(Mathf.Sin (Time.time), -1, 1, -20, 20)
-		);
+        //if (GetComponent<OffsetPropertyBlockControl>()) {
+            mat.mainTextureOffset = new Vector2(
+                mat.mainTextureOffset.x + MyMath.Map(Input.GetAxis("Mouse X"), -1f, 1f, -relativeSpeed, relativeSpeed),
+                MyMath.Map(Mathf.Sin(Time.time), -1, 1, -20, 20)
+            );
+        //}
 	}
 }

@@ -1,10 +1,11 @@
-﻿Shader "Custom/Dennis" {
+﻿Shader "Custom/Dennis2" {
 	Properties {
 		
 		[PerRendererData] _Color ("Color", Color) = (1,1,1,1)
 		[PerRendererData] _Emission ("Emission", Color) = (0,0,0,0)
 		[PerRendererData] _Explode ("Explode", float) = 0
 		[PerRendererData] _RandomSeed ("Random Seed", Range(0,10)) = 0
+		[PerRendererData] _TextureOffset ("Texture Offset", Vector) = (0,0,0,0)
 		_ExplodeDistance ("Explode Distance", Range(0.1, 100)) = 2.0
 		_ExplodeCutoff ("Explode Alpha Cutoff", Range(0,1)) = 0.5
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
@@ -47,6 +48,7 @@
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _Emission)
 			UNITY_DEFINE_INSTANCED_PROP(float, _Explode)
 			UNITY_DEFINE_INSTANCED_PROP(float, _RandomSeed)
+			UNITY_DEFINE_INSTANCED_PROP(float4, _TextureOffset)
 		UNITY_INSTANCING_CBUFFER_END
 
 		//just generates a nice Perlin noise from a texture. It's offset using the _RandomSeed instance property (hopefully different for every object).
@@ -57,7 +59,7 @@
 		    float3 f = frac(x);
 			f = f*f*(3.0-2.0*f);
 			float2 uv = TRANSFORM_TEX((p.xy+float2(37.0,17.0)*p.z) + f.xy,_NoiseTex); 
-
+			uv += UNITY_ACCESS_INSTANCED_PROP(_TextureOffset).xy;
 			float2 rg = tex2Dlod( _NoiseTex, float4((uv+float2(0.5,0.5))/1.0,0,0)).yx;
 			return lerp( rg.x, rg.y, f.z );
 		

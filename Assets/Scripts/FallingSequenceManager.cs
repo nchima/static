@@ -97,9 +97,6 @@ public class FallingSequenceManager : MonoBehaviour {
             // Update billboards.
             GameManager.instance.GetComponent<BatchBillboard>().UpdateBillboards();
 
-            // Set up bonus time for next level.
-            GameManager.instance.DetermineBonusTime();
-
             // Set up variables for falling.
             playerTouchedDown = false;
             savedRegularMoveSpeed = player.GetComponent<PlayerController>().maxAirSpeed;
@@ -134,6 +131,11 @@ public class FallingSequenceManager : MonoBehaviour {
             GameManager.instance.scoreManager.HideLevelCompleteScreen();
             GameManager.instance.CountEnemies();
 
+            // Set up bonus time for next level.
+            GameManager.instance.DetermineBonusTime();
+
+            GameManager.instance.specialBarManager.freezeDecay = false;
+
             player.transform.position = new Vector3(player.transform.position.x, 2.11f, player.transform.position.z);
 
             // Begin rotating camera back to regular position.
@@ -147,8 +149,6 @@ public class FallingSequenceManager : MonoBehaviour {
             fallingSequenceTimer = 0f;
 
             if (speedFallActivated) InstantiateShockwave(shockwavePrefab, GameManager.instance.gun.burstsPerSecondModifierMax);
-
-            GameManager.instance.specialBarManager.freezeDecay = true;
 
             playerState = PlayerState.FiringShockwave;
         }

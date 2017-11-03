@@ -20,6 +20,7 @@ public class HealthManager : MonoBehaviour {
             // Audio/visual effects:
             if (value < _playerHealth)
             {
+                Debug.Log("doing this");
                 getHurtAudio.Play();
                 GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 0.3f);
                 //GameObject.Find("Screen").BroadcastMessage("IncreaseResShift", 0.5f);
@@ -27,12 +28,14 @@ public class HealthManager : MonoBehaviour {
 
                 // Delete health box.
                 for (int i = Mathf.Clamp(value, 0, 4); i < 5; i++) healthBlocks[i].SetActive(false);
+                //for (int i = 0; i < healthBlocks.Length; i++) { healthBlocks[i].SetActive(false); }
             }
 
             else
             {
                 // Reactivate health box.
-                if (value <= 5) healthBlocks[value-1].SetActive(true);
+                if (value <= 5) healthBlocks[value - 1].SetActive(true);
+                //for(int i = 0; i < healthBlocks.Length; i++) { healthBlocks[i].SetActive(true); }
             }
 
             //Debug.Log(value);

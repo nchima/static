@@ -9,12 +9,13 @@ public class PropertyBlockControl : MonoBehaviour {
 	protected MaterialPropertyBlock _propBlock;
 
     
-
 	void Awake()
 	{
 		_propBlock = new MaterialPropertyBlock(); //first we create an empty material property block
 		_seed = Random.Range (0f, 10f);
 	}
-	
+
+
+
 }
 
