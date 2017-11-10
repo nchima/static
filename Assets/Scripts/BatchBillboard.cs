@@ -9,23 +9,20 @@ public class BatchBillboard : MonoBehaviour {
 	private int indexSkip = 1;  // How many billboard objects we should skip this frame.
 
 
-	private void Start()
-    {
-        UpdateBillboards();
+	private void Start() {
+        FindAllBillboards();
 	}
 
 
-	private void Update() 
-	{	
+	private void Update() {
         // Determine where in the array to start.
-		indexStart += 1;
-		indexStart %= indexSkip;
+        indexStart = 0;
+
+        FindAllBillboards();
 
         // Skip through the array and rotate chosen billboards to face the camera.
-		for (int i = indexStart; i < billboardTransforms.Length; i += indexSkip)
-		{
-			if (billboardTransforms [i] != null)
-            {
+		for (int i = 0; i < billboardTransforms.Length; i++) {
+			if (billboardTransforms [i] != null) {
                 float zRot = billboardTransforms[i].rotation.eulerAngles.z;
                 Vector3 newRotation = Camera.main.transform.rotation.eulerAngles;
                 newRotation.z = zRot;
@@ -38,13 +35,11 @@ public class BatchBillboard : MonoBehaviour {
     /// <summary>
     /// Finds all objects tagged with "Billboard" in the scene and begins billboarding them.
     /// </summary>
-    public void UpdateBillboards()
-    {
+    public void FindAllBillboards() {
         // Find and store references to all sprites which should be billboarded.
         GameObject[] billboards = GameObject.FindGameObjectsWithTag("Billboard");
         billboardTransforms = new Transform[billboards.Length];
-        for (int i = 0; i < billboards.Length; i++)
-        {
+        for (int i = 0; i < billboards.Length; i++) {
             billboardTransforms[i] = billboards[i].transform;
         }
     }

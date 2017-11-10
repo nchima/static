@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour {
     // MISC REFERENCES
     [HideInInspector] public static GameManager instance;
     [HideInInspector] public ScoreManager scoreManager;
-    [HideInInspector] public SpecialBarManager specialBarManager;
+    [HideInInspector] public static SpecialBarManager specialBarManager;
     [HideInInspector] public static HealthManager healthManager;
     [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
     [HideInInspector] public static MusicManager musicManager;
@@ -213,8 +213,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void CompleteShotgunCharge()
-    {
+    public void CompleteShotgunCharge() {
         player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
         player.GetComponentInChildren<ShotgunCharge>().EndCharge();
     }
@@ -363,7 +362,8 @@ public class GameManager : MonoBehaviour {
         
     }
 
-    
+    [SerializeField] GameObject wiper;
+    float previousSine = 0f;
     void UpdateGunSine()
     {
         // Update sine
@@ -411,9 +411,30 @@ public class GameManager : MonoBehaviour {
             //currentSine += Input.GetAxis("Vertical") * -0.05f;
 
             currentSine += Input.GetAxis("Mouse Y") * 0.1f;
-
-                currentSine = Mathf.Clamp(currentSine, -1f, 1f);
+            currentSine = Mathf.Clamp(currentSine, -1f, 1f);
             //}
+
+            if (Mathf.Abs(previousSine - currentSine) >= 0.01f) {
+                wiper.transform.localScale = new Vector3(
+                    MyMath.Map(Mathf.Abs(previousSine - currentSine), 0f, 0.5f, 0f, 10f),
+                    wiper.transform.localScale.y,
+                    wiper.transform.localScale.z
+                );
+            } else {
+                wiper.transform.localScale = new Vector3(
+                        0f,
+                        wiper.transform.localScale.y,
+                        wiper.transform.localScale.z
+                    );
+            }
+
+            wiper.transform.localPosition = new Vector3(
+                wiper.transform.localPosition.x,
+                MyMath.Map(currentSine, -1f, 1f, -25f, 11f),
+                wiper.transform.localPosition.z
+                );
+
+            previousSine = currentSine;
 
             newTuningTimer += Time.deltaTime;
             if (newTuningTimer > nextTuningTime)
@@ -443,7 +464,7 @@ public class GameManager : MonoBehaviour {
 
     public void UpdateBillboards()
     {
-        FindObjectOfType<BatchBillboard>().UpdateBillboards();
+        FindObjectOfType<BatchBillboard>().FindAllBillboards();
     }
 
 

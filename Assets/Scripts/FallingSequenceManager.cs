@@ -95,7 +95,7 @@ public class FallingSequenceManager : MonoBehaviour {
             GameManager.instance.SetFloorCollidersActive(true);
 
             // Update billboards.
-            GameManager.instance.GetComponent<BatchBillboard>().UpdateBillboards();
+            GameManager.instance.GetComponent<BatchBillboard>().FindAllBillboards();
 
             // Set up variables for falling.
             playerTouchedDown = false;
@@ -134,7 +134,7 @@ public class FallingSequenceManager : MonoBehaviour {
             // Set up bonus time for next level.
             GameManager.instance.DetermineBonusTime();
 
-            GameManager.instance.specialBarManager.freezeDecay = false;
+            GameManager.specialBarManager.freezeDecay = false;
 
             player.transform.position = new Vector3(player.transform.position.x, 2.11f, player.transform.position.z);
 
@@ -165,8 +165,7 @@ public class FallingSequenceManager : MonoBehaviour {
             GameManager.instance.gun.canShoot = true;
 
             // Allow enemies to start attacking.
-            foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-            {
+            foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) {
                 enemy.GetComponent<Enemy>().willAttack = true;
             }
 
@@ -177,10 +176,8 @@ public class FallingSequenceManager : MonoBehaviour {
                 player.GetComponent<CapsuleCollider>().radius,
                 1 << 8);
 
-            for (int i = 0; i < overlappingSolids.Length; i++)
-            {
-                if (overlappingSolids[i].tag == "Obstacle")
-                {
+            for (int i = 0; i < overlappingSolids.Length; i++) {
+                if (overlappingSolids[i].tag == "Obstacle") {
                     overlappingSolids[i].GetComponent<Obstacle>().DestroyByPlayerFalling();
                 }
             }
@@ -203,6 +200,8 @@ public class FallingSequenceManager : MonoBehaviour {
 
     public void InstantiateShockwave(GameObject prefab, float gunRate)
     {
+        Debug.Log("Firing shockwave.");
+
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
         FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);

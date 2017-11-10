@@ -12,6 +12,8 @@ public class ShotgunCharge : MonoBehaviour {
     [SerializeField] float sphereInactivePosition = 0.9f;
     [SerializeField] float sphereActivePosition = 0.25f;
 
+    [SerializeField] float kickForce = 100f;
+
     FloatRange materialTilingRangeX = new FloatRange(11f, 17f);
     FloatRange materialTilingRangeY = new FloatRange(-18.7f, 18.7f);
 
@@ -26,7 +28,7 @@ public class ShotgunCharge : MonoBehaviour {
     bool isCharging = false;
     float chargeTimer = 0f;
     float minimumChargeDuration = 0.5f;
-    public bool isReadyToEndCharge {
+    public bool isAboveFloor {
         get {
             bool returnValue = false;
 
@@ -35,8 +37,8 @@ public class ShotgunCharge : MonoBehaviour {
             RaycastHit hit2;
 
             // If we didn't find anything, return false.
-            if (!Physics.Raycast(player.transform.position + player.transform.forward * 1.5f, Vector3.down, out hit1, 5f)) { return false; }
-            if (!Physics.Raycast(player.transform.position + player.transform.forward * -1.5f, Vector3.down, out hit2, 5f)) { return false; }
+            if (!Physics.Raycast(player.transform.position + player.transform.forward * 0.75f, Vector3.down, out hit1, 5f, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(player.transform.position + player.transform.forward * -1.5f, Vector3.down, out hit2, 5f, (1 << 20 | 1 << 24))) { return false; }
 
             // If both things hit something and it was the floor, we're all good baby!
             if (hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) {
@@ -46,12 +48,14 @@ public class ShotgunCharge : MonoBehaviour {
                 return false;
             }
 
-
-            // Pee pee.
-            if (chargeTimer >= minimumChargeDuration) { returnValue = true; }
-            else { return false; }
-
             return returnValue;
+        }
+    }
+    public bool hasChargedForMinimumTime {
+        get {
+            // See if the player has been charging for at least the minimum time allowed.
+            if (chargeTimer >= minimumChargeDuration) { return true; }
+            else { return false; }
         }
     }
 
@@ -112,13 +116,18 @@ public class ShotgunCharge : MonoBehaviour {
             // Finish shockwave sequence.
             else if (sloMoTimer >= slowMoDuration + 0.25f)
             {
-                isFiringShockwave = false;
-                isReturningToFullSpeed = false;
-                GameManager.instance.forceInvincibility = false;
-                player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-                sloMoTimer = 0f;
+                ResetAllVariables();
             }
         }
+    }
+
+
+    void ResetAllVariables() {
+        isFiringShockwave = false;
+        isReturningToFullSpeed = false;
+        GameManager.instance.forceInvincibility = false;
+        player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        sloMoTimer = 0f;
     }
 
 
@@ -136,6 +145,9 @@ public class ShotgunCharge : MonoBehaviour {
         // Allow player to pass through railings.
         Physics.IgnoreLayerCollision(16, 24, true);
 
+        // Add a kick to get the player going.
+        player.GetComponent<Rigidbody>().AddForce(player.transform.forward * kickForce, ForceMode.Impulse);
+
         chargeTimer = 0f;
         isCharging = true;
     }
@@ -143,18 +155,22 @@ public class ShotgunCharge : MonoBehaviour {
 
     public void EndCharge()
     {
+        if (player.GetComponent<PlayerController>().state != PlayerController.State.ShotgunCharge) { return; }
+
         sphere.transform.DOLocalMoveZ(sphereInactivePosition, 0.1f);
         isCharging = false;
 
         Physics.IgnoreLayerCollision(16, 24, false);
 
-        FireShockwave();
+        if (isAboveFloor) { FireShockwave(); }
+        else { ResetAllVariables(); }
     }
 
 
     void FireShockwave()
     {
         GameManager.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 50f);
+        player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
         capturedEnemies.Clear();
         isFiringShockwave = true;
     }

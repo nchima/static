@@ -47,13 +47,13 @@ public class EnemyShot : MonoBehaviour {
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.tag == "Obstacle" || collider.tag == "Wall" || (collider.name.ToLower().Contains("Floor") && collideWithFloor))
+        if (collider.tag == "Obstacle" || collider.tag == "Wall" || (collider.name.ToLower().Contains("floor") && collideWithFloor))
         {
             //Debug.Log("I bumped into an obstacle.");
             Detonate();
         }
 
-        else if (collider.tag == "Enemy" && collider.gameObject != firedEnemy)
+        else if (collider.tag.Contains("Enem") && collider.gameObject != firedEnemy)
         {
             collider.GetComponent<Enemy>().HP -= Random.Range(5, 15);
             Detonate();

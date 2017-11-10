@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float mouseSensitivity;
     private Quaternion targetRotation;
 
-    // STATE
+    // STATE    
     public enum State { Normal, ShotgunCharge, Falling, SpeedFalling }
     public State state;
 
@@ -60,7 +60,11 @@ public class PlayerController : MonoBehaviour {
     private void Update()
     {
         /* GET DIRECTIONAL INPUT */
-        if (state != State.ShotgunCharge) { directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")); }
+        if (state != State.ShotgunCharge
+            && Physics.Raycast(transform.position + transform.forward * 0.75f, Vector3.down, 5f, 1 << 20)
+            || (state == State.Falling || state == State.SpeedFalling)) {
+            directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        }
 
         /* HANDLE VIEW ROTATION */
         float _mouseSensitivity = mouseSensitivity;
@@ -190,7 +194,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnCollisionEnter(Collision collision) {
         // If the player collides with a wall, end the shotgun charge.
-        if (state == State.ShotgunCharge && collision.collider.name.ToLower().Contains("wall")) {
+        if (state == State.ShotgunCharge && collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle")) {
             FindObjectOfType<Gun>().EndShotgunCharge();
         }
     }

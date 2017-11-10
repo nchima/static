@@ -111,6 +111,11 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
+    public void PlayerAbsorbedAmmo(float value) {
+        currentValue += value;
+    }
+
+
     public void FlashBar()
     {
         barObject.GetComponent<MeshRenderer>().material.color = Color.Lerp(readyColor1, readyColor2, Random.Range(0f, 1f));
@@ -118,6 +123,7 @@ public class SpecialBarManager : MonoBehaviour {
 
 
     public void PlayerKilledEnemy() {
+        return;
         // Increase the value of the multiplier bar.
         currentValue += enemyValue;
     }
@@ -125,6 +131,7 @@ public class SpecialBarManager : MonoBehaviour {
 
     public void BulletHitEnemy()
     {
+        return;
         currentValue += bulletHitValue;
     }
 

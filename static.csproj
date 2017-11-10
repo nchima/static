@@ -182,6 +182,7 @@
     <Compile Include="Assets\Scripts\ShotgunCharge.cs" />
     <Compile Include="Assets\Scripts\SnailEnemy.cs" />
     <Compile Include="Assets\Scripts\SpecialBarManager.cs" />
+    <Compile Include="Assets\Scripts\SpecialMoveAmmo.cs" />
     <Compile Include="Assets\Scripts\SubtleRandomRotation.cs" />
     <Compile Include="Assets\Scripts\TextureOffsetChanger.cs" />
     <Compile Include="Assets\Scripts\Timer.cs" />

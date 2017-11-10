@@ -134,6 +134,10 @@ public class Enemy : MonoBehaviour
     //[SerializeField] int timeBonusValue;    // How many points this enemy adds to the max time bonus value.
     public float bonusTimeAdded;    // How much time this enemy adds to the bonus timer at level generation.
 
+    // DROPPING SPECIAL MOVE AMMO
+    [SerializeField] GameObject specialMoveAmmoPrefab;
+    [SerializeField] int specialMoveAmmoToDrop = 3;
+
     // REFERENCES
     protected GameManager gameManager;
     protected Rigidbody myRigidbody;
@@ -274,15 +278,25 @@ public class Enemy : MonoBehaviour
     //}
 
 
-    protected virtual void Die()
-    {
+    protected virtual void Die() {
         // isAlive is used to make sure that this function is not called more than once.
-        if (isAlive)
-        {
-            Instantiate(deathParticles, transform.position, Quaternion.identity);
-            gameManager.PlayerKilledEnemy(killValue);
-            isAlive = false;
-            Destroy(gameObject);
+        if (!isAlive) { return; }
+
+        DropSpecialMoveAmmo();
+
+        Instantiate(deathParticles, transform.position, Quaternion.identity);
+        gameManager.PlayerKilledEnemy(killValue);
+        isAlive = false;
+        Destroy(gameObject);
+    }
+
+
+    void DropSpecialMoveAmmo() {
+        for (int i = 0; i < specialMoveAmmoToDrop; i++) {
+            GameObject droppedAmmo = Instantiate(specialMoveAmmoPrefab);
+            droppedAmmo.transform.position = transform.position + Random.insideUnitSphere;
+            Vector3 forceDirection = Vector3.Normalize(Random.insideUnitSphere);
+            droppedAmmo.GetComponent<Rigidbody>().AddForce(forceDirection * 1f, ForceMode.Impulse);
         }
     }
 
