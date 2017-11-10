@@ -145,19 +145,15 @@
       <Project>{8DAEA302-C887-B750-1344-15B88EA25163}</Project>
       <Name>static</Name>
     </ProjectReference>
-    <ProjectReference Include="static.Plugins.csproj">
-      <Project>{FC28CEB1-47FC-0CD4-8C8C-31D2090CB2A6}</Project>
-      <Name>static.Plugins</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
-    <Compile Include="Assets\Examples\Editor\NavMeshPrefabInstanceEditor.cs" />
-    <Compile Include="Assets\NavMeshComponents\Editor\NavMeshComponentsGUIUtility.cs" />
-    <Compile Include="Assets\NavMeshComponents\Editor\NavMeshLinkEditor.cs" />
-    <Compile Include="Assets\NavMeshComponents\Editor\NavMeshModifierEditor.cs" />
-    <Compile Include="Assets\NavMeshComponents\Editor\NavMeshModifierVolumeEditor.cs" />
-    <Compile Include="Assets\NavMeshComponents\Editor\NavMeshSurfaceEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Auto Navmesh\Examples\Editor\NavMeshPrefabInstanceEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshComponentsGUIUtility.cs" />
+    <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshLinkEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshModifierEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshModifierVolumeEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshSurfaceEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
     <Compile Include="Assets\Scripts\Editor\LevelGeneratorEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\ScoreManagerEditor.cs" />
   </ItemGroup>
@@ -168,24 +164,24 @@
     <None Include="Assets\Asset Packages\DOTween\DOTween50.xml" />
     <None Include="Assets\Asset Packages\DOTween\Editor\DOTweenEditor.XML" />
     <None Include="Assets\Asset Packages\DOTween\readme.txt" />
-    <None Include="Assets\Materials\Enemy Shot.shader" />
-    <None Include="Assets\Materials\EnemyShotUnlit.shader" />
-    <None Include="Assets\Materials\InvertColors.shader" />
-    <None Include="Assets\Prefabs\Bullet\Bullet Shader.shader" />
+    <None Include="Assets\Asset Packages\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
+    <None Include="Assets\Asset Packages\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
+    <None Include="Assets\Asset Packages\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
     <None Include="Assets\Prefabs\Enemies\EnemyShader.shader" />
     <None Include="Assets\Prefabs\Enemies\NewSurfaceShader.shader" />
+    <None Include="Assets\Shaders\Bullet Shader.shader" />
     <None Include="Assets\Shaders\BulletMask.shader" />
     <None Include="Assets\Shaders\Clip Black Pixels.shader" />
     <None Include="Assets\Shaders\ColorMask.shader" />
     <None Include="Assets\Shaders\ColorMask2.shader" />
     <None Include="Assets\Shaders\ColorMaskBlack.shader" />
     <None Include="Assets\Shaders\Dennis.shader" />
+    <None Include="Assets\Shaders\Enemy Shot.shader" />
+    <None Include="Assets\Shaders\EnemyShotUnlit.shader" />
     <None Include="Assets\Shaders\Flash.shader" />
+    <None Include="Assets\Shaders\InvertColors.shader" />
     <None Include="Assets\Shaders\InvertFilter.shader" />
     <None Include="Assets\Shaders\MakePixelsBlack.shader" />
-    <None Include="Assets\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
-    <None Include="Assets\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
-    <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
