@@ -167,8 +167,6 @@
     <None Include="Assets\Asset Packages\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
-    <None Include="Assets\Prefabs\Enemies\EnemyShader.shader" />
-    <None Include="Assets\Prefabs\Enemies\NewSurfaceShader.shader" />
     <None Include="Assets\Shaders\Bullet Shader.shader" />
     <None Include="Assets\Shaders\BulletMask.shader" />
     <None Include="Assets\Shaders\Clip Black Pixels.shader" />
@@ -177,6 +175,7 @@
     <None Include="Assets\Shaders\ColorMaskBlack.shader" />
     <None Include="Assets\Shaders\Dennis.shader" />
     <None Include="Assets\Shaders\Enemy Shot.shader" />
+    <None Include="Assets\Shaders\EnemyShader.shader" />
     <None Include="Assets\Shaders\EnemyShotUnlit.shader" />
     <None Include="Assets\Shaders\Flash.shader" />
     <None Include="Assets\Shaders\InvertColors.shader" />
