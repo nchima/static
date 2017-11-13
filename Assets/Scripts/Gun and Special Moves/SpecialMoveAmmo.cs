@@ -17,7 +17,6 @@ public class SpecialMoveAmmo : MonoBehaviour {
     private void Update() {
         if (state == State.Hover) {
             // Hover or whatever.
-
             stayTimer += Time.deltaTime;
             if (stayTimer >= stayDuration) { Destroy(gameObject); }
         }
@@ -34,11 +33,15 @@ public class SpecialMoveAmmo : MonoBehaviour {
         Destroy(gameObject);
     }
 
+    public void BeginMovingTowardsPlayer() {
+        GetComponent<Rigidbody>().AddForce(directionToPlayer * kickForce, ForceMode.Impulse);
+        state = State.MoveToPlayer;
+    }
+
     public void OnTriggerEnterChild(Collider other) {
         // If the player crossed into my radius, start moving towards them.
         if (state == State.Hover && other.gameObject == GameManager.instance.player) {
-            GetComponent<Rigidbody>().AddForce(directionToPlayer * kickForce, ForceMode.Impulse);
-            state = State.MoveToPlayer;
+            BeginMovingTowardsPlayer();
         }
     }
 

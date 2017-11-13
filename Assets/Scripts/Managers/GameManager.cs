@@ -240,8 +240,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void LevelComplete()
-    {
+    public void LevelComplete() {
         if (fallingSequenceManager.playerState == FallingSequenceManager.PlayerState.PauseAfterLevelComplete) return;
         if (dontChangeLevel) return;
 
@@ -252,6 +251,8 @@ public class GameManager : MonoBehaviour {
 
         gun.canShoot = false;
 
+        GatherRemainingAmmoPickups();
+
         //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
 
         // Disable the floor's collider so the player falls through it.
@@ -259,6 +260,11 @@ public class GameManager : MonoBehaviour {
 
         // Initiate falling sequence.
         fallingSequenceManager.BeginFalling();
+    }
+
+
+    void GatherRemainingAmmoPickups() {
+        foreach(SpecialMoveAmmo specialMoveAmmo in FindObjectsOfType<SpecialMoveAmmo>()) { specialMoveAmmo.BeginMovingTowardsPlayer(); }
     }
 
 

@@ -32,8 +32,7 @@ public class FallingSequenceManager : MonoBehaviour {
     Transform player;
 
 
-    private void Start()
-    {
+    private void Start() {
         playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
         savedGravity = Physics.gravity;
         normalPlayerBounciness =
@@ -49,11 +48,9 @@ public class FallingSequenceManager : MonoBehaviour {
     }
 
 
-    private void Update()
-    {
+    private void Update() {
         // Handle falling.
-        if (playerState != PlayerState.Normal) 
-            {
+        if (playerState != PlayerState.Normal) {
             switch (playerState) {
                 case PlayerState.PauseAfterLevelComplete:
                     PauseAfterLevelComplete();
@@ -69,8 +66,7 @@ public class FallingSequenceManager : MonoBehaviour {
     }
 
 
-    void PauseAfterLevelComplete()
-    {
+    void PauseAfterLevelComplete() {
         fallingSequenceTimer += Time.deltaTime;
         //Debug.Log(fallingTimer);
 
@@ -110,8 +106,7 @@ public class FallingSequenceManager : MonoBehaviour {
     }
 
 
-    void FallIntoLevel()
-    {
+    void FallIntoLevel() {
         // Player can activate speed fall by pressing fire.
         if (!speedFallActivated && Input.GetButtonDown("Fire1")) {
             ActivateSpeedFall();
@@ -151,8 +146,7 @@ public class FallingSequenceManager : MonoBehaviour {
     }
 
 
-    void FireShockwave()
-    {
+    void FireShockwave() {
         fallingSequenceTimer += Time.deltaTime;
         if (fallingSequenceTimer >= lookUpSpeed)
         {
@@ -195,7 +189,6 @@ public class FallingSequenceManager : MonoBehaviour {
 
 
     public void InstantiateShockwave(GameObject prefab, float gunRate) {
-        Debug.Log("Firing shockwave.");
 
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
