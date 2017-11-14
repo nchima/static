@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour {
 
         else if (state == State.ShotgunCharge) {
             // Add forward acceleration.
-            rigidBody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);            
+            rigidBody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
         }
     }
 
