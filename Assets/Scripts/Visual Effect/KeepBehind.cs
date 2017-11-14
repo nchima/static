@@ -8,7 +8,7 @@ public class KeepBehind : MonoBehaviour {
 
     private void Update()
     {
-        Vector3 directionFromPlayer = Vector3.Normalize(transform.parent.position - GameManager.instance.player.transform.position);
+        Vector3 directionFromPlayer = Vector3.Normalize(transform.parent.position - GameManager.player.transform.position);
         Vector3 newPosition = transform.parent.position + (directionFromPlayer * distance);
         newPosition.y = transform.parent.position.y;
         transform.position = newPosition;

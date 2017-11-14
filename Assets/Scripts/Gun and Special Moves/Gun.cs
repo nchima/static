@@ -182,7 +182,7 @@ public class Gun : MonoBehaviour {
         if (missileTimer >= missileCooldown) {
             missilesFired++;
             missileTimer = 0;
-            Instantiate(missilePrefab, gunTipTransform.position, gameManager.player.transform.rotation);
+            Instantiate(missilePrefab, gunTipTransform.position, GameManager.player.transform.rotation);
         } else {
             missileTimer += Time.deltaTime;
         }
@@ -290,7 +290,7 @@ public class Gun : MonoBehaviour {
 
         /* SEE IF WE NEED TO AIM UP OR DOWN AT ENEMIES */
 
-        nearestEnemyPosition = GameManager.instance.player.transform.position + GameManager.instance.player.transform.forward * 1000f;
+        nearestEnemyPosition = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
             float bandSize = 0.025f;
@@ -303,8 +303,8 @@ public class Gun : MonoBehaviour {
                 Vector3 thisEnemyPosition = enemy.GetComponentInChildren<MeshRenderer>().bounds.center;
 
                 // See if the distance to this enemy is less than the distance to the previous nearest enemy.
-                if (Vector3.Distance(GameManager.instance.player.transform.position, thisEnemyPosition)
-                    < Vector3.Distance(GameManager.instance.player.transform.position, nearestEnemyPosition))
+                if (Vector3.Distance(GameManager.player.transform.position, thisEnemyPosition)
+                    < Vector3.Distance(GameManager.player.transform.position, nearestEnemyPosition))
                 {
                     nearestEnemyPosition = thisEnemyPosition;
                 }
@@ -329,7 +329,7 @@ public class Gun : MonoBehaviour {
         }
 
         // Add recoil to player controller.
-        gameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
+        GameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
 
         timeSinceLastShot = 0f;
 

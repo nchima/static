@@ -56,7 +56,7 @@ public class LaserShot : EnemyShot {
         state = State.PreDamage;
 
         // Find the player's x and z position.
-        Vector3 targetPosition = GameManager.instance.player.transform.position;
+        Vector3 targetPosition = GameManager.player.transform.position;
         targetPosition = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
 
         // Get the direction to the player.
@@ -192,7 +192,7 @@ public class LaserShot : EnemyShot {
 
     void OnTriggerEnterChild(Collider other)
     {
-        if (state == State.Damage && other.transform == GameManager.instance.player.transform)
+        if (state == State.Damage && other.transform == GameManager.player.transform)
         {
             GameManager.instance.PlayerWasHurt();
             GetComponentInChildren<Collider>().enabled = false;

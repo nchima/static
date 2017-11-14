@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static MusicManager musicManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public GenerateNoise noiseGenerator;
-    [HideInInspector] public GameObject player;
+    [HideInInspector] public static GameObject player;
     [SerializeField] GameObject gunSliderBorder;
 
 
@@ -241,7 +241,7 @@ public class GameManager : MonoBehaviour {
 
 
     public void LevelComplete() {
-        if (fallingSequenceManager.playerState == FallingSequenceManager.PlayerState.PauseAfterLevelComplete) return;
+        if (fallingSequenceManager.isPlayerFalling) return;
         if (dontChangeLevel) return;
 
         levelWinAudio.Play();

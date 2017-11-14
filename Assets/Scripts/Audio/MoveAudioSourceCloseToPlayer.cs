@@ -13,7 +13,7 @@ public class MoveAudioSourceCloseToPlayer : MonoBehaviour {
 
     private void Update()
     {
-        Vector3 closestPointToPlayer = myCollider.ClosestPoint(GameManager.instance.player.transform.position);
+        Vector3 closestPointToPlayer = myCollider.ClosestPoint(GameManager.player.transform.position);
         transform.position = closestPointToPlayer;
     }
 }

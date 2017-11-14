@@ -6,7 +6,7 @@ public class SnailEnemy : Enemy {
 
     [SerializeField] float visionCone = 15f; // When the player is inside this cone, I will start firing bullets at them.
 
-    Vector3 directionToPlayer { get { return Vector3.Scale(Vector3.Normalize(gameManager.player.transform.position - transform.position), new Vector3(1f, 0f, 1f)); } }
+    Vector3 directionToPlayer { get { return Vector3.Scale(Vector3.Normalize(GameManager.player.transform.position - transform.position), new Vector3(1f, 0f, 1f)); } }
 
     bool playerInVisionCone;
     float shotCooldown = 1f;
@@ -24,7 +24,7 @@ public class SnailEnemy : Enemy {
         if (willMove)
         {
             // Move forward
-            navMeshAgent.SetDestination(gameManager.player.transform.position);
+            navMeshAgent.SetDestination(GameManager.player.transform.position);
 
             // Turn towards player.
             Quaternion lookAtPlayerRotation = Quaternion.LookRotation(directionToPlayer);

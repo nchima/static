@@ -165,12 +165,12 @@ public class HomingShot : EnemyShot {
             //}
 
             //Debug.Log("Homing shot lost target.");
-            currentTarget = gameManager.player.transform.position;
+            currentTarget = GameManager.player.transform.position;
             state = HomingShotState.NotLockedOn;
             return;
         }
 
-        currentTarget = gameManager.player.transform.position;
+        currentTarget = GameManager.player.transform.position;
             //+ gameManager.playerVelocity * Vector3.Distance(gameManager.player.transform.position, transform.position);
 
         MoveToTarget();

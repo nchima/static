@@ -11,7 +11,7 @@ public class KeepUpright : MonoBehaviour {
 
 	private void Update ()
     {
-		if (GameManager.fallingSequenceManager.playerState == FallingSequenceManager.PlayerState.FallingIntoLevel) {
+		if (GameManager.fallingSequenceManager.isPlayerFalling) {
 			transform.localScale = new Vector3 (widthAtMaxDistance * 0.1f, transform.localScale.y, widthAtMaxDistance * 0.1f);
 		} else {
 			ChangeScaleBasedOnPlayerDistance ();
@@ -25,7 +25,7 @@ public class KeepUpright : MonoBehaviour {
 	void ChangeScaleBasedOnPlayerDistance()
 	{
 		// Get distance from player.
-		float distance = Vector3.Distance(transform.position, GameManager.instance.player.transform.position);
+		float distance = Vector3.Distance(transform.position, GameManager.player.transform.position);
 
 		// Change width based on distance from player.
 		if (GetComponentInParent<Enemy>() != null && (distance < minimumVisibleDistance && GetComponentInParent<Enemy> ().canSeePlayer)) {

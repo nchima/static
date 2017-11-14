@@ -3,32 +3,47 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class FallingSequenceManager : MonoBehaviour {
+public class FallingSequenceManager : StateController {
 
     [HideInInspector] public enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
     [HideInInspector] public PlayerState playerState = PlayerState.Normal;
 
-    [SerializeField] bool startMidFall;
+    [SerializeField] TriggerTransition fallingTrigger;
+    public Collider fallCatcher;
+
+    public bool isPlayerFalling {
+        get {
+            if (currentState.name.ToLower().Contains("fall") || currentState.name.ToLower().Contains("fall")) { return true; }
+            else { return false; }
+        }
+    }
+    public bool isStateIdle {
+        get {
+            if (currentState.name.ToLower().Contains("idle")) { return true; }
+            else { return false; }
+        }
+    }
 
     [HideInInspector] public float fallingSequenceTimer; // General purpose timer.
 
     float pauseAfterLevelCompleteLength = 1.5f;
-    float lookUpSpeed = 0.25f;  // How quickly the player looks up after touching down.
+    [HideInInspector] public float lookUpSpeed = 0.25f;  // How quickly the player looks up after touching down.
 
-    float playerMoveSpeedWhenFalling = 50f;
-    float savedRegularMoveSpeed;
-    Vector3 savedGravity;
+    [HideInInspector] public float playerMoveSpeedWhenFalling = 50f;
+    [HideInInspector] public float savedRegularMoveSpeed;
+    [HideInInspector] public Vector3 savedGravity;
+    [HideInInspector] public Color savedFogColor;
 
     float speedFallGravityMultipier = 10f;
-    bool speedFallActivated = false;
+    [HideInInspector] public bool isSpeedFallActive = false;
 
     [HideInInspector] public bool playerTouchedDown = false;
 
-    float normalPlayerBounciness;
+    [HideInInspector] public float normalPlayerBounciness;
 
-    [SerializeField] GameObject shockwavePrefab;
+    public GameObject shockwavePrefab;
 
-    Transform playerSpawnPoint;
+    [HideInInspector] public Transform playerSpawnPoint;
     Transform player;
 
 
@@ -39,30 +54,26 @@ public class FallingSequenceManager : MonoBehaviour {
             FindObjectOfType<PlayerController>().
             GetComponent<CapsuleCollider>().
             material.bounciness;
-        player = GameManager.instance.player.transform;
-
-        if (startMidFall) {
-            fallingSequenceTimer = 0f;
-            playerState = PlayerState.PauseAfterLevelComplete;
-        }
     }
 
 
-    private void Update() {
+    protected override void Update() {
+        base.Update();
+
         // Handle falling.
-        if (playerState != PlayerState.Normal) {
-            switch (playerState) {
-                case PlayerState.PauseAfterLevelComplete:
-                    PauseAfterLevelComplete();
-                    break;
-                case PlayerState.FallingIntoLevel:
-                    FallIntoLevel();
-                    break;
-                case PlayerState.FiringShockwave:
-                    FireShockwave();
-                    break;
-            }
-        }
+        //if (playerState != PlayerState.Normal) {
+        //    switch (playerState) {
+        //        case PlayerState.PauseAfterLevelComplete:
+        //            PauseAfterLevelComplete();
+        //            break;
+        //        case PlayerState.FallingIntoLevel:
+        //            FallIntoLevel();
+        //            break;
+        //        case PlayerState.FiringShockwave:
+        //            FireShockwave();
+        //            break;
+        //    }
+        //}
     }
 
 
@@ -76,7 +87,7 @@ public class FallingSequenceManager : MonoBehaviour {
             player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
             player.GetComponent<Collider>().material.bounciness = 0f;
             Physics.gravity = savedGravity;
-            speedFallActivated = false;
+            isSpeedFallActive = false;
             GameManager.instance.forceInvincibility = false;
 
             // Generate new level.
@@ -107,8 +118,9 @@ public class FallingSequenceManager : MonoBehaviour {
 
 
     void FallIntoLevel() {
+
         // Player can activate speed fall by pressing fire.
-        if (!speedFallActivated && Input.GetButtonDown("Fire1")) {
+        if (!isSpeedFallActive && Input.GetButtonDown("Fire1")) {
             ActivateSpeedFall();
         }
 
@@ -139,7 +151,7 @@ public class FallingSequenceManager : MonoBehaviour {
 
             fallingSequenceTimer = 0f;
 
-            if (speedFallActivated) InstantiateShockwave(shockwavePrefab, GameManager.instance.gun.burstsPerSecondModifierMax);
+            if (isSpeedFallActive) InstantiateShockwave(shockwavePrefab, GameManager.instance.gun.burstsPerSecondModifierMax);
 
             playerState = PlayerState.FiringShockwave;
         }
@@ -177,7 +189,7 @@ public class FallingSequenceManager : MonoBehaviour {
 
             Physics.gravity = savedGravity;
 
-            speedFallActivated = false;
+            isSpeedFallActive = false;
 
             GameManager.instance.forceInvincibility = false;
 
@@ -189,7 +201,6 @@ public class FallingSequenceManager : MonoBehaviour {
 
 
     public void InstantiateShockwave(GameObject prefab, float gunRate) {
-
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
         FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
@@ -199,25 +210,29 @@ public class FallingSequenceManager : MonoBehaviour {
         DOTween.To
             (() => GameManager.instance.gun.burstsPerSecondModifier, x => GameManager.instance.gun.burstsPerSecondModifier = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
 
-        Vector3 shockwavePosition = player.transform.position;
+        Vector3 shockwavePosition = GameManager.player.transform.position;
         shockwavePosition.y = 0f;
         Instantiate(prefab, shockwavePosition, Quaternion.identity);
     }
 
 
-    void ActivateSpeedFall() {
-        if (player.GetComponent<PlayerController>().state == PlayerController.State.SpeedFalling) { return; }
+    public void ActivateSpeedFall() {
+        if (GameManager.player.GetComponent<PlayerController>().state == PlayerController.State.SpeedFalling) { return; }
         //player.GetComponent<Rigidbody>().isKinematic = false;
-        player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
-        player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
+        GameManager.player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
+        GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
         //Physics.gravity *= speedFallGravityMultipier;
-        speedFallActivated = true;
+        isSpeedFallActive = true;
         GameManager.instance.forceInvincibility = true;
     }
 
 
     public void BeginFalling() {
-        fallingSequenceTimer = 0f;
-        playerState = PlayerState.PauseAfterLevelComplete;
+        fallingTrigger.isTriggerSet = true;
+    }
+
+
+    public void BeginFallingInstant() {
+        TransitionToState(GetComponentInChildren<FallIntoLevelState>());
     }
 }

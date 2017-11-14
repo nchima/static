@@ -12,7 +12,7 @@ public class SpecialMoveAmmo : MonoBehaviour {
     enum State { Hover, MoveToPlayer }
     State state = State.Hover;
 
-    Vector3 directionToPlayer { get { return Vector3.Normalize(GameManager.instance.player.transform.position - transform.position); } }
+    Vector3 directionToPlayer { get { return Vector3.Normalize(GameManager.player.transform.position - transform.position); } }
 
     private void Update() {
         if (state == State.Hover) {
@@ -40,14 +40,14 @@ public class SpecialMoveAmmo : MonoBehaviour {
 
     public void OnTriggerEnterChild(Collider other) {
         // If the player crossed into my radius, start moving towards them.
-        if (state == State.Hover && other.gameObject == GameManager.instance.player) {
+        if (state == State.Hover && other.gameObject == GameManager.player) {
             BeginMovingTowardsPlayer();
         }
     }
 
     private void OnCollisionEnter(Collision collision) {
         // If I touch the player, get absorbed or whatever.
-        if (collision.collider.gameObject == GameManager.instance.player) {
+        if (collision.collider.gameObject == GameManager.player) {
             GetAbsorbed();
         }
     }

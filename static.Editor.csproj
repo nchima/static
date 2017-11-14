@@ -178,6 +178,7 @@
     <None Include="Assets\Shaders\EnemyShader.shader" />
     <None Include="Assets\Shaders\EnemyShotUnlit.shader" />
     <None Include="Assets\Shaders\Flash.shader" />
+    <None Include="Assets\Shaders\IgnoreFog.shader" />
     <None Include="Assets\Shaders\InvertColors.shader" />
     <None Include="Assets\Shaders\InvertFilter.shader" />
     <None Include="Assets\Shaders\MakePixelsBlack.shader" />

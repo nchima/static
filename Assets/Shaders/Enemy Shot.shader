@@ -4,6 +4,7 @@
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
 		_Glossiness ("Smoothness", Range(0,1)) = 0.5
 		_Metallic ("Metallic", Range(0,1)) = 0.0
+		_AlphaCutoff("Alpha Cutoff", Range(0,1)) = 0.5
 	}
 
 	SubShader {
@@ -36,6 +37,7 @@
 		half _Glossiness;
 		half _Metallic;
 		fixed4 _Color;
+		float _AlphaCutoff;
 
 		// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
 		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
@@ -52,6 +54,7 @@
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 			o.Alpha = c.a;
+			clip(c.a - _AlphaCutoff);
 		}
 		ENDCG
 	}

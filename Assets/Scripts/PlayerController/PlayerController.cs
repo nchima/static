@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour {
             float _accelerationSpeed = accelerationSpeedGround;
             float _maxSpeed = maxGroundSpeed;
 
-            if (state == State.Falling) {
+            if (state == State.Falling || state == State.SpeedFalling) {
                 _accelerationSpeed = accelerationSpeedAir;
                 _maxSpeed = maxAirSpeed;
             }
@@ -107,13 +107,14 @@ public class PlayerController : MonoBehaviour {
             if (desiredMove.magnitude != 0)
                 rigidBody.AddForce(desiredMove.normalized * _accelerationSpeed, ForceMode.VelocityChange);
 
-            // Add movement kick.
+            // Check whether we should add movement kick.
             movementKickTimer += Time.deltaTime;
             if (!movementKickReady) {
                 if (directionalInput == Vector2.zero && movementKickTimer >= movementKickCooldown) movementKickReady = true;
                 else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
             }
 
+            // Add movement kick.
             if (directionalInput != Vector2.zero) {
                 if (movementKickReady && state != State.Falling && state != State.SpeedFalling) {
                     lastKickDirection = directionalInput;
@@ -196,14 +197,6 @@ public class PlayerController : MonoBehaviour {
         // If the player collides with a wall, end the shotgun charge.
         if (state == State.ShotgunCharge && collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle")) {
             FindObjectOfType<Gun>().EndShotgunCharge();
-        }
-    }
-
-
-    private void OnTriggerEnter(Collider other) {
-        if (other.name.Contains("Player Fall Catcher")) {
-            if (GameManager.healthManager.playerHealth <= 0) { return; }
-            GameManager.fallingSequenceManager.playerState = FallingSequenceManager.PlayerState.PauseAfterLevelComplete;            
         }
     }
 }

@@ -171,6 +171,13 @@
     <Compile Include="Assets\Scripts\Enemy\SnailEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\TankEnemy.cs" />
     <Compile Include="Assets\Scripts\Explosion\Explosion.cs" />
+    <Compile Include="Assets\Scripts\Fall Catcher\FallCatcher.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\FallIntoLevelState.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\FiringShockwaveState.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\PauseAfterLevelCompleteFallingState.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\PlayerTouchedDownTransition.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\State_SpeedFalling.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\Transition_ToSpeedFall.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Gun.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\GunExperimental.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\PlayerMissile.cs" />
@@ -190,6 +197,13 @@
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Scripts\PlayerController\PlayerController.cs" />
+    <Compile Include="Assets\Scripts\State\State.cs" />
+    <Compile Include="Assets\Scripts\State\State_Idle.cs" />
+    <Compile Include="Assets\Scripts\State\StateController.cs" />
+    <Compile Include="Assets\Scripts\State\Transition.cs" />
+    <Compile Include="Assets\Scripts\Transitions\Transition_MouseButtonPressed.cs" />
+    <Compile Include="Assets\Scripts\Transitions\TriggerTransition.cs" />
+    <Compile Include="Assets\Scripts\Transitions\WaitForSecondsTransition.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHair.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHairLines.cs" />
     <Compile Include="Assets\Scripts\UI\GameOverScreen.cs" />
@@ -248,6 +262,7 @@
     <None Include="Assets\Shaders\EnemyShader.shader" />
     <None Include="Assets\Shaders\EnemyShotUnlit.shader" />
     <None Include="Assets\Shaders\Flash.shader" />
+    <None Include="Assets\Shaders\IgnoreFog.shader" />
     <None Include="Assets\Shaders\InvertColors.shader" />
     <None Include="Assets\Shaders\InvertFilter.shader" />
     <None Include="Assets\Shaders\MakePixelsBlack.shader" />
