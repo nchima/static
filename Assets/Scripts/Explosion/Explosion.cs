@@ -8,7 +8,7 @@ public class Explosion : MonoBehaviour {
     enum ExplosionState { Expanding, Fading };
     ExplosionState explosionState;
 
-	[SerializeField] float explosionRadius;
+	public float explosionRadius;
     [SerializeField] float pushForce;
     [SerializeField] float expandDuration;
     [SerializeField] float fadeDuration;
@@ -64,29 +64,25 @@ public class Explosion : MonoBehaviour {
         if (affectedObjects.Contains(collider)) return;
         else affectedObjects.Add(collider);
 
-        if (collider.tag == "Player")
-        {
+        if (collider.tag == "Player") {
             if (!shouldDamagePlayer) return;
 
             // Raycast to see if player is behind cover.
             RaycastHit hit;
-            if (Physics.Raycast(transform.position + Vector3.up * 0.5f, collider.transform.position - transform.position, out hit, explosionRadius, 1<<8))
-            {
+            if (Physics.Raycast(transform.position + Vector3.up * 0.5f, collider.transform.position - transform.position, out hit, explosionRadius, 1<<8)) {
                 if (hit.transform != collider.transform) return;
             }
             gameManager.PlayerWasHurt();
         }
 
-        else if (collider.tag == "Enemy")
-        {
+        else if (collider.tag == "Enemy") {
             //Debug.Log("Enemy affected by explosion.");
             collider.GetComponent<Enemy>().BecomePhysicsObject(1f);
             collider.GetComponent<Rigidbody>().AddExplosionForce(pushForce, Vector3.Scale(transform.position, new Vector3(1f, 0f, 1f)), explosionRadius, pushForce*0.01f, ForceMode.Impulse);
             collider.GetComponent<Enemy>().HP -= Random.Range(damageMin, damageMax);
         }
 
-        else if (LayerMask.LayerToName(collider.gameObject.layer).Contains("ShootableBullet"))
-        {
+        else if (LayerMask.LayerToName(collider.gameObject.layer).Contains("ShootableBullet")) {
             collider.SendMessage("Detonate", SendMessageOptions.DontRequireReceiver);
         }
     }

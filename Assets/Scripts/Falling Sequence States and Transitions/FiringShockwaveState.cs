@@ -31,7 +31,7 @@ public class FiringShockwaveState : State {
 
         fallingSequenceManager.fallingSequenceTimer = 0f;
 
-        if (fallingSequenceManager.isSpeedFallActive) fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, GameManager.instance.gun.burstsPerSecondModifierMax);
+        if (fallingSequenceManager.isSpeedFallActive) fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, GameManager.instance.gun.burstsPerSecondSloMoModifierMax);
     }
 
     public override void Run(StateController stateController) {

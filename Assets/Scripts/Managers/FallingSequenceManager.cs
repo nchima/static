@@ -68,7 +68,7 @@ public class FallingSequenceManager : StateController {
         // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
         GameManager.instance.gun.canShoot = true;
         DOTween.To
-            (() => GameManager.instance.gun.burstsPerSecondModifier, x => GameManager.instance.gun.burstsPerSecondModifier = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+            (() => GameManager.instance.gun.burstsPerSecondSloMoModifierCurrent, x => GameManager.instance.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
 
         Vector3 shockwavePosition = GameManager.player.transform.position;
         shockwavePosition.y = 0f;

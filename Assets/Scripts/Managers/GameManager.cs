@@ -61,6 +61,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static HealthManager healthManager;
     [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
     [HideInInspector] public static MusicManager musicManager;
+    [HideInInspector] public static SFXManager sfxManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public static GameObject player;
@@ -102,6 +103,7 @@ public class GameManager : MonoBehaviour {
         levelGenerator = GetComponent<LevelGenerator>();
         levelManager = GetComponentInChildren<LevelManager>();
         fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
+        sfxManager = GetComponentInChildren<SFXManager>();
         musicManager = GetComponentInChildren<MusicManager>();
         gun = FindObjectOfType<Gun>();
         noiseGenerator = GetComponent<GenerateNoise>();
@@ -223,7 +225,7 @@ public class GameManager : MonoBehaviour {
     {
         // Begin tweening time scale, gun burst rate, and music pitch back to normal.
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        DOTween.To(() => gun.burstsPerSecondModifier, x => gun.burstsPerSecondModifier = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+        DOTween.To(() => gun.burstsPerSecondSloMoModifierCurrent, x => gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
         FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(1f, 1f).SetUpdate(true);
     }
 

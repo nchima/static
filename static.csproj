@@ -156,6 +156,7 @@
     <Compile Include="Assets\Asset Packages\Standard Assets\Utility\WaypointProgressTracker.cs" />
     <Compile Include="Assets\Scripts\Audio\MoveAudioSourceCloseToPlayer.cs" />
     <Compile Include="Assets\Scripts\Audio\MusicManager.cs" />
+    <Compile Include="Assets\Scripts\Audio\SFXManager.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\EnemyShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\HomingShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\LaserShot.cs" />
@@ -196,7 +197,7 @@
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
-    <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletPooler.cs" />
+    <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletMesh.cs" />
     <Compile Include="Assets\Scripts\PlayerController\PlayerController.cs" />
     <Compile Include="Assets\Scripts\State\State.cs" />
     <Compile Include="Assets\Scripts\State\State_Idle.cs" />
@@ -220,7 +221,9 @@
     <Compile Include="Assets\Scripts\Util\Int2.cs" />
     <Compile Include="Assets\Scripts\Util\IntRange.cs" />
     <Compile Include="Assets\Scripts\Util\MyMath.cs" />
+    <Compile Include="Assets\Scripts\Util\ObjectPooler.cs" />
     <Compile Include="Assets\Scripts\Util\PerlinNoise.cs" />
+    <Compile Include="Assets\Scripts\Util\PooledObject.cs" />
     <Compile Include="Assets\Scripts\Util\ReportTriggerToParent.cs" />
     <Compile Include="Assets\Scripts\Util\Timer.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\AlphaCutoffJitter.cs" />
