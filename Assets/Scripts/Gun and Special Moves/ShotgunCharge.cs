@@ -40,9 +40,12 @@ public class ShotgunCharge : MonoBehaviour {
             if (!Physics.Raycast(player.transform.position + player.transform.forward * 0.75f, Vector3.down, out hit1, 5f, (1 << 20 | 1 << 24))) { return false; }
             if (!Physics.Raycast(player.transform.position + player.transform.forward * -1.5f, Vector3.down, out hit2, 5f, (1 << 20 | 1 << 24))) { return false; }
 
+            Debug.Log("checking if player is on floor.");
+
             // If both things hit something and it was the floor, we're all good baby!
             if (hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) {
                 returnValue = true;
+                Debug.Log(".. and the player was on a floor, how about that!");
             // If it wasn't the floor, return false.
             } else {
                 return false;
@@ -54,7 +57,7 @@ public class ShotgunCharge : MonoBehaviour {
     public bool hasChargedForMinimumTime {
         get {
             // See if the player has been charging for at least the minimum time allowed.
-            if (chargeTimer >= minimumChargeDuration) { return true; }
+            if (chargeTimer >= minimumChargeDuration) { Debug.Log("has charged for minimum time");  return true; }
             else { return false; }
         }
     }
@@ -130,8 +133,7 @@ public class ShotgunCharge : MonoBehaviour {
     }
 
 
-    public void BeginCharge()
-    {
+    public void BeginCharge() {
         // Begin moving visual sphere into position.
         sphere.transform.DOLocalMoveZ(sphereActivePosition, 0.1f);
 
@@ -152,9 +154,12 @@ public class ShotgunCharge : MonoBehaviour {
     }
 
 
-    public void EndCharge()
-    {
+    public void EndCharge() {
+        Debug.Log("trying to end shotty gunny chargey " + player.GetComponent<PlayerController>().state);
+
         if (player.GetComponent<PlayerController>().state != PlayerController.State.ShotgunCharge) { return; }
+
+        Debug.Log("ending shotbgunnyg hghar");
 
         sphere.transform.DOLocalMoveZ(sphereInactivePosition, 0.1f);
         isCharging = false;
@@ -163,22 +168,19 @@ public class ShotgunCharge : MonoBehaviour {
 
         if (isAboveFloor) { FireShockwave(); }
         else { ResetAllVariables(); }
+
+        player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
     }
 
-
-    void FireShockwave()
-    {
+    void FireShockwave() {
         GameManager.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 50f);
         player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
         capturedEnemies.Clear();
         isFiringShockwave = true;
     }
 
-
-    public void OnTriggerEnter(Collider other)
-    {
-        if (isCharging && other.GetComponent<Enemy>() != null && !capturedEnemies.Contains(other.gameObject))
-        {
+    public void OnTriggerEnter(Collider other) {
+        if (isCharging && other.GetComponent<Enemy>() != null && !capturedEnemies.Contains(other.gameObject)) {
             other.GetComponent<Enemy>().HP -= collideDamage;
             other.GetComponent<Enemy>().BecomePhysicsObject(2f);
             capturedEnemies.Add(other.gameObject);

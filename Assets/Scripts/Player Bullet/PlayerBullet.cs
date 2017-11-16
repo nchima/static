@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerBullet : MonoBehaviour
-{
+public class PlayerBullet : MonoBehaviour {
     [SerializeField]
     float deleteTime = 0.25f;   // How long this bullet lasts on screen before being 'deleted'.
     private float timeOnScreen;    // How long this bullet has existed thus far.
@@ -35,6 +34,11 @@ public class PlayerBullet : MonoBehaviour
 
             isOnScreen = false;
         }
+    }
+
+
+    public void SetVisualsActive(bool value) {
+        GetComponentInChildren<Renderer>().enabled = value;
     }
 
 

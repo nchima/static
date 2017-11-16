@@ -196,6 +196,7 @@
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
+    <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletPooler.cs" />
     <Compile Include="Assets\Scripts\PlayerController\PlayerController.cs" />
     <Compile Include="Assets\Scripts\State\State.cs" />
     <Compile Include="Assets\Scripts\State\State_Idle.cs" />

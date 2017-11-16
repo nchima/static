@@ -214,7 +214,7 @@ public class GameManager : MonoBehaviour {
 
 
     public void CompleteShotgunCharge() {
-        player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
+        //player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
         player.GetComponentInChildren<ShotgunCharge>().EndCharge();
     }
 

@@ -195,8 +195,9 @@ public class Gun : MonoBehaviour {
 
 
     void DoShotgunCharge() {
+        Debug.Log("Doing shotgun charge");
         // See if the player has released the button.
-        if (Input.GetButtonUp("Fire2") 
+        if (Input.GetButtonUp("Fire2")
             && FindObjectOfType<ShotgunCharge>().isAboveFloor 
             && FindObjectOfType<ShotgunCharge>().hasChargedForMinimumTime
             && FindObjectOfType<PlayerController>().state == PlayerController.State.ShotgunCharge ) {
