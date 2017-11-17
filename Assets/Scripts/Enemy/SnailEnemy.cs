@@ -75,4 +75,8 @@ public class SnailEnemy : Enemy {
         newShot.GetComponent<NormalShot>().direction = direction;
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
     }
+
+    public override void BecomePhysicsObject(float duration) {
+        return;
+    }
 }

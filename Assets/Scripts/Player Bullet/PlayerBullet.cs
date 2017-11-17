@@ -48,9 +48,10 @@ public class PlayerBullet : MonoBehaviour {
             transform.forward,
             out hit,
             Vector3.Distance(nextPosition, previousPosition),
-            (1 << 8) | (1 << 13) | (1 << 14));
+            (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23));
 
         if (hit.collider != null) {
+            //Debug.Log(hit.collider.name + " was hit");
             transform.position = hit.point;
             HandleHit(hit);
         } else {
@@ -108,7 +109,7 @@ public class PlayerBullet : MonoBehaviour {
         if (explosionRadius > 0f) {
             GameObject newExplosion = Instantiate(explosionPrefab, hit.point, Quaternion.identity);
             newExplosion.GetComponent<Explosion>().explosionRadius = explosionRadius;
-            //newExplosion.GetComponent<Explosion>().
+            newExplosion.GetComponent<Explosion>().SetColor(m_Color);
         }
 
         EndBulletsExistence();

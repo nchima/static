@@ -72,12 +72,6 @@ public class GameManager : MonoBehaviour {
     {
         instance = this;
 
-        // Pause everything for the main menu.
-        foreach (Enemy enemy in FindObjectsOfType<Enemy>())
-        {
-            enemy.enabled = false;
-        }
-
         player = GameObject.Find("Player");
         player.GetComponent<PlayerController>().enabled = false;
 
@@ -111,6 +105,11 @@ public class GameManager : MonoBehaviour {
         scoreManager.DetermineBonusTime();
 
         levelManager.LoadLevel(levelManager.currentLevelNumber);
+
+        // Pause everything for the main menu.
+        foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+            enemy.enabled = false;
+        }
 
         if (gunMethod == GunMethod.TuningBased)
         {
@@ -340,6 +339,8 @@ public class GameManager : MonoBehaviour {
 
     public void StartGame()
     {
+        CountEnemies();
+
         // Unpause enemies in the background.
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
         {

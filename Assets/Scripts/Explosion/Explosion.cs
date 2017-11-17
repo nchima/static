@@ -57,6 +57,12 @@ public class Explosion : MonoBehaviour {
     }
 
 
+    public void SetColor(Color _color) {
+        explosionSphere.GetComponent<Renderer>().material.color = _color;
+        explosionSphere.GetComponent<Renderer>().material.SetColor("_EmissionColor", _color);
+    }
+
+
     public void OnTriggerEnterChild(Collider collider)
     {
         if (explosionState != ExplosionState.Expanding) return;

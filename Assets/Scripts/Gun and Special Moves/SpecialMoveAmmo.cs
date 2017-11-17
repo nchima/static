@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class SpecialMoveAmmo : MonoBehaviour {
 
-    float moveForce = 10f;
-    float kickForce = 100f;
+    float moveForce = 200f;
+    float kickForce = 300f;
     [SerializeField] float ammoValue = 0.1f;
     [SerializeField] float stayDuration = 6f;
     float stayTimer = 0f;
@@ -38,7 +38,7 @@ public class SpecialMoveAmmo : MonoBehaviour {
         state = State.MoveToPlayer;
     }
 
-    public void OnTriggerEnterChild(Collider other) {
+    public void OnTriggerStayChild(Collider other) {
         // If the player crossed into my radius, start moving towards them.
         if (state == State.Hover && other.gameObject == GameManager.player) {
             BeginMovingTowardsPlayer();

@@ -21,6 +21,7 @@ public class LevelManager : MonoBehaviour {
     private void Start() {
         //levelChunks = GameObject.FindGameObjectsWithTag("Level Chunk");
         //Debug.Log("level chunks length: " + levelChunks.Length);
+        //if (!isLevelLoaded) { LoadLevel(currentLevelNumber); }
     }
 
 

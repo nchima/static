@@ -301,7 +301,7 @@ public class Enemy : MonoBehaviour
     }
 
 
-    public void BecomePhysicsObject(float duration)
+    public virtual void BecomePhysicsObject(float duration)
     {
         if (immovable) return;
 
