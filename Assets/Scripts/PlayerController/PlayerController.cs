@@ -47,6 +47,34 @@ public class PlayerController : MonoBehaviour {
 
     // MISC
     Rigidbody rigidBody;
+    public bool isAboveFloor {
+        get {
+            bool returnValue = false;
+
+            // See if the player is over a floor tile.
+            RaycastHit hit1;
+            RaycastHit hit2;
+
+            float colliderRadius = GetComponent<CapsuleCollider>().radius;
+
+            // If we didn't find anything, return false.
+            if (!Physics.Raycast(transform.position + transform.forward * colliderRadius * 1.1f, Vector3.down, out hit1, 5f, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(transform.position + transform.forward * -colliderRadius * 1.1f, Vector3.down, out hit2, 5f, (1 << 20 | 1 << 24))) { return false; }
+
+            // If both things hit something and it was the floor, we're all good baby!
+            if (hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) {
+                returnValue = true;
+            }
+
+            // If it wasn't the floor, return false.
+            else {
+                return false;
+            }
+
+            return returnValue;
+        }
+    }
+
 
 
     private void Start()

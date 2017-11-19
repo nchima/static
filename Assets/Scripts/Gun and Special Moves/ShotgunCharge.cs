@@ -5,17 +5,11 @@ using DG.Tweening;
 
 public class ShotgunCharge : MonoBehaviour {
 
-	[SerializeField] GameObject sphere;
+	ShotgunChargeSphere sphere;
 
     [SerializeField] int collideDamage = 20;
-
-    [SerializeField] float sphereInactivePosition = 0.9f;
-    [SerializeField] float sphereActivePosition = 0.25f;
-
     [SerializeField] float kickForce = 100f;
 
-    FloatRange materialTilingRangeX = new FloatRange(11f, 17f);
-    FloatRange materialTilingRangeY = new FloatRange(-18.7f, 18.7f);
 
     List<GameObject> capturedEnemies = new List<GameObject>();
 
@@ -28,32 +22,6 @@ public class ShotgunCharge : MonoBehaviour {
     bool isCharging = false;
     float chargeTimer = 0f;
     float minimumChargeDuration = 0.5f;
-    public bool isAboveFloor {
-        get {
-            bool returnValue = false;
-
-            // See if the player is over a floor tile.
-            RaycastHit hit1;
-            RaycastHit hit2;
-
-            // If we didn't find anything, return false.
-            if (!Physics.Raycast(player.transform.position + player.transform.forward * 0.75f, Vector3.down, out hit1, 5f, (1 << 20 | 1 << 24))) { return false; }
-            if (!Physics.Raycast(player.transform.position + player.transform.forward * -1.5f, Vector3.down, out hit2, 5f, (1 << 20 | 1 << 24))) { return false; }
-
-            Debug.Log("checking if player is on floor.");
-
-            // If both things hit something and it was the floor, we're all good baby!
-            if (hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) {
-                returnValue = true;
-                Debug.Log(".. and the player was on a floor, how about that!");
-            // If it wasn't the floor, return false.
-            } else {
-                return false;
-            }
-
-            return returnValue;
-        }
-    }
     public bool hasChargedForMinimumTime {
         get {
             // See if the player has been charging for at least the minimum time allowed.
@@ -67,37 +35,24 @@ public class ShotgunCharge : MonoBehaviour {
 
     private void Awake() {
         player = FindObjectOfType<PlayerController>().transform;
+        sphere = GetComponentInChildren<ShotgunChargeSphere>();
     }
 
 
     private void Update() {
-        // Rotate visual sphere
-        sphere.transform.rotation = Random.rotation;
 
         if (isCharging) {
             chargeTimer += Time.deltaTime;
         }
 
-        // Do texture stuff on the visual sphere.
-        foreach (MeshRenderer mr in sphere.GetComponentsInChildren<MeshRenderer>()) {
-            mr.material.mainTextureOffset = new Vector2(0f, Random.Range(0f, 100f));
-            mr.material.mainTextureScale = new Vector2(materialTilingRangeX.Random, materialTilingRangeY.Random);
-            Color newColor = mr.material.color;
-            newColor.r = Random.Range(0.8f, 1f);
-            newColor.g = Random.Range(0.8f, 1f);
-            mr.material.color = newColor;
-        }
-
         // Keep captured enemies in front of player.
         for (int i = 0; i < capturedEnemies.Count; i++) {
-            if (capturedEnemies[i] != null)
-            {
+            if (capturedEnemies[i] != null) {
                 Vector3 forceDirection = Vector3.Normalize((transform.parent.position + transform.parent.forward * 15f) - capturedEnemies[i].transform.position);
                 capturedEnemies[i].GetComponent<Rigidbody>().AddForce(forceDirection * 20f, ForceMode.Impulse);
             }
 
-            else
-            {
+            else {
                 capturedEnemies.Remove(capturedEnemies[i]);
             }
         }
@@ -134,8 +89,7 @@ public class ShotgunCharge : MonoBehaviour {
 
 
     public void BeginCharge() {
-        // Begin moving visual sphere into position.
-        sphere.transform.DOLocalMoveZ(sphereActivePosition, 0.1f);
+        sphere.BeginCharge();
 
         // Make player temporarily invisible.
         GameManager.instance.forceInvincibility = true;
@@ -155,18 +109,15 @@ public class ShotgunCharge : MonoBehaviour {
 
 
     public void EndCharge() {
-        Debug.Log("trying to end shotty gunny chargey " + player.GetComponent<PlayerController>().state);
+        sphere.EndCharge();
 
         if (player.GetComponent<PlayerController>().state != PlayerController.State.ShotgunCharge) { return; }
 
-        Debug.Log("ending shotbgunnyg hghar");
-
-        sphere.transform.DOLocalMoveZ(sphereInactivePosition, 0.1f);
         isCharging = false;
 
         Physics.IgnoreLayerCollision(16, 24, false);
 
-        if (isAboveFloor) { FireShockwave(); }
+        if (player.GetComponent<PlayerController>().isAboveFloor) { FireShockwave(); }
         else { ResetAllVariables(); }
 
         player.GetComponent<PlayerController>().state = PlayerController.State.Normal;

@@ -183,6 +183,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\GunExperimental.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\PlayerMissile.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\ShotgunCharge.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\ShotgunChargeSphere.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\SpecialMoveAmmo.cs" />
     <Compile Include="Assets\Scripts\Level\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Level\FloorCreator.cs" />

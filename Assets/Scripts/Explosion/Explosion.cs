@@ -66,7 +66,7 @@ public class Explosion : MonoBehaviour {
     public void OnTriggerEnterChild(Collider collider)
     {
         if (explosionState != ExplosionState.Expanding) return;
-
+        if (affectedObjects == null) { return; }
         if (affectedObjects.Contains(collider)) return;
         else affectedObjects.Add(collider);
 
