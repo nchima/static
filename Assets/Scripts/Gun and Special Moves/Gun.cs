@@ -106,6 +106,7 @@ public class Gun : MonoBehaviour {
         //    firingMissiles = true;
         //}
 
+        // See if the player has fired a special move & if so, initialize proper variables.
         if (canShoot && (Input.GetButton("Fire2") /*|| Input.GetAxisRaw("Fire2") != 0*/)) {
             if (missilesAreReady && !firingMissiles && !firedMissiles) {
                 gameManager.PlayerUsedSpecialMove();
@@ -114,14 +115,13 @@ public class Gun : MonoBehaviour {
                 firingMissiles = true;
             } else if (shotgunChargeIsReady) {
                 gameManager.PlayerUsedSpecialMove();
+                FindObjectOfType<ShotgunCharge>().BeginSequence();
                 isDoingShotgunCharge = true;
-                gameManager.BeginShotgunCharge();
             }
         }
 
-        // Perform special move if necessary.
+        // Begin performing the special move.
         if (firingMissiles) FireMissiles();
-        else if (isDoingShotgunCharge) { DoShotgunCharge(); }
 
         /* Firing normal bullets */
         if (Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) FireBurst();
@@ -142,17 +142,6 @@ public class Gun : MonoBehaviour {
         if (missilesFired >= missilesPerBurst) {
             firingMissiles = false;
             firedMissiles = true;
-        }
-    }
-
-
-    void DoShotgunCharge() {
-        // See if the player has released the button.
-        if (Input.GetButtonUp("Fire2")
-            && FindObjectOfType<PlayerController>().isAboveFloor 
-            && FindObjectOfType<ShotgunCharge>().hasChargedForMinimumTime
-            && FindObjectOfType<PlayerController>().state == PlayerController.State.ShotgunCharge ) {
-            EndShotgunCharge();
         }
     }
 

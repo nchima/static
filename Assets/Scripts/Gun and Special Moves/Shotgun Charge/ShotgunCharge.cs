@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class ShotgunCharge : MonoBehaviour {
+public class ShotgunCharge : StateController {
 
-	ShotgunChargeSphere sphere;
+	[HideInInspector] public ShotgunChargeSphere sphere;
 
     [SerializeField] int collideDamage = 20;
-    [SerializeField] float kickForce = 100f;
-
+    public float kickForce = 100f;
 
     List<GameObject> capturedEnemies = new List<GameObject>();
 
@@ -19,9 +18,9 @@ public class ShotgunCharge : MonoBehaviour {
     float sloMoTimer = 0f;
     [SerializeField] GameObject shockwavePrefab;
 
-    bool isCharging = false;
-    float chargeTimer = 0f;
-    float minimumChargeDuration = 0.5f;
+    [HideInInspector] public bool isCharging = false;
+    [HideInInspector] public float chargeTimer = 0f;
+    public float minimumChargeDuration = 0.5f;
     public bool hasChargedForMinimumTime {
         get {
             // See if the player has been charging for at least the minimum time allowed.
@@ -29,6 +28,8 @@ public class ShotgunCharge : MonoBehaviour {
             else { return false; }
         }
     }
+
+    [SerializeField] TriggerTransition chargeTrigger;
 
     Transform player;
 
@@ -39,11 +40,8 @@ public class ShotgunCharge : MonoBehaviour {
     }
 
 
-    private void Update() {
-
-        if (isCharging) {
-            chargeTimer += Time.deltaTime;
-        }
+    protected override void Update() {
+        base.Update();
 
         // Keep captured enemies in front of player.
         for (int i = 0; i < capturedEnemies.Count; i++) {
@@ -71,11 +69,16 @@ public class ShotgunCharge : MonoBehaviour {
             }
 
             // Finish shockwave sequence.
-            else if (sloMoTimer >= slowMoDuration + 0.25f)
-            {
+            else if (sloMoTimer >= slowMoDuration + 0.25f) {
                 ResetAllVariables();
             }
         }
+    }
+
+
+    public void BeginSequence() {
+        Debug.Log("Beginning shotgun charge sequence.");
+        chargeTrigger.isTriggerSet = true;
     }
 
 
@@ -85,26 +88,6 @@ public class ShotgunCharge : MonoBehaviour {
         GameManager.instance.forceInvincibility = false;
         player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         sloMoTimer = 0f;
-    }
-
-
-    public void BeginCharge() {
-        sphere.BeginCharge();
-
-        // Make player temporarily invisible.
-        GameManager.instance.forceInvincibility = true;
-
-        // Make sure player does move up or down.
-        player.GetComponent<Rigidbody>().constraints |= RigidbodyConstraints.FreezePositionY;
-
-        // Allow player to pass through railings.
-        Physics.IgnoreLayerCollision(16, 24, true);
-
-        // Add a kick to get the player going.
-        player.GetComponent<Rigidbody>().AddForce(player.transform.forward * kickForce, ForceMode.Impulse);
-
-        chargeTimer = 0f;
-        isCharging = true;
     }
 
 
@@ -131,6 +114,7 @@ public class ShotgunCharge : MonoBehaviour {
     }
 
     public void OnTriggerEnter(Collider other) {
+        // If we collide into an enemy while charging, capture it.
         if (isCharging && other.GetComponent<Enemy>() != null && !capturedEnemies.Contains(other.gameObject)) {
             other.GetComponent<Enemy>().HP -= collideDamage;
             other.GetComponent<Enemy>().BecomePhysicsObject(2f);

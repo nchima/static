@@ -20,7 +20,9 @@ public abstract class State : MonoBehaviour {
 
     void CheckTransitions(StateController stateController) {
         for (int i = 0; i < transitions.Length; i++) {
+            Debug.Log(stateController.name + " is making " + this + " check transition: " + transitions[i]);
             if (transitions[i].IsConditionTrue(stateController)) {
+                Debug.Log(transitions[i] + " was found to be true.");
                 stateController.TransitionToState(transitions[i].nextState);
             }
         }

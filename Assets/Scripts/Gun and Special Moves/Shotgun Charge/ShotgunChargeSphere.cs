@@ -33,7 +33,7 @@ public class ShotgunChargeSphere : MonoBehaviour {
     }
 
 
-    public void BeginCharge() {
+    public void MoveIntoChargePosition() {
         // Begin moving visual sphere into position.
         transform.DOLocalMoveZ(activePosition, 0.1f);
     }

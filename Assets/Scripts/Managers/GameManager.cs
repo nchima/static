@@ -207,13 +207,6 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void BeginShotgunCharge() {
-        invincible = true;
-        player.GetComponentInChildren<ShotgunCharge>().BeginCharge();
-        player.GetComponent<PlayerController>().state = PlayerController.State.ShotgunCharge;
-    }
-
-
     public void CompleteShotgunCharge() {
         //player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
         player.GetComponentInChildren<ShotgunCharge>().EndCharge();

@@ -73,7 +73,5 @@ public class FiringShockwaveState : State {
         GameManager.instance.forceInvincibility = false;
 
         GameManager.player.GetComponent<Collider>().material.bounciness = fallingSequenceManager.normalPlayerBounciness;
-
-        Debug.Log("Did all this.");
     }
 }
