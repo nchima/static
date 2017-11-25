@@ -38,9 +38,6 @@ public class Gun : MonoBehaviour {
     bool firingMissiles = false;
     bool firedMissiles = false;
 
-    /* SHOTGUN CHARGE STUFF */
-    bool isDoingShotgunCharge = false;
-
     // USED DURING SHOOTING
     int bulletsPerBurst;
     int bulletsHitThisBurst = 0;
@@ -116,7 +113,6 @@ public class Gun : MonoBehaviour {
             } else if (shotgunChargeIsReady) {
                 gameManager.PlayerUsedSpecialMove();
                 FindObjectOfType<ShotgunCharge>().BeginSequence();
-                isDoingShotgunCharge = true;
             }
         }
 
@@ -147,8 +143,6 @@ public class Gun : MonoBehaviour {
 
 
     public void EndShotgunCharge() {
-        isDoingShotgunCharge = false;
-        gameManager.CompleteShotgunCharge();
     }
 
 

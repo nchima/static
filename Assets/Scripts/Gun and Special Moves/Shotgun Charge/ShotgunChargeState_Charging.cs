@@ -26,8 +26,6 @@ public class ShotgunChargeState_Charging : State {
         // Add a kick to get the player going.
         GameManager.player.GetComponent<Rigidbody>().AddForce(GameManager.player.transform.forward * shotgunCharge.kickForce, ForceMode.Impulse);
 
-        Debug.Log("Doing all this stuff.");
-
         shotgunCharge.chargeTimer = 0f;
         shotgunCharge.isCharging = true;
     }

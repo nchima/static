@@ -207,12 +207,6 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void CompleteShotgunCharge() {
-        //player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
-        player.GetComponentInChildren<ShotgunCharge>().EndCharge();
-    }
-
-
     public void ReturnToFullSpeed()
     {
         // Begin tweening time scale, gun burst rate, and music pitch back to normal.

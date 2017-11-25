@@ -17,7 +17,6 @@ public class TriggerTransition : Transition {
 
 
     public override bool IsConditionTrue(StateController stateController) {
-        Debug.Log(this + " is being checked by " + stateController);
         if (isTriggerSet) {
             isTriggerSet = false;
             return true;

@@ -6,7 +6,6 @@ using UnityEngine;
 public class PauseAfterLevelCompleteFallingState : State {
 
     public override void Initialize(StateController stateController) {
-        Debug.Log("Pause after level complete.");
         GameManager.instance.SetFloorCollidersActive(false);
     }
 

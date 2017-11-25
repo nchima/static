@@ -13,10 +13,9 @@ public class ShotgunCharge : StateController {
     List<GameObject> capturedEnemies = new List<GameObject>();
 
     bool isReturningToFullSpeed;
-    bool isFiringShockwave = false;
+    [HideInInspector] public bool isFiringShockwave = false;
     float slowMoDuration = 0.25f;
     float sloMoTimer = 0f;
-    [SerializeField] GameObject shockwavePrefab;
 
     [HideInInspector] public bool isCharging = false;
     [HideInInspector] public float chargeTimer = 0f;
@@ -77,41 +76,22 @@ public class ShotgunCharge : StateController {
 
 
     public void BeginSequence() {
-        Debug.Log("Beginning shotgun charge sequence.");
         chargeTrigger.isTriggerSet = true;
     }
 
 
-    void ResetAllVariables() {
-        isFiringShockwave = false;
-        isReturningToFullSpeed = false;
-        GameManager.instance.forceInvincibility = false;
-        player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-        sloMoTimer = 0f;
+    public void ResetAllVariables() {
+        //isFiringShockwave = false;
+        //isReturningToFullSpeed = false;
+        //GameManager.instance.forceInvincibility = false;
+        //player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        //sloMoTimer = 0f;
     }
 
 
     public void EndCharge() {
-        sphere.EndCharge();
-
-        if (player.GetComponent<PlayerController>().state != PlayerController.State.ShotgunCharge) { return; }
-
-        isCharging = false;
-
-        Physics.IgnoreLayerCollision(16, 24, false);
-
-        if (player.GetComponent<PlayerController>().isAboveFloor) { FireShockwave(); }
-        else { ResetAllVariables(); }
-
-        player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
     }
 
-    void FireShockwave() {
-        GameManager.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 50f);
-        player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
-        capturedEnemies.Clear();
-        isFiringShockwave = true;
-    }
 
     public void OnTriggerEnter(Collider other) {
         // If we collide into an enemy while charging, capture it.

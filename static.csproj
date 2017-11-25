@@ -186,7 +186,8 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeSphere.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeState_Charging.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeState_FinalAttack.cs" />
-    <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_EndCharge.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerCollidedWithWallOrEnemy.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\SpecialMoveAmmo.cs" />
     <Compile Include="Assets\Scripts\Level\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Level\FloorCreator.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Assets\Scripts\State\State_Idle.cs" />
     <Compile Include="Assets\Scripts\State\StateController.cs" />
     <Compile Include="Assets\Scripts\State\Transition.cs" />
+    <Compile Include="Assets\Scripts\Transitions\Transition_Collision.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_MouseButtonPressed.cs" />
     <Compile Include="Assets\Scripts\Transitions\TriggerTransition.cs" />
     <Compile Include="Assets\Scripts\Transitions\WaitForSecondsTransition.cs" />
@@ -220,6 +222,8 @@
     <Compile Include="Assets\Scripts\UI\MonitorSliderScript.cs" />
     <Compile Include="Assets\Scripts\UI\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\UI\SpecialBarManager.cs" />
+    <Compile Include="Assets\Scripts\Util\CollisionListener.cs" />
+    <Compile Include="Assets\Scripts\Util\CollisionReporter.cs" />
     <Compile Include="Assets\Scripts\Util\DebugUtil.cs" />
     <Compile Include="Assets\Scripts\Util\FloatRange.cs" />
     <Compile Include="Assets\Scripts\Util\Int2.cs" />

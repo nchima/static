@@ -222,9 +222,9 @@ public class PlayerController : MonoBehaviour {
 
 
     private void OnCollisionEnter(Collision collision) {
-        // If the player collides with a wall, end the shotgun charge.
+        // If the player collides with a wall while shotgun charging, end the shotgun charge.
         if (state == State.ShotgunCharge && collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle")) {
-            FindObjectOfType<Gun>().EndShotgunCharge();
+            //FindObjectOfType<Gun>().EndShotgunCharge();
         }
     }
 }

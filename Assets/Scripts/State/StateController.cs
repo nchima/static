@@ -8,7 +8,6 @@ public class StateController : MonoBehaviour {
 
     protected virtual void Update() {
         currentState.Run(this);
-        Debug.Log(this.name + " is running " + currentState.name);
     }
 
     public void TransitionToState(State nextState) {
