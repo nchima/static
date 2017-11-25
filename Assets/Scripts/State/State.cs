@@ -21,7 +21,6 @@ public abstract class State : MonoBehaviour {
     void CheckTransitions(StateController stateController) {
         for (int i = 0; i < transitions.Length; i++) {
             if (transitions[i].IsConditionTrue(stateController)) {
-                Debug.Log("Because of " + transitions[i] + ", " + gameObject.name + " is transitioning to " + transitions[i].nextState.gameObject.name);
                 stateController.TransitionToState(transitions[i].nextState);
             }
         }

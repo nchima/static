@@ -10,7 +10,6 @@ public class ShotgunChargeTransition_PlayerCollidedWithWallOrEnemy : Transition_
 
     protected override void ReportedCollision(Collision collision) {
         if (collision.collider.GetComponent<Enemy>() || collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle")) {
-            Debug.Log("Collision was reported with " + collision.collider.name);
             collided = true;
         }
     }
