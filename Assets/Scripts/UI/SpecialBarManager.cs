@@ -62,8 +62,7 @@ public class SpecialBarManager : MonoBehaviour {
     [SerializeField] private GameObject specialMoveReadyScreen;
 
 
-    private void Start()
-    {
+    private void Start() {
         currentValue = startValue;
         currentDecay = baseDecay;
         currentStartValue = startValue;
@@ -75,8 +74,8 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
-    private void Update()
-    {
+    private void Update() {
+
         // If bar is at max, keep it there for a moment to make things easier for the player.
         if (barIsFull) {
             barBorderObject.GetComponent<MeshRenderer>().material.color = Color.Lerp(readyColor1, readyColor2, Random.value);
@@ -129,8 +128,7 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
-    public void BulletHitEnemy()
-    {
+    public void BulletHitEnemy() {
         return;
         currentValue += bulletHitValue;
     }

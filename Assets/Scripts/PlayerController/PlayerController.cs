@@ -27,12 +27,6 @@ public class PlayerController : MonoBehaviour {
     // PHYSICS MATERIAL STUFF
     float normalBounciness;
 
-    // FOV
-    FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
-    FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
-    [SerializeField] Camera[] perspectiveCams;
-    [SerializeField] Camera[] orthographicCams;
-
     // TURNING
     [SerializeField] float mouseSensitivity;
     private Quaternion targetRotation;
@@ -207,19 +201,6 @@ public class PlayerController : MonoBehaviour {
         forceVector *= forceAmt;
         GetComponent<Rigidbody>().AddForce(forceVector, ForceMode.Impulse);
     }
-
-
-    public void SetFieldOfView(float value) {
-        float newFov = MyMath.Map(value, 1f, -1f, fieldOfViewRange.min, fieldOfViewRange.max);
-        float newSize = MyMath.Map(value, 1f, -1f, orthographicSizeRange.min, orthographicSizeRange.max);
-
-        for (int i = 0; i < perspectiveCams.Length; i++)    
-            perspectiveCams[i].fieldOfView = newFov;
-
-        for (int i = 0; i < orthographicCams.Length; i++)
-            orthographicCams[i].orthographicSize = newSize;
-    }
-
 
     private void OnCollisionEnter(Collision collision) {
         // If the player collides with a wall while shotgun charging, end the shotgun charge.

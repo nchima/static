@@ -185,6 +185,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunCharge.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeSphere.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeState_Charging.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeState_ChargingUp.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeState_FinalAttack.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerCollidedWithWallOrEnemy.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
@@ -198,16 +199,19 @@
     <Compile Include="Assets\Scripts\Managers\DebugManager.cs" />
     <Compile Include="Assets\Scripts\Managers\FallingSequenceManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\GunValueManager.cs" />
     <Compile Include="Assets\Scripts\Managers\HealthManager.cs" />
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletMesh.cs" />
+    <Compile Include="Assets\Scripts\PlayerController\FieldOfViewController.cs" />
     <Compile Include="Assets\Scripts\PlayerController\PlayerController.cs" />
     <Compile Include="Assets\Scripts\State\State.cs" />
     <Compile Include="Assets\Scripts\State\State_Idle.cs" />
     <Compile Include="Assets\Scripts\State\StateController.cs" />
     <Compile Include="Assets\Scripts\State\Transition.cs" />
+    <Compile Include="Assets\Scripts\Transitions\Transition_ButtonReleased.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_Collision.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_MouseButtonPressed.cs" />
     <Compile Include="Assets\Scripts\Transitions\TriggerTransition.cs" />

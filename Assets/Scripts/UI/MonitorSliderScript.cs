@@ -8,14 +8,12 @@ public class MonitorSliderScript : MonoBehaviour {
 
     GameManager gameManager;
 
-    private void Start()
-    {
+    private void Start() {
         gameManager = FindObjectOfType<GameManager>();
     }
 
-    void Update ()
-    {
-		float newXPos = MyMath.Map (gameManager.currentSine, -1f, 1f, minXPos, maxXPos);
+    void Update() {
+		float newXPos = MyMath.Map (GunValueManager.currentGunValue, -1f, 1f, minXPos, maxXPos);
 		transform.localPosition = new Vector3 (newXPos, transform.localPosition.y, transform.localPosition.z);
 	}
 }

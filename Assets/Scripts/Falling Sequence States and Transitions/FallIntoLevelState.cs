@@ -7,29 +7,29 @@ using DG.Tweening;
 public class FallIntoLevelState : State {
 
     public override void Initialize(StateController stateController) {
-
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
+        // In case the game is currently running in slow motion, return to full speed.
         GameManager.instance.ReturnToFullSpeed();
 
+        // If the player is not currently set to falling state, set them to that state.
         if (GameManager.player.GetComponent<PlayerController>().state != PlayerController.State.SpeedFalling) {
             GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
         }
 
         GameManager.player.GetComponent<Collider>().material.bounciness = 0f;
         GameManager.instance.forceInvincibility = false;
+
+        // Reset gravity to starting value.
         Physics.gravity = fallingSequenceManager.savedGravity;
 
         // Load next level.
-        if (!GameManager.instance.dontChangeLevel && GameManager.levelManager.isLevelCompleted /* && !startMidFall*/) {
+        if (!GameManager.instance.dontChangeLevel && GameManager.levelManager.isLevelCompleted) {
             GameManager.instance.LoadNextLevel();
         }
 
         // Place the player in the correct spot above the level.
-        GameManager.player.transform.position = new Vector3(
-            GameManager.player.transform.position.x,
-            fallingSequenceManager.playerSpawnPoint.position.y,
-            GameManager.player.transform.position.z);
+        GameManager.player.transform.position = fallingSequenceManager.playerSpawnPoint.position;
 
         // Re-enable the floor's collision (since it is disabled when the player completes a level.)
         GameManager.instance.SetFloorCollidersActive(true);

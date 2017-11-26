@@ -24,25 +24,13 @@ public class CrossHair : MonoBehaviour {
         line.positionCount = segments + 1;
         line.useWorldSpace = false;
         CreatePoints(line, xradius, yradius);
-
-        if (GameManager.instance.gunMethod == GameManager.GunMethod.TuningBased)
-        {
-            //tuningTarget.positionCount = segments + 1;
-            //tuningTarget.useWorldSpace = false;
-            //CreatePoints(tuningTarget, ttXRadius, ttYRadius);
-        }
-
-        else
-        {
-            //tuningTarget.gameObject.SetActive(false);
-        }
     }
 
 
     private void Update()
     {
-        xradius = MyMath.Map(GameManager.instance.currentSine, -1f, 1f, maxRadius, minRadius);
-        yradius = MyMath.Map(GameManager.instance.currentSine, -1f, 1f, maxRadius, minRadius);
+        xradius = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, maxRadius, minRadius);
+        yradius = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, maxRadius, minRadius);
         transform.Rotate(new Vector3(0f, Random.Range(-180f, 180f), 0f));
         CreatePoints(line, xradius, yradius);
 

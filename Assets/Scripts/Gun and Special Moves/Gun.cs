@@ -86,7 +86,7 @@ public class Gun : MonoBehaviour {
         timeSinceLastShot += Time.deltaTime;
 
         // Reset special moves if sine is in middle of bar.
-        if (gameManager.currentSine < 0.1f && gameManager.currentSine > -0.1f) {
+        if (GunValueManager.currentGunValue < 0.1f && GunValueManager.currentGunValue > -0.1f) {
             firedMissiles = false;
         }
 
@@ -95,13 +95,6 @@ public class Gun : MonoBehaviour {
             if (shotgunChargeIsReady || missilesAreReady) mr.material.color = Color.Lerp(specialMoveReadyColor1, specialMoveReadyColor2, Random.Range(0f, 1f));
             else mr.material.color = Color.black;
         }
-
-        //if (Input.GetButton("Fire2"))
-        //{
-        //    missilesFired = 0;
-        //    missileTimer = 0f;
-        //    firingMissiles = true;
-        //}
 
         // See if the player has fired a special move & if so, initialize proper variables.
         if (canShoot && (Input.GetButton("Fire2") /*|| Input.GetAxisRaw("Fire2") != 0*/)) {
@@ -141,25 +134,20 @@ public class Gun : MonoBehaviour {
         }
     }
 
-
-    public void EndShotgunCharge() {
-    }
-
-
     public void FireBurst() {
 
         // Get new firing variables based on current oscillation.
-        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(gameManager.currentSine, -1f, 1f, bulletsPerBurstRange.max, bulletsPerBurstRange.min));
-        float burstsPerSecond = MyMath.Map(gameManager.currentSine, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
-        float inaccuracy = MyMath.Map(gameManager.currentSine, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
+        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, bulletsPerBurstRange.max, bulletsPerBurstRange.min));
+        float burstsPerSecond = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
+        float inaccuracy = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
 
         // Handle audio.
         rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
-        rifleAudioSource.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
-        rifleAudioSource.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.2f, 1f);
+        rifleAudioSource.pitch = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.2f, 1f);
+        rifleAudioSource.volume = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.2f, 1f);
 
-        shotgunAudioSource.pitch = MyMath.Map(gameManager.currentSine, -1f, 1f, 0.8f, 2f);
-        shotgunAudioSource.volume = MyMath.Map(gameManager.currentSine, -1f, 1f, 1f, 0.2f);
+        shotgunAudioSource.pitch = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.8f, 2f);
+        shotgunAudioSource.volume = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 1f, 0.2f);
 
         // Make sure enough time has passed since the last shot.
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
@@ -177,9 +165,9 @@ public class Gun : MonoBehaviour {
         _muzzleFlash.transform.position = gunTipTransform.position;
         _muzzleFlash.transform.rotation = gunTipTransform.rotation;
         _muzzleFlash.transform.localScale = new Vector3(
-            MyMath.Map(gameManager.currentSine, -1f, 1f, 0.5f, 0.3f),
-            MyMath.Map(gameManager.currentSine, -1f, 1f, 0.5f, 0.3f),
-            MyMath.Map(gameManager.currentSine, -1f, 1f, 0.5f, 0.3f)
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.5f, 0.3f),
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.5f, 0.3f),
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.5f, 0.3f)
             );
 
         // Auto aim
@@ -227,11 +215,11 @@ public class Gun : MonoBehaviour {
         newBullet.GetComponent<PlayerBullet>().GetFired(
             bulletSpawnTransform.position,
             bulletSpawnTransform.forward,
-            MyMath.Map(gameManager.currentSine, -1f, 1f, bulletThicknessRange.max, bulletThicknessRange.min),
-            MyMath.Map(gameManager.currentSine, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
-            MyMath.Map(gameManager.currentSine, -1f, 1f, bulletExplosionRadiusRange.min, bulletExplosionRadiusRange.max),
-            MyMath.Map(gameManager.currentSine, -1f, 1f, explosionDamageRange.min, explosionDamageRange.max),
-            Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(gameManager.currentSine, -1f, 1f, 0f, 1f))
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, bulletThicknessRange.max, bulletThicknessRange.min),
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, bulletExplosionRadiusRange.min, bulletExplosionRadiusRange.max),
+            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, explosionDamageRange.min, explosionDamageRange.max),
+            Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0f, 1f))
         );
     }
 }

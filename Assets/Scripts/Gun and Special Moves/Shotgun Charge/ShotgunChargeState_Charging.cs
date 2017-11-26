@@ -10,6 +10,10 @@ public class ShotgunChargeState_Charging : State {
         
         shotgunCharge.sphere.MoveIntoChargePosition();
 
+        shotgunCharge.isCharging = true;
+
+        FindObjectOfType<FieldOfViewController>().TweenToNormalFOV();
+
         // Make player temporarily invincible (Why am I setting two separate variables for this??)
         GameManager.instance.forceInvincibility = true;
         GameManager.instance.invincible = true;
@@ -24,10 +28,13 @@ public class ShotgunChargeState_Charging : State {
         Physics.IgnoreLayerCollision(16, 24, true);
 
         // Add a kick to get the player going.
+        GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
         GameManager.player.GetComponent<Rigidbody>().AddForce(GameManager.player.transform.forward * shotgunCharge.kickForce, ForceMode.Impulse);
+    }
 
-        shotgunCharge.chargeTimer = 0f;
-        shotgunCharge.isCharging = true;
+    public override void Run(StateController stateController) {
+        base.Run(stateController);
+        GunValueManager.currentGunValue = -1f;
     }
 
     public override void End(StateController stateController) {

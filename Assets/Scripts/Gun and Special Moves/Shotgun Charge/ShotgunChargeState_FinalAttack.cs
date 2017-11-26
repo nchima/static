@@ -15,6 +15,7 @@ public class ShotgunChargeState_FinalAttack : State {
         shotgunCharge.sphere.EndCharge();
 
         shotgunCharge.isCharging = false;
+        shotgunCharge.chargeTimer = 0f;
 
         // Make player once again collide with railings.
         Physics.IgnoreLayerCollision(16, 24, false);
@@ -31,14 +32,13 @@ public class ShotgunChargeState_FinalAttack : State {
         base.Run(stateController);
 
         // Keep gun state at 100% shotgun and fire it over and over.
-        GameManager.instance.currentSine = -1f;
+        GunValueManager.currentGunValue = -1f;
         GameManager.instance.gun.FireBurst();
     }
 
     public override void End(StateController stateController) {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
 
-        shotgunCharge.isFiringShockwave = false;
         //shotgunCharge.isReturningToFullSpeed = false;
         GameManager.instance.forceInvincibility = false;
         GameManager.player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
@@ -50,7 +50,6 @@ public class ShotgunChargeState_FinalAttack : State {
         GameManager.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 50f);
         GameManager.player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
         //shotgunCharge.capturedEnemies.Clear();
-        shotgunCharge.isFiringShockwave = true;
         StartCoroutine(ShockwaveCoroutine());
     }
 

@@ -34,22 +34,6 @@ public class GameManager : MonoBehaviour {
     float timeSinceLastInput = 0f;
     public bool gameStarted = false;
 
-    // USED FOR SINE TRACKER
-    public enum GunMethod { TimeBased, MovementBasedQuick, MovementBasedGradual, FloorBased, RotationBased, TuningBased };
-    public GunMethod gunMethod;
-    [HideInInspector] public float currentSine;
-    public float oscSpeed = 0.3f;
-    [SerializeField] float bulletHitSineIncrease = 0.01f;
-    float sineTime = 0.0f;
-
-    // Used only for tuning method:
-    [SerializeField] float idealTuningSize = 0.3f;  // How 'big' the range will be in which the gun is considered to be ideally tuned.
-    FloatRange currentIdealRange;   // A gun value in this range will be considered 'in tune'.
-    float tuningSpeed = 0.01f;  // How quickly the player can tune the gun. (Not used in case of mouse)
-    float newTuningTimer = 0f;
-    FloatRange newTuningTimeRange = new FloatRange(7f, 16f);
-    float nextTuningTime;
-
     // RANDOM USEFUL STUFF
     Vector3 playerPositionLast;
     [HideInInspector] public Vector3 playerVelocity;
@@ -63,36 +47,19 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static MusicManager musicManager;
     [HideInInspector] public static SFXManager sfxManager;
     [HideInInspector] public Gun gun;
+    [HideInInspector] public static GunValueManager gunValueManager;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public static GameObject player;
     [SerializeField] GameObject gunSliderBorder;
 
 
-    void Awake()
-    {
+    void Awake() {
+        // Get various references.
         instance = this;
-
         player = GameObject.Find("Player");
         player.GetComponent<PlayerController>().enabled = false;
-
-        foreach (Gun gun in FindObjectsOfType<Gun>())
-        {
-            gun.enabled = false;
-        }
-    }
-
-
-    private void Start()
-    {
-        // Set up the current number of enemies.
-        currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
-
-        //currentSine = Mathf.Sin(Time.time * oscSpeed);
-        currentSine = Mathf.Sin(sineTime);
-
-        // Get references
         scoreManager = GetComponent<ScoreManager>();
-        specialBarManager = GetComponent<SpecialBarManager>();
+        specialBarManager = GetComponentInChildren<SpecialBarManager>();
         healthManager = GetComponent<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
         levelManager = GetComponentInChildren<LevelManager>();
@@ -100,7 +67,19 @@ public class GameManager : MonoBehaviour {
         sfxManager = GetComponentInChildren<SFXManager>();
         musicManager = GetComponentInChildren<MusicManager>();
         gun = FindObjectOfType<Gun>();
+        gunValueManager = GetComponentInChildren<GunValueManager>();
         noiseGenerator = GetComponent<GenerateNoise>();
+
+        // Disable gun.
+        foreach (Gun gun in FindObjectsOfType<Gun>()) {
+            gun.enabled = false;
+        }
+    }
+
+
+    private void Start() {
+        // Set up the current number of enemies.
+        currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
 
         scoreManager.DetermineBonusTime();
 
@@ -110,27 +89,17 @@ public class GameManager : MonoBehaviour {
         foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
             enemy.enabled = false;
         }
-
-        if (gunMethod == GunMethod.TuningBased)
-        {
-            FindObjectOfType<CrossHair>().tuningTarget.gameObject.SetActive(true);
-            GetNewTuningTarget();
-        }
     }
 
 
-    private void Update()
-    {
+    private void Update() {
         // Keep track of player velocity.
         playerVelocity = (player.transform.position - playerPositionLast) / Time.deltaTime;
         playerPositionLast = player.transform.position;
 
-        UpdateGunSine();
-
         // See if a special move is ready to be fired.
-        bool sineInPosition = currentSine <= -1f + gun.specialMoveSineRange || currentSine >= 1f - gun.specialMoveSineRange;
-        if (sineInPosition)
-        {
+        bool sineInPosition = GunValueManager.currentGunValue <= -1f + gun.specialMoveSineRange || GunValueManager.currentGunValue >= 1f - gun.specialMoveSineRange;
+        if (sineInPosition) {
             //Debug.Log("Sine in position.");
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.Lerp(Color.red, Color.yellow, Random.value);
             //Debug.Log(gunSliderBorder.GetComponent<MeshRenderer>().material);
@@ -141,16 +110,14 @@ public class GameManager : MonoBehaviour {
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
         }
 
-        gun.shotgunChargeIsReady = currentSine <= 0f && specialBarManager.barIsFull;
-        gun.missilesAreReady = currentSine >= 0f && specialBarManager.barIsFull;
+        gun.shotgunChargeIsReady = GunValueManager.currentGunValue <= 0f && specialBarManager.barIsFull;
+        gun.missilesAreReady = GunValueManager.currentGunValue >= 0f && specialBarManager.barIsFull;
 
-        if ((gun.shotgunChargeIsReady || gun.missilesAreReady))
-        {
+        if ((gun.shotgunChargeIsReady || gun.missilesAreReady)) {
             specialBarManager.FlashBar();
         }
 
-        if (gunMethod == GunMethod.TuningBased && specialBarManager.barIsFull)
-        {
+        if (specialBarManager.barIsFull) {
             specialBarManager.FlashBar();
         }
 
@@ -195,20 +162,17 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void LoadNextLevel()
-    {
+    public void LoadNextLevel() {
         levelManager.LoadNextLevel();
     }
 
 
     public void PlayerUsedSpecialMove() {
         specialBarManager.PlayerUsedSpecialMove();
-        if (gunMethod == GunMethod.TuningBased) GetNewTuningTarget();
     }
 
 
-    public void ReturnToFullSpeed()
-    {
+    public void ReturnToFullSpeed() {
         // Begin tweening time scale, gun burst rate, and music pitch back to normal.
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
         DOTween.To(() => gun.burstsPerSecondSloMoModifierCurrent, x => gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
@@ -216,8 +180,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerKilledEnemy(int enemyKillValue)
-    {
+    public void PlayerKilledEnemy(int enemyKillValue) {
         // Add score and special bar values.
         scoreManager.PlayerKilledEnemy(enemyKillValue);
         specialBarManager.PlayerKilledEnemy();
@@ -256,33 +219,28 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void CountEnemies()
-    {
+    public void CountEnemies() {
         currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
         currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
     }
 
 
-    public void FreezeSpecialBarDecay(bool value)
-    {
+    public void FreezeSpecialBarDecay(bool value) {
         specialBarManager.freezeDecay = value;
     }
 
 
-    public void DetermineBonusTime()
-    {
+    public void DetermineBonusTime() {
         scoreManager.DetermineBonusTime();
     }
 
 
-    public void SetFloorCollidersActive(bool value)
-    {
+    public void SetFloorCollidersActive(bool value) {
         levelManager.SetFloorCollidersActive(value);
     }
 
 
-    public void PlayerWasHurt()
-    {
+    public void PlayerWasHurt() {
         if (invincible) return;
         invincibilityTimer += invincibilityTime;
 
@@ -299,8 +257,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void ShowHighScores()
-    {
+    public void ShowHighScores() {
         scoreManager.LoadScoresForHighScoreScreen();
 
         gameOverScreen.gameObject.SetActive(false);
@@ -309,8 +266,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void BulletHitEnemy()
-    {
+    public void BulletHitEnemy() {
         //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) return;
         scoreManager.BulletHitEnemy();
         specialBarManager.BulletHitEnemy();
@@ -318,14 +274,12 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    void ShowGameOverScreen()
-    {
+    void ShowGameOverScreen() {
         gameOverScreen.SetActive(true);
     }
 
 
-    public void StartGame()
-    {
+    public void StartGame() {
         CountEnemies();
 
         // Unpause enemies in the background.
@@ -346,125 +300,15 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void RestartGame()
-    {
+    public void RestartGame() {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-
-    public void SpecialMoveReady()
-    {
-        
-    }
-
-    [SerializeField] GameObject wiper;
-    float previousSine = 0f;
-    void UpdateGunSine()
-    {
-        // Update sine
-        if (gunMethod == GunMethod.TimeBased)
-        {
-            sineTime += Time.deltaTime;
-            currentSine = Mathf.Sin(sineTime * oscSpeed);
-        }
-
-        else if (gunMethod == GunMethod.MovementBasedQuick)
-            currentSine = Mathf.Lerp(currentSine, (Input.GetAxis("Horizontal") * MyMath.Map(Mathf.Abs(Input.GetAxis("Vertical")), 0f, 1f, 1f, 0.5f)), 0.5f);
-
-        else if (gunMethod == GunMethod.MovementBasedGradual)
-        {
-            if (Input.GetAxis("Horizontal") != 0) currentSine += Input.GetAxis("Horizontal") * 0.05f;
-            else currentSine = Mathf.Lerp(currentSine, 0f, 0.05f);
-            //else if (currentSine > 0) currentSine -= 0.04f;
-            currentSine = Mathf.Clamp(currentSine, -1f, 1f);
-        }
-
-        else if (gunMethod == GunMethod.RotationBased)
-            currentSine = MyMath.Map(player.transform.rotation.eulerAngles.y, 0f, 360f, -1f, 1);
-
-        else if (gunMethod == GunMethod.FloorBased)
-        {
-            // Raycast from player downwards to floor.
-            RaycastHit hit;
-            if (Physics.Raycast(player.transform.position, Vector3.down, out hit, 500f, 1 << 20))
-            {
-                //Debug.Log("Down ray: " + hit.collider.name);
-                if (hit.collider.GetComponent<FloorTile>() != null)
-                {
-                    currentSine = hit.collider.GetComponent<FloorTile>().shotgunValue;
-                }
-            }
-        }
-
-        else if (gunMethod == GunMethod.TuningBased)
-        {
-            // Control tuning via my penis.
-            //if (Input.GetButton("Gun Tuning"))
-            //{
-            //currentSine += Input.GetAxis("Mouse X") * 0.1f;
-
-            //currentSine += Input.GetAxis("Vertical") * -0.05f;
-
-            currentSine += Input.GetAxis("Mouse Y") * 0.1f;
-            currentSine = Mathf.Clamp(currentSine, -1f, 1f);
-            //}
-
-            if (Mathf.Abs(previousSine - currentSine) >= 0.01f) {
-                wiper.transform.localScale = new Vector3(
-                    MyMath.Map(Mathf.Abs(previousSine - currentSine), 0f, 0.5f, 0f, 10f),
-                    wiper.transform.localScale.y,
-                    wiper.transform.localScale.z
-                );
-            } else {
-                wiper.transform.localScale = new Vector3(
-                        0f,
-                        wiper.transform.localScale.y,
-                        wiper.transform.localScale.z
-                    );
-            }
-
-            wiper.transform.localPosition = new Vector3(
-                wiper.transform.localPosition.x,
-                MyMath.Map(currentSine, -1f, 1f, -25f, 11f),
-                wiper.transform.localPosition.z
-                );
-
-            previousSine = currentSine;
-
-            newTuningTimer += Time.deltaTime;
-            if (newTuningTimer > nextTuningTime)
-            {
-                GetNewTuningTarget();
-                nextTuningTime = newTuningTimeRange.Random;
-                newTuningTimer = 0f;
-            }
-        }
-
-        musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", (currentSine + 1f) * 11000f + 200f);
-        musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer
-            .SetFloat("FilterCutoff", MyMath.Map(currentSine, -1f, 1f, 10000f, 20000f));
-
-        player.GetComponent<PlayerController>().SetFieldOfView(currentSine);
-    }
-
-
-    void GetNewTuningTarget()
-    {
-        float newIdealCenter = Random.Range(-1 + idealTuningSize*0.5f, 1 - idealTuningSize*0.5f);
-        currentIdealRange = new FloatRange(newIdealCenter - idealTuningSize * 0.5f, newIdealCenter + idealTuningSize * 0.5f);
-
-        //FindObjectOfType<CrossHair>().UpdateTuningTarget(newIdealCenter);
-    }
-
-
-    public void UpdateBillboards()
-    {
+    public void UpdateBillboards() {
         FindObjectOfType<BatchBillboard>().FindAllBillboards();
     }
 
-
-    public bool PositionIsInLevelBoundaries(Vector3 position)
-    {
+    public bool PositionIsInLevelBoundaries(Vector3 position) {
         if (position.x > levelGenerator.baseLevelSize / 2 ||
             position.x < -levelGenerator.baseLevelSize / 2 ||
             position.z > levelGenerator.baseLevelSize / 2 ||

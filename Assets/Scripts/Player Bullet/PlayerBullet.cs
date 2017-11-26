@@ -82,7 +82,7 @@ public class PlayerBullet : MonoBehaviour {
         previousPosition = transform.position;
         explosionRadius = _explosionRadius;
         explosionDamage = _explosionDamage;
-        headVisuals.transform.localScale = Vector3.one * MyMath.Map(GameManager.instance.currentSine, -1f, 1f, headSizeRange.min, headSizeRange.max);
+        headVisuals.transform.localScale = Vector3.one * MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, headSizeRange.min, headSizeRange.max);
         m_Color = _color;
         headVisuals.GetComponentInChildren<Renderer>().material.SetColor("_Tint", m_Color);
     }
