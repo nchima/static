@@ -15,7 +15,7 @@ public class FiringShockwaveState : State {
         // Set up bonus time for next level.
         GameManager.instance.DetermineBonusTime();
 
-        GameManager.specialBarManager.freezeDecay = false;
+        //GameManager.specialBarManager.freezeDecay = false;
 
         GameManager.player.transform.position = new Vector3(GameManager.player.transform.position.x, 2.11f, GameManager.player.transform.position.z);
 

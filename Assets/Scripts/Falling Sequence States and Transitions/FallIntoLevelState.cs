@@ -50,7 +50,7 @@ public class FallIntoLevelState : State {
         GameObject.Find("Cameras").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
 
         // Begin falling sequence.
-        GameManager.instance.FreezeSpecialBarDecay(true);
+        //GameManager.instance.FreezeSpecialBarDecay(true);
     }
 
     public override void Run(StateController stateController) {
