@@ -225,7 +225,9 @@
     <Compile Include="Assets\Scripts\UI\MainMenuUI.cs" />
     <Compile Include="Assets\Scripts\UI\MonitorSliderScript.cs" />
     <Compile Include="Assets\Scripts\UI\PauseMenu.cs" />
-    <Compile Include="Assets\Scripts\UI\SpecialBarManager.cs" />
+    <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBar.cs" />
+    <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarManager.cs" />
+    <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarSizeController.cs" />
     <Compile Include="Assets\Scripts\Util\CollisionListener.cs" />
     <Compile Include="Assets\Scripts\Util\CollisionReporter.cs" />
     <Compile Include="Assets\Scripts\Util\DebugUtil.cs" />

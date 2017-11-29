@@ -110,16 +110,16 @@ public class GameManager : MonoBehaviour {
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
         }
 
-        gun.shotgunChargeIsReady = GunValueManager.currentGunValue <= 0f && specialBarManager.barIsFull;
-        gun.missilesAreReady = GunValueManager.currentGunValue >= 0f && specialBarManager.barIsFull;
+        //gun.shotgunChargeIsReady = GunValueManager.currentGunValue <= 0f && specialBarManager.barIsFull;
+        //gun.missilesAreReady = GunValueManager.currentGunValue >= 0f && specialBarManager.barIsFull;
 
         if ((gun.shotgunChargeIsReady || gun.missilesAreReady)) {
             specialBarManager.FlashBar();
         }
 
-        if (specialBarManager.barIsFull) {
-            specialBarManager.FlashBar();
-        }
+        //if (specialBarManager.barIsFull) {
+        //    specialBarManager.FlashBar();
+        //}
 
         //else gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
 
@@ -225,9 +225,9 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void FreezeSpecialBarDecay(bool value) {
-        specialBarManager.freezeDecay = value;
-    }
+    //public void FreezeSpecialBarDecay(bool value) {
+    //    specialBarManager.freezeDecay = value;
+    //}
 
 
     public void DetermineBonusTime() {
