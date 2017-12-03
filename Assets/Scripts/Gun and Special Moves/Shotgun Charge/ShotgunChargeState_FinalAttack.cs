@@ -32,7 +32,7 @@ public class ShotgunChargeState_FinalAttack : State {
         base.Run(stateController);
 
         // Keep gun state at 100% shotgun and fire it over and over.
-        GunValueManager.currentGunValue = -1f;
+        GunValueManager.currentValue = -1f;
         GameManager.instance.gun.FireBurst();
     }
 

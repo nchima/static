@@ -16,24 +16,13 @@ public class PlayerBullet : MonoBehaviour {
     [SerializeField] GameObject headVisuals;
     [SerializeField] FloatRange headSizeRange = new FloatRange(0f, 0.75f);
 
-    float thickness = 0.2f;
-    Color m_Color;
-    float travelledDistance = 0f;
+    PlayerBulletTrail m_playerBulletTrail;
+
+    public Color m_Color;
+    public float thickness = 0.2f;
     Vector3 previousPosition = Vector3.zero;
-    static ObjectPooler meshPooler;
+    float travelledDistance = 0f;
 
-
-    private void Awake() {
-        if (meshPooler == null) {
-            if (!GameObject.Find("Pooled Bullet Meshes").GetComponent<ObjectPooler>()) {
-                Debug.LogError("Could not find bullet mesh pooler!");
-                Debug.Break();
-                return;
-            } else {
-                meshPooler = GameObject.Find("Pooled Bullet Meshes").GetComponent<ObjectPooler>();
-            }
-        }
-    }
 
 
     private void FixedUpdate() {
@@ -60,16 +49,9 @@ public class PlayerBullet : MonoBehaviour {
             if (travelledDistance >= maxDistance) { EndBulletsExistence(); }
         }
 
-        DrawTrail();
+        m_playerBulletTrail.AddSegment(transform.position, previousPosition);
 
         previousPosition = transform.position;
-    }
-
-
-    void DrawTrail() {
-        GameObject newTrailPiece = meshPooler.GrabObject();
-        newTrailPiece.GetComponent<PlayerBulletMesh>().SetTransformByEndPoints(previousPosition, transform.position, thickness);
-        newTrailPiece.GetComponent<PlayerBulletMesh>().SetColor(m_Color);
     }
 
 
@@ -82,9 +64,17 @@ public class PlayerBullet : MonoBehaviour {
         previousPosition = transform.position;
         explosionRadius = _explosionRadius;
         explosionDamage = _explosionDamage;
-        headVisuals.transform.localScale = Vector3.one * MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, headSizeRange.min, headSizeRange.max);
+        headVisuals.transform.localScale = Vector3.one * MyMath.Map(GunValueManager.currentValue, -1f, 1f, headSizeRange.min, headSizeRange.max);
         m_Color = _color;
         headVisuals.GetComponentInChildren<Renderer>().material.SetColor("_Tint", m_Color);
+
+        if (m_playerBulletTrail == null) {
+            GameObject newObject = new GameObject();
+            m_playerBulletTrail = newObject.AddComponent<PlayerBulletTrail>();
+        }
+
+        m_playerBulletTrail.thickness = thickness;
+        m_playerBulletTrail.m_Color = m_Color;
     }
 
 
@@ -110,6 +100,8 @@ public class PlayerBullet : MonoBehaviour {
             GameObject newExplosion = Instantiate(explosionPrefab, hit.point, Quaternion.identity);
             newExplosion.GetComponent<Explosion>().explosionRadius = explosionRadius;
             newExplosion.GetComponent<Explosion>().SetColor(m_Color);
+            newExplosion.GetComponent<Explosion>().damageMin = 1;
+            newExplosion.GetComponent<Explosion>().damageMax = (int) explosionDamage;
         }
 
         EndBulletsExistence();

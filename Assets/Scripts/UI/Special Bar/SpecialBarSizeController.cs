@@ -13,12 +13,12 @@ public class SpecialBarSizeController : MonoBehaviour {
         get {
             return _percentageFilled;
         }
-
         set {
             _percentageFilled = value;
 
             // Set the bar's scale based on it's percentage.
             float newYScale = MyMath.Map(_percentageFilled, 0f, 1f, sizeRange.min, sizeRange.max);
+            newYScale = Mathf.Clamp(newYScale, sizeRange.min, sizeRange.max);
             barTransform.DOScaleY(newYScale, tweenSpeed);
         }
     }
@@ -29,10 +29,10 @@ public class SpecialBarSizeController : MonoBehaviour {
 
     private void Update() {
         // Set the bar's Y position so that it still starts from it's original bottom.
-        float newYPos = originPosition + barTransform.lossyScale.y * 0.5f;
+        float newXPos = originPosition + barTransform.lossyScale.y * 0.5f;
         barTransform.localPosition = new Vector3(
-                barTransform.localPosition.x,
-                newYPos,
+                newXPos,
+                barTransform.localPosition.y,
                 barTransform.localPosition.z
             );
     }

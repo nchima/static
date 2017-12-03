@@ -11,7 +11,7 @@ public class ShotgunChargeState_ChargingUp : State {
 
     public override void Run(StateController stateController) {
         base.Run(stateController);
-        GunValueManager.currentGunValue = -1f;
+        GunValueManager.currentValue = -1f;
     }
 
     public override void End(StateController stateController) {}

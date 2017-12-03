@@ -27,7 +27,6 @@ public class FieldOfViewController : MonoBehaviour {
         }
 
         set {
-            Debug.Log("setting perspective size to " + value);
             for (int i = 0; i < perspectiveCams.Count; i++) { perspectiveCams[i].fieldOfView = value; }
             _currentFOV = value;
         }
@@ -40,7 +39,6 @@ public class FieldOfViewController : MonoBehaviour {
         }
 
         set {
-            Debug.Log("setting ortho size to " + value);
             for (int i = 0; i < orthographicCams.Count; i++) { orthographicCams[i].orthographicSize = value; }
             _currentOrthoSize = value;
         }
@@ -59,7 +57,7 @@ public class FieldOfViewController : MonoBehaviour {
     }
 
     private void Update() {
-        SetFieldOfView(GunValueManager.currentGunValue);
+        SetFieldOfView(GunValueManager.currentValue);
     }
 
     void SetFieldOfView(float sineValue) {

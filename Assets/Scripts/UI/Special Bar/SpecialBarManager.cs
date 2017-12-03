@@ -10,18 +10,23 @@ public class SpecialBarManager : MonoBehaviour {
 
     // GAMEPLAY STUFF
     public float startValue = 0.4f;    // How large of a special the player starts the game with.
-    public float baseDecay = 0.01f;  // How quickly the special bar shrinks (increases as the player's multiplier increases)
 
     public float stickToFullDuration = 2f;   // How long the bars stick to their maximum value.
 
     // Relating to the decay of the special bar.
-    [HideInInspector] public float decayRate;     // How quickly the special bar currently shrinks.
+    public float decayRate;     // How quickly the special bar currently shrinks.
 
     [SerializeField] private float enemyValue = 0.4f; // How much the player's special increases for killing an enemy.
     [SerializeField] private float bulletHitValue = 0.01f;    // How much the player's special increases for hitting an enemy with one bullet.
     [SerializeField] private float getHurtPenalty = 0.1f; // How much the special bar decreases when the player is hurt.
 
     [SerializeField] private GameObject specialMoveReadyScreen;
+
+    public bool bothBarsFull {
+        get {
+            return leftBar.currentValue >= 0.99f && rightBar.currentValue >= 0.99f;
+        }
+    }
 
 
     private void Start() {
@@ -33,6 +38,9 @@ public class SpecialBarManager : MonoBehaviour {
     private void Update() {
         leftBar.Run(this);
         rightBar.Run(this);
+
+        if (bothBarsFull) { specialMoveReadyScreen.SetActive(true); }
+        else { specialMoveReadyScreen.SetActive(false); }
     }
 
 
@@ -47,15 +55,14 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
-    public void PlayerKilledEnemy() {
-        leftBar.currentValue += enemyValue;
-        rightBar.currentValue += enemyValue;
-    }
+    public void AddValue(float value) {
+        // Split value based on current gun value.
+        float mappedGunValue = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f);
+        float leftValue = value * (1 - mappedGunValue);
+        float rightValue = value * mappedGunValue;
 
-
-    public void BulletHitEnemy() {
-        leftBar.currentValue += bulletHitValue;
-        rightBar.currentValue += bulletHitValue;
+        leftBar.currentValue += leftValue;
+        rightBar.currentValue += rightValue;
     }
 
 

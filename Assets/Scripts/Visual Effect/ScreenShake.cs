@@ -10,7 +10,9 @@ public class ScreenShake : MonoBehaviour {
     float shakeTimer = 0f;
     float vibrateAmount = 0.009f;    // How much the screen should vibrate to encourage zfighting.
 	float decreaseFactor = 0.5f;    // How quickly the shake should decrease.
-    float moveBackSpeed = 0.5f; // How quickly elements of the screen should move back to their original position after the shake ends.
+    float moveBackSpeed = 0.3f; // How quickly elements of the screen should move back to their original position after the shake ends.
+
+    public bool useDrift = false;
 
     // Ambient drift is used to make the screen drift apart when the gun is out of tune.
     const float ambientDriftMax = 0f;
@@ -31,17 +33,17 @@ public class ScreenShake : MonoBehaviour {
 
 	void Update()
     {
-  //      // Get a drift position.
-  //      currentDriftPosition = new Vector3(
-  //          originalPosition.x + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.x + driftNoiseOffset.x, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
-  //          originalPosition.y + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.y + driftNoiseOffset.y, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
-  //          originalPosition.z + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.z + driftNoiseOffset.z, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax)
-  //          );
+        // Get a drift position.
+        //currentDriftPosition = new Vector3(
+        //    originalPosition.x + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.x + driftNoiseOffset.x, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
+        //    originalPosition.y + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.y + driftNoiseOffset.y, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax),
+        //    originalPosition.z + MyMath.Map(Mathf.PerlinNoise(driftNoiseTime.z + driftNoiseOffset.z, 0f), 0f, 1f, -ambientDriftMax, ambientDriftMax)
+        //    );
 
-  //      // Increment drift noise.
-  //      driftNoiseTime.x += DRIFT_NOISE_SPEED;
-  //      driftNoiseTime.y += DRIFT_NOISE_SPEED;
-		//driftNoiseTime.z += DRIFT_NOISE_SPEED;
+        // Increment drift noise.
+        //driftNoiseTime.x += DRIFT_NOISE_SPEED;
+        //driftNoiseTime.y += DRIFT_NOISE_SPEED;
+        //driftNoiseTime.z += DRIFT_NOISE_SPEED;
 
         // If the screen is currently shaking.
         if (shakeTimer > 0f)
@@ -54,7 +56,7 @@ public class ScreenShake : MonoBehaviour {
             );
 
             // Update position.
-            transform.position = shakePosition;
+            currentDriftPosition = shakePosition;
 
             // Decrease current shake.
 			currentShake -= Time.deltaTime * decreaseFactor;
@@ -62,28 +64,28 @@ public class ScreenShake : MonoBehaviour {
 		}
 
         // If this object is not current shaking or has finished shaking.
-        else
+        else if (useDrift)
         {
             // Set current shake to exaclty 0.
 			currentShake = 0.0f;
             shakeTimer = 0f;
 
             // Move back towards original position.
-            //Vector3 newPosition = Vector3.Lerp(transform.position, originalPosition, moveBackSpeed * Time.deltaTime);
-            //transform.position = newPosition;
+            Vector3 newPosition = Vector3.Lerp(currentDriftPosition, originalPosition, moveBackSpeed * Time.deltaTime);
+            currentDriftPosition = newPosition;
 
             // Vibrate to encourage z fighting.
-            Vector3 vibratePosition = new Vector3(
-                    originalPosition.x + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.x,
-                    originalPosition.y + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.y,
-                    originalPosition.z + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.z
-                );
+            //Vector3 vibratePosition = new Vector3(
+            //        originalPosition.x + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.x,
+            //        originalPosition.y + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.y,
+            //        originalPosition.z + Random.Range(-vibrateAmount, vibrateAmount) * shakeScale.z
+            //    );
 
-            vibratePosition = new Vector3(
-                   originalPosition.x + Mathf.Sin(Time.time*1.11f) *vibrateAmount * shakeScale.x*10f,
-                   originalPosition.y + Mathf.Sin(Time.time)  * vibrateAmount  * shakeScale.y * 10f,
-                   originalPosition.z + Mathf.Sin(Time.time*0.92f)  * vibrateAmount * shakeScale.z * 10f
-               );
+            //vibratePosition = new Vector3(
+            //       originalPosition.x + Mathf.Sin(Time.time*1.11f) *vibrateAmount * shakeScale.x*10f,
+            //       originalPosition.y + Mathf.Sin(Time.time)  * vibrateAmount  * shakeScale.y * 10f,
+            //       originalPosition.z + Mathf.Sin(Time.time*0.92f)  * vibrateAmount * shakeScale.z * 10f
+            //   );
 
             // If this object is set to not move on certain axes, reset those axes to their current position.
             //if (!shakeOnXAxis) vibratePosition.x = transform.position.x;
@@ -91,22 +93,26 @@ public class ScreenShake : MonoBehaviour {
             //if (!shakeOnZAxis) vibratePosition.z = transform.position.z;
             //vibratePosition = Vector3.Scale(vibratePosition, shakeScale);
 
-            transform.position = vibratePosition;
+            //transform.position = vibratePosition;
         }
+
+        else {
+            currentDriftPosition = originalPosition;
+        }
+
+        transform.position = currentDriftPosition;
     }
 
 
     // Increase shake magnitude by a certain ammount.
-	void IncreaseShake(float increaseAmount)
-    {
+	void IncreaseShake(float increaseAmount) {
 		currentShake += increaseAmount;
         shakeTimer = 0.5f;
 	}
 
 
     // Set shake magnitude directly.
-    public void SetShake(float magnitude, float time)
-    {
+    public void SetShake(float magnitude, float time) {
         currentShake = magnitude;
         shakeTimer = time;
     }

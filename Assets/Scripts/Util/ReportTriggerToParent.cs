@@ -9,26 +9,20 @@ public class ReportTriggerToParent : MonoBehaviour {
     [SerializeField] bool reportStay = false;
 
 
-	void OnTriggerEnter(Collider collider)
-    {
+	void OnTriggerEnter(Collider collider) {
         if (!reportEnter) return;
-
-        transform.parent.SendMessage("OnTriggerEnterChild", collider);
+        transform.parent.SendMessage("OnTriggerEnterChild", collider, SendMessageOptions.DontRequireReceiver);
     }
 
 
-    void OnTriggerExit(Collider collider)
-    {
+    void OnTriggerExit(Collider collider) {
         if (!reportExit) return;
-
-        transform.parent.SendMessage("OnTriggerExitChild", collider);
+        transform.parent.SendMessage("OnTriggerExitChild", collider, SendMessageOptions.DontRequireReceiver);
     }
 
 
-    void OnTriggerStay(Collider collider)
-    {
+    void OnTriggerStay(Collider collider) {
         if (!reportStay) return;
-
-        transform.parent.SendMessage("OnTriggerStayChild", collider);
+        transform.parent.SendMessage("OnTriggerStayChild", collider, SendMessageOptions.DontRequireReceiver);
     }
 }

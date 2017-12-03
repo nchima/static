@@ -13,7 +13,7 @@ public class MonitorSliderScript : MonoBehaviour {
     }
 
     void Update() {
-		float newXPos = MyMath.Map (GunValueManager.currentGunValue, -1f, 1f, minXPos, maxXPos);
+		float newXPos = MyMath.Map (GunValueManager.currentValue, -1f, 1f, minXPos, maxXPos);
 		transform.localPosition = new Vector3 (newXPos, transform.localPosition.y, transform.localPosition.z);
 	}
 }

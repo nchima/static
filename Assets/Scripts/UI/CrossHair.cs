@@ -29,8 +29,8 @@ public class CrossHair : MonoBehaviour {
 
     private void Update()
     {
-        xradius = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, maxRadius, minRadius);
-        yradius = MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, maxRadius, minRadius);
+        xradius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
+        yradius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
         transform.Rotate(new Vector3(0f, Random.Range(-180f, 180f), 0f));
         CreatePoints(line, xradius, yradius);
 

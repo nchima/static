@@ -7,10 +7,6 @@ public class PlayerBulletMesh : MonoBehaviour {
     float screenTime = 0.2f;
     float timer = 0f;
 
-    private void Update() {
-        timer += Time.deltaTime;
-        if (timer >= screenTime) { GoBackToWhereICameFrom(); }
-    }
 
     public  void SetTransformByEndPoints(Vector3 back, Vector3 front, float thickness) {
 

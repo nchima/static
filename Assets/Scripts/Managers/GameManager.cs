@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour {
         playerPositionLast = player.transform.position;
 
         // See if a special move is ready to be fired.
-        bool sineInPosition = GunValueManager.currentGunValue <= -1f + gun.specialMoveSineRange || GunValueManager.currentGunValue >= 1f - gun.specialMoveSineRange;
+        bool sineInPosition = GunValueManager.currentValue <= -1f + gun.specialMoveSineRange || GunValueManager.currentValue >= 1f - gun.specialMoveSineRange;
         if (sineInPosition) {
             //Debug.Log("Sine in position.");
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.Lerp(Color.red, Color.yellow, Random.value);
@@ -183,7 +183,7 @@ public class GameManager : MonoBehaviour {
     public void PlayerKilledEnemy(int enemyKillValue) {
         // Add score and special bar values.
         scoreManager.PlayerKilledEnemy(enemyKillValue);
-        specialBarManager.PlayerKilledEnemy();
+        specialBarManager.AddValue(enemyKillValue);
 
         // If player has killed all the enemies in the current level, begin the level completion sequence.
         currentEnemyAmt -= 1;
@@ -269,7 +269,7 @@ public class GameManager : MonoBehaviour {
     public void BulletHitEnemy() {
         //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) return;
         scoreManager.BulletHitEnemy();
-        specialBarManager.BulletHitEnemy();
+        specialBarManager.AddValue(0.01f);
         //sineTime += bulletHitSineIncrease;
     }
 

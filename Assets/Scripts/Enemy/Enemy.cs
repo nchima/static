@@ -282,7 +282,7 @@ public class Enemy : MonoBehaviour
         // isAlive is used to make sure that this function is not called more than once.
         if (!isAlive) { return; }
 
-        DropSpecialMoveAmmo();
+        //DropSpecialMoveAmmo();
 
         Instantiate(deathParticles, transform.position, Quaternion.identity);
         gameManager.PlayerKilledEnemy(killValue);

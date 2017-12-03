@@ -7,22 +7,18 @@ public class FloatRange {
 
     public float min;
     public float max;
-    public float size
-    {
-        get
-        {
+    public float size {
+        get {
             return max - min;
         }
     }
 
-    public FloatRange(float _min, float _max)
-    {
+    public FloatRange(float _min, float _max) {
         min = _min;
         max = _max;
     }
 
-    public float Random
-    {
+    public float Random {
         get { return UnityEngine.Random.Range(min, max); }
     }
 }

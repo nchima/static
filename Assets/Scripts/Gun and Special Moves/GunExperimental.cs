@@ -129,7 +129,7 @@ public class GunExperimental : MonoBehaviour {
         //else currentPower = 0f;
         //Debug.Log(gameObject.name + " power: " + currentPower);
 
-        currentPower = MyMath.Map(Mathf.Abs(GunValueManager.currentGunValue - sinePosition), 0f, nullDistance, 1f, 0f);
+        currentPower = MyMath.Map(Mathf.Abs(GunValueManager.currentValue - sinePosition), 0f, nullDistance, 1f, 0f);
 
         // Get new firing variables based on current power.
         int bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(EvaluateCurveByPower(bulletsPerBurstCurve), 0f, 1f, bulletsPerBurstMin, bulletsPerBurstMax));
@@ -160,7 +160,7 @@ public class GunExperimental : MonoBehaviour {
 
     private float EvaluateCurveBySine(AnimationCurve curve)
     {
-        return curve.Evaluate(MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, curve.keys[0].time, curve[curve.keys.Length - 1].time));
+        return curve.Evaluate(MyMath.Map(GunValueManager.currentValue, -1f, 1f, curve.keys[0].time, curve[curve.keys.Length - 1].time));
     }
 
 
@@ -183,9 +183,9 @@ public class GunExperimental : MonoBehaviour {
         _muzzleFlash.transform.position = gunTipTransform.position;
         _muzzleFlash.transform.rotation = gunTipTransform.rotation;
         _muzzleFlash.transform.localScale = new Vector3(
-            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.5f, 0.3f),
-            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.5f, 0.3f),
-            MyMath.Map(GunValueManager.currentGunValue, -1f, 1f, 0.5f, 0.3f)
+            MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f),
+            MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f),
+            MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f)
             );
 
         // Get a new bullet color based on current sine

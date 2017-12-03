@@ -5,14 +5,15 @@ using UnityEngine;
 public class SpecialBar : MonoBehaviour {
 
 
-    public float currentValue;
-    public float value {
+    float _currentValue;
+    public float currentValue {
         get {
-            return currentValue;
+            return _currentValue;
         }
 
         set {
-            currentValue = value;
+            sizeController.percentageFilled = value;
+            _currentValue = value;
         }
     }
 
@@ -33,9 +34,11 @@ public class SpecialBar : MonoBehaviour {
         sizeController = GetComponentInChildren<SpecialBarSizeController>();
     }
 
+
     public void Initialize(SpecialBarManager manager) {
-        currentValue = manager.startValue;
+        _currentValue = manager.startValue;
     }
+
 
     public void Run(SpecialBarManager manager) {
 
