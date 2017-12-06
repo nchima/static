@@ -137,6 +137,7 @@ public class Enemy : MonoBehaviour
     // DROPPING SPECIAL MOVE AMMO
     [SerializeField] GameObject specialMoveAmmoPrefab;
     [SerializeField] int specialMoveAmmoToDrop = 3;
+    [SerializeField] float specialValue = 0.3f;
 
     // REFERENCES
     protected GameManager gameManager;
@@ -285,7 +286,7 @@ public class Enemy : MonoBehaviour
         //DropSpecialMoveAmmo();
 
         Instantiate(deathParticles, transform.position, Quaternion.identity);
-        gameManager.PlayerKilledEnemy(killValue);
+        gameManager.PlayerKilledEnemy(killValue, specialValue);
         isAlive = false;
         Destroy(gameObject);
     }

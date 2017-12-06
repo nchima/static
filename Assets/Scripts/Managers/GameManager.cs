@@ -180,10 +180,10 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerKilledEnemy(int enemyKillValue) {
+    public void PlayerKilledEnemy(int scoreValue, float specialValue) {
         // Add score and special bar values.
-        scoreManager.PlayerKilledEnemy(enemyKillValue);
-        specialBarManager.AddValue(enemyKillValue);
+        scoreManager.PlayerKilledEnemy(scoreValue);
+        specialBarManager.AddValue(specialValue);
 
         // If player has killed all the enemies in the current level, begin the level completion sequence.
         currentEnemyAmt -= 1;
@@ -269,7 +269,6 @@ public class GameManager : MonoBehaviour {
     public void BulletHitEnemy() {
         //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) return;
         scoreManager.BulletHitEnemy();
-        specialBarManager.AddValue(0.01f);
         //sineTime += bulletHitSineIncrease;
     }
 

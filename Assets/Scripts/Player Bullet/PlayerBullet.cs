@@ -83,7 +83,7 @@ public class PlayerBullet : MonoBehaviour {
         if (hit.transform.GetComponent<Enemy>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
             hit.collider.GetComponent<Enemy>().HP -= 1;
-            GameManager.instance.BulletHitEnemy();
+            if (!(FindObjectOfType<ShotgunCharge>().currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
             GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>());
         } 
         
