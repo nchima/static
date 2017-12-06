@@ -21,7 +21,8 @@ public class HealthManager : MonoBehaviour {
             if (value < _playerHealth)
             {
                 getHurtAudio.Play();
-                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 0.2f);
+                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 0.3f);
+                GameManager.colorPaletteManager.StartCoroutine(GameManager.colorPaletteManager.PlayerHurtSequence());
                 //GameObject.Find("Screen").BroadcastMessage("IncreaseResShift", 0.5f);
                 GameObject.Find("Pain Flash").GetComponent<Animator>().SetTrigger("Pain Flash");
 

@@ -157,6 +157,8 @@
     <Compile Include="Assets\Scripts\Audio\MoveAudioSourceCloseToPlayer.cs" />
     <Compile Include="Assets\Scripts\Audio\MusicManager.cs" />
     <Compile Include="Assets\Scripts\Audio\SFXManager.cs" />
+    <Compile Include="Assets\Scripts\Color Palette\ColorPalette.cs" />
+    <Compile Include="Assets\Scripts\Color Palette\ColorPaletteManager.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\EnemyShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\HomingShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\LaserShot.cs" />

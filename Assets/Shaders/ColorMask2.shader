@@ -3,7 +3,7 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		_ColorMask ("Color Mask", Vector) = (0, 1, 0, 1)
+		_Color ("Color Mask", Color) = (0, 1, 0, 1)
 		_AlphaCutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
 	}
 
@@ -53,7 +53,7 @@
 				return frac(sin(dot(n.xy, float2(12.9898, 78.233)))* 43758.453) * (1+scale) - scale;
 			}
 
-			fixed4 _ColorMask;
+			fixed4 _Color;
 			float _AlphaCutoff;
 			
 			fixed4 frag (v2f i) : SV_Target
@@ -61,23 +61,23 @@
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
 				
-				col.rgb *= _ColorMask.rgb;
+				col.rgb *= _Color.rgb;
 
-				clip(((col.r + col.g + col.b) / 3) - ((_ColorMask.r + _ColorMask.g + _ColorMask.b) / 3));
+				clip(((col.r + col.g + col.b) / 3) - ((_Color.r + _Color.g + _Color.b) / 3));
 				clip(((col.r + col.g + col.b) / 3) - _AlphaCutoff);
 				clip(col.a - _AlphaCutoff);
 
-				//clip(col.r - (_ColorMask.r + nrand(i.uv)));
-				//clip(col.g - (_ColorMask.g + nrand(i.uv)));
-				//clip(col.b - (_ColorMask.b + nrand(i.uv)));
-				//clip(col.a - (_ColorMask.a + nrand(i.uv)));
+				//clip(col.r - (_Color.r + nrand(i.uv)));
+				//clip(col.g - (_Color.g + nrand(i.uv)));
+				//clip(col.b - (_Color.b + nrand(i.uv)));
+				//clip(col.a - (_Color.a + nrand(i.uv)));
 
-				col.r = _ColorMask.r * 2;
-				col.g = _ColorMask.g * 2;
-				col.b = _ColorMask.b * 2;
-				col.a = _ColorMask.a * 2;
+				col.r = _Color.r * 2;
+				col.g = _Color.g * 2;
+				col.b = _Color.b * 2;
+				col.a = _Color.a * 2;
 
-				//col = _ColorMask;
+				//col = _Color;
 
 				// apply fog
 				UNITY_APPLY_FOG(i.fogCoord, col);

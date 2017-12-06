@@ -48,6 +48,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static SFXManager sfxManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public static GunValueManager gunValueManager;
+    [HideInInspector] public static ColorPaletteManager colorPaletteManager;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public static GameObject player;
     [SerializeField] GameObject gunSliderBorder;
@@ -66,6 +67,7 @@ public class GameManager : MonoBehaviour {
         fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
         sfxManager = GetComponentInChildren<SFXManager>();
         musicManager = GetComponentInChildren<MusicManager>();
+        colorPaletteManager = GetComponentInChildren<ColorPaletteManager>();
         gun = FindObjectOfType<Gun>();
         gunValueManager = GetComponentInChildren<GunValueManager>();
         noiseGenerator = GetComponent<GenerateNoise>();

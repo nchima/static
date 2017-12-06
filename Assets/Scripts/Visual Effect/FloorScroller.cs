@@ -16,10 +16,8 @@ public class FloorScroller : MonoBehaviour {
 
     void Update()
     {
-        if (GetComponent<OffsetPropertyBlockControl>()) {
-            Vector2 newOffset = material.mainTextureOffset;
-            newOffset.y += scrollRate;
-            GetComponent<OffsetPropertyBlockControl>().Offset = newOffset;
-        }
+        Vector2 newOffset = material.mainTextureOffset;
+        newOffset.y += scrollRate;
+        GetComponent<MeshRenderer>().material.mainTextureOffset = newOffset;
     }
 }
