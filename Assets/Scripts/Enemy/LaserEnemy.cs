@@ -5,14 +5,13 @@ using DG.Tweening;
 
 public class LaserEnemy : ShootingEnemy {
 
+    [SerializeField] Transform laserOrigin;
     bool shotFired = false;
-
     GameObject lastShot;    // A reference to the most recent shot that I fired.
-
     Color chargingLaserColor = new Color(0.5f, 1f, 1f);
 
 
-
+    
     protected override void PrepareToMove()
     {
         base.PrepareToMove();
@@ -47,10 +46,9 @@ public class LaserEnemy : ShootingEnemy {
     protected override void PreShoot()
     {
         // Fire a shot.
-        if (!shotFired)
-        {
+        if (!shotFired) {
             //Debug.Log("Laser enemy firing laser.");
-            GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 2.7f, transform.position.z), Quaternion.identity);
+            GameObject newShot = Instantiate(shotPrefab, laserOrigin.transform.position, Quaternion.identity);
             newShot.transform.parent = transform;
             newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
             newShot.GetComponent<LaserShot>().preDamageDuration = preShotDelay;
@@ -59,10 +57,8 @@ public class LaserEnemy : ShootingEnemy {
         }
 
         shotTimer.Run();
-        if (shotTimer.finished)
-        {
+        if (shotTimer.finished) {
             myGeometry.transform.DOScale(1f, 0.1f);
-
             currentState = BehaviorState.Shooting;
         }
     }

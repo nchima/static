@@ -19,19 +19,13 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] GameObject orthoScreen3;
 
     [SerializeField] ColorPalette originalPalette;
+    [SerializeField] ColorPalette tempSavedPalette;
     [SerializeField] ColorPalette playerVulnerablePalette;
-
+    [SerializeField] ColorPalette fallingSequencePalette;
+ 
     private void Awake() {
         // Memorize original colors.
-        originalPalette.wallColor = wallMaterial.color;
-        originalPalette.floorColor = floorMaterial.color;
-        originalPalette.obstacleColor = obstacleMaterial.color;
-        originalPalette.perspectiveColor1 = perspectiveScreen1.GetComponent<MeshRenderer>().material.color;
-        originalPalette.perspectiveColor2 = perspectiveScreen2.GetComponent<MeshRenderer>().material.color;
-        originalPalette.perspectiveColor3 = perspectiveScreen3.GetComponent<MeshRenderer>().material.color;
-        originalPalette.orthoColor1 = orthoScreen1.GetComponent<MeshRenderer>().material.GetColor("_Color");
-        originalPalette.orthoColor2 = orthoScreen2.GetComponent<MeshRenderer>().material.GetColor("_Color");
-        originalPalette.orthoColor3 = orthoScreen3.GetComponent<MeshRenderer>().material.GetColor("_Color");
+        SaveCurrentPalette(originalPalette);
     }
 
     void ChangePalette(ColorPalette newPalette, float duration) {
@@ -59,13 +53,28 @@ public class ColorPaletteManager : MonoBehaviour {
 
     }
 
-    public IEnumerator PlayerHurtSequence() {
-        float duration = 0.1f;
-        ChangePalette(playerVulnerablePalette, duration);
-        yield return new WaitForSeconds(duration);
-        duration = 5f;
-        ChangePalette(originalPalette, duration);
-        yield return null;
+    void SaveCurrentPalette(ColorPalette saveTarget) {
+        saveTarget.wallColor = wallMaterial.color;
+        saveTarget.floorColor = floorMaterial.color;
+        saveTarget.obstacleColor = obstacleMaterial.color;
+        saveTarget.perspectiveColor1 = perspectiveScreen1.GetComponent<MeshRenderer>().material.color;
+        saveTarget.perspectiveColor2 = perspectiveScreen2.GetComponent<MeshRenderer>().material.color;
+        saveTarget.perspectiveColor3 = perspectiveScreen3.GetComponent<MeshRenderer>().material.color;
+        saveTarget.orthoColor1 = orthoScreen1.GetComponent<MeshRenderer>().material.GetColor("_Color");
+        saveTarget.orthoColor2 = orthoScreen2.GetComponent<MeshRenderer>().material.GetColor("_Color");
+        saveTarget.orthoColor3 = orthoScreen3.GetComponent<MeshRenderer>().material.GetColor("_Color");
+    }
+
+    public void LoadVulnerablePalette() {
+        ChangePalette(playerVulnerablePalette, 0.1f);
+    }
+
+    public void LoadFallingSequencePalette() {
+        ChangePalette(fallingSequencePalette, 0.1f);
+    }
+
+    public void RestoreSavedPalette() {
+        ChangePalette(originalPalette, 0.78f);
     }
 
     private void OnDisable() {

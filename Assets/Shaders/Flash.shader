@@ -3,6 +3,10 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
+		_FlashColor1 ("Flash Color 1", Color) = (1, 1, 1, 1)
+		_FlashColor2 ("Flash Color 2", Color) = (1, 1, 1, 1)
+		_FlashColor3 ("Flash Color 3", Color) = (1, 1, 1, 1)
+		_FlashColor4 ("Flash Color 4", Color) = (1, 1, 1, 1)
 	}
 	SubShader
 	{
@@ -49,6 +53,11 @@
 				return o;
 			}
 			
+			fixed4 _FlashColor1;
+			fixed4 _FlashColor2;
+			fixed4 _FlashColor3;
+			fixed4 _FlashColor4;
+
 			fixed4 frag (v2f i) : SV_Target
 			{
 				// sample the texture
@@ -57,16 +66,10 @@
 				clip(col.a - 1);
 
 			    float3 COLOR_MASKS[4];
-				COLOR_MASKS[0] = float3( 0.0, 0.0, 0.0 );
-				COLOR_MASKS[1] = float3( 1, 1, 1 );
-				COLOR_MASKS[2] = float3(1, 0, 0);
-				COLOR_MASKS[3] = float3(1, 1, 0);
-//				COLOR_MASKS[2] = float3( 1.0, 0.5, 0.5 );
-//				COLOR_MASKS[3] = float3( 0.5, 1.0, 0.5 );
-//				COLOR_MASKS[4] = float3( 0.5, 0.5, 1.0 );
-//				COLOR_MASKS[5] = float3( 0.5, 1.0, 1.0 );
-//				COLOR_MASKS[6] = float3( 1.0, 0.5, 1.0 );
-//				COLOR_MASKS[7] = float3( 1.0, 1.0, 0.5 );
+				COLOR_MASKS[0] = _FlashColor1;
+				COLOR_MASKS[1] = _FlashColor2;
+				COLOR_MASKS[2] = _FlashColor3;
+				COLOR_MASKS[3] = _FlashColor4;
 			    
    				int index = int(fmod(_Time.y*60.0, 4.0));
     			col.rgb = COLOR_MASKS[index];

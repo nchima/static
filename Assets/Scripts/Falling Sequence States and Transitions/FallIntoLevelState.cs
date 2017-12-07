@@ -28,6 +28,9 @@ public class FallIntoLevelState : State {
             GameManager.instance.LoadNextLevel();
         }
 
+        // Drain color palette.
+        GameManager.colorPaletteManager.LoadFallingSequencePalette();
+
         // Place the player in the correct spot above the level.
         GameManager.player.transform.position = fallingSequenceManager.playerSpawnPoint.position;
 

@@ -26,8 +26,8 @@ public class LaserShot : EnemyShot {
 
     // Values for the thickness of my laser beam at various states.
     const float INITIAL_BEAM_THICKNESS = 0.01f;
-    const float MAX_PRE_DAMAGE_BEAM_THICKNESS = 0.2f;
-    const float DAMAGE_BEAM_THICKNESS = 2f;
+    const float MAX_PRE_DAMAGE_BEAM_THICKNESS = 0.4f;
+    const float DAMAGE_BEAM_THICKNESS = 4f;
 
     // Values for the color of my laser beam at various states.
     [SerializeField] Color finalPreDamageBeamColor;

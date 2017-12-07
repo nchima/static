@@ -21,24 +21,21 @@ public class HealthManager : MonoBehaviour {
             if (value < _playerHealth)
             {
                 getHurtAudio.Play();
-                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 0.3f);
-                GameManager.colorPaletteManager.StartCoroutine(GameManager.colorPaletteManager.PlayerHurtSequence());
-                //GameObject.Find("Screen").BroadcastMessage("IncreaseResShift", 0.5f);
+                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 1f);
+                GameManager.colorPaletteManager.LoadVulnerablePalette();
+                GameManager.player.GetComponent<Rigidbody>().velocity *= 0.01f;
                 GameObject.Find("Pain Flash").GetComponent<Animator>().SetTrigger("Pain Flash");
 
                 // Delete health box.
                 for (int i = Mathf.Clamp(value, 0, 4); i < 5; i++) healthBlocks[i].SetActive(false);
-                //for (int i = 0; i < healthBlocks.Length; i++) { healthBlocks[i].SetActive(false); }
             }
 
             else
             {
                 // Reactivate health box.
-                if (value <= 5) healthBlocks[value - 1].SetActive(true);
-                //for(int i = 0; i < healthBlocks.Length; i++) { healthBlocks[i].SetActive(true); }
+                if (value <= 5) healthBlocks[Mathf.Clamp(value - 1, 0, 5)].SetActive(true);
+                if (value == 5) GameManager.colorPaletteManager.RestoreSavedPalette();
             }
-
-            //Debug.Log(value);
 
             // Lower health.
             _playerHealth = value;
