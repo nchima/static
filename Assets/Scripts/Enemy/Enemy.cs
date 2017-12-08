@@ -248,11 +248,9 @@ public class Enemy : MonoBehaviour
     }
 
 
-    void JitterVertices()
-    {
+    void JitterVertices() {
         MeshFilter[] myMeshFilters = myGeometry.GetComponentsInChildren<MeshFilter>();
-        for (int i = 0; i < myMeshFilters.Length; i++)
-        {
+        for (int i = 0; i < myMeshFilters.Length; i++) {
             //myMeshRenderers[i].material.SetFloat("_VertexJitterX", Random.Range(-1f, 1f) * vertexJitterRate * Time.deltaTime);
             //myMeshRenderers[i].material.SetFloat("_VertexJitterY", Random.Range(-1f, 1f) * vertexJitterRate * Time.deltaTime);
             //myMeshRenderers[i].material.SetFloat("_VertexJitterZ", Random.Range(-1f, 1f) * vertexJitterRate * Time.deltaTime);
