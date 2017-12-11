@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemySpawner : Enemy {
+public class EnemySpawner : EnemyOld {
 
 	[SerializeField] GameObject enemyToSpawn;
     [SerializeField] float timeBetweenSpawns;

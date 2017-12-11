@@ -85,7 +85,10 @@ public class Explosion : MonoBehaviour {
             //Debug.Log("Enemy affected by explosion.");
             //collider.GetComponent<Enemy>().BecomePhysicsObject(1f);
             collider.GetComponent<Rigidbody>().AddExplosionForce(pushForce, Vector3.Scale(transform.position, new Vector3(1f, 0f, 1f)), explosionRadius, pushForce*0.01f, ForceMode.Impulse);
-            collider.GetComponent<Enemy>().HP -= damageMax;
+
+            // Affordance for old enemy system.
+            if (collider.GetComponent<Enemy>()) { collider.GetComponent<Enemy>().currentHealth -= damageMax; }
+            else { collider.GetComponent<EnemyOld>().HP -= damageMax; }
         }
 
         else if (LayerMask.LayerToName(collider.gameObject.layer).Contains("ShootableBullet")) {

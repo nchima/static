@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class HoveringEnemy : ShootingEnemy {
+public class HoveringEnemy : ShootingEnemyOld {
 
     [SerializeField] float meanderMaximum = 10f;
     [SerializeField] float meanderNoiseSpeed = 0.01f;

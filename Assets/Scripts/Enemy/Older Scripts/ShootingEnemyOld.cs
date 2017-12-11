@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class ShootingEnemy : Enemy {
+public class ShootingEnemyOld : EnemyOld {
 
     // USED FOR SHOOTING
     [SerializeField] protected float shotTimerMin = 0.7f;   // The minimum amount of time in between shots.
@@ -36,8 +36,7 @@ public class ShootingEnemy : Enemy {
     {
         base.Update();
 
-        switch (currentState)
-        {
+        switch (currentState) {
             case BehaviorState.PreparingToMove:
                 PrepareToMove();
                 break;
@@ -56,8 +55,7 @@ public class ShootingEnemy : Enemy {
         }
     }
 
-    protected virtual void PrepareToMove()
-    {
+    protected virtual void PrepareToMove() {
         if (!willMove) return;
 
         if (!navMeshAgent.enabled) navMeshAgent.enabled = true;
@@ -80,8 +78,7 @@ public class ShootingEnemy : Enemy {
         currentState = BehaviorState.Moving;
     }
 
-    protected virtual void Move()
-    {
+    protected virtual void Move() {
         // See if it's time to shoot at the player
         shotTimer.Run();
         if (shotTimer.finished && willAttack)
@@ -127,8 +124,7 @@ public class ShootingEnemy : Enemy {
         }
     }
 
-    protected virtual void ReadyPreShoot()
-    {
+    protected virtual void ReadyPreShoot() {
         // Set timer for pre shot delay
         shotTimer = new Timer(preShotDelay);
 
@@ -150,8 +146,7 @@ public class ShootingEnemy : Enemy {
         //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.1f);
     }
 
-    protected virtual void Attack()
-    {
+    protected virtual void Attack() {
         // Fire a shot.
         GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 1.75f, transform.position.z), Quaternion.identity);
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;

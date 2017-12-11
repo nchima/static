@@ -55,7 +55,8 @@ public class EnemyShot : MonoBehaviour {
 
         else if (collider.tag.Contains("Enem") && collider.gameObject != firedEnemy)
         {
-            collider.GetComponent<Enemy>().HP -= Random.Range(5, 15);
+            if (collider.GetComponent<EnemyOld>()) { collider.GetComponent<EnemyOld>().HP -= Random.Range(5, 15); }
+            else { collider.GetComponent<Enemy>().currentHealth -= Random.Range(5, 15); }
             Detonate();
         }
 

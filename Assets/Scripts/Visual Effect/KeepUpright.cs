@@ -27,7 +27,7 @@ public class KeepUpright : MonoBehaviour {
 		float distance = Vector3.Distance(transform.position, GameManager.player.transform.position);
 
 		// Change width based on distance from player.
-		if (GetComponentInParent<Enemy>() != null && (distance < minimumVisibleDistance && GetComponentInParent<Enemy> ().canSeePlayer)) {
+		if (GetComponentInParent<EnemyOld>() != null && (distance < minimumVisibleDistance && GetComponentInParent<EnemyOld> ().canSeePlayer)) {
 			transform.localScale = new Vector3 (0f, transform.localScale.y, 0f);
 		}
 

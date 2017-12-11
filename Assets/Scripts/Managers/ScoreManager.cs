@@ -117,7 +117,7 @@ public class ScoreManager : MonoBehaviour
         maxTimeBonus = 0;
 
         // Get all enemies and add their values to max values.
-        Enemy[] allEnemies = FindObjectsOfType<Enemy>();
+        EnemyOld[] allEnemies = FindObjectsOfType<EnemyOld>();
         for (int i = 0; i < allEnemies.Length; i++)
         {
             maxTimeBonus += allEnemies[i].killValue;

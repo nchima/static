@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class LaserEnemy : ShootingEnemy {
+public class LaserEnemy : ShootingEnemyOld {
 
     [SerializeField] Transform laserOrigin;
     bool shotFired = false;

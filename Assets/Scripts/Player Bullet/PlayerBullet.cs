@@ -80,11 +80,11 @@ public class PlayerBullet : MonoBehaviour {
 
     public void HandleHit(RaycastHit hit) {
 
-        if (hit.transform.GetComponent<Enemy>() != null) {
+        if (hit.transform.GetComponent<EnemyOld>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
-            hit.collider.GetComponent<Enemy>().HP -= 1;
+            hit.collider.GetComponent<EnemyOld>().HP -= 1;
             if (!(FindObjectOfType<ShotgunCharge>().currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
-            GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>());
+            GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<EnemyOld>());
         } 
         
         else if (hit.collider.name.Contains("Homing Shot")) {

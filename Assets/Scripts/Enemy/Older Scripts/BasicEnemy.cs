@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BasicEnemy : ShootingEnemy {
+public class BasicEnemy : ShootingEnemyOld {
 
     /*
      * 

@@ -47,7 +47,7 @@ public class FiringShockwaveState : State {
 
         // Allow enemies to start attacking.
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) {
-            enemy.GetComponent<Enemy>().willAttack = true;
+            enemy.GetComponent<EnemyOld>().willAttack = true;
         }
 
         // Destroy any obstacles that the player is touching.

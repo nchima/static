@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class MeleeEnemy : Enemy {
+public class MeleeEnemy : EnemyOld {
 
 	enum BehaviorState { MovingTowardsPlayer, ChargingUpAttack, Attacking, FinishingAttack };
     BehaviorState currentState;

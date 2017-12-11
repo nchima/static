@@ -130,7 +130,7 @@ public class LevelGenerator : MonoBehaviour {
 
         foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
         {
-            enemy.GetComponent<Enemy>().willAttack = false;
+            enemy.GetComponent<EnemyOld>().willAttack = false;
         }
 
         // Delete all empty space.

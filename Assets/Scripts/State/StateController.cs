@@ -6,6 +6,10 @@ public class StateController : MonoBehaviour {
 
     public State currentState;
 
+    private void Start() {
+        currentState.Initialize(this);
+    }
+
     protected virtual void Update() {
         currentState.Run(this);
     }

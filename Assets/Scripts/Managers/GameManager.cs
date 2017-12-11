@@ -81,14 +81,14 @@ public class GameManager : MonoBehaviour {
 
     private void Start() {
         // Set up the current number of enemies.
-        currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
+        currentEnemyAmt = FindObjectsOfType<EnemyOld>().Length;
 
         scoreManager.DetermineBonusTime();
 
         levelManager.LoadLevel(levelManager.currentLevelNumber);
 
         // Pause everything for the main menu.
-        foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+        foreach (EnemyOld enemy in FindObjectsOfType<EnemyOld>()) {
             enemy.enabled = false;
         }
     }
@@ -222,7 +222,7 @@ public class GameManager : MonoBehaviour {
 
 
     public void CountEnemies() {
-        currentEnemyAmt = FindObjectsOfType<Enemy>().Length;
+        currentEnemyAmt = FindObjectsOfType<EnemyOld>().Length;
         currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
     }
 
@@ -284,7 +284,7 @@ public class GameManager : MonoBehaviour {
         CountEnemies();
 
         // Unpause enemies in the background.
-        foreach (Enemy enemy in FindObjectsOfType<Enemy>())
+        foreach (EnemyOld enemy in FindObjectsOfType<EnemyOld>())
         {
             enemy.enabled = true;
             enemy.willAttack = true;

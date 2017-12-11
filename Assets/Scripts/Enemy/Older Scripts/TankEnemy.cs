@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TankEnemy : ShootingEnemy {
+public class TankEnemy : ShootingEnemyOld {
 
     /*
      * I wish I never learned how to tell

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SnailEnemy : Enemy {
+public class SnailEnemy : EnemyOld {
 
     [SerializeField] float visionCone = 15f; // When the player is inside this cone, I will start firing bullets at them.
 
