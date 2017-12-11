@@ -53,8 +53,8 @@ public class Enemy : StateController {
         }
     }
 
-    private void Awake() {
-        _currentHealth = maxHealth;
+    private void Start() {
+        currentHealth = maxHealth;
     }
 
     protected virtual void Die() {

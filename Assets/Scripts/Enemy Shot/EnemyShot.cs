@@ -53,12 +53,13 @@ public class EnemyShot : MonoBehaviour {
             Detonate();
         }
 
-        else if (collider.tag.Contains("Enem") && collider.gameObject != firedEnemy)
-        {
-            if (collider.GetComponent<EnemyOld>()) { collider.GetComponent<EnemyOld>().HP -= Random.Range(5, 15); }
-            else { collider.GetComponent<Enemy>().currentHealth -= Random.Range(5, 15); }
-            Detonate();
-        }
+        // Uncomment this to allow enemies to harm each other.
+        //else if (collider.tag.Contains("Enem") && collider.gameObject != firedEnemy)
+        //{
+        //    if (collider.GetComponent<EnemyOld>()) { collider.GetComponent<EnemyOld>().HP -= Random.Range(5, 15); }
+        //    else { collider.GetComponent<Enemy>().currentHealth -= Random.Range(5, 15); }
+        //    Detonate();
+        //}
 
         else if (collider.tag == "Player")
         {

@@ -80,9 +80,10 @@ public class PlayerBullet : MonoBehaviour {
 
     public void HandleHit(RaycastHit hit) {
 
-        if (hit.transform.GetComponent<EnemyOld>() != null) {
+        if (hit.transform.GetComponent<EnemyOld>() != null || hit.transform.GetComponent<Enemy>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
-            hit.collider.GetComponent<EnemyOld>().HP -= 1;
+            if (hit.collider.GetComponent<EnemyOld>()) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
+            else { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
             if (!(FindObjectOfType<ShotgunCharge>().currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
             GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<EnemyOld>());
         } 
