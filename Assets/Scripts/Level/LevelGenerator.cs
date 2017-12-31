@@ -128,10 +128,10 @@ public class LevelGenerator : MonoBehaviour {
         //Debug.Log("Number of enemies: " + numberOfEnemies);
         gameManager.currentEnemyAmt = currentNumberOfEnemies;
 
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
-        {
-            enemy.GetComponent<EnemyOld>().willAttack = false;
-        }
+        //foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy"))
+        //{
+        //    enemy.GetComponent<EnemyOld>().willAttack = false;
+        //}
 
         // Delete all empty space.
         for (int i = 0; i < emptySpaces.Count; i++) Destroy(emptySpaces[i]);

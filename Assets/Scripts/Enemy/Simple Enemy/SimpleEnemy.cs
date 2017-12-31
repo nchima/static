@@ -8,6 +8,7 @@ public class SimpleEnemy : Enemy {
     public FloatRange timeBetweenShotsRange;    // How often I fire a shot.
     [HideInInspector] public NavMeshAgent navMeshAgent;
     public GameObject shotPrefab;
+    public GameObject chargeParticles;
 
 
     private void Awake() {

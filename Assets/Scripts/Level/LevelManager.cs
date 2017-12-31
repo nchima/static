@@ -25,8 +25,7 @@ public class LevelManager : MonoBehaviour {
     }
 
 
-    public void LoadNextLevel()
-    {
+    public void LoadNextLevel() {
         LoadLevel(currentLevelNumber + 1);
         currentLevelNumber++;
     }
@@ -79,6 +78,26 @@ public class LevelManager : MonoBehaviour {
         if (isLevelLoaded) { SceneManager.UnloadSceneAsync(currentLevelNumber); }
         SceneManager.LoadScene(levelNumber, LoadSceneMode.Additive);
         isLevelCompleted = false;
+    }
+
+
+    public void SetEnemiesActive(bool value) {
+        StartCoroutine(SetEnemiesActiveCoroutine(value));
+    }
+
+    IEnumerator SetEnemiesActiveCoroutine(bool value) {
+        yield return new WaitForSeconds(0.1f);
+
+        foreach (EnemyOld enemy in FindObjectsOfType<EnemyOld>()) {
+            enemy.enabled = value;
+            enemy.willAttack = true;
+        }
+        foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+            enemy.pauseAI = !value;
+            enemy.enabled = value;
+        }
+
+        yield return null;
     }
 
 

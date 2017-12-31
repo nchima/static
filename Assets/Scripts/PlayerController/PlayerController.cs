@@ -163,6 +163,9 @@ public class PlayerController : MonoBehaviour {
             // Add forward acceleration.
             rigidBody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
         }
+        if (transform.position.x > 10000f || transform.position.z > 10000f) {
+            transform.position = new Vector3(0f, transform.position.y, 0f);
+        }
     }
 
 

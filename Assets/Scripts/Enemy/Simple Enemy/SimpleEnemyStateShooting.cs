@@ -37,6 +37,10 @@ public class SimpleEnemyStateShooting : State {
 
         // Begin the charging up animation.
         if (controller.GetComponent<Animator>() != null) controller.GetComponent<Animator>().SetTrigger("ChargeUp");
+        foreach (ParticleSystem particleSystem in controller.chargeParticles.GetComponentsInChildren<ParticleSystem>()) {
+            particleSystem.Stop();
+            particleSystem.Play();
+        }
 
         // I plan to redo this color system to let's not worry about it for now.
         //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.8f * Time.deltaTime);

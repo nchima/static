@@ -18,7 +18,7 @@ Shader "Custom/Bullet Shader"
 		}
 
 		ZWrite Off
-		Blend SrcAlpha OneMinusSrcAlpha
+		Blend OneMinusDstColor OneMinusDstColor
 
 		Pass
 		{

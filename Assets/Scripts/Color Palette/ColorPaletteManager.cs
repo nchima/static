@@ -65,6 +65,19 @@ public class ColorPaletteManager : MonoBehaviour {
         saveTarget.orthoColor3 = orthoScreen3.GetComponent<MeshRenderer>().material.GetColor("_Color");
     }
 
+    public void ChangeToRandomPalette(float duration) {
+        wallMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0.8f, 1f)), duration);
+        floorMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        obstacleMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        perspectiveScreen2.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        perspectiveScreen3.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+
+    }
+
     public void LoadVulnerablePalette() {
         ChangePalette(playerVulnerablePalette, 0.1f);
     }

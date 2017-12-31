@@ -140,14 +140,14 @@ public class ShootingEnemyOld : EnemyOld {
         currentState = BehaviorState.PreShooting;
     }
 
-    protected virtual void PreShoot()
-    {
+    protected virtual void PreShoot() {
         // Do nothing and wait for charge-up animation to finish.
         //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.1f);
     }
 
     protected virtual void Attack() {
         // Fire a shot.
+        Debug.Log(gameManager.name + " is firing a shot.");
         GameObject newShot = Instantiate(shotPrefab, new Vector3(transform.position.x, 1.75f, transform.position.z), Quaternion.identity);
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
 
@@ -160,8 +160,7 @@ public class ShootingEnemyOld : EnemyOld {
     }
 
 
-    protected virtual void PostShoot()
-    {
+    protected virtual void PostShoot() {
         // See if we've waited long enough.
         shotTimer.Run();
         if (shotTimer.finished)

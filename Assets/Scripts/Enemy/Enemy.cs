@@ -52,6 +52,7 @@ public class Enemy : StateController {
             }
         }
     }
+    [HideInInspector] public bool pauseAI;
 
     private void Start() {
         currentHealth = maxHealth;

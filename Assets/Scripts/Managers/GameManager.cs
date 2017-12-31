@@ -76,10 +76,7 @@ public class GameManager : MonoBehaviour {
         foreach (Gun gun in FindObjectsOfType<Gun>()) {
             gun.enabled = false;
         }
-    }
 
-
-    private void Start() {
         // Set up the current number of enemies.
         currentEnemyAmt = FindObjectsOfType<EnemyOld>().Length;
 
@@ -88,11 +85,8 @@ public class GameManager : MonoBehaviour {
         levelManager.LoadLevel(levelManager.currentLevelNumber);
 
         // Pause everything for the main menu.
-        foreach (EnemyOld enemy in FindObjectsOfType<EnemyOld>()) {
-            enemy.enabled = false;
-        }
+        levelManager.SetEnemiesActive(false);
     }
-
 
     private void Update() {
         // Keep track of player velocity.
@@ -284,16 +278,11 @@ public class GameManager : MonoBehaviour {
         CountEnemies();
 
         // Unpause enemies in the background.
-        foreach (EnemyOld enemy in FindObjectsOfType<EnemyOld>())
-        {
-            enemy.enabled = true;
-            enemy.willAttack = true;
-        }
+        levelManager.SetEnemiesActive(true);
 
         // Enable player movement and shooting.
         GameObject.Find("Player").GetComponent<PlayerController>().enabled = true;
-        foreach (Gun gun in FindObjectsOfType<Gun>())
-        {
+        foreach (Gun gun in FindObjectsOfType<Gun>()) {
             gun.enabled = true;
         }
 

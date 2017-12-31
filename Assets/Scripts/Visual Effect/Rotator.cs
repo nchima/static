@@ -8,6 +8,7 @@ public class Rotator : MonoBehaviour {
     FloatRange rotateSpeedRange = new FloatRange(5f, 10f);
     float rotateSpeed;
     public float speedScale = 1f;
+    [SerializeField] Vector3 directionModifier = Vector3.one;
 
     float noiseTime = 0f;
     float noiseSpeed = 0.1f;
@@ -28,9 +29,9 @@ public class Rotator : MonoBehaviour {
         noiseTime += noiseSpeed * Time.deltaTime;
         rotateSpeed = MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset, 0f), 0f, 1f, rotateSpeedRange.min, rotateSpeedRange.max) * speedScale;
         rotateDirection = new Vector3(
-            rotateDirection.x + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset2, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime,
-            rotateDirection.y + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset3, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime,
-            rotateDirection.z + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset4, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime
+            rotateDirection.x + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset2, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime * directionModifier.x,
+            rotateDirection.y + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset3, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime * directionModifier.y,
+            rotateDirection.z + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset4, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime * directionModifier.z
             ).normalized;
 
         transform.Rotate(rotateDirection, rotateSpeed, Space.Self);

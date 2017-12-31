@@ -46,9 +46,7 @@ public class FiringShockwaveState : State {
         GameManager.instance.gun.canShoot = true;
 
         // Allow enemies to start attacking.
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) {
-            enemy.GetComponent<EnemyOld>().willAttack = true;
-        }
+        GameManager.levelManager.SetEnemiesActive(true);
 
         // Destroy any obstacles that the player is touching.
         Collider[] overlappingSolids = Physics.OverlapCapsule(
@@ -67,6 +65,7 @@ public class FiringShockwaveState : State {
         GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
 
         GameManager.colorPaletteManager.RestoreSavedPalette();
+        //GameManager.colorPaletteManager.ChangeToRandomPalette(0.1f);
 
         Physics.gravity = fallingSequenceManager.savedGravity;
 

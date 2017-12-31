@@ -296,6 +296,7 @@ public class EnemyOld : MonoBehaviour
 
     public virtual void BecomePhysicsObject(float duration)
     {
+        return;
         if (immovable) return;
 
         if (navMeshAgent != null) navMeshAgent.enabled = false;
