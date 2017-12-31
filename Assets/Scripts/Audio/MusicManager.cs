@@ -12,14 +12,12 @@ public class MusicManager : MonoBehaviour {
 
     AudioSource audioSource;
 
-	void Start ()
-    {
+	void Start () {
 		audioSource = GetComponent<AudioSource> ();
 
         // Put all the clips into the Stack.
         trackStack = new Stack<AudioClip>();
-        foreach (AudioClip clip in tracks)
-        {
+        foreach (AudioClip clip in tracks) {
             trackStack.Push(clip);
         }
 
@@ -35,28 +33,26 @@ public class MusicManager : MonoBehaviour {
     }
 
 
-    void Update()
-    {
-        if (dontPlayMusic)
-        {
+    void Update() {
+        if (dontPlayMusic) {
             audioSource.Stop();
             return;
         }
 
-        if (!audioSource.isPlaying)
-        {
+        if (!audioSource.isPlaying) {
             ChooseNewClip();
         }
+
+        // Set music based on current sine value.
+        //GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", (GunValueManager.currentValue + 1f) * 11000f + 200f);
+        GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", MyMath.Map(GunValueManager.currentValue, -1f, 1f, 3000f, 7000f));
     }
 
 
-    void ChooseNewClip()
-    {
-
+    void ChooseNewClip() {
         // Make sure the same track does not play twice in a row.
         int clipIndex = previousTrackIndex;
-        while (tracks.Length > 1 && clipIndex == previousTrackIndex)
-        {
+        while (tracks.Length > 1 && clipIndex == previousTrackIndex) {
             clipIndex = Random.Range(0, tracks.Length);
         }
 
@@ -64,6 +60,4 @@ public class MusicManager : MonoBehaviour {
         audioSource.clip = tracks [clipIndex];
 		audioSource.Play ();
 	}
-	
-
 }

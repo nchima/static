@@ -37,10 +37,5 @@ public class GunValueManager : MonoBehaviour {
             );
 
         previousGunValue = currentValue;
-
-        // Set music based on current sine value.
-        GameManager.musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", (currentValue + 1f) * 11000f + 200f);
-        GameManager.musicManager.GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer
-            .SetFloat("FilterCutoff", MyMath.Map(currentValue, -1f, 1f, 10000f, 20000f));
     }
 }
