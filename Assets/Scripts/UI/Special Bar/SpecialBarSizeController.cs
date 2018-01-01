@@ -28,7 +28,7 @@ public class SpecialBarSizeController : MonoBehaviour {
 
 
     private void Update() {
-        // Set the bar's Y position so that it still starts from it's original bottom.
+        // Set the bar's Y position so that it still starts from its original bottom.
         float newXPos = originPosition + barTransform.lossyScale.y * 0.5f;
         barTransform.localPosition = new Vector3(
                 newXPos,
