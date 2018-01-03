@@ -83,27 +83,6 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Update() {
-        // Keep track of player velocity.
-
-        // See if a special move is ready to be fired.
-        bool sineInPosition = GunValueManager.currentValue <= -1f + gun.specialMoveSineRange || GunValueManager.currentValue >= 1f - gun.specialMoveSineRange;
-        if (sineInPosition) {
-            //Debug.Log("Sine in position.");
-            gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.Lerp(Color.red, Color.yellow, Random.value);
-            //Debug.Log(gunSliderBorder.GetComponent<MeshRenderer>().material);
-        }
-
-        else {
-            gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
-        }
-
-
-        //if (specialBarManager.barIsFull) {
-        //    specialBarManager.FlashBar();
-        //}
-
-        //else gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
-
         // Check invincibility frames.
         if (forceInvincibility) invincible = true;
         invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
