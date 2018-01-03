@@ -18,7 +18,7 @@ public class FallIntoLevelState : State {
         }
 
         GameManager.player.GetComponent<Collider>().material.bounciness = 0f;
-        GameManager.instance.forceInvincibility = false;
+        GameManager.healthManager.forceInvincibility = false;
 
         // Reset gravity to starting value.
         Physics.gravity = fallingSequenceManager.savedGravity;

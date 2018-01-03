@@ -9,10 +9,6 @@ public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
     public bool dontChangeLevel;
-    [HideInInspector] public bool invincible;
-    [SerializeField] public bool forceInvincibility;
-    [SerializeField] float invincibilityTime = 0.5f;
-    float invincibilityTimer = 0f;
 
     // AUDIO
     [SerializeField] private AudioSource levelWinAudio;   // The audio source that plays when the player completes a level.
@@ -83,14 +79,6 @@ public class GameManager : MonoBehaviour {
     }
 
     private void Update() {
-        // Check invincibility frames.
-        if (forceInvincibility) invincible = true;
-        invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
-        if (invincibilityTimer > 0) {
-            invincible = true;
-            invincibilityTimer -= Time.deltaTime;
-        }
-        else if (!forceInvincibility) invincible = false;
     }
 
 
@@ -172,10 +160,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerWasHurt() {
-        if (invincible) return;
-        invincibilityTimer += invincibilityTime;
-
+    public void PlayerWasHurt() {        
         scoreManager.GetHurt();
         specialBarManager.PlayerWasHurt();
 

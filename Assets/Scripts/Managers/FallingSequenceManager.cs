@@ -82,7 +82,7 @@ public class FallingSequenceManager : StateController {
         GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
         //Physics.gravity *= speedFallGravityMultipier;
         isSpeedFallActive = true;
-        GameManager.instance.forceInvincibility = true;
+        GameManager.healthManager.forceInvincibility = true;
     }
 
     public void BeginFalling() {

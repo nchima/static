@@ -40,7 +40,7 @@ public class ShotgunChargeState_FinalAttack : State {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
 
         //shotgunCharge.isReturningToFullSpeed = false;
-        GameManager.instance.forceInvincibility = false;
+        GameManager.healthManager.forceInvincibility = false;
         GameManager.player.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         //sloMoTimer = 0f;
     }
