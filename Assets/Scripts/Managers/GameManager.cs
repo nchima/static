@@ -29,14 +29,10 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject nameEntryScreen;
     [SerializeField] GameObject mainMenuScreen; 
 
-    // USED FOR IDLE TIMER
-    [SerializeField] float idleResetTime = 20f;
-    float timeSinceLastInput = 0f;
-    public bool gameStarted = false;
-
     // RANDOM USEFUL STUFF
     Vector3 playerPositionLast;
     [HideInInspector] public Vector3 playerVelocity;
+    public bool gameStarted = false;
 
     // MISC REFERENCES
     [HideInInspector] public static GameManager instance;
@@ -119,38 +115,10 @@ public class GameManager : MonoBehaviour {
 
         //else gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
 
-        // Run idle timer.
-        if (gameStarted)
-        {
-            if (timeSinceLastInput >= idleResetTime)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            }
-
-            // Check all joystick buttons.
-            bool buttonPressed = false;
-            for (int i = 0; i < 20; i++)
-            {
-                if (Input.GetKeyDown("joystick 1 button " + i.ToString()))
-                {
-                    buttonPressed = true;
-                }
-            }
-
-            // See if any other buttons or keys have been pressed.
-            if (Input.anyKeyDown || buttonPressed || Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
-            {
-                timeSinceLastInput = 0f;
-            }
-
-            timeSinceLastInput += Time.deltaTime;
-        }
-
         // Check invincibility frames.
         if (forceInvincibility) invincible = true;
         invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
-        if (invincibilityTimer > 0)
-        {
+        if (invincibilityTimer > 0) {
             invincible = true;
             invincibilityTimer -= Time.deltaTime;
         }

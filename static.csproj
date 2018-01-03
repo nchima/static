@@ -208,6 +208,7 @@
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GunValueManager.cs" />
     <Compile Include="Assets\Scripts\Managers\HealthManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\IdleTimer.cs" />
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
