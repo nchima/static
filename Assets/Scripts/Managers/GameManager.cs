@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour {
         player.GetComponent<PlayerController>().enabled = false;
         scoreManager = GetComponent<ScoreManager>();
         specialBarManager = GetComponentInChildren<SpecialBarManager>();
-        healthManager = GetComponent<HealthManager>();
+        healthManager = GetComponentInChildren<HealthManager>();
         levelGenerator = GetComponent<LevelGenerator>();
         levelManager = GetComponentInChildren<LevelManager>();
         fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
