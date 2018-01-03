@@ -12,7 +12,6 @@ public class PlayerController : MonoBehaviour {
     public float maxGroundSpeed;
     public float maxAirSpeed;
     [SerializeField] float maxFallingSpeed;
-    private Vector3 velocity;
 
     [SerializeField] float movementKickForce = 5f;
     Vector2 lastKickDirection = new Vector3(0f, 0f, 1f);
@@ -68,19 +67,20 @@ public class PlayerController : MonoBehaviour {
             return returnValue;
         }
     }
+    public static Vector3 velocity;
+    Vector3 previousPosition;   // Used to calculate velocity.
 
 
 
-    private void Start()
-    {
+    private void Start() {
         targetRotation = transform.localRotation;
         rigidBody = GetComponent<Rigidbody>();
         normalBounciness = GetComponent<Collider>().material.bounciness;
     }
 
 
-    private void Update()
-    {
+    private void Update() {
+
         /* GET DIRECTIONAL INPUT */
         if (state != State.ShotgunCharge
             && Physics.Raycast(transform.position + transform.forward * 0.75f, Vector3.down, 5f, 1 << 20)
@@ -100,8 +100,11 @@ public class PlayerController : MonoBehaviour {
     }
 
 
-    private void FixedUpdate()
-    {
+    private void FixedUpdate() {
+
+        velocity = (transform.position - previousPosition) / Time.deltaTime;
+        previousPosition = transform.position;
+
         /* HANDLE MOVEMENT */
         if (state == State.Normal || state == State.Falling || state == State.SpeedFalling) {
             float _accelerationSpeed = accelerationSpeedGround;

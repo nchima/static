@@ -53,12 +53,11 @@ public class HomingShot : EnemyShot {
 
         bool foundTarget = false;
 
-        while (!foundTarget)
-        {
+        while (!foundTarget) {
             currentTarget = new Vector3(
-                (playerTransform.position.x + GameManager.instance.playerVelocity.x * leading) + Random.insideUnitCircle.x * inaccuracy * 2f,
+                (playerTransform.position.x + PlayerController.velocity.x * leading) + Random.insideUnitCircle.x * inaccuracy * 2f,
                 0f,
-                (playerTransform.position.z + GameManager.instance.playerVelocity.z * leading) + Random.insideUnitCircle.y * inaccuracy * 2f);
+                (playerTransform.position.z + PlayerController.velocity.z * leading) + Random.insideUnitCircle.y * inaccuracy * 2f);
 
             leading -= 1f;
             leading = Mathf.Clamp(leading, 0f, 99f);

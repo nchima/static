@@ -30,8 +30,6 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject mainMenuScreen; 
 
     // RANDOM USEFUL STUFF
-    Vector3 playerPositionLast;
-    [HideInInspector] public Vector3 playerVelocity;
     public bool gameStarted = false;
 
     // MISC REFERENCES
@@ -86,8 +84,6 @@ public class GameManager : MonoBehaviour {
 
     private void Update() {
         // Keep track of player velocity.
-        playerVelocity = (player.transform.position - playerPositionLast) / Time.deltaTime;
-        playerPositionLast = player.transform.position;
 
         // See if a special move is ready to be fired.
         bool sineInPosition = GunValueManager.currentValue <= -1f + gun.specialMoveSineRange || GunValueManager.currentValue >= 1f - gun.specialMoveSineRange;
@@ -97,17 +93,10 @@ public class GameManager : MonoBehaviour {
             //Debug.Log(gunSliderBorder.GetComponent<MeshRenderer>().material);
         }
 
-        else
-        {
+        else {
             gunSliderBorder.GetComponent<MeshRenderer>().material.color = Color.black;
         }
 
-        //gun.shotgunChargeIsReady = GunValueManager.currentGunValue <= 0f && specialBarManager.barIsFull;
-        //gun.missilesAreReady = GunValueManager.currentGunValue >= 0f && specialBarManager.barIsFull;
-
-        if ((gun.shotgunChargeIsReady || gun.missilesAreReady)) {
-            specialBarManager.FlashBar();
-        }
 
         //if (specialBarManager.barIsFull) {
         //    specialBarManager.FlashBar();

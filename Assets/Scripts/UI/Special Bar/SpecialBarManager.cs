@@ -22,6 +22,7 @@ public class SpecialBarManager : MonoBehaviour {
 
     [SerializeField] private GameObject specialMoveReadyScreen;
 
+
     public bool bothBarsFull {
         get {
             return leftBar.currentValue >= 0.99f && rightBar.currentValue >= 0.99f;
@@ -39,8 +40,14 @@ public class SpecialBarManager : MonoBehaviour {
         leftBar.Run(this);
         rightBar.Run(this);
 
-        if (bothBarsFull) { specialMoveReadyScreen.SetActive(true); }
-        else { specialMoveReadyScreen.SetActive(false); }
+        if (bothBarsFull) {
+            specialMoveReadyScreen.SetActive(true);
+            FlashBar();
+        }
+
+        else {
+            specialMoveReadyScreen.SetActive(false);
+        }
     }
 
 
