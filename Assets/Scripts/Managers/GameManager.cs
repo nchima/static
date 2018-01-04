@@ -27,6 +27,7 @@ public class GameManager : MonoBehaviour {
 
     // RANDOM USEFUL STUFF
     public bool gameStarted = false;
+    Vector3 initialGravity;
 
     // MISC REFERENCES
     [HideInInspector] public static GameManager instance;
@@ -48,7 +49,6 @@ public class GameManager : MonoBehaviour {
         // Get various references.
         instance = this;
         player = GameObject.Find("Player");
-        player.GetComponent<PlayerController>().enabled = false;
         scoreManager = GetComponent<ScoreManager>();
         specialBarManager = GetComponentInChildren<SpecialBarManager>();
         healthManager = GetComponentInChildren<HealthManager>();
@@ -61,24 +61,38 @@ public class GameManager : MonoBehaviour {
         gun = FindObjectOfType<Gun>();
         gunValueManager = GetComponentInChildren<GunValueManager>();
         noiseGenerator = GetComponent<GenerateNoise>();
-
-        // Disable gun.
-        foreach (Gun gun in FindObjectsOfType<Gun>()) {
-            gun.enabled = false;
-        }
-
-        // Set up the current number of enemies.
-        currentEnemyAmt = FindObjectsOfType<EnemyOld>().Length;
-
-        scoreManager.DetermineBonusTime();
-
-        levelManager.LoadLevel(levelManager.currentLevelNumber);
-
-        // Pause everything for the main menu.
-        levelManager.SetEnemiesActive(false);
     }
 
+
+    private void Start() {
+        StartCoroutine(InitialSetup());
+    }
+
+
     private void Update() {
+        if (!gameStarted) {
+            if (Input.GetMouseButtonDown(0)) {
+                StartGame();
+            }
+        }
+    }
+
+
+    IEnumerator InitialSetup() {
+        gun.enabled = false;
+        player.GetComponent<PlayerController>().isMovementEnabled = false;
+        
+        levelManager.LoadLevel(levelManager.currentLevelNumber);
+        levelManager.SetEnemiesActive(false);
+
+        yield return new WaitForEndOfFrame();
+
+        fallingSequenceManager.BeginFallingInstant();
+
+        initialGravity = Physics.gravity;
+        Physics.gravity = Vector3.zero;
+
+        yield return null;
     }
 
 
@@ -160,15 +174,14 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerWasHurt() {        
+    public void PlayerWasHurt() {
         scoreManager.GetHurt();
         specialBarManager.PlayerWasHurt();
 
         healthManager.playerHealth -= 4;
 
         // If health is now less than zero, trigger a game over.
-        if (healthManager.playerHealth <= 0)
-        {
+        if (healthManager.playerHealth <= 0) {
             ShowGameOverScreen();
         }
     }
@@ -196,16 +209,13 @@ public class GameManager : MonoBehaviour {
 
 
     public void StartGame() {
-        CountEnemies();
-
         // Unpause enemies in the background.
         levelManager.SetEnemiesActive(true);
 
-        // Enable player movement and shooting.
-        GameObject.Find("Player").GetComponent<PlayerController>().enabled = true;
-        foreach (Gun gun in FindObjectsOfType<Gun>()) {
-            gun.enabled = true;
-        }
+        player.GetComponent<PlayerController>().isMovementEnabled = true;
+        gun.enabled = true;
+
+        Physics.gravity = initialGravity;
 
         gameStarted = true;
     }

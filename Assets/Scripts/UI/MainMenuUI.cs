@@ -25,7 +25,7 @@ public class MainMenuUI : MonoBehaviour {
         // Turn off the main menu.
         transform.parent.gameObject.SetActive(false);
 
-        FindObjectOfType<GameManager>().StartGame();
+        //FindObjectOfType<GameManager>().StartGame();
     }
 
 

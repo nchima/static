@@ -47,7 +47,7 @@ public class FallingSequenceManager : StateController {
     Transform player;
 
 
-    private void Start() {
+    private void Awake() {
         playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
         savedGravity = Physics.gravity;
         normalPlayerBounciness =

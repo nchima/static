@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
     public float maxGroundSpeed;
     public float maxAirSpeed;
     [SerializeField] float maxFallingSpeed;
+    [HideInInspector] public bool isMovementEnabled = true;
 
     [SerializeField] float movementKickForce = 5f;
     Vector2 lastKickDirection = new Vector3(0f, 0f, 1f);
@@ -106,6 +107,8 @@ public class PlayerController : MonoBehaviour {
         previousPosition = transform.position;
 
         /* HANDLE MOVEMENT */
+        if (!isMovementEnabled) { return; }
+
         if (state == State.Normal || state == State.Falling || state == State.SpeedFalling) {
             float _accelerationSpeed = accelerationSpeedGround;
             float _maxSpeed = maxGroundSpeed;
@@ -166,6 +169,7 @@ public class PlayerController : MonoBehaviour {
             // Add forward acceleration.
             rigidBody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
         }
+
         if (transform.position.x > 10000f || transform.position.z > 10000f) {
             transform.position = new Vector3(0f, transform.position.y, 0f);
         }
