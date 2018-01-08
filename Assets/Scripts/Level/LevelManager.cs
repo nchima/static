@@ -73,8 +73,7 @@ public class LevelManager : MonoBehaviour {
     //}
 
 
-    public void LoadLevel(int levelNumber)
-    {
+    public void LoadLevel(int levelNumber) {
         if (isLevelLoaded) { SceneManager.UnloadSceneAsync(currentLevelNumber); }
         SceneManager.LoadScene(levelNumber, LoadSceneMode.Additive);
         isLevelCompleted = false;
@@ -101,8 +100,7 @@ public class LevelManager : MonoBehaviour {
     }
 
 
-    public void SetFloorCollidersActive(bool value)
-    {
+    public void SetFloorCollidersActive(bool value) {
         Collider[] floorColliders = GameObject.Find("Floor Planes").GetComponentsInChildren<Collider>();
         foreach (Collider collider in floorColliders) collider.enabled = value;
     }

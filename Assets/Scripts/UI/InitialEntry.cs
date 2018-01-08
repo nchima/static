@@ -18,10 +18,12 @@ public class InitialEntry : MonoBehaviour {
     public Color activeColor;   // The color of the letter when it is active.
     public Color inactiveColor;
 
-    public float activeScale = 1.1f;
-    public float inactiveScale = 1.0f;
+    public float activeScale = 1.2f;
+    public float inactiveScale = 0.9f;
 
-    float keyCooldown = 0.09f;   // How often a keypress is registered.
+    [SerializeField] float startPause = 1f;   // How long the UI waits before it accepts the first input.
+    float startPauseTimer;
+    [SerializeField] float keyCooldown = 0.14f;   // How often a keypress is registered.
     float sinceLastKeypress = 0f;
 
     float joystickDeadzone = 0.5f;
@@ -41,9 +43,10 @@ public class InitialEntry : MonoBehaviour {
 	
 	void Update ()
     {
-        sinceLastKeypress += Time.deltaTime;
-
         /* PLAYER CONTROL */
+        sinceLastKeypress += Time.deltaTime;
+        startPauseTimer += Time.deltaTime;
+        if (startPauseTimer < startPause) { return; }
 
         // See if the player is using the keyboard to type their initials.
         if (Input.anyKeyDown && Input.inputString.Length > 0)

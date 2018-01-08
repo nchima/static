@@ -16,5 +16,9 @@ public class ScoreManagerEditor : Editor {
         {
             myTarget.ResetScores();
         }
+
+        if (GUILayout.Button("Print High Scores to Console")) {
+            myTarget.PrintHighScores();
+        }
     }
 }

@@ -59,17 +59,15 @@ public class ScoreManager : MonoBehaviour
     float bonusTimer = 0;
     public int currentTimeBonus
     {
-        get
-        {
+        get {
             return Mathf.Clamp(Mathf.RoundToInt(MyMath.Map(bonusTimer, 0f, maxBonusTime, maxTimeBonus, 0f)), 0, maxTimeBonus);
         }
     }
 
 
-    void Start()
-    {
+    void Start() {
         // Set up high score list.
-        highScoreEntries = LoadHighScores();
+        highScoreEntries = RetrieveHighScores();
 
         // Set up the score and multiplier number displays.
         scoreDisplay.text = score.ToString();
@@ -199,24 +197,20 @@ public class ScoreManager : MonoBehaviour
     /// Loads saved high scores from PlayerPrefs.
     /// </summary>
     /// <returns>List<ScoreEntry></returns>
-    List<ScoreEntry> LoadHighScores()
-    {
+    List<ScoreEntry> RetrieveHighScores() {
         // Declare a new high score list.
         List<ScoreEntry> newHighScoreList = new List<ScoreEntry>();
 
         // Initialize 10 empty score entries in the highScore List.
-        for (int i = 0; i < 10; i++)
-        {
-            newHighScoreList.Add(new ScoreEntry("AAA", 0));
+        for (int i = 0; i < 10; i++) {
+            newHighScoreList.Add(new ScoreEntry("AAA", 0, 0));
         }
 
         // Load saved high scores from PlayerPrefs.
-        for (int i = 0; i < 10; i++)
-        {
+        for (int i = 0; i < 10; i++) {
             // Check to see if this score entry has previously been saved.
-            if (PlayerPrefs.GetString("HighScoreName" + i) != "")
-            {
-                newHighScoreList[i] = new ScoreEntry(PlayerPrefs.GetString("HighScoreName" + i), PlayerPrefs.GetInt("HighScoreNumber" + i));
+            if (PlayerPrefs.GetString("HighScoreName" + i) != "") {
+                newHighScoreList[i] = new ScoreEntry(PlayerPrefs.GetString("HighScoreName" + i), PlayerPrefs.GetInt("HighScoreNumber" + i), PlayerPrefs.GetInt("Newest" + i));
             }
         }
 
@@ -227,42 +221,45 @@ public class ScoreManager : MonoBehaviour
     // Saves high scores
     void SaveHighScores()
     {
-        for (int i = 0; i < 10; i++)
-        {
+        for (int i = 0; i < 10; i++) {
             PlayerPrefs.SetString("HighScoreName" + i, highScoreEntries[i].initials);
             PlayerPrefs.SetInt("HighScoreNumber" + i, highScoreEntries[i].score);
+            PlayerPrefs.SetInt("Newest" + i, highScoreEntries[i].newest);
         }
     }
 
 
-    public void LoadScoresForHighScoreScreen()
-    {
-        highScoreEntries = LoadHighScores();
+    public void RetrieveScoresForHighScoreScreen() {
+        highScoreEntries = RetrieveHighScores();
 
         string scoreList = "";
 
-        for (int i = 0; i < highScoreEntries.Count; i++)
-        {
-            scoreList += highScoreEntries[i].initials + ": " + highScoreEntries[i].score + "\n";
+        for (int i = 0; i < highScoreEntries.Count; i++) {
+            if (highScoreEntries[i].newest == 1) { Debug.Log("adding newest score"); scoreList += ">"; }
+            scoreList += highScoreEntries[i].initials + ": " + highScoreEntries[i].score;
+            if (highScoreEntries[i].newest == 1) { scoreList += "<"; }
+            scoreList += "\n";
+
+            highScoreEntries[i].newest = 0;
         }
 
         highScoreListText.GetComponent<TextMesh>().text = scoreList;
+        SaveHighScores();
     }
 
 
     // Insters a score into the list.
     public void InsertScore(string initials)
     {
-        highScoreEntries = LoadHighScores();
+        highScoreEntries = RetrieveHighScores();
 
         // Add score to list
-        highScoreEntries.Add(new ScoreEntry(initials, score));
+        highScoreEntries.Add(new ScoreEntry(initials, score, 1));
 
         SortScores();
 
         // Stop showing game over screen and show high score list instead.
         SaveHighScores();
-        LoadScoresForHighScoreScreen();
     }
 
 
@@ -291,12 +288,13 @@ public class ScoreManager : MonoBehaviour
 
     public void ResetScores()
     {
-        highScoreEntries = LoadHighScores();
+        highScoreEntries = RetrieveHighScores();
 
         for (int i = 0; i < 10; i++)
         {
             highScoreEntries[i].score = 0;
             highScoreEntries[i].initials = "AAA";
+            highScoreEntries[i].newest = 0;
         }
 
         PlayerPrefs.DeleteAll();
@@ -305,15 +303,26 @@ public class ScoreManager : MonoBehaviour
     }
 
 
+    public void PrintHighScores() {
+        for (int i = 0; i < 10; i++) {
+            Debug.Log(PlayerPrefs.GetString("HighScoreName" + i, highScoreEntries[i].initials) + ", "
+            + PlayerPrefs.GetInt("HighScoreNumber" + i, highScoreEntries[i].score) + ", "
+            + PlayerPrefs.GetInt("Newest" + i, highScoreEntries[i].newest));
+        }
+    }
+
+
     public class ScoreEntry
     {
         public string initials;
         public int score;
+        public int newest; // Int as bool... 0 = false, 1 = true
 
-        public ScoreEntry(string _initials, int _score)
+        public ScoreEntry(string initials, int score, int newest)
         {
-            initials = _initials;
-            score = _score;
+            this.initials = initials;
+            this.score = score;
+            this.newest = newest;
         }
     }
 }

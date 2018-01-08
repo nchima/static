@@ -83,10 +83,10 @@ public class GameManager : MonoBehaviour {
         player.GetComponent<PlayerController>().isMovementEnabled = false;
         
         levelManager.LoadLevel(levelManager.currentLevelNumber);
+
+        while (!SceneManager.GetSceneByBuildIndex(levelManager.currentLevelNumber).isLoaded) { yield return null; }
+
         levelManager.SetEnemiesActive(false);
-
-        yield return new WaitForEndOfFrame();
-
         fallingSequenceManager.BeginFallingInstant();
 
         initialGravity = Physics.gravity;
@@ -177,7 +177,6 @@ public class GameManager : MonoBehaviour {
     public void PlayerWasHurt() {
         scoreManager.GetHurt();
         specialBarManager.PlayerWasHurt();
-
         healthManager.playerHealth -= 4;
 
         // If health is now less than zero, trigger a game over.
@@ -188,7 +187,7 @@ public class GameManager : MonoBehaviour {
 
 
     public void ShowHighScores() {
-        scoreManager.LoadScoresForHighScoreScreen();
+        scoreManager.RetrieveScoresForHighScoreScreen();
 
         gameOverScreen.gameObject.SetActive(false);
         nameEntryScreen.gameObject.SetActive(false);
@@ -222,7 +221,7 @@ public class GameManager : MonoBehaviour {
 
 
     public void RestartGame() {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
     public void UpdateBillboards() {

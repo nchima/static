@@ -10,6 +10,8 @@ public class GameOverScreen : MonoBehaviour
     ScoreManager scoreManager;
     [SerializeField] GameObject nameEntryScreen;
 
+    [SerializeField] GameObject specialMoveUIScreen;
+
 
     private void Awake()
     {
@@ -18,21 +20,23 @@ public class GameOverScreen : MonoBehaviour
         Cursor.visible = true;
 
         // Disable player controls.
-        player = FindObjectOfType<PlayerController>().gameObject;
-        player.GetComponent<PlayerController>().UnlockCursor();
-        player.GetComponent<CapsuleCollider>().center = new Vector3(player.GetComponent<CapsuleCollider>().center.x, player.GetComponent<CapsuleCollider>().center.y - 0.5f, player.GetComponent<CapsuleCollider>().center.z);
-        player.GetComponent<PlayerController>().maxAirSpeed = 0;
-        //player.GetComponent<PlayerController>(). = 0;
+        GameManager.player.GetComponent<PlayerController>().UnlockCursor();
+        //GameManager.player.GetComponent<CapsuleCollider>().center = new Vector3(player.GetComponent<CapsuleCollider>().center.x, player.GetComponent<CapsuleCollider>().center.y - 0.5f, player.GetComponent<CapsuleCollider>().center.z);
+        GameManager.player.GetComponent<PlayerController>().isMovementEnabled = false;
+
+        // Disable fall catcher so that a new level is not loaded.
+        FindObjectOfType<FallCatcher>().enabled = false;
 
         // Disable gun object.
-        foreach (Gun gun in FindObjectsOfType<Gun>())
-        {
+        foreach (Gun gun in FindObjectsOfType<Gun>()) {
             gun.enabled = false;
         }
 
+        // Disable other UI elements.
+        specialMoveUIScreen.SetActive(false);
+
         // Disable floor
         GameManager.instance.SetFloorCollidersActive(false);
-        //GameObject.Find("Floor").SetActive(false);
 
         // Turn background red.
         //GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color = new Color(GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.r + 0.1f, GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.g, GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.b);
@@ -55,8 +59,7 @@ public class GameOverScreen : MonoBehaviour
 
     private void Update()
     {
-        if (!nameEntryScreen.activeSelf && Input.GetButton("Start"))
-        {
+        if (!nameEntryScreen.activeSelf && Input.GetButton("Start")) {
             GameObject.Find("Game Manager").GetComponent<GameManager>().RestartGame();
         }
     }
