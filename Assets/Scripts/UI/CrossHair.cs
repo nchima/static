@@ -16,6 +16,10 @@ public class CrossHair : MonoBehaviour {
     float ttXRadius = 0.5f;
     float ttYRadius = 0.5f;
 
+    float shakeValueResting = 0.025f;
+    public FloatRange shakeRange = new FloatRange(0.1f, 0.4f);
+    float shakeValue;
+
 
     void Start()
     {
@@ -24,6 +28,8 @@ public class CrossHair : MonoBehaviour {
         line.positionCount = segments + 1;
         line.useWorldSpace = false;
         CreatePoints(line, xradius, yradius);
+
+        shakeValue = shakeRange.min;
     }
 
 
@@ -33,6 +39,9 @@ public class CrossHair : MonoBehaviour {
         yradius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
         transform.Rotate(new Vector3(0f, Random.Range(-180f, 180f), 0f));
         CreatePoints(line, xradius, yradius);
+
+        shakeValue = Mathf.Lerp(shakeValue, shakeValueResting, 0.4f);
+        shakeValue = Mathf.Clamp(shakeValue, shakeValueResting, shakeRange.max);
 
         //if (tuningTarget.gameObject.activeSelf)
         //{
@@ -49,16 +58,20 @@ public class CrossHair : MonoBehaviour {
 
         float angle = 20f;
 
-        for (int i = 0; i < (segments + 1); i++)
-        {
-            x = Mathf.Sin(Mathf.Deg2Rad * angle) * xRadius;
+        for (int i = 0; i < (segments + 1); i++) {
+            x = (Mathf.Sin(Mathf.Deg2Rad * angle) * xRadius) + Random.Range(-shakeValue, shakeValue);
             y = 0f;
-            z = Mathf.Cos(Mathf.Deg2Rad * angle) * yRadius;
+            z = (Mathf.Cos(Mathf.Deg2Rad * angle) * yRadius) + Random.Range(-shakeValue, shakeValue);
 
             target.SetPosition(i, new Vector3(x, y, z));
 
             angle += (360f / segments);
         }
+    }
+
+
+    public void AdjustShakeValueForShotFired() {
+        shakeValue = MyMath.Map(GunValueManager.currentValue, 1f, -1f, shakeRange.min * 1.1f, shakeRange.max);
     }
 
     
