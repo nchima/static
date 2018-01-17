@@ -59,6 +59,7 @@ public class Gun : MonoBehaviour {
     GameManager gameManager;
     Transform bulletSpawnTransform; // The point where bullets originate (ie the tip of the player's gun)
     Transform gunTipTransform;
+    GameObject screen;
 
     /* MISC */
     Vector3 nearestEnemyPosition;
@@ -75,6 +76,8 @@ public class Gun : MonoBehaviour {
 
         // Get a reference to the score controller.
         gameManager = FindObjectOfType<GameManager>();
+
+        screen = GameObject.Find("Screen");
 
         originalPosition = transform.localPosition;
         recoilPosition = new Vector3(0f, -3.68f, 10.68f);
@@ -166,7 +169,7 @@ public class Gun : MonoBehaviour {
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
 
-        //transform.parent.SendMessage("IncreaseShake", 0.01f);
+        screen.BroadcastMessage("IncreaseShake", MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 10f, 40f));
 
         // Show muzzle flash.
         GameObject _muzzleFlash = Instantiate(muzzleFlash);
@@ -223,7 +226,7 @@ public class Gun : MonoBehaviour {
         newBullet.GetComponent<PlayerBullet>().GetFired(
             bulletSpawnTransform.position,
             bulletSpawnTransform.forward,
-            MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletThicknessRange.max, bulletThicknessRange.min),
+            MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletExplosionRadiusRange.min, bulletExplosionRadiusRange.max),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, explosionDamageRange.min, explosionDamageRange.max),

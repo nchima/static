@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject mainMenuScreen; 
 
     // RANDOM USEFUL STUFF
-    public bool gameStarted = false;
+    public static bool gameStarted = false;
     Vector3 initialGravity;
 
     // MISC REFERENCES
@@ -110,7 +110,6 @@ public class GameManager : MonoBehaviour {
         // Begin tweening time scale, gun burst rate, and music pitch back to normal.
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
         DOTween.To(() => gun.burstsPerSecondSloMoModifierCurrent, x => gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(1f, 1f).SetUpdate(true);
     }
 
 

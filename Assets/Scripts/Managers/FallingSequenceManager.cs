@@ -63,7 +63,7 @@ public class FallingSequenceManager : StateController {
     public void InstantiateShockwave(GameObject prefab, float gunRate) {
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
-        FindObjectOfType<MusicManager>().GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
+        GameManager.musicManager.PitchDownMusicForSlowMotion();
 
         // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
         GameManager.instance.gun.canShoot = true;

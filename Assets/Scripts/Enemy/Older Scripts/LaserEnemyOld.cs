@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class LaserEnemy : ShootingEnemyOld {
+public class LaserEnemyOld : ShootingEnemyOld {
 
     [SerializeField] Transform laserOrigin;
     bool shotFired = false;
     GameObject lastShot;    // A reference to the most recent shot that I fired.
     Color chargingLaserColor = new Color(0.5f, 1f, 1f);
-
 
     
     protected override void PrepareToMove()
@@ -31,6 +30,7 @@ public class LaserEnemy : ShootingEnemyOld {
         navMeshAgent.enabled = false;
         GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
 
+        // 'Puff up' as I charge the laser.
         myGeometry.transform.DOScale(1.5f, preShotDelay);
         //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.DOColor(chargingLaserColor, preShotDelay).SetEase(Ease.Linear);
         //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.DOColor(chargingLaserColor, "_EmissionColor", preShotDelay).SetEase(Ease.Linear);

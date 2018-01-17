@@ -3,6 +3,8 @@ using System.Collections;
 
 public class PlayerBullet : MonoBehaviour {
 
+    [SerializeField] bool justBeInstant;
+
     [SerializeField] float maxDistance = 1000f;
     [SerializeField] float speed;
 
@@ -23,10 +25,19 @@ public class PlayerBullet : MonoBehaviour {
     Vector3 previousPosition = Vector3.zero;
     float travelledDistance = 0f;
 
+    ShotgunCharge shotgunCharge;
+
+
+    private void Awake() {
+        shotgunCharge = FindObjectOfType<ShotgunCharge>();
+    }
 
 
     private void FixedUpdate() {
+
         Vector3 nextPosition = transform.position + transform.forward * speed * Time.deltaTime;
+
+        if (justBeInstant) { nextPosition = transform.position + transform.forward * 1000f; }
 
         // Raycast from my previous position to my new position to see if I hit anything.
         RaycastHit hit;
@@ -84,7 +95,7 @@ public class PlayerBullet : MonoBehaviour {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
             if (hit.collider.GetComponent<EnemyOld>()) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
             else { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
-            if (!(FindObjectOfType<ShotgunCharge>().currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
+            if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
             GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<EnemyOld>());
         } 
         
@@ -97,13 +108,13 @@ public class PlayerBullet : MonoBehaviour {
         }
 
         // Instantiate explosion
-        if (explosionRadius > 0f) {
-            GameObject newExplosion = Instantiate(explosionPrefab, hit.point, Quaternion.identity);
-            newExplosion.GetComponent<Explosion>().explosionRadius = explosionRadius;
-            newExplosion.GetComponent<Explosion>().SetColor(m_Color);
-            newExplosion.GetComponent<Explosion>().damageMin = 1;
-            newExplosion.GetComponent<Explosion>().damageMax = (int) explosionDamage;
-        }
+        //if (explosionRadius > 0f) {
+        //    GameObject newExplosion = Instantiate(explosionPrefab, hit.point, Quaternion.identity);
+        //    newExplosion.GetComponent<Explosion>().explosionRadius = explosionRadius;
+        //    newExplosion.GetComponent<Explosion>().SetColor(m_Color);
+        //    newExplosion.GetComponent<Explosion>().damageMin = 1;
+        //    newExplosion.GetComponent<Explosion>().damageMax = (int) explosionDamage;
+        //}
 
         EndBulletsExistence();
     }

@@ -54,8 +54,8 @@ public class Enemy : StateController {
     }
     [HideInInspector] public bool pauseAI;
 
-    private void Start() {
-        currentHealth = maxHealth;
+    protected virtual void Start() {
+        _currentHealth = maxHealth;
     }
 
     protected virtual void Die() {

@@ -167,6 +167,8 @@
     <None Include="Assets\Asset Packages\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
+    <None Include="Assets\Shaders\Atmosphere Fucked With.shader" />
+    <None Include="Assets\Shaders\Atmosphere.shader" />
     <None Include="Assets\Shaders\Bullet Shader.shader" />
     <None Include="Assets\Shaders\BulletMask.shader" />
     <None Include="Assets\Shaders\Clip Black Pixels.shader" />

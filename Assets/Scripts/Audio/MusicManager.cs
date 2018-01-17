@@ -1,63 +1,56 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Audio;
 
 public class MusicManager : MonoBehaviour {
 
-    public bool dontPlayMusic = false;
+    [SerializeField] AudioMixer musicMasterMixer;
+    [SerializeField] AudioMixer layerAMixer;
+    [SerializeField] AudioMixer layerBMixer;
+    [SerializeField] AudioMixer rhythmMixer;
 
-	[SerializeField] private AudioClip[] tracks;    // An array holding references to the music tracks I will choose from.
-    Stack<AudioClip> trackStack;
-    private int previousTrackIndex;  // The index of the track that I played last (to make sure the same track doesn't play twice.)
+    int tracksPerLayer = 2;
 
-    AudioSource audioSource;
-
-	void Start () {
-		audioSource = GetComponent<AudioSource> ();
-
-        // Put all the clips into the Stack.
-        trackStack = new Stack<AudioClip>();
-        foreach (AudioClip clip in tracks) {
-            trackStack.Push(clip);
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.J)) {
+            RandomizeAllMusicVolumeLevels();
         }
-
-		int clipIndex = Random.Range(0, tracks.Length);
-        previousTrackIndex = clipIndex;
-		audioSource.clip = tracks [clipIndex];
-	}
-
-
-    void LoadTracks()
-    {
-
     }
 
-
-    void Update() {
-        if (dontPlayMusic) {
-            audioSource.Stop();
-            return;
-        }
-
-        if (!audioSource.isPlaying) {
-            ChooseNewClip();
-        }
-
-        // Set music based on current sine value.
-        //GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", (GunValueManager.currentValue + 1f) * 11000f + 200f);
-        GetComponent<AudioSource>().outputAudioMixerGroup.audioMixer.SetFloat("FilterCutoff", MyMath.Map(GunValueManager.currentValue, -1f, 1f, 3000f, 7000f));
+    public void ChooseAllTracksRandomly() {
+        SelectRandomTrack(layerAMixer);
+        SelectRandomTrack(layerBMixer);
+        SelectRandomTrack(rhythmMixer);
     }
 
-
-    void ChooseNewClip() {
-        // Make sure the same track does not play twice in a row.
-        int clipIndex = previousTrackIndex;
-        while (tracks.Length > 1 && clipIndex == previousTrackIndex) {
-            clipIndex = Random.Range(0, tracks.Length);
+    void SelectRandomTrack(AudioMixer mixer) {
+        int trackToSelect = Random.Range(1, tracksPerLayer + 1);
+        for (int i = 1; i <= tracksPerLayer; i++) {
+            if (i == trackToSelect) { mixer.SetFloat("Track " + trackToSelect + " Volume", 0f); }
+            else { mixer.SetFloat("Track " + i + " Volume", -80f); }
         }
+    }
 
-        previousTrackIndex = clipIndex;
-        audioSource.clip = tracks [clipIndex];
-		audioSource.Play ();
-	}
+    public void RandomizeAllMusicVolumeLevels() {
+        RandomizeAllTrackVolumeLevels(layerAMixer);
+        RandomizeAllTrackVolumeLevels(layerBMixer);
+        RandomizeAllTrackVolumeLevels(rhythmMixer);
+    }
+
+    void RandomizeAllTrackVolumeLevels(AudioMixer mixer) {
+        int loudTrack = Random.Range(1, tracksPerLayer + 1);
+        for (int i = 1; i <= tracksPerLayer; i++) {
+            if (i == loudTrack) { mixer.SetFloat("Track " + i + " Volume", 0f); }
+            else { mixer.SetFloat("Track " + i + " Volume", Random.Range(-60f, -10f)); }
+        }
+    }
+
+    public void ReturnMusicPitchToFullSpeed() {
+        //musicManager..DOPitch(1f, 1f).SetUpdate(true);
+    }
+
+    public void PitchDownMusicForSlowMotion() {
+        //GameManager.musicManager.GetComponent<AudioSource>().DOPitch(0.1f, 0.1f).SetUpdate(true);
+    }
 }

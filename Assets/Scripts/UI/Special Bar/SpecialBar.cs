@@ -58,7 +58,7 @@ public class SpecialBar : MonoBehaviour {
             //if (barObject.GetComponent<MeshRenderer>().material.color != Color.black) barObject.GetComponent<MeshRenderer>().material.color = Color.black;
 
             // Apply decay
-            if (FindObjectOfType<GameManager>().gameStarted && !freezeDecay) {
+            if (GameManager.gameStarted && !freezeDecay) {
                 currentValue -= manager.decayRate * Time.deltaTime;
             }
         }

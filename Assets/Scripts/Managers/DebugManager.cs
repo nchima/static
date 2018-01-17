@@ -18,7 +18,7 @@ public class DebugManager : MonoBehaviour {
             if (value == AudioState.Normal)
             {
                 AudioListener.volume = originalVolume;
-                GetComponentInChildren<MusicManager>().dontPlayMusic = false;
+                GetComponentInChildren<MusicManagerOld>().dontPlayMusic = false;
             }
 
             else if (value == AudioState.Silent)
@@ -29,7 +29,7 @@ public class DebugManager : MonoBehaviour {
             else if (value == AudioState.SFXOnly)
             {
                 AudioListener.volume = originalVolume;
-                GetComponentInChildren<MusicManager>().dontPlayMusic = true;
+                GetComponentInChildren<MusicManagerOld>().dontPlayMusic = true;
             }
 
             _audioState = value;

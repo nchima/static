@@ -18,7 +18,7 @@ Shader "Custom/Bullet Shader"
 		}
 
 		ZWrite Off
-		Blend OneMinusDstColor OneMinusDstColor
+		Blend OneMinusDstColor DstColor
 
 		Pass
 		{
@@ -69,6 +69,7 @@ Shader "Custom/Bullet Shader"
 				i.uvProj = (i.uvProj + 1) * 0.5;
 
 				half4 color = tex2D(_MainTex, i.uvProj.xy);
+				clip (color.a - _AlphaCutoff);
 
 				float brightness = (color.x + color.y + color.z) / 3;
 				if (brightness < _AlphaCutoff) discard;

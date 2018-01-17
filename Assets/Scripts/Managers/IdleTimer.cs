@@ -11,7 +11,7 @@ public class IdleTimer : MonoBehaviour {
 
     void Update () {
         // Run idle timer.
-        if (GameManager.instance.gameStarted) {
+        if (GameManager.gameStarted) {
             if (timeSinceLastInput >= idleResetTime) {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }

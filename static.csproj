@@ -156,6 +156,7 @@
     <Compile Include="Assets\Asset Packages\Standard Assets\Utility\WaypointProgressTracker.cs" />
     <Compile Include="Assets\Scripts\Audio\MoveAudioSourceCloseToPlayer.cs" />
     <Compile Include="Assets\Scripts\Audio\MusicManager.cs" />
+    <Compile Include="Assets\Scripts\Audio\MusicManagerOld.cs" />
     <Compile Include="Assets\Scripts\Audio\SFXManager.cs" />
     <Compile Include="Assets\Scripts\Color Palette\ColorPalette.cs" />
     <Compile Include="Assets\Scripts\Color Palette\ColorPaletteManager.cs" />
@@ -164,11 +165,15 @@
     <Compile Include="Assets\Scripts\Enemy Shot\LaserShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\NormalShot.cs" />
     <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyStateDash.cs" />
+    <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyStateShoot.cs" />
+    <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyTransitionFromDash.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\BasicEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\EnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\EnemySpawner.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\HoveringEnemy.cs" />
-    <Compile Include="Assets\Scripts\Enemy\Older Scripts\LaserEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Older Scripts\LaserEnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\MeleeEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\NavMeshEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\ShootingEnemyOld.cs" />
@@ -280,6 +285,8 @@
     <None Include="Assets\Asset Packages\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
+    <None Include="Assets\Shaders\Atmosphere Fucked With.shader" />
+    <None Include="Assets\Shaders\Atmosphere.shader" />
     <None Include="Assets\Shaders\Bullet Shader.shader" />
     <None Include="Assets\Shaders\BulletMask.shader" />
     <None Include="Assets\Shaders\Clip Black Pixels.shader" />

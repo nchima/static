@@ -6,7 +6,7 @@ using UnityEngine;
 public class Transition_LevelStarted : Transition {
     public override bool IsConditionTrue(StateController stateController) {
         Enemy enemy = stateController as Enemy;
-        if (GameManager.fallingSequenceManager.isPlayerFalling || enemy.pauseAI == true) { return false; }
+        if (!GameManager.gameStarted || enemy.pauseAI) { return false; }
         else { return true; }
     }
 }

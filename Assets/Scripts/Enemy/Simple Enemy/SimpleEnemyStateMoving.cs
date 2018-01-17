@@ -8,7 +8,7 @@ public class SimpleEnemyStateMoving : State {
     [SerializeField] float moveRandomness;
     [SerializeField] FloatRange moveDistanceRange;
 
-    const float MOVE_TIME = 5f;    // This is mostly used as a failsafe to make sure that I don't get stuck trying to reach an unreachable point.
+    const float MAX_MOVE_TIME = 5f;    // This is mostly used as a failsafe to make sure that I don't get stuck trying to reach an unreachable point.
     float moveTimer;
 
     Vector3 targetPosition; // The point which I haven chosen as my next destination.
@@ -40,7 +40,8 @@ public class SimpleEnemyStateMoving : State {
     }
 
 
-    public override void End(StateController stateController) {}
+    public override void End(StateController stateController) {
+    }
 
 
     private void ChooseNewDestination(StateController stateController) {
