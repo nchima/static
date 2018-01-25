@@ -5,15 +5,29 @@ using UnityEngine;
 
 public class LaserEnemyTransitionFromDash : Transition {
 
-    public override bool IsConditionTrue(StateController stateController) {
-        LaserEnemy controller = stateController as LaserEnemy;
-        
-        if (controller.timesDashed >= controller.timesToDash) {
-            return true;
+    bool _isTriggerSet = false;
+    public bool isTriggerSet {
+        get { return _isTriggerSet; }
+        set {
+            _isTriggerSet = value;
+            if (_isTriggerSet == true) { StartCoroutine(Reset()); }
         }
+    }
+    [SerializeField] float resetTime = 0.1f;
 
-        else {
+
+    public override bool IsConditionTrue(StateController stateController) {
+        if (isTriggerSet) {
+            isTriggerSet = false;
+            return true;
+        } else {
             return false;
         }
+    }
+
+    private IEnumerator Reset() {
+        yield return new WaitForSeconds(resetTime);
+        isTriggerSet = false;
+        yield return null;
     }
 }

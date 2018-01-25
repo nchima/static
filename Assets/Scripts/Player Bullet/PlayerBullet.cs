@@ -96,7 +96,8 @@ public class PlayerBullet : MonoBehaviour {
             if (hit.collider.GetComponent<EnemyOld>()) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
             else { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
             if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
-            GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<EnemyOld>());
+            if (hit.collider.GetComponent<EnemyOld>()) { GameManager.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
+            else { GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
         } 
         
         else if (hit.collider.name.Contains("Homing Shot")) {

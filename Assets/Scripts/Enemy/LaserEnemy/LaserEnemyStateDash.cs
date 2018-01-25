@@ -29,16 +29,24 @@ public class LaserEnemyStateDash : State {
         Vector3 nextPosition = ChooseNextPosition(stateController);
 
         // Turn towards new position.
-        controller.transform.DOLookAt(nextPosition, turnDuration).SetEase(Ease.InFlash);
+        controller.transform.DOLookAt(nextPosition, turnDuration).SetEase(Ease.InExpo);
         yield return new WaitForSeconds(turnDuration + 0.3f);
 
         // Dash to new position.
-        controller.transform.DOMove(nextPosition, dashDuration).SetEase(Ease.InOutQuad);
+        controller.transform.DOMove(nextPosition, dashDuration).SetEase(Ease.InExpo);
         yield return new WaitForSeconds(dashDuration);
 
         // PROBLEM AREA: not sure if it'll work.
         controller.timesDashed++;
-        if (controller.timesDashed < controller.timesToDash) { GetComponent<TriggerTransition>().isTriggerSet = true; }
+        if (controller.timesDashed >= controller.timesToDash) {
+            // Go to shooting state.
+            GetComponent<LaserEnemyTransitionFromDash>().isTriggerSet = true;
+        }
+        else {
+            // Redo dashing state.
+            GetComponent<TriggerTransition>().isTriggerSet = true;
+        }
+
         yield return null;
     }
 

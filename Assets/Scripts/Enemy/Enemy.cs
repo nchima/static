@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enemy : StateController {
 
     // HEALTH AND DYING
-    [SerializeField] int maxHealth;
+    public int maxHealth;
     int _currentHealth;
     public virtual int currentHealth {
         get {
