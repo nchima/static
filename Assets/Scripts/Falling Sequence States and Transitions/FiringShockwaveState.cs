@@ -17,13 +17,15 @@ public class FiringShockwaveState : State {
 
         //GameManager.specialBarManager.freezeDecay = false;
 
-        GameManager.player.transform.position = new Vector3(GameManager.player.transform.position.x, 2.11f, GameManager.player.transform.position.z);
+        GameManager.player.transform.position = new Vector3(GameManager.player.transform.position.x, 2.15f, GameManager.player.transform.position.z);
 
         // Begin rotating camera back to regular position.
         GameManager.player.transform.Find("Cameras").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), fallingSequenceManager.lookUpSpeed * 0.6f, RotateMode.Fast);
 
         // Reset movement variables.
-        //player.GetComponent<Rigidbody>().isKinematic = true;
+        GameManager.player.transform.position = new Vector3(GameManager.player.transform.position.x, 2.8f, GameManager.player.transform.position.z);
+        GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GameManager.player.GetComponent<Rigidbody>().useGravity = false;
         GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
         GameManager.player.GetComponent<PlayerController>().maxAirSpeed = fallingSequenceManager.savedRegularMoveSpeed;
 
@@ -42,6 +44,8 @@ public class FiringShockwaveState : State {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
         GameManager.instance.ReturnToFullSpeed();
+        GameManager.musicManager.ExitFallingSequence();
+        GameManager.musicManager.RandomizeAllMusicVolumeLevels();
 
         GameManager.instance.gun.canShoot = true;
 

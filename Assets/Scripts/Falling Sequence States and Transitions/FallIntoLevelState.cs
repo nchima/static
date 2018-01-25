@@ -43,7 +43,7 @@ public class FallIntoLevelState : State {
         // Set up variables for falling.
         fallingSequenceManager.playerTouchedDown = false;
         fallingSequenceManager.savedRegularMoveSpeed = GameManager.player.GetComponent<PlayerController>().maxAirSpeed;
-        GameManager.player.GetComponent<PlayerController>().maxAirSpeed = fallingSequenceManager.playerMoveSpeedWhenFalling;
+        //GameManager.player.GetComponent<PlayerController>().maxAirSpeed = fallingSequenceManager.playerMoveSpeedWhenFalling;
 
         // Turn off fog.
         fallingSequenceManager.savedFogColor = RenderSettings.fogColor;

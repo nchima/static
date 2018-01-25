@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityStandardAssets.Characters.FirstPerson;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic;   
 
 public class Gun : MonoBehaviour {
 

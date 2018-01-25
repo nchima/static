@@ -5,16 +5,12 @@ using DG.Tweening;
 
 public class LaserShot : EnemyShot {
 
-    float inaccuracy = 45f;
-
     //const float PRE_DAMAGE_DURATION = 0.7f; Actually, this will be set by the firing enemy.
     public float preDamageDuration;
     const float DAMAGE_DURATION = 0.7f;
     public  float postDamageDuration = 0.5f;
 
     float timer = 0f;
-
-    Vector3 direction;
 
     public enum State { PreDamage, Damage, PostDamage };
     public State state;
@@ -47,42 +43,32 @@ public class LaserShot : EnemyShot {
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip firingClip;
     const float AUDIO_PITCH_MAX = 3f;
-	
 
-    new void Start()
+
+    public void GetShot(Vector3 shotDirection, LaserEnemyStateShoot theEnemyWhoFiredMe)
     {
         base.Start();
-
         state = State.PreDamage;
-
-        // Find the player's x and z position.
-        Vector3 targetPosition = GameManager.player.transform.position;
-        targetPosition = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
-
-        // Get the direction to the player.
-        direction = targetPosition - transform.position;
-        direction.Normalize();
-
-        // Rotate that direction by my inaccuracy.
-        direction = Quaternion.Euler(0, Random.Range(-inaccuracy, inaccuracy), 0) * direction;
 
         // Raycast in that direction to get the nearest solid collider.
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit, 500f, 1<<8))
+        if (Physics.Raycast(theEnemyWhoFiredMe.laserOrigin.position, shotDirection, out hit, 500f, 1<<8))
         {
             // Scale me correctly.
-            geometry.transform.localScale = new Vector3(INITIAL_BEAM_THICKNESS, Vector3.Distance(transform.position, hit.point) * 0.5f, INITIAL_BEAM_THICKNESS);
+            geometry.transform.localScale = new Vector3(INITIAL_BEAM_THICKNESS, Vector3.Distance(theEnemyWhoFiredMe.laserOrigin.position, hit.point) * 0.5f, INITIAL_BEAM_THICKNESS);
             sphere1.transform.localScale = Vector3.one * INITIAL_BEAM_THICKNESS;
             sphere2.transform.localScale = Vector3.one * INITIAL_BEAM_THICKNESS;
 
             // Move my position halfway down the ray.
-            transform.position += (direction * Vector3.Distance(transform.position, hit.point)) * 0.5f;
+            transform.position += (shotDirection * Vector3.Distance(theEnemyWhoFiredMe.laserOrigin.position, hit.point)) * 0.5f;
 
             // Rotate me correctly.
-            transform.rotation = Quaternion.LookRotation(Vector3.down, direction);
+            transform.rotation = Quaternion.LookRotation(Vector3.down, shotDirection);
 
             sphere1.transform.position = hit.point;
-            sphere2.transform.position = hit.point + (-direction * Vector3.Distance(transform.position, hit.point) * 2f);
+            sphere1.transform.localPosition = new Vector3(sphere1.transform.localPosition.x, sphere1.transform.localPosition.y, 0f);
+            sphere2.transform.position = theEnemyWhoFiredMe.laserOrigin.position;
+            sphere2.transform.localPosition = new Vector3(sphere2.transform.localPosition.x, sphere2.transform.localPosition.y, 0f);
         }
 
         // Begin tweening.

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -9,8 +8,9 @@ public class LaserEnemyStateShoot : State {
     [SerializeField] float preShotDelay;
     [SerializeField] float postShotDelay;
     [SerializeField] GameObject laserPrefab;
-    [SerializeField] Transform laserOrigin;
+    public Transform laserOrigin;
     [SerializeField] Transform geometry;
+    [SerializeField] float inaccuracy = 45f;
 
     GameObject lastShot;
 
@@ -36,8 +36,14 @@ public class LaserEnemyStateShoot : State {
         controller.m_NavMeshAgent.enabled = false;
         controller.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
 
-        // Turn towards the player.
-        controller.transform.DOLookAt(GameManager.player.transform.position, preShotDelay * 0.5f).SetEase(Ease.InQuad);
+        // Get a direction in which to fire my shot.
+        Vector3 shotDirection = Vector3.Normalize(GameManager.player.transform.position - controller.transform.position);
+        float tempInaccuracy = inaccuracy;
+        if (PlayerController.velocity.magnitude < 1f) { tempInaccuracy = 0f; }
+        shotDirection = Quaternion.Euler(0, Random.Range(-tempInaccuracy, tempInaccuracy), 0) * shotDirection;
+
+        // Turn towards the firing direction.
+        controller.transform.DOLookAt(controller.transform.position + shotDirection, preShotDelay * 0.5f).SetEase(Ease.InQuad);
         yield return new WaitForSeconds(preShotDelay * 0.5f);
 
         // 'Puff up' and rotate more quickly as I charge my shot.
@@ -58,6 +64,7 @@ public class LaserEnemyStateShoot : State {
         newShot.transform.parent = controller.transform;
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
         newShot.GetComponent<LaserShot>().preDamageDuration = preShotDelay;
+        newShot.GetComponent<LaserShot>().GetShot(shotDirection, this);
         lastShot = newShot;
 
         yield return new WaitForSeconds(preShotDelay);

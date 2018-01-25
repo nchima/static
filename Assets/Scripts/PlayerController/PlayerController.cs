@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour {
     Vector2 lastKickDirection = new Vector3(0f, 0f, 1f);
     bool movementKickReady = true;
     float movementKickTimer = 0f;
-    float movementKickCooldown = 0.6f;
+    float movementKickCooldown = 0.3f;
 
     // SHOTGUN CHARGE STUFF
     float shotGunChargeSpeed = 300f;
@@ -109,6 +109,49 @@ public class PlayerController : MonoBehaviour {
         /* HANDLE MOVEMENT */
         if (!isMovementEnabled) { return; }
 
+        Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
+
+        if (state == State.Normal) {
+
+            transform.position = new Vector3(transform.position.x, 2.8f, transform.position.z);
+            desiredMove = new Vector3(desiredMove.x, 0f, desiredMove.z);
+
+            // Deceleration
+            float decelerateTo = maxGroundSpeed;
+            if (directionalInput.magnitude == 0) { decelerateTo = 0f; }
+            if (rigidBody.velocity.magnitude > decelerateTo) {
+                Vector3 deccelerateForce = rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -3.5f;
+                //Debug.Log("Rigidbody velocity: " + rigidBody.velocity + ", " + "Deccelereate Force: " + deccelerateForce);
+                deccelerateForce.y = 0;
+                rigidBody.AddForce(deccelerateForce, ForceMode.Force);
+            }
+
+            Vector3 walkForce = desiredMove.normalized * accelerationSpeedGround;
+            walkForce.y = 0f;
+            rigidBody.AddForce(walkForce, ForceMode.Acceleration);
+
+            // Apply movment kick.
+            CheckMovementKick();
+            if (directionalInput != Vector2.zero && movementKickReady && state != State.Falling && state != State.SpeedFalling) {
+                Debug.Log("Applying movement kick.");
+                lastKickDirection = directionalInput;
+                movementKickTimer = 0f;
+                movementKickReady = false;
+                Vector3 kickForce = desiredMove.normalized * movementKickForce;
+                kickForce.y = 0f;
+                rigidBody.AddForce(kickForce, ForceMode.VelocityChange);
+            }
+
+            if (isAboveFloor) { rigidBody.velocity = new Vector3(rigidBody.velocity.x, 0f, rigidBody.velocity.z); }
+        }
+        
+        else if (state == State.Falling || state == State.SpeedFalling) {
+            if (desiredMove == Vector3.zero) { rigidBody.velocity = new Vector3(0f, rigidBody.velocity.y, 0f); }
+            else { rigidBody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
+        }
+
+        return;
+
         if (state == State.Normal || state == State.Falling || state == State.SpeedFalling) {
             float _accelerationSpeed = accelerationSpeedGround;
             float _maxSpeed = maxGroundSpeed;
@@ -121,13 +164,13 @@ public class PlayerController : MonoBehaviour {
             if (directionalInput.sqrMagnitude > 1) directionalInput.Normalize();
 
             // Get desired movement direction.
-            Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
+            //Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
 
             //Vector3 desiredMove = transform.TransformDirection(new Vector3(directionalInput.x, 0f, directionalInput.y));
             //Debug.Log("Direction Input X: " + directionalInput.x + ", Direction input Y: " + directionalInput.y + "Desired move: " + transform.InverseTransformDirection(desiredMove));
 
             // Deccelerate.
-            Vector3 deccelerateForce = rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1.12f;
+            Vector3 deccelerateForce = rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1f;
             deccelerateForce.y = 0;
             rigidBody.AddForce(deccelerateForce, ForceMode.Force);
 
@@ -135,12 +178,7 @@ public class PlayerController : MonoBehaviour {
             if (desiredMove.magnitude != 0)
                 rigidBody.AddForce(desiredMove.normalized * _accelerationSpeed, ForceMode.VelocityChange);
 
-            // Check whether we should add movement kick.
-            movementKickTimer += Time.deltaTime;
-            if (!movementKickReady) {
-                if (directionalInput == Vector2.zero && movementKickTimer >= movementKickCooldown) movementKickReady = true;
-                else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
-            }
+            CheckMovementKick();
 
             // Add movement kick.
             if (directionalInput != Vector2.zero && state != State.Falling && state != State.SpeedFalling) {
@@ -172,6 +210,16 @@ public class PlayerController : MonoBehaviour {
 
         if (transform.position.x > 10000f || transform.position.z > 10000f) {
             transform.position = new Vector3(0f, transform.position.y, 0f);
+        }
+    }
+
+
+    void CheckMovementKick() {
+        // Check whether we should add movement kick.
+        movementKickTimer += Time.fixedDeltaTime;
+        if (!movementKickReady) {
+            if (directionalInput == Vector2.zero && movementKickTimer >= movementKickCooldown) movementKickReady = true;
+            else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
         }
     }
 

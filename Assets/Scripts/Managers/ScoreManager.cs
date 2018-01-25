@@ -235,7 +235,7 @@ public class ScoreManager : MonoBehaviour
         string scoreList = "";
 
         for (int i = 0; i < highScoreEntries.Count; i++) {
-            if (highScoreEntries[i].newest == 1) { Debug.Log("adding newest score"); scoreList += ">"; }
+            if (highScoreEntries[i].newest == 1) { scoreList += ">"; }
             scoreList += highScoreEntries[i].initials + ": " + highScoreEntries[i].score;
             if (highScoreEntries[i].newest == 1) { scoreList += "<"; }
             scoreList += "\n";

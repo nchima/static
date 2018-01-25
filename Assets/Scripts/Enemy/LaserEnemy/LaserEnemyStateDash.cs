@@ -14,7 +14,6 @@ public class LaserEnemyStateDash : State {
 
     public override void Initialize(StateController stateController) {
         base.Initialize(stateController);
-        Debug.Log("initializeing");
         StartCoroutine(Dash(stateController));
     }
 
@@ -67,11 +66,9 @@ public class LaserEnemyStateDash : State {
             Vector3 newPosition = controller.transform.position + moveDirection;
             NavMeshHit navMeshHit;
             if (NavMesh.Raycast(controller.transform.position, newPosition, out navMeshHit, 0)) {
-                Debug.Log("bad spot.");
                 continue;
             }
 
-            Debug.Log("good spot.");
             return newPosition;
         }
 

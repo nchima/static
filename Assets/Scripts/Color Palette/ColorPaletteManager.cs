@@ -18,6 +18,7 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] GameObject orthoScreen2;
     [SerializeField] GameObject orthoScreen3;
 
+    [SerializeField] ColorPalette startingPalette;
     [SerializeField] ColorPalette originalPalette;
     [SerializeField] ColorPalette tempSavedPalette;
     [SerializeField] ColorPalette playerVulnerablePalette;
@@ -25,6 +26,7 @@ public class ColorPaletteManager : MonoBehaviour {
  
     private void Awake() {
         // Memorize original colors.
+        ChangePaletteImmediate(startingPalette);
         SaveCurrentPalette(originalPalette);
     }
 
