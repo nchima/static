@@ -113,8 +113,14 @@ public class PlayerController : MonoBehaviour {
 
         if (state == State.Normal) {
 
-            transform.position = new Vector3(transform.position.x, 2.8f, transform.position.z);
-            desiredMove = new Vector3(desiredMove.x, 0f, desiredMove.z);
+            Debug.Log("player is above floor: " + isAboveFloor);
+
+            if (!isAboveFloor) {
+                rigidBody.useGravity = true;
+                return;
+            } else {
+                rigidBody.useGravity = false;
+            }
 
             // Deceleration
             float decelerateTo = maxGroundSpeed;
@@ -124,6 +130,10 @@ public class PlayerController : MonoBehaviour {
                 //Debug.Log("Rigidbody velocity: " + rigidBody.velocity + ", " + "Deccelereate Force: " + deccelerateForce);
                 deccelerateForce.y = 0;
                 rigidBody.AddForce(deccelerateForce, ForceMode.Force);
+            }
+
+            if (rigidBody.velocity.magnitude < 5) {
+                rigidBody.velocity = Vector3.zero;
             }
 
             Vector3 walkForce = desiredMove.normalized * accelerationSpeedGround;

@@ -73,9 +73,15 @@ public class LaserEnemyStateDash : State {
             // Check to see if there is a path on the navmesh to the new position.
             Vector3 newPosition = controller.transform.position + moveDirection;
             NavMeshHit navMeshHit;
-            if (NavMesh.Raycast(controller.transform.position, newPosition, out navMeshHit, 0)) {
+            if (NavMesh.Raycast(controller.transform.position, newPosition, out navMeshHit, NavMesh.AllAreas)) {
+                Debug.DrawLine(controller.transform.position, navMeshHit.position, Color.red);
                 continue;
             }
+
+            Debug.Log("NavMeshHit: " + navMeshHit.hit);
+
+            Debug.DrawLine(controller.transform.position, navMeshHit.position, Color.green);
+            //Debug.Break();
 
             return newPosition;
         }

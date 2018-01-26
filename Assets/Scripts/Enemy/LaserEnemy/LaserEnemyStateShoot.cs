@@ -39,7 +39,7 @@ public class LaserEnemyStateShoot : State {
         // Get a direction in which to fire my shot.
         Vector3 shotDirection = Vector3.Normalize(GameManager.player.transform.position - controller.transform.position);
         float tempInaccuracy = inaccuracy;
-        if (PlayerController.velocity.magnitude < 2f) { tempInaccuracy = 0f; }
+        if (PlayerController.velocity.magnitude < 10f) { tempInaccuracy = 0f; }
         shotDirection = Quaternion.Euler(0, Random.Range(-tempInaccuracy, tempInaccuracy), 0) * shotDirection;
 
         // Turn towards the firing direction.
