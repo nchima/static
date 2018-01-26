@@ -7,7 +7,7 @@ using System;
 public class LaserEnemyStateDash : State {
 
     [SerializeField] float turnDuration = 0.5f; // How quickly I turn towards the dash direction.
-    [SerializeField] float dashDistance = 5f;
+    [SerializeField] float maxDashDistance = 20f;
     [SerializeField] float dashDuration = 2f;
     [SerializeField] float optimalDistanceFromPlayer = 15f;
 
@@ -54,7 +54,11 @@ public class LaserEnemyStateDash : State {
     Vector3 ChooseNextPosition(StateController stateController) {
         LaserEnemy controller = stateController as LaserEnemy;
 
+        float currentDashDistance = maxDashDistance + maxDashDistance/100;
+
         for (int i = 0; i < 100; i++) {
+            maxDashDistance -= maxDashDistance / 100;
+
             // Get a vector towards or away from the player based on whether we are within optimal distance.
             Vector3 moveDirection = Vector3.zero;
             if (Vector3.Distance(controller.transform.position, GameManager.player.transform.position) > optimalDistanceFromPlayer) {
@@ -65,22 +69,30 @@ public class LaserEnemyStateDash : State {
 
             // Make sure the move direction is parallel to the ground, then scale it.
             moveDirection.y = 0f;
-            moveDirection = moveDirection.normalized * dashDistance;
+            moveDirection = moveDirection.normalized * currentDashDistance;
 
             // Rotate the move direction within a random range.
             moveDirection = Quaternion.Euler(0, UnityEngine.Random.Range(-90f, 90f), 0) * moveDirection;
 
-            // Check to see if there is a path on the navmesh to the new position.
             Vector3 newPosition = controller.transform.position + moveDirection;
-            NavMeshHit navMeshHit;
-            if (NavMesh.Raycast(controller.transform.position, newPosition, out navMeshHit, NavMesh.AllAreas)) {
-                Debug.DrawLine(controller.transform.position, navMeshHit.position, Color.red);
+
+            // Check to see if the new position is on the navmesh.
+            NavMeshHit destinationNavMeshHit;
+            if (!NavMesh.SamplePosition(newPosition, out destinationNavMeshHit, 5f, NavMesh.AllAreas)) {
                 continue;
             }
 
-            Debug.Log("NavMeshHit: " + navMeshHit.hit);
+            // Check to see if there is a path on the navmesh to the new position.
+            NavMeshHit currentPositionNavMeshHit;
+            NavMesh.SamplePosition(controller.transform.position, out currentPositionNavMeshHit, 5f, NavMesh.AllAreas);
+            if (NavMesh.Raycast(currentPositionNavMeshHit.position, destinationNavMeshHit.position, out currentPositionNavMeshHit, NavMesh.AllAreas)) {
+                Debug.DrawLine(controller.transform.position, destinationNavMeshHit.position, Color.red);
+                continue;
+            }
 
-            Debug.DrawLine(controller.transform.position, navMeshHit.position, Color.green);
+            Debug.Log("NavMeshHit: " + currentPositionNavMeshHit.hit);
+
+            Debug.DrawLine(controller.transform.position, newPosition, Color.green);
             //Debug.Break();
 
             return newPosition;
