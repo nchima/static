@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour {
 
         if (state == State.Normal) {
 
-            Debug.Log("player is above floor: " + isAboveFloor);
+            //Debug.Log("player is above floor: " + isAboveFloor);
 
             if (!isAboveFloor) {
                 rigidBody.useGravity = true;
@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour {
             // Apply movment kick.
             CheckMovementKick();
             if (directionalInput != Vector2.zero && movementKickReady && state != State.Falling && state != State.SpeedFalling) {
-                Debug.Log("Applying movement kick.");
+                //Debug.Log("Applying movement kick.");
                 lastKickDirection = directionalInput;
                 movementKickTimer = 0f;
                 movementKickReady = false;

@@ -77,7 +77,7 @@ public class LaserEnemyStateShoot : State {
         // Get small again as the laser is fired.
         geometry.transform.DOScale(1f, 0.1f);
 
-        controller.animationController.StartShootReleaseAnimation(0.1f);
+        controller.animationController.StartShootReleaseAnimation(0.01f);
 
         // More color stuff...
         //while (baseEmissionColor != originalEmissionColor) baseEmissionColor = originalEmissionColor;

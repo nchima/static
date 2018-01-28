@@ -11,6 +11,7 @@
 		Pass
 		{
 			ZWrite On
+			Cull Off
 			ColorMask 0
 		}
 	}

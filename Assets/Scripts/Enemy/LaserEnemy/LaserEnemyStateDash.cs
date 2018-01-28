@@ -64,7 +64,7 @@ public class LaserEnemyStateDash : State {
         float currentModifierAngle = 45f - (180 - 45) / 100;
 
         for (int i = 0; i < 100; i++) {
-            maxDashDistance -= maxDashDistance / 100;
+            currentDashDistance -= maxDashDistance / 100;
             currentModifierAngle += (180 - currentModifierAngle) / 100;
 
             // Get a vector towards or away from the player based on whether we are within optimal distance.
@@ -86,7 +86,8 @@ public class LaserEnemyStateDash : State {
 
             // Check to see if the new position is on the navmesh.
             NavMeshHit destinationNavMeshHit;
-            if (!NavMesh.SamplePosition(newPosition, out destinationNavMeshHit, 5f, NavMesh.AllAreas)) {
+            if (!NavMesh.SamplePosition(newPosition, out destinationNavMeshHit, 10f, NavMesh.AllAreas)) {
+                Debug.DrawLine(controller.transform.position, newPosition, Color.magenta, 1f);
                 continue;
             }
 
@@ -94,20 +95,18 @@ public class LaserEnemyStateDash : State {
             NavMeshHit currentPositionNavMeshHit;
             NavMesh.SamplePosition(controller.transform.position, out currentPositionNavMeshHit, 5f, NavMesh.AllAreas);
             if (NavMesh.Raycast(currentPositionNavMeshHit.position, destinationNavMeshHit.position, out currentPositionNavMeshHit, NavMesh.AllAreas)) {
-                Debug.DrawLine(controller.transform.position, destinationNavMeshHit.position, Color.red);
+                Debug.DrawLine(controller.transform.position, destinationNavMeshHit.position, Color.red, 1f);
                 continue;
             }
 
-            Debug.Log("NavMeshHit: " + currentPositionNavMeshHit.hit);
-
-            Debug.DrawLine(controller.transform.position, newPosition, Color.green);
+            Debug.DrawLine(controller.transform.position, newPosition, Color.green, 1f);
             //Debug.Break();
 
             return newPosition;
         }
 
         // Failsafe:
-        Debug.LogError("Laser enemy could not find a suitable position to move to.");
+        Debug.Log("Laser enemy could not find a suitable position to move to.");
         return controller.transform.position;
     }
 }

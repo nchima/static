@@ -59,7 +59,8 @@ public class ScreenShake : MonoBehaviour {
             currentDriftPosition = shakePosition;
 
             // Decrease current shake.
-			currentShake -= Time.deltaTime * decreaseFactor;
+            currentShake = Mathf.Clamp(currentShake - Time.deltaTime * decreaseFactor, 0f, 1000f);
+            Debug.Log("Current shake: " + currentShake);
             shakeTimer -= Time.deltaTime;
 		}
 
@@ -106,7 +107,7 @@ public class ScreenShake : MonoBehaviour {
 
     // Increase shake magnitude by a certain ammount.
 	void IncreaseShake(float increaseAmount) {
-		currentShake += increaseAmount;
+        currentShake += increaseAmount;
         shakeTimer = 0.5f;
 	}
 

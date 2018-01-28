@@ -23,7 +23,7 @@ public class HealthManager : MonoBehaviour {
 
                 // Audio/visuals
                 getHurtAudio.Play();
-                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 1f);
+                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 2f);
                 GameManager.colorPaletteManager.LoadVulnerablePalette();
                 GameManager.player.GetComponent<Rigidbody>().velocity *= 0.01f;
                 GameObject.Find("Pain Flash").GetComponent<Animator>().SetTrigger("Pain Flash");

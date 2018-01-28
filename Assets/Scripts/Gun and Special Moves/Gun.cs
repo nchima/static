@@ -67,6 +67,11 @@ public class Gun : MonoBehaviour {
     GameObject[] bullets;    // Holds references to all bullets.
     Vector3 originalPosition;   // The original position of the gun (used for recoil).
     Vector3 recoilPosition;
+    ScreenShake[] screenShakes;
+
+    private void Awake() {
+        screenShakes = FindObjectsOfType<ScreenShake>();
+    }
 
 
     void Start() {
@@ -169,7 +174,10 @@ public class Gun : MonoBehaviour {
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
 
-        screen.BroadcastMessage("IncreaseShake", MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 10f, 40f));
+        Debug.Log("bullet fired.");
+        foreach (ScreenShake screenShake in screenShakes) {
+            screenShake.SetShake(MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f), (1/burstsPerSecond) * 0.6f);
+        }
 
         // Show muzzle flash.
         GameObject _muzzleFlash = Instantiate(muzzleFlash);
@@ -206,7 +214,7 @@ public class Gun : MonoBehaviour {
         }
 
         // Add recoil to player controller.
-        GameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
+        //GameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
 
         timeSinceLastShot = 0f;
     }
