@@ -32,7 +32,7 @@ public class LaserEnemyStateShoot : State {
 
     IEnumerator ShootLaser(LaserEnemy controller) {
 
-        // Lock enemy in place.
+        // Lock this enemy in place.
         controller.m_NavMeshAgent.enabled = false;
         controller.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
 
@@ -44,10 +44,11 @@ public class LaserEnemyStateShoot : State {
 
         // Turn towards the firing direction.
         controller.transform.DOLookAt(controller.transform.position + shotDirection, preShotDelay * 0.5f).SetEase(Ease.InQuad);
+        controller.animationController.StartShootAnimation(preShotDelay * 0.5f + preShotDelay);
         yield return new WaitForSeconds(preShotDelay * 0.5f);
 
         // 'Puff up' and rotate more quickly as I charge my shot.
-        geometry.transform.DOScale(1.5f, preShotDelay);
+        geometry.transform.DOScale(1.1f, preShotDelay * 0.9f);
         DOTween.To(() => geometry.GetComponentInChildren<Rotator>().speedScale, x => geometry.GetComponentInChildren<Rotator>().speedScale = x, 5f, preShotDelay * 0.9f)
             .SetEase(Ease.Linear)
             .SetUpdate(true);
@@ -64,13 +65,18 @@ public class LaserEnemyStateShoot : State {
         newShot.transform.parent = controller.transform;
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
         newShot.GetComponent<LaserShot>().preDamageDuration = preShotDelay;
+        newShot.GetComponent<LaserShot>().damageDuration = postShotDelay;
         newShot.GetComponent<LaserShot>().GetShot(shotDirection, this);
         lastShot = newShot;
 
         yield return new WaitForSeconds(preShotDelay);
 
+        /* THE LASER IS FILED */
+
         // Get small again as the laser is fired.
         geometry.transform.DOScale(1f, 0.1f);
+
+        controller.animationController.StartShootReleaseAnimation(0.1f);
 
         // More color stuff...
         //while (baseEmissionColor != originalEmissionColor) baseEmissionColor = originalEmissionColor;
@@ -88,6 +94,8 @@ public class LaserEnemyStateShoot : State {
 
 
         yield return new WaitForSeconds(postShotDelay);
+
+        controller.animationController.EndShootAnimation(0.1f);
 
         // Unlock position.
         controller.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;

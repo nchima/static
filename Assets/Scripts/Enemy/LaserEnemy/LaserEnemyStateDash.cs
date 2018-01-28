@@ -29,14 +29,20 @@ public class LaserEnemyStateDash : State {
         Vector3 nextPosition = ChooseNextPosition(stateController);
 
         // Turn towards new position.
+        controller.animationController.StartDashWindupAnimation(turnDuration);
         controller.transform.DOLookAt(nextPosition, turnDuration).SetEase(Ease.InExpo);
         yield return new WaitForSeconds(turnDuration + 0.3f);
 
         // Dash to new position.
+        float dashAnimDuration = dashDuration * 0.8f;
+        controller.animationController.StartDashReleaseAnimation(dashAnimDuration);
         controller.transform.DOMove(nextPosition, dashDuration).SetEase(Ease.InExpo);
+        yield return new WaitForSeconds(dashAnimDuration);
+
+        controller.animationController.EndDashReleaseAnimation(0.5f);
         yield return new WaitForSeconds(dashDuration);
 
-        // PROBLEM AREA: not sure if it'll work.
+        // Go to shooting state or redo this state depending on whether we have dashed enough times.
         controller.timesDashed++;
         if (controller.timesDashed >= controller.timesToDash) {
             // Go to shooting state.
@@ -55,9 +61,11 @@ public class LaserEnemyStateDash : State {
         LaserEnemy controller = stateController as LaserEnemy;
 
         float currentDashDistance = maxDashDistance + maxDashDistance/100;
+        float currentModifierAngle = 45f - (180 - 45) / 100;
 
         for (int i = 0; i < 100; i++) {
             maxDashDistance -= maxDashDistance / 100;
+            currentModifierAngle += (180 - currentModifierAngle) / 100;
 
             // Get a vector towards or away from the player based on whether we are within optimal distance.
             Vector3 moveDirection = Vector3.zero;
@@ -72,7 +80,7 @@ public class LaserEnemyStateDash : State {
             moveDirection = moveDirection.normalized * currentDashDistance;
 
             // Rotate the move direction within a random range.
-            moveDirection = Quaternion.Euler(0, UnityEngine.Random.Range(-90f, 90f), 0) * moveDirection;
+            moveDirection = Quaternion.Euler(0, UnityEngine.Random.Range(-currentModifierAngle, currentModifierAngle), 0) * moveDirection;
 
             Vector3 newPosition = controller.transform.position + moveDirection;
 

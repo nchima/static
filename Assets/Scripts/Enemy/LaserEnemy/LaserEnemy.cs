@@ -12,9 +12,12 @@ public class LaserEnemy : Enemy {
     [HideInInspector] public int timesToDash;
     [HideInInspector] public NavMeshAgent m_NavMeshAgent;
 
+    [HideInInspector] public LaserEnemyAnimationController animationController;
+
 
     void Awake () {
         m_NavMeshAgent = GetComponent<NavMeshAgent>();
+        animationController = GetComponentInChildren<LaserEnemyAnimationController>();
 	}
 
     protected override void Start() {

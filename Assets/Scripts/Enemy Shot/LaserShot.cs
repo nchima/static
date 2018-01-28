@@ -7,7 +7,7 @@ public class LaserShot : EnemyShot {
 
     //const float PRE_DAMAGE_DURATION = 0.7f; Actually, this will be set by the firing enemy.
     public float preDamageDuration;
-    const float DAMAGE_DURATION = 0.7f;
+    public float damageDuration = 0.7f;
     public  float postDamageDuration = 0.5f;
 
     float timer = 0f;
@@ -143,7 +143,7 @@ public class LaserShot : EnemyShot {
     void Damage()
     {
         timer += Time.deltaTime;
-        if (timer >= DAMAGE_DURATION)
+        if (timer >= damageDuration)
         {
             ReadyPostDamage();
         }
