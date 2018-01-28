@@ -37,7 +37,8 @@ public class LaserEnemyStateShoot : State {
         controller.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
 
         // Get a direction in which to fire my shot.
-        Vector3 shotDirection = Vector3.Normalize(GameManager.player.transform.position - controller.transform.position);
+        Vector3 targetPosition = new Vector3(GameManager.player.transform.position.x, laserOrigin.transform.position.y, GameManager.player.transform.position.z);
+        Vector3 shotDirection = Vector3.Normalize(targetPosition - laserOrigin.transform.position);
         float tempInaccuracy = inaccuracy;
         if (PlayerController.velocity.magnitude < 10f) { tempInaccuracy = 0f; }
         shotDirection = Quaternion.Euler(0, Random.Range(-tempInaccuracy, tempInaccuracy), 0) * shotDirection;
@@ -62,7 +63,7 @@ public class LaserEnemyStateShoot : State {
 
         // Begin firing shot.
         GameObject newShot = Instantiate(laserPrefab, laserOrigin.position, Quaternion.identity);
-        newShot.transform.parent = controller.transform;
+        newShot.transform.parent = laserOrigin.transform;
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
         newShot.GetComponent<LaserShot>().preDamageDuration = preShotDelay;
         newShot.GetComponent<LaserShot>().damageDuration = postShotDelay;

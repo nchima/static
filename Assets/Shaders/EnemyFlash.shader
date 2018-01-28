@@ -1,4 +1,4 @@
-﻿Shader "Unlit/Flash"
+﻿Shader "Unlit/Flash - Enemy"
 {
 	Properties
 	{
@@ -12,8 +12,8 @@
 	{
 		Tags { "RenderType"="Transparent" "Queue"="Transparent" }
 		LOD 100
-		ZWrite On
-		Cull Off
+		ZWrite Off
+		Cull Front
 
 		Pass
 		{

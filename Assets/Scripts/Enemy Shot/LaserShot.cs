@@ -66,9 +66,9 @@ public class LaserShot : EnemyShot {
             transform.rotation = Quaternion.LookRotation(Vector3.down, shotDirection);
 
             sphere1.transform.position = hit.point;
-            sphere1.transform.localPosition = new Vector3(sphere1.transform.localPosition.x, sphere1.transform.localPosition.y, 0f);
+            //sphere1.transform.localPosition = new Vector3(sphere1.transform.localPosition.x, sphere1.transform.localPosition.y, 0f);
             sphere2.transform.position = theEnemyWhoFiredMe.laserOrigin.position;
-            sphere2.transform.localPosition = new Vector3(sphere2.transform.localPosition.x, sphere2.transform.localPosition.y, 0f);
+            //sphere2.transform.localPosition = new Vector3(sphere2.transform.localPosition.x, sphere2.transform.localPosition.y, 0f);
         }
 
         // Begin tweening.

@@ -177,6 +177,7 @@
     <None Include="Assets\Shaders\ColorMaskBlack.shader" />
     <None Include="Assets\Shaders\Dennis.shader" />
     <None Include="Assets\Shaders\Enemy Shot.shader" />
+    <None Include="Assets\Shaders\EnemyFlash.shader" />
     <None Include="Assets\Shaders\EnemyShader.shader" />
     <None Include="Assets\Shaders\EnemyShotUnlit.shader" />
     <None Include="Assets\Shaders\Flash.shader" />

@@ -16,7 +16,7 @@
 	SubShader {
 		Tags { "Queue" = "Transparent" "RenderType"="Transparent" }
 		LOD 200
-		Cull Back
+		Cull Off
 
 		CGPROGRAM
 		// Physically based Standard lighting model, and enable shadows on all light types
