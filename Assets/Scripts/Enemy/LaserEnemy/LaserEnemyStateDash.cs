@@ -37,10 +37,10 @@ public class LaserEnemyStateDash : State {
         float dashAnimDuration = dashDuration * 0.8f;
         controller.animationController.StartDashReleaseAnimation(dashAnimDuration);
         controller.transform.DOMove(nextPosition, dashDuration).SetEase(Ease.InExpo);
-        yield return new WaitForSeconds(dashAnimDuration);
-
-        controller.animationController.EndDashReleaseAnimation(0.5f);
         yield return new WaitForSeconds(dashDuration);
+
+        controller.animationController.EndDashReleaseAnimation(0.3f);
+        yield return new WaitForSeconds(0.3f);
 
         // Go to shooting state or redo this state depending on whether we have dashed enough times.
         controller.timesDashed++;
@@ -83,6 +83,12 @@ public class LaserEnemyStateDash : State {
             moveDirection = Quaternion.Euler(0, UnityEngine.Random.Range(-currentModifierAngle, currentModifierAngle), 0) * moveDirection;
 
             Vector3 newPosition = controller.transform.position + moveDirection;
+
+            // Spherecast to see if there's anything in the way (This is mostly to detect the player, but maybe it'll be good if it detects all obstacles.)
+            Ray sphereCastRay = new Ray(transform.position, Vector3.Normalize(newPosition - controller.transform.position));
+            if (Physics.SphereCast(sphereCastRay, controller.GetComponent<SphereCollider>().radius * 1.1f, Vector3.Distance(controller.transform.position, newPosition))) {
+                continue;
+            }
 
             // Check to see if the new position is on the navmesh.
             NavMeshHit destinationNavMeshHit;

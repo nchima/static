@@ -174,7 +174,6 @@ public class Gun : MonoBehaviour {
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
 
-        Debug.Log("bullet fired.");
         foreach (ScreenShake screenShake in screenShakes) {
             screenShake.SetShake(MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f), (1/burstsPerSecond) * 0.6f);
         }

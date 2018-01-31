@@ -166,6 +166,7 @@
     <Compile Include="Assets\Scripts\Enemy Shot\LaserShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\NormalShot.cs" />
     <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\EnemyWeakPointGrower.cs" />
     <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyStateDash.cs" />

@@ -11,6 +11,7 @@ public class LaserEnemyStateShoot : State {
     public Transform laserOrigin;
     [SerializeField] Transform geometry;
     [SerializeField] float inaccuracy = 45f;
+    [SerializeField] GameObject weakPoint;
 
     GameObject lastShot;
 
@@ -70,9 +71,12 @@ public class LaserEnemyStateShoot : State {
         newShot.GetComponent<LaserShot>().GetShot(shotDirection, this);
         lastShot = newShot;
 
+        // Reveal weak point.
+        weakPoint.GetComponent<EnemyWeakPointGrower>().Grow(preShotDelay * 0.7f);
+
         yield return new WaitForSeconds(preShotDelay);
 
-        /* THE LASER IS FILED */
+        /* THE LASER IS FIRED */
 
         // Get small again as the laser is fired.
         geometry.transform.DOScale(1f, 0.1f);
@@ -93,6 +97,8 @@ public class LaserEnemyStateShoot : State {
             .SetEase(Ease.Linear).
             SetUpdate(true);
 
+        // Hide weak point.
+        weakPoint.GetComponent<EnemyWeakPointGrower>().Shrink(postShotDelay * 0.1f);
 
         yield return new WaitForSeconds(postShotDelay);
 

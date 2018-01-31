@@ -34,35 +34,55 @@ public class PlayerBullet : MonoBehaviour {
 
 
     private void FixedUpdate() {
+        FixedUpdateMove();
+    }
 
-        Vector3 nextPosition = transform.position + transform.forward * speed * Time.deltaTime;
+
+    void FixedUpdateMove() {
+        Vector3 nextPosition = transform.position + transform.forward * speed * Time.fixedDeltaTime;
 
         if (justBeInstant) { nextPosition = transform.position + transform.forward * 1000f; }
 
-        // Raycast from my previous position to my new position to see if I hit anything.
-        RaycastHit hit;
-
-        bool spherecast = Physics.SphereCast(
-            previousPosition,
-            thickness,
-            transform.forward,
-            out hit,
-            Vector3.Distance(nextPosition, previousPosition),
-            (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23));
+        // Raycast first ignoring regular enemy layers in order to see if we are aimed at a weak point.
+        //Debug.Log((1 << 8) | (1 << 28));
+        RaycastHit hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 28));
 
         if (hit.collider != null) {
-            //Debug.Log(hit.collider.name + " was hit");
             transform.position = hit.point;
             HandleHit(hit);
         } else {
-            transform.position = nextPosition;
-            travelledDistance += Vector3.Distance(transform.position, previousPosition);
-            if (travelledDistance >= maxDistance) { EndBulletsExistence(); }
+            // Raycast from my previous position to my new position to see if I hit an enemy's regular surface.
+            hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23));
+
+            if (hit.collider != null) {
+                //Debug.Log(hit.collider.name + " was hit");
+                transform.position = hit.point;
+                HandleHit(hit);
+            } else {
+                transform.position = nextPosition;
+                travelledDistance += Vector3.Distance(transform.position, previousPosition);
+                if (travelledDistance >= maxDistance) { EndBulletsExistence(); }
+            }
         }
 
         m_playerBulletTrail.AddSegment(transform.position, previousPosition);
 
         previousPosition = transform.position;
+    }
+
+
+    RaycastHit SphereCastOnLayer(Vector3 toPosition, int layerBitmask) {
+        RaycastHit hit;
+
+        bool spherecast = Physics.SphereCast(
+        previousPosition,
+        thickness,
+        transform.forward,
+        out hit,
+        Vector3.Distance(toPosition, previousPosition),
+        layerBitmask);
+
+        return hit;
     }
 
 
@@ -91,18 +111,25 @@ public class PlayerBullet : MonoBehaviour {
 
     public void HandleHit(RaycastHit hit) {
 
-        if (hit.transform.GetComponent<EnemyOld>() != null || hit.transform.GetComponent<Enemy>() != null) {
+        if (hit.collider.GetComponent<EnemyOld>() != null || hit.collider.GetComponent<Enemy>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
-            if (hit.collider.GetComponent<EnemyOld>()) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
-            else { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
+
+            if (hit.collider.GetComponent<EnemyOld>() != null) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
+            else if (hit.collider.GetComponent<Enemy>() != null) { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
+
             if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
-            if (hit.collider.GetComponent<EnemyOld>()) { GameManager.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
+
+            if (hit.collider.GetComponent<EnemyOld>() != null) { GameManager.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
             else { GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
         } 
         
         else if (hit.collider.name.Contains("Homing Shot")) {
             hit.collider.gameObject.GetComponent<HomingShot>().GotShot(hit.point);
         } 
+
+        else if (hit.collider.name.Contains("Weak Point")) {
+            Debug.Log("Bullet struck enemy weak point!");
+        }
         
         else {
             Instantiate(strikeWallPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
