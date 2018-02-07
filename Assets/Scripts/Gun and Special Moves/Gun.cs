@@ -62,7 +62,6 @@ public class Gun : MonoBehaviour {
     GameObject screen;
 
     /* MISC */
-    Vector3 nearestEnemyPosition;
     float timeSinceLastShot;
     GameObject[] bullets;    // Holds references to all bullets.
     Vector3 originalPosition;   // The original position of the gun (used for recoil).
@@ -188,28 +187,19 @@ public class Gun : MonoBehaviour {
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f)
             );
 
-        // Auto aim
-        nearestEnemyPosition = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
-        foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) {
-            float bandSize = 0.025f;
+        // Auto aim for weak points.
+        Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
+        autoAimPoint = AutoAim("Weak Point", 0.0125f);
 
-            // See if this enemy is near the middle of the screen.
-            Vector3 viewportPosition = Camera.main.WorldToViewportPoint(enemy.transform.position);
-            if ((viewportPosition.x >= 0.5f-bandSize && viewportPosition.x <= 0.5f+bandSize) && (viewportPosition.y >= 0f && viewportPosition.y <= 1f)) {
-                // For the enemies's position, use the center of its renderer.
-                Vector3 thisEnemyPosition = enemy.GetComponentInChildren<MeshRenderer>().bounds.center;
+        // If we couldn't hit a weak point, auto aim for enemies instead.
+        if (!Physics.Raycast(gunTipTransform.position, autoAimPoint - gunTipTransform.position, 1000f, 1 << 28)) {
+            autoAimPoint = AutoAim("Enemy", 0.025f);
 
-                // See if the distance to this enemy is less than the distance to the previous nearest enemy.
-                if (Vector3.Distance(GameManager.player.transform.position, thisEnemyPosition)
-                    < Vector3.Distance(GameManager.player.transform.position, nearestEnemyPosition)) {
-                    nearestEnemyPosition = thisEnemyPosition;
-                }
-            }
         }
 
         // Fire the specified number of bullets.
         for (int i = 0; i < bulletsPerBurst; i++) {
-            FireBullet(inaccuracy);
+            FireBullet(autoAimPoint, inaccuracy);
         }
 
         // Add recoil to player controller.
@@ -217,11 +207,11 @@ public class Gun : MonoBehaviour {
 
         timeSinceLastShot = 0f;
     }
-    
+
     // Firing an individual bullet.
-    void FireBullet(float inaccuracy) {
+    void FireBullet(Vector3 target, float inaccuracy) {
         // Rotate bullet spawner to get the direction of the next bullet.
-        bulletSpawnTransform.LookAt(nearestEnemyPosition);
+        bulletSpawnTransform.LookAt(target);
         bulletSpawnTransform.localRotation = Quaternion.Euler(
             new Vector3(bulletSpawnTransform.localRotation.eulerAngles.x + Random.insideUnitCircle.y * inaccuracy, Random.insideUnitCircle.x * inaccuracy, 0)
             );
@@ -239,5 +229,29 @@ public class Gun : MonoBehaviour {
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, explosionDamageRange.min, explosionDamageRange.max),
             Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f))
         );
+    }
+
+
+    Vector3 AutoAim(string tag, float bandSize) {
+        
+        Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
+
+        foreach (GameObject thisObject in GameObject.FindGameObjectsWithTag(tag)) {
+
+            // See if this object is near the middle of the screen.
+            Vector3 viewportPosition = Camera.main.WorldToViewportPoint(thisObject.transform.position);
+            if ((viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize) && (viewportPosition.y >= 0f && viewportPosition.y <= 1f)) {
+
+                // For the enemies's position, use the center of its renderer.
+                Vector3 thisPosition = thisObject.GetComponentInChildren<MeshRenderer>().bounds.center;
+
+                // See if the distance to this enemy is less than the distance to the previous nearest enemy.
+                if (Vector3.Distance(GameManager.player.transform.position, thisPosition) < Vector3.Distance(GameManager.player.transform.position, autoAimPoint)) {
+                    autoAimPoint = thisPosition;
+                }
+            }
+        }
+
+        return autoAimPoint;
     }
 }

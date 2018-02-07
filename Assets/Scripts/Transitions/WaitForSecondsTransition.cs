@@ -8,6 +8,11 @@ public class WaitForSecondsTransition : Transition {
     [SerializeField] float duration = 0f;
     float elapsed = 0f;
 
+    public override void Initialize() {
+        base.Initialize();
+        elapsed = 0f;
+    }
+
     public override bool IsConditionTrue(StateController stateController) {
         elapsed += Time.deltaTime;
         if (elapsed >= duration) {

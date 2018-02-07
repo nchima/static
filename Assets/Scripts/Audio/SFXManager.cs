@@ -5,7 +5,8 @@ using UnityEngine;
 public class SFXManager : MonoBehaviour {
 
     [SerializeField] AudioSource bulletHitEnemyAudioSource;
-
+    [SerializeField] AudioSource bulletHitWeakPointAudioSource;
+ 
     public void PlayBulletEnemyHitSoundOld(EnemyOld hitEnemy) {
 
         /* Come back later and make this compatible with new enemies. */
@@ -26,5 +27,9 @@ public class SFXManager : MonoBehaviour {
         float newPitch = MyMath.Map(hitEnemy.currentHealth, 0f, hitEnemy.maxHealth, 1f, 0.75f);
         bulletHitEnemyAudioSource.pitch = newPitch;
         bulletHitEnemyAudioSource.Play();
+    }
+
+    public void PlayBulletHitWeakPointSound() {
+        bulletHitWeakPointAudioSource.Play();
     }
 }

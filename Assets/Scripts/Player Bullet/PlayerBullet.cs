@@ -9,6 +9,7 @@ public class PlayerBullet : MonoBehaviour {
     [SerializeField] float speed;
 
     [SerializeField] GameObject strikeEnemyPrefab;
+    [SerializeField] GameObject strikeWeakPointPrefab;
     [SerializeField] GameObject strikeWallPrefab;
 
     [SerializeField] GameObject explosionPrefab;
@@ -129,6 +130,12 @@ public class PlayerBullet : MonoBehaviour {
 
         else if (hit.collider.name.Contains("Weak Point")) {
             Debug.Log("Bullet struck enemy weak point!");
+            Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
+
+            GameManager.sfxManager.PlayBulletHitWeakPointSound();
+
+            if (hit.collider.transform.parent.parent.GetComponent<Enemy>() != null) { hit.collider.transform.parent.parent.GetComponent<Enemy>().currentHealth -= 50; }
+            GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
         }
         
         else {

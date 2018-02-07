@@ -25,7 +25,6 @@ public class MusicManager : MonoBehaviour {
 
 
     public void EnterFallingSequence() {
-        Debug.Log("enter falling sequence");
         isInFallingSequence = true;
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);

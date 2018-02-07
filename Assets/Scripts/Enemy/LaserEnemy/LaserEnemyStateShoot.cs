@@ -97,10 +97,10 @@ public class LaserEnemyStateShoot : State {
             .SetEase(Ease.Linear).
             SetUpdate(true);
 
+        yield return new WaitForSeconds(postShotDelay);
+
         // Hide weak point.
         weakPoint.GetComponent<EnemyWeakPointGrower>().Shrink(postShotDelay * 0.1f);
-
-        yield return new WaitForSeconds(postShotDelay);
 
         controller.animationController.EndShootAnimation(0.1f);
 
