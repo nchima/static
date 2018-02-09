@@ -1,15 +1,23 @@
 fileFormatVersion: 2
-guid: 7bf26c6a1d5a45c47b16d491c95bd4ab
-timeCreated: 1500075001
+guid: 4226180990cae334391ea39f39bb1b42
+timeCreated: 1518065721
 licenseType: Free
 ModelImporter:
   serializedVersion: 21
   fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: pPyramid1
+    100000: pPyramid5
+    100002: pPyramid6
+    100004: //RootNode
+    400000: pPyramid5
+    400002: pPyramid6
+    400004: //RootNode
+    2300000: pPyramid6
+    3300000: pPyramid6
+    4300000: pPyramid5
+    4300002: pPyramid6
+    9500000: //RootNode
+    13700000: pPyramid5
+    13700002: //RootNode
   materials:
     importMaterials: 1
     materialName: 0
@@ -37,13 +45,13 @@ ModelImporter:
     isReadable: 1
   meshes:
     lODScreenPercentages: []
-    globalScale: 5
+    globalScale: 0.06
     meshCompression: 0
     addColliders: 0
-    importVisibility: 0
+    importVisibility: 1
     importBlendShapes: 1
-    importCameras: 0
-    importLights: 0
+    importCameras: 1
+    importLights: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
@@ -56,10 +64,10 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
-    normalSmoothAngle: 0
-    normalImportMode: 1
+    normalSmoothAngle: 60
+    normalImportMode: 0
     tangentImportMode: 3
-    normalCalculationMode: 0
+    normalCalculationMode: 4
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
@@ -79,7 +87,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

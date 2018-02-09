@@ -8,9 +8,10 @@ public class MeleeEnemy : Enemy {
 
     [SerializeField] Rotator meshRotator;   // The game object that rotates.
     public GameObject geometryParent;
-    [SerializeField] MeshRenderer sheatheMeshRenderer;
+    [SerializeField] SkinnedMeshRenderer sheatheMeshRenderer;
     public AudioSource humAudioSource;
     public AudioSource attackAudioSource;
+    public MeleeEnemyAnimationController m_AnimationController;
 
     [HideInInspector] public float rotationSpeedMax = 2000f; // How quickly we rotate just when we're about to charge.
     float rotationSpeedCurrent; // The current rotation speed.

@@ -44,14 +44,35 @@ public class MeleeEnemyState_Moving : State {
         }
 
         // Get the direction towards the player, then modify it by our flanking angle.
-        Vector3 directionTowardsPlayer = GameManager.player.transform.position - transform.position;
+        Vector3 directionTowardsPlayer = GameManager.player.transform.position - controller.transform.position;
         directionTowardsPlayer.y = 0f;
         directionTowardsPlayer = Quaternion.AngleAxis(flankingAngle, Vector3.up) * directionTowardsPlayer;
 
-        transform.DORotate(Quaternion.LookRotation(directionTowardsPlayer).eulerAngles, 0.5f);
+        RaycastHit hit;
+        Debug.DrawRay(controller.transform.position, directionTowardsPlayer.normalized * 20f, Color.green);
+        if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, out hit, 20f, 1 << 8)) {
+            Vector3 direction1 = Quaternion.Euler(0f, 90f, 0f) * hit.normal;
+            Vector3 direction2 = Quaternion.Euler(0f, -90f, 0f) * hit.normal;
 
-        controller.m_NavMeshAgent.SetDestination(transform.position + directionTowardsPlayer.normalized * 5f);
-        Vector3 nextPosition = transform.position + controller.m_NavMeshAgent.desiredVelocity.normalized * tempMoveSpeed * Time.deltaTime;
+            Debug.DrawLine(hit.point + hit.normal, hit.point + hit.normal + direction1);
+            Debug.DrawLine(hit.point + hit.normal, hit.point + hit.normal + direction2);
+
+            if (Vector3.Angle(direction1, directionTowardsPlayer) < Vector3.Angle(direction2, directionTowardsPlayer)) {
+                directionTowardsPlayer = direction1;
+            } else {
+                directionTowardsPlayer = direction2;
+            }
+
+            if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, 20f, 1 << 8)) {
+                GetNewFlankingAngle();
+                return;
+            }
+        }
+
+        //controller.transform.DORotate(Quaternion.LookRotation(directionTowardsPlayer).eulerAngles, 1f);
+
+        controller.m_NavMeshAgent.SetDestination(controller.transform.position + directionTowardsPlayer.normalized * 5f);
+        Vector3 nextPosition = controller.transform.position + controller.m_NavMeshAgent.desiredVelocity.normalized * tempMoveSpeed * Time.deltaTime;
         //Vector3 velocity = (Vector3.Normalize(navMeshAgent.desiredVelocity) + Vector3.Normalize(gameManager.playerVelocity)*2.5f) * moveSpeed * Time.deltaTime;
         //Vector3 nextPosition = transform.position + velocity;
 
@@ -62,7 +83,7 @@ public class MeleeEnemyState_Moving : State {
     }
 
     void GetNewFlankingAngle() {
-        flankingAngle *= Random.Range(0.75f, 1f);
+        flankingAngle *= Random.Range(15, 40f);
         if (Random.value >= 0.5f) flankingAngle *= -1;
     }
 }

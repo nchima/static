@@ -26,11 +26,14 @@ public class MeleeEnemyState_ChargingUp : State {
         controller.m_NavMeshAgent.isStopped = true;
 
         // Begin rotating more quickly.
-        controller.TweenRotationSpeed(controller.rotationSpeedMax, chargeUpDuration * 0.9f);
+        controller.TweenRotationSpeed(controller.rotationSpeedMax, chargeUpDuration * 0.75f);
 
         // Change color.
         // attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.75f * Time.deltaTime);
         controller.TweenAttackColor(controller.attackingColor, chargeUpDuration * 0.75f);
+
+        // Play animation
+        controller.m_AnimationController.StartChargeWindupAnimation(chargeUpDuration * 0.75f);
 
         // Change audio values.
         controller.humAudioSource.DOPitch(3f, chargeUpDuration * 0.9f).SetEase(Ease.InQuad);

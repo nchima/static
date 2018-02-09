@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour {
     float movementKickCooldown = 0.3f;
 
     // SHOTGUN CHARGE STUFF
-    float shotGunChargeSpeed = 300f;
+    float shotGunChargeSpeed = 1000f;
     float shotGunChargeMouseSensitivity = 0.76f;
 
     // PHYSICS MATERIAL STUFF
@@ -155,69 +155,19 @@ public class PlayerController : MonoBehaviour {
             if (isAboveFloor) { rigidBody.velocity = new Vector3(rigidBody.velocity.x, 0f, rigidBody.velocity.z); }
         }
         
+        // Handle air movement.
         else if (state == State.Falling || state == State.SpeedFalling) {
             if (desiredMove == Vector3.zero) { rigidBody.velocity = new Vector3(0f, rigidBody.velocity.y, 0f); }
             else { rigidBody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
-        }
-
-        return;
-
-        if (state == State.Normal || state == State.Falling || state == State.SpeedFalling) {
-            float _accelerationSpeed = accelerationSpeedGround;
-            float _maxSpeed = maxGroundSpeed;
-
-            if (state == State.Falling || state == State.SpeedFalling) {
-                _accelerationSpeed = accelerationSpeedAir;
-                _maxSpeed = maxAirSpeed;
-            }
-
-            if (directionalInput.sqrMagnitude > 1) directionalInput.Normalize();
-
-            // Get desired movement direction.
-            //Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
-
-            //Vector3 desiredMove = transform.TransformDirection(new Vector3(directionalInput.x, 0f, directionalInput.y));
-            //Debug.Log("Direction Input X: " + directionalInput.x + ", Direction input Y: " + directionalInput.y + "Desired move: " + transform.InverseTransformDirection(desiredMove));
-
-            // Deccelerate.
-            Vector3 deccelerateForce = rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -1f;
-            deccelerateForce.y = 0;
-            rigidBody.AddForce(deccelerateForce, ForceMode.Force);
-
-            // Apply movement force to rigidbody.
-            if (desiredMove.magnitude != 0)
-                rigidBody.AddForce(desiredMove.normalized * _accelerationSpeed, ForceMode.VelocityChange);
-
-            CheckMovementKick();
-
-            // Add movement kick.
-            if (directionalInput != Vector2.zero && state != State.Falling && state != State.SpeedFalling) {
-                if (movementKickReady && state != State.Falling && state != State.SpeedFalling) {
-                    lastKickDirection = directionalInput;
-                    movementKickTimer = 0f;
-                    movementKickReady = false;
-                    rigidBody.AddForce(desiredMove.normalized * movementKickForce, ForceMode.Impulse);
-                }
-            }
-
-            // Clamp velocity to max speed.
-            if (state == State.Falling || state == State.SpeedFalling) {
-                //rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxFallingSpeed);
-                rigidBody.velocity = new Vector3(
-                    Mathf.Clamp(rigidBody.velocity.x, -maxAirSpeed * 0.5f, maxAirSpeed * 0.5f),
-                    Mathf.Clamp(rigidBody.velocity.y, -maxFallingSpeed, maxFallingSpeed),
-                    Mathf.Clamp(rigidBody.velocity.z, -maxAirSpeed * 0.5f, maxAirSpeed * 0.5f)
-                    );
-            } else {
-                rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxGroundSpeed);
-            }
-        }
-
+        } 
+        
+        // Handle shotgun charge movement.
         else if (state == State.ShotgunCharge) {
             // Add forward acceleration.
             rigidBody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
         }
 
+        // Failsafe for getting teleported outside level.
         if (transform.position.x > 10000f || transform.position.z > 10000f) {
             transform.position = new Vector3(0f, transform.position.y, 0f);
         }
@@ -236,26 +186,22 @@ public class PlayerController : MonoBehaviour {
 
     void HandleCursorLocking()
     {
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
+        if (Input.GetKeyUp(KeyCode.Escape)) {
             UnlockCursor();
         }
 
-        else if (Input.GetMouseButtonUp(0))
-        {
+        else if (Input.GetMouseButtonUp(0)) {
             LockCursor();
         }
     }
 
 
-    public void LockCursor()
-    {
+    public void LockCursor() {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    public void UnlockCursor()
-    {
+    public void UnlockCursor() {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }

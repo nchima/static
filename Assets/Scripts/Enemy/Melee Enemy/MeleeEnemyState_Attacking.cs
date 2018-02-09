@@ -32,6 +32,9 @@ public class MeleeEnemyState_Attacking : State {
         ParticleSystem.EmissionModule em = meshParticleObject.GetComponent<ParticleSystem>().emission;
         em.enabled = true;
 
+        // Play animation.
+        controller.m_AnimationController.StartChargeWindupAnimation(0.1f);
+
         distanceCharged = 0f;
 
         StartCoroutine(AttackCoroutine(controller));
@@ -73,12 +76,11 @@ public class MeleeEnemyState_Attacking : State {
         controller.TweenRotationSpeed(0f, 1f);
         controller.ReturnToOriginalAttackColor(afterAttackPauseTime * 0.9f);
 
-        Debug.Log("after attack pause start: " + Time.time);
+        // Exit charge animation.s
+        controller.m_AnimationController.EndChargeReleaseAnimation(afterAttackPauseTime * 0.8f);
 
         // Wait for a few seconds before resuming normal movement.
         yield return new WaitForSeconds(afterAttackPauseTime);
-
-        Debug.Log("after attack pause end: " + Time.time);
 
         GetComponent<TriggerTransition>().isTriggerSet = true;
 

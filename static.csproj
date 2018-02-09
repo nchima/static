@@ -172,6 +172,7 @@
     <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyStateDash.cs" />
     <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyStateShoot.cs" />
     <Compile Include="Assets\Scripts\Enemy\LaserEnemy\LaserEnemyTransitionFromDash.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyState_Attacking.cs" />
     <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyState_ChargingUp.cs" />
     <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyState_Moving.cs" />
