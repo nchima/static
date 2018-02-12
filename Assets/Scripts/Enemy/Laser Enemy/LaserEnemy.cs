@@ -20,15 +20,6 @@ public class LaserEnemy : Enemy {
         animationController = GetComponentInChildren<LaserEnemyAnimationController>();
 	}
 
-    protected override void Start() {
-        base.Start();
-        DetermineTimesToDash();
-    }
-
-    protected override void Update () {
-        base.Update();
-	}
-
     public void DetermineTimesToDash() {
         timesToDash = Random.Range(0, maxTimesToDash);
     }

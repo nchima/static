@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : StateController {
 
@@ -53,6 +54,9 @@ public class Enemy : StateController {
         }
     }
     [HideInInspector] public bool pauseAI;
+    
+    // REFERENCES
+    public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
 
     protected virtual void Start() {
         _currentHealth = maxHealth;
@@ -66,6 +70,23 @@ public class Enemy : StateController {
         GameManager.instance.PlayerKilledEnemy(scoreKillValue, specialKillValue);
         isAlive = false;
         Destroy(gameObject);
+    }
+
+    public bool IsPointOnNavMesh(Vector3 inputPoint) {
+        // Check to see if the new position is on the navmesh.
+        NavMeshHit destinationNavMeshHit;
+        if (!NavMesh.SamplePosition(inputPoint, out destinationNavMeshHit, 10f, NavMesh.AllAreas)) {
+            return false;
+        }
+
+        // Check to see if there is a path on the navmesh to the new position.
+        NavMeshHit currentPositionNavMeshHit;
+        NavMesh.SamplePosition(transform.position, out currentPositionNavMeshHit, 5f, NavMesh.AllAreas);
+        if (!NavMesh.Raycast(currentPositionNavMeshHit.position, destinationNavMeshHit.position, out currentPositionNavMeshHit, NavMesh.AllAreas)) {
+            return false;
+        }
+
+        return true;
     }
 
     private void OnTriggerEnter(Collider other) {

@@ -50,7 +50,7 @@ public class MeleeEnemyState_Moving : State {
 
         RaycastHit hit;
         Debug.DrawRay(controller.transform.position, directionTowardsPlayer.normalized * 20f, Color.green);
-        if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, out hit, 20f, 1 << 8)) {
+        if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, out hit, 20f, (1 << 8) | (1 << 24))) {
             Vector3 direction1 = Quaternion.Euler(0f, 90f, 0f) * hit.normal;
             Vector3 direction2 = Quaternion.Euler(0f, -90f, 0f) * hit.normal;
 
@@ -63,7 +63,7 @@ public class MeleeEnemyState_Moving : State {
                 directionTowardsPlayer = direction2;
             }
 
-            if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, 20f, 1 << 8)) {
+            if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, 20f, (1 << 8) | (1 << 24))) {
                 GetNewFlankingAngle();
                 return;
             }

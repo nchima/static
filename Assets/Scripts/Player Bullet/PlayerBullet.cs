@@ -48,7 +48,7 @@ public class PlayerBullet : MonoBehaviour {
         //Debug.Log((1 << 8) | (1 << 28));
         RaycastHit hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 28));
 
-        if (hit.collider != null) {
+        if (hit.collider != null && hit.collider.name.Contains("Weak Point")) {
             transform.position = hit.point;
             HandleHit(hit);
         } else {
@@ -75,13 +75,16 @@ public class PlayerBullet : MonoBehaviour {
     RaycastHit SphereCastOnLayer(Vector3 toPosition, int layerBitmask) {
         RaycastHit hit;
 
+        Debug.DrawLine(previousPosition, toPosition, Color.red);
+
         bool spherecast = Physics.SphereCast(
-        previousPosition,
-        thickness,
-        transform.forward,
-        out hit,
-        Vector3.Distance(toPosition, previousPosition),
-        layerBitmask);
+            previousPosition,
+            thickness,
+            transform.forward,
+            out hit,
+            Vector3.Distance(toPosition, previousPosition),
+            layerBitmask
+        );
 
         return hit;
     }

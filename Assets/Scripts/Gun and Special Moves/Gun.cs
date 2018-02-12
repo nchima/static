@@ -194,7 +194,6 @@ public class Gun : MonoBehaviour {
         // If we couldn't hit a weak point, auto aim for enemies instead.
         if (!Physics.Raycast(gunTipTransform.position, autoAimPoint - gunTipTransform.position, 1000f, 1 << 28)) {
             autoAimPoint = AutoAim("Enemy", 0.025f);
-
         }
 
         // Fire the specified number of bullets.
