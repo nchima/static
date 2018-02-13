@@ -8,7 +8,7 @@ public class ScoreManagerEditor : Editor {
 
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        base.OnInspectorGUI();  
 
         ScoreManager myTarget = target as ScoreManager;
 

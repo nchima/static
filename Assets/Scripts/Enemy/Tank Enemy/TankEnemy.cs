@@ -6,6 +6,29 @@ using UnityEngine.AI;
 public class TankEnemy : Enemy {
 
     public float runAwayDistance = 30f;
+    [SerializeField] FloatRange shotTimeRange = new FloatRange(3f, 6f);
+    float nextShotTime;
+    float shotTimer;
+    [HideInInspector] public bool shotTrigger;
 
-    public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
+
+    protected override void Start() {
+        base.Start();
+        nextShotTime = shotTimeRange.min;
+    }
+
+    protected override void Update() {
+        base.Update();
+        shotTimer += Time.deltaTime;
+        if (shotTimer >= nextShotTime) {
+            shotTrigger = true;
+        }
+    }
+
+    public void ResetShotTimer() {
+        nextShotTime = shotTimeRange.Random;
+        shotTimer = 0f;
+        shotTrigger = false;
+    }
 }
+    

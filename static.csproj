@@ -193,8 +193,10 @@
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateShooting.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_RunFromPlayer.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_Shooting.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_Wandering.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyTransition_PlayerIsClose.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyTransition_ShotReady.cs" />
     <Compile Include="Assets\Scripts\Explosion\Explosion.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\Fall Catcher\FallCatcher.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\FallIntoLevelState.cs" />
