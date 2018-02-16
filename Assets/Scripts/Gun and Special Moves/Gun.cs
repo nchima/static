@@ -242,7 +242,7 @@ public class Gun : MonoBehaviour {
             if ((viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize) && (viewportPosition.y >= 0f && viewportPosition.y <= 1f)) {
 
                 // For the enemies's position, use the center of its renderer.
-                Vector3 thisPosition = thisObject.GetComponentInChildren<MeshRenderer>().bounds.center;
+                Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;
 
                 // See if the distance to this enemy is less than the distance to the previous nearest enemy.
                 if (Vector3.Distance(GameManager.player.transform.position, thisPosition) < Vector3.Distance(GameManager.player.transform.position, autoAimPoint)) {
