@@ -7,7 +7,6 @@ using UnityEngine.AI;
 public class TankEnemyState_Wandering : State {
 
     [SerializeField] FloatRange wanderDistanceRange = new FloatRange(5f, 30f);
-
     Vector3 centerPoint;
 
 
@@ -17,6 +16,8 @@ public class TankEnemyState_Wandering : State {
 
         centerPoint = transform.position;
         controller.m_NavMeshAgent.SetDestination(GetWanderPoint(stateController));
+
+        controller.animationController.SetSeigeMode(true);
     }
 
 

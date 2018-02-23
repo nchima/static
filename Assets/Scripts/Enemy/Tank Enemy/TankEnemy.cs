@@ -7,6 +7,8 @@ public class TankEnemy : Enemy {
 
     public float runAwayDistance = 30f;
     [SerializeField] FloatRange shotTimeRange = new FloatRange(3f, 6f);
+    public TankEnemyAnimationController animationController;
+
     float nextShotTime;
     float shotTimer;
     [HideInInspector] public bool shotTrigger;

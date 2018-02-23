@@ -168,6 +168,11 @@
     <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\EnemyTransition_ReachedNavMeshDestination.cs" />
     <Compile Include="Assets\Scripts\Enemy\EnemyWeakPointGrower.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemyAnimationController.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemyState_AttackingPlayer.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemyState_MovingTowardPlayer.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemyTransition_AttackPlayer.cs" />
     <Compile Include="Assets\Scripts\Enemy\Laser Enemy\LaserEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Laser Enemy\LaserEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Laser Enemy\LaserEnemyStateDash.cs" />
@@ -182,7 +187,6 @@
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\BasicEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\EnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\EnemySpawner.cs" />
-    <Compile Include="Assets\Scripts\Enemy\Older Scripts\HoveringEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\LaserEnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\MeleeEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\NavMeshEnemy.cs" />
@@ -192,6 +196,7 @@
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateMoving.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateShooting.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_RunFromPlayer.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_Shooting.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_Wandering.cs" />

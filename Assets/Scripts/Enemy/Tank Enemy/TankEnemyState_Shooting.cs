@@ -29,6 +29,9 @@ public class TankEnemyState_Shooting : State {
         // 'Puff up' and rotate more quickly as I charge my shot.
         geometry.transform.DOScale(1.1f, preShotDelay * 0.9f);
 
+        // Begin animation.
+        controller.animationController.StartOpenCrystalAnimation(preShotDelay * 0.1f);
+
         // Color stuff.. Maybe I'll want to bring this back some day?
         //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.DOColor(chargingLaserColor, preShotDelay).SetEase(Ease.Linear);
         //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.DOColor(chargingLaserColor, "_EmissionColor", preShotDelay).SetEase(Ease.Linear);
@@ -36,13 +39,12 @@ public class TankEnemyState_Shooting : State {
         //DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, chargingLaserColor, preShotDelay * 0.9f).SetEase(Ease.Linear).SetUpdate(true);
         //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.9f * preShotDelay * 0.9f * Time.deltaTime);
 
-        // Begin firing shot.
-        GameObject newShot = Instantiate(shotPrefab, shotOrigin.position, Quaternion.identity);
-        newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
-
         yield return new WaitForSeconds(preShotDelay);
 
         /* THE SHOT IS FIRED */
+
+        GameObject newShot = Instantiate(shotPrefab, shotOrigin.position, Quaternion.identity);
+        newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
 
         // Get small again as the laser is fired.
         geometry.transform.DOScale(1f, 0.1f);
@@ -51,6 +53,9 @@ public class TankEnemyState_Shooting : State {
         //while (baseEmissionColor != originalEmissionColor) baseEmissionColor = originalEmissionColor;
         //while (baseColor != originalColor) baseColor = originalColor;
         //attackingColorCurrent = originalColor;
+
+        // Start closing animation.
+        controller.animationController.StartCloseCrystalAnimation(preShotDelay * 1.5f);
 
         yield return new WaitForSeconds(postShotDelay);
 
