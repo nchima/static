@@ -8,7 +8,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
     [SerializeField] float bristleAnimationDuration = 0.1f;
     [SerializeField] float bristleDuration = 1f;
     [SerializeField] float attackAnimationDuration = 0.34f;
-    [SerializeField] float attackLength = 1f;
+    [SerializeField] float attackDuration = 1f;
     [SerializeField] float attackWithdrawAnimationDuration = 0.7f;
     [SerializeField] float postAttackPauseDuration = 1f;
     [SerializeField] BoxCollider hitBox;
@@ -20,7 +20,13 @@ public class HoveringEnemyState_AttackingPlayer : State {
         lookTarget.y = stateController.transform.position.y;
         stateController.transform.LookAt(lookTarget);
 
-        StartCoroutine(AttackCoroutine(stateController));
+        // Make sure there is not an obstacle in the way.
+        RaycastHit hit;
+        if (Physics.SphereCast(stateController.transform.position, stateController.GetComponent<SphereCollider>().radius, transform.forward, out hit, 10f, 1 << 8)) {
+            GetComponent<TriggerTransition>().isTriggerSet = true;
+        } else {
+            StartCoroutine(AttackCoroutine(stateController));
+        }
     }
 
 
@@ -37,14 +43,19 @@ public class HoveringEnemyState_AttackingPlayer : State {
 
         // Keep testing attack area until during attack animation.
         float timer = 0f;
+        bool playerDamaged = false;
         yield return new WaitUntil(() => {
-            if (timer >= attackLength) {
+            if (timer >= attackDuration) {
                 return true;
             }
 
             else {
                 timer += Time.deltaTime;
-                if (PlayerIsInHitBox(stateController)) { GameManager.instance.PlayerWasHurt(); }
+                if (!playerDamaged && PlayerIsInHitBox(stateController)) {
+                    GameManager.instance.PlayerWasHurt();
+                    playerDamaged = true;
+                }
+
                 return false;
             }
         });
@@ -52,7 +63,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
         controller.m_AnimationController.StartWithdrawAnimation(attackWithdrawAnimationDuration);
 
         yield return new WaitForSeconds(postAttackPauseDuration);
-
+        
         GetComponent<TriggerTransition>().isTriggerSet = true;
 
         yield return null;
@@ -70,7 +81,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
             hitBox.bounds.extents * 0.5f, 
             stateController.transform.rotation
             );
-        DebugUtil.DrawBox(hitBoxPosition, hitBox.bounds.extents * 0.5f, stateController.transform.rotation, Color.red);
+
         foreach (Collider collider in collidersInHitBox) {
             if (collider.gameObject == GameManager.player) { return true; }
         }

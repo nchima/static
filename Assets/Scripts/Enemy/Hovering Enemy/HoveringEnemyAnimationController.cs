@@ -11,7 +11,8 @@ public class HoveringEnemyAnimationController : MonoBehaviour {
     [SerializeField] int idleMorph2Index = 0;
 
     [SerializeField] float idleMorphSpeed;
-    [SerializeField] FloatRange idleMorphNoiseRange = new FloatRange(1f, 100f);
+    [SerializeField] FloatRange idleMorph1NoiseRange = new FloatRange(1f, 100f);
+    [SerializeField] FloatRange idleMorph2NoiseRange = new FloatRange(1f, 100f);
 
     SkinnedMeshRenderer[] blendRenderers;
 
@@ -48,8 +49,8 @@ public class HoveringEnemyAnimationController : MonoBehaviour {
         idleMorph1Noise.Iterate();
         idleMorph2Noise.Iterate();
 
-        currentIdleMorph1Value = idleMorph1Noise.MapValue(idleMorphNoiseRange.min, idleMorphNoiseRange.max).x;
-        currentIdleMorph2Value = idleMorph2Noise.MapValue(idleMorphNoiseRange.min, idleMorphNoiseRange.max).x;
+        currentIdleMorph1Value = idleMorph1Noise.MapValue(idleMorph1NoiseRange.min, idleMorph1NoiseRange.max).x;
+        currentIdleMorph2Value = idleMorph2Noise.MapValue(idleMorph2NoiseRange.min, idleMorph2NoiseRange.max).x;
     }
 
 

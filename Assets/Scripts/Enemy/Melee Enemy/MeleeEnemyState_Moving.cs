@@ -48,21 +48,24 @@ public class MeleeEnemyState_Moving : State {
         directionTowardsPlayer.y = 0f;
         directionTowardsPlayer = Quaternion.AngleAxis(flankingAngle, Vector3.up) * directionTowardsPlayer;
 
+        // Modify direction to avoid obstacles.
         RaycastHit hit;
-        Debug.DrawRay(controller.transform.position, directionTowardsPlayer.normalized * 20f, Color.green);
+
+        // Raycast to look for solid objects in front of us.
         if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, out hit, 20f, (1 << 8) | (1 << 24))) {
+
+            // Directions perpendicular left and right from the detected wall.
             Vector3 direction1 = Quaternion.Euler(0f, 90f, 0f) * hit.normal;
             Vector3 direction2 = Quaternion.Euler(0f, -90f, 0f) * hit.normal;
 
-            Debug.DrawLine(hit.point + hit.normal, hit.point + hit.normal + direction1);
-            Debug.DrawLine(hit.point + hit.normal, hit.point + hit.normal + direction2);
-
+            // Travel in the perpendicular direction that forms an obtuse angle with our forward direction.
             if (Vector3.Angle(direction1, directionTowardsPlayer) < Vector3.Angle(direction2, directionTowardsPlayer)) {
                 directionTowardsPlayer = direction1;
             } else {
                 directionTowardsPlayer = direction2;
             }
 
+            // If this new direction will still lead us into a wall, give up and change direction completely.
             if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, 20f, (1 << 8) | (1 << 24))) {
                 GetNewFlankingAngle();
                 return;
