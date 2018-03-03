@@ -195,6 +195,7 @@
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateMoving.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateShooting.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Snail Enemy\SnailEnemyState_NormalMovement.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_RunFromPlayer.cs" />

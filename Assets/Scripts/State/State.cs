@@ -20,6 +20,9 @@ public abstract class State : MonoBehaviour {
         CheckTransitions(stateController);
     }
 
+    public virtual void FixedRun(StateController stateController) {
+    }
+
     public abstract void End(StateController stateController);
 
     void CheckTransitions(StateController stateController) {

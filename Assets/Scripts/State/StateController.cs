@@ -5,6 +5,11 @@ using UnityEngine;
 public class StateController : MonoBehaviour {
 
     public State currentState;
+    State initialState;
+
+    private void Awake() {
+        initialState = currentState;
+    }
 
     private void Start() {
         currentState.Initialize(this);
@@ -14,11 +19,18 @@ public class StateController : MonoBehaviour {
         currentState.Run(this);
     }
 
+    protected virtual void FixedUpdate() {
+        currentState.FixedRun(this);
+    }
+
     public void TransitionToState(State nextState) {
         if (nextState == null) { return; }
-
         currentState.End(this);
         nextState.Initialize(this);
         currentState = nextState;
+    }
+
+    protected void ReturnToInitialState() {
+        TransitionToState(initialState);
     }
 }

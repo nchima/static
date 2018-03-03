@@ -92,7 +92,7 @@ public class LevelManager : MonoBehaviour {
             enemy.willAttack = true;
         }
         foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
-            enemy.pauseAI = !value;
+            enemy.isAIPaused = !value;
             enemy.enabled = value;
         }
 

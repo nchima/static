@@ -47,8 +47,7 @@ public class EnemyShot : MonoBehaviour {
 
     void OnTriggerEnter(Collider collider)
     {
-        if (collider.tag == "Obstacle" || collider.tag == "Wall" || (collider.name.ToLower().Contains("floor") && collideWithFloor))
-        {
+        if (collider.tag == "Obstacle" || collider.tag == "Wall" || (collider.name.ToLower().Contains("floor") && collideWithFloor)) {
             //Debug.Log("I bumped into an obstacle.");
             Detonate();
         }

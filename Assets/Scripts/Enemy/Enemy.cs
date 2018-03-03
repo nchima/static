@@ -19,6 +19,7 @@ public class Enemy : StateController {
                 Die();
             } else {
                 //hurtAudio.Play();
+                TestPainChance();
                 _currentHealth = value;
             }
         }
@@ -26,6 +27,9 @@ public class Enemy : StateController {
     [SerializeField] AudioSource hurtAudio;
     protected bool isAlive = true;
     [SerializeField] GameObject deathParticles;
+
+    [SerializeField] protected float painChance = 0.5f;
+    static float painTime = 0.4f;
 
     // SCORING
     public int scoreKillValue;  // How many points the player gets for killing this enemy.
@@ -53,13 +57,19 @@ public class Enemy : StateController {
             }
         }
     }
-    [HideInInspector] public bool pauseAI;
-    
+    [HideInInspector] public bool isAIPaused;
+    Coroutine painCoroutine;
+
     // REFERENCES
     public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
 
+
     protected virtual void Start() {
         _currentHealth = maxHealth;
+    }
+
+    protected override void Update() {
+        base.Update();
     }
 
     protected virtual void Die() {
@@ -71,6 +81,7 @@ public class Enemy : StateController {
         isAlive = false;
         Destroy(gameObject);
     }
+
 
     public bool IsPointOnNavMesh(Vector3 inputPoint) {
         // Check to see if the new position is on the navmesh.
@@ -88,6 +99,29 @@ public class Enemy : StateController {
 
         return true;
     }
+
+
+    void TestPainChance() {
+        if (Random.value <= painChance) {
+            if (painCoroutine != null) { StopCoroutine(painCoroutine); }
+            painCoroutine = StartCoroutine(PainCoroutine());
+        }
+    }
+
+
+    IEnumerator PainCoroutine() {
+        SetAIActive(false);
+        yield return new WaitForSeconds(painTime);
+        SetAIActive(true);
+        yield return null;
+    }
+
+
+    void SetAIActive(bool value) {
+        ReturnToInitialState();
+        isAIPaused = !value;
+    }
+
 
     private void OnTriggerEnter(Collider other) {
         // Make sure we die instantly if, for some reason, we fall off the level.

@@ -132,7 +132,7 @@ public class PlayerBullet : MonoBehaviour {
         } 
 
         else if (hit.collider.name.Contains("Weak Point")) {
-            Debug.Log("Bullet struck enemy weak point!");
+            //Debug.Log("Bullet struck enemy weak point!");
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
             GameManager.sfxManager.PlayBulletHitWeakPointSound();
