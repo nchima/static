@@ -52,7 +52,7 @@ public class MeleeEnemyState_Moving : State {
         RaycastHit hit;
 
         // Raycast to look for solid objects in front of us.
-        if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, out hit, 20f, (1 << 8) | (1 << 24))) {
+        if (Physics.Raycast(controller.transform.position, directionTowardsPlayer, out hit, 10f, (1 << 8) | (1 << 24))) {
 
             // Directions perpendicular left and right from the detected wall.
             Vector3 direction1 = Quaternion.Euler(0f, 90f, 0f) * hit.normal;
@@ -72,6 +72,8 @@ public class MeleeEnemyState_Moving : State {
             }
         }
 
+        Quaternion newRotation = Quaternion.LookRotation(directionTowardsPlayer, Vector3.up);
+        controller.transform.rotation = newRotation;
         //controller.transform.DORotate(Quaternion.LookRotation(directionTowardsPlayer).eulerAngles, 1f);
 
         controller.m_NavMeshAgent.SetDestination(controller.transform.position + directionTowardsPlayer.normalized * 5f);

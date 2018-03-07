@@ -11,7 +11,7 @@ public class ShotgunChargeState_FinalAttack : State {
     public override void Initialize(StateController stateController) {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
 
-        // Return visual effects to original position.
+        // Return visual effects sphere to original position.
         shotgunCharge.sphere.EndCharge();
 
         shotgunCharge.isCharging = false;
@@ -23,8 +23,9 @@ public class ShotgunChargeState_FinalAttack : State {
         // If the player is above a floor then fire the shockwave.
         if (GameManager.player.GetComponent<PlayerController>().isAboveFloor) { FireShockwave(shotgunCharge); }
         // Otherwise, just end this state right now.
-        else { GetComponent<TriggerTransition>().isTriggerSet = true; }
+        else { Debug.Log("Returning to idle mode."); GetComponent<TriggerTransition>().isTriggerSet = true; }
 
+        GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
         GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
     }
 

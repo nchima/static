@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class PlayerTouchedDownTransition : Transition {
     public override bool IsConditionTrue(StateController stateController) {
-        if (Physics.Raycast(GameManager.player.transform.position, Vector3.down, 7f)) { return true; } 
+        //bool playerGrounded = Physics.Raycast(GameManager.player.transform.position, Vector3.down, 7f);
+        bool playerGrounded = GameManager.player.GetComponent<PlayerController>().isAboveFloor;
+        if (playerGrounded) { return true; } 
         else { return false; }
     }
 }

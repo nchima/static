@@ -28,7 +28,6 @@ public class SnailEnemyState_NormalMovement : State {
         Quaternion lookAtPlayerRotation = Quaternion.LookRotation(controller.directionToPlayer);
         Quaternion newRotation = Quaternion.RotateTowards(controller.transform.rotation, lookAtPlayerRotation, turnSpeed * Time.deltaTime);
         controller.GetComponent<Rigidbody>().MoveRotation(newRotation);
-        //controller.GetComponent<Rigidbody>().MoveRotation(Quaternion.Slerp(transform.rotation, lookAtPlayerRotation, turnSpeed * Time.deltaTime));
 
         // See if player is in vision cone.
         playerInVisionCone = Vector3.Angle(controller.directionToPlayer, transform.forward) <= visionConeAngle;

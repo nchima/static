@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     public float maxAirSpeed;
     [SerializeField] float maxFallingSpeed;
     [HideInInspector] public bool isMovementEnabled = true;
+    Vector3 unrotatedVelocity = Vector3.zero;
 
     [SerializeField] float movementKickForce = 5f;
     Vector2 lastKickDirection = new Vector3(0f, 0f, 1f);
@@ -68,9 +69,8 @@ public class PlayerController : MonoBehaviour {
             return returnValue;
         }
     }
-    public static Vector3 velocity;
+    public static Vector3 currentVelocity;
     Vector3 previousPosition;   // Used to calculate velocity.
-
 
 
     private void Start() {
@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviour {
 
     private void FixedUpdate() {
 
-        velocity = (transform.position - previousPosition) / Time.deltaTime;
+        currentVelocity = (transform.position - previousPosition) / Time.deltaTime;
         previousPosition = transform.position;
 
         /* HANDLE MOVEMENT */
@@ -113,8 +113,7 @@ public class PlayerController : MonoBehaviour {
 
         if (state == State.Normal) {
 
-            //Debug.Log("player is above floor: " + isAboveFloor);
-
+            // Ground check
             if (!isAboveFloor) {
                 rigidBody.useGravity = true;
                 return;
@@ -126,16 +125,17 @@ public class PlayerController : MonoBehaviour {
             float decelerateTo = maxGroundSpeed;
             if (directionalInput.magnitude == 0) { decelerateTo = 0f; }
             if (rigidBody.velocity.magnitude > decelerateTo) {
-                Vector3 deccelerateForce = rigidBody.velocity.normalized * rigidBody.velocity.sqrMagnitude * -3.5f;
-                //Debug.Log("Rigidbody velocity: " + rigidBody.velocity + ", " + "Deccelereate Force: " + deccelerateForce);
+                Vector3 deccelerateForce = rigidBody.velocity.normalized * -100f;
                 deccelerateForce.y = 0;
-                rigidBody.AddForce(deccelerateForce, ForceMode.Force);
+                rigidBody.AddForce(deccelerateForce, ForceMode.Acceleration);
             }
 
+            // If we're going slowly enough, just stop instantly.
             if (rigidBody.velocity.magnitude < 5) {
                 rigidBody.velocity = Vector3.zero;
             }
 
+            // Get actual walking force.
             Vector3 walkForce = desiredMove.normalized * accelerationSpeedGround;
             walkForce.y = 0f;
             rigidBody.AddForce(walkForce, ForceMode.Acceleration);
@@ -143,7 +143,6 @@ public class PlayerController : MonoBehaviour {
             // Apply movment kick.
             CheckMovementKick();
             if (directionalInput != Vector2.zero && movementKickReady && state != State.Falling && state != State.SpeedFalling) {
-                //Debug.Log("Applying movement kick.");
                 lastKickDirection = directionalInput;
                 movementKickTimer = 0f;
                 movementKickReady = false;
@@ -152,7 +151,10 @@ public class PlayerController : MonoBehaviour {
                 rigidBody.AddForce(kickForce, ForceMode.VelocityChange);
             }
 
+            // Keep player at floor level.
             if (isAboveFloor) { rigidBody.velocity = new Vector3(rigidBody.velocity.x, 0f, rigidBody.velocity.z); }
+
+            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxGroundSpeed);
         }
         
         // Handle air movement.
