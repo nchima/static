@@ -88,7 +88,7 @@ public class MeleeEnemyState_Moving : State {
     }
 
     void GetNewFlankingAngle() {
-        flankingAngle *= Random.Range(15, 40f);
+        flankingAngle = Random.Range(15f, 30f);
         if (Random.value >= 0.5f) flankingAngle *= -1;
     }
 }

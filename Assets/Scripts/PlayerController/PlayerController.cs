@@ -125,7 +125,7 @@ public class PlayerController : MonoBehaviour {
             float decelerateTo = maxGroundSpeed;
             if (directionalInput.magnitude == 0) { decelerateTo = 0f; }
             if (rigidBody.velocity.magnitude > decelerateTo) {
-                Vector3 deccelerateForce = rigidBody.velocity.normalized * -100f;
+                Vector3 deccelerateForce = rigidBody.velocity.normalized * -125f;
                 deccelerateForce.y = 0;
                 rigidBody.AddForce(deccelerateForce, ForceMode.Acceleration);
             }

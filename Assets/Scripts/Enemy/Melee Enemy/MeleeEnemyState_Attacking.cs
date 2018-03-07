@@ -62,7 +62,8 @@ public class MeleeEnemyState_Attacking : State {
             else {
                 Vector3 nextPosition = Vector3.MoveTowards(controller.transform.position, attackFinishPoint, attackSpeed * Time.deltaTime);
                 distanceCharged += Vector3.Distance(controller.transform.position, nextPosition);
-                controller.GetComponent<Rigidbody>().MovePosition(nextPosition);
+                //controller.GetComponent<Rigidbody>().MovePosition(nextPosition);
+                controller.transform.position = nextPosition;
                 controller.transform.LookAt(attackFinishPoint);
                 return false;
             }
