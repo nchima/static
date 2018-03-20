@@ -10,7 +10,7 @@ public class ScreenShake : MonoBehaviour {
     float shakeTimer = 0f;
     float vibrateAmount = 0.009f;    // How much the screen should vibrate to encourage zfighting.
 	float decreaseFactor = 0.5f;    // How quickly the shake should decrease.
-    float moveBackSpeed = 1f; // How quickly elements of the screen should move back to their original position after the shake ends.
+    float moveBackSpeed = 3f; // How quickly elements of the screen should move back to their original position after the shake ends.
 
     public bool useDrift = false;
 

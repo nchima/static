@@ -1,10 +1,8 @@
-﻿<Properties StartupItem="Assembly-CSharp.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/ScreenShake.cs">
+﻿<Properties StartupItem="static.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Audio\MusicManager.cs">
     <Files>
-      <File FileName="Assets/Prefabs/Enemies/MeleeEnemy.cs" Line="37" Column="37" />
-      <File FileName="Assets/Scripts/ScreenShake.cs" Line="8" Column="32" />
-      <File FileName="Assets/Scripts/GameManager.cs" Line="374" Column="28" />
+      <File FileName="Assets\Scripts\Audio\MusicManager.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

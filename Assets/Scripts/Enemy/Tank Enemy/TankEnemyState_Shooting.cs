@@ -9,6 +9,7 @@ public class TankEnemyState_Shooting : State {
     [SerializeField] GameObject shotPrefab;
     [SerializeField] GameObject geometry;
     [SerializeField] Transform shotOrigin;
+    [SerializeField] GameObject chargeParticles;
     [SerializeField] float preShotDelay = 1f;
     [SerializeField] float postShotDelay = 1f;
 
@@ -31,6 +32,14 @@ public class TankEnemyState_Shooting : State {
 
         // Begin animation.
         controller.animationController.StartOpenCrystalAnimation(preShotDelay * 0.1f);
+
+        // Particle sytem
+        foreach (ParticleSystem particleSystem in chargeParticles.GetComponentsInChildren<ParticleSystem>()) {
+            particleSystem.Stop();
+            ParticleSystem.MainModule mm = particleSystem.main;
+            mm.duration = preShotDelay * 0.9f;
+            particleSystem.Play();
+        }
 
         // Color stuff.. Maybe I'll want to bring this back some day?
         //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.DOColor(chargingLaserColor, preShotDelay).SetEase(Ease.Linear);

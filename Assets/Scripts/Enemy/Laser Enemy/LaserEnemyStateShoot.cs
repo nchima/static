@@ -12,6 +12,7 @@ public class LaserEnemyStateShoot : State {
     [SerializeField] Transform geometry;
     [SerializeField] float inaccuracy = 45f;
     [SerializeField] GameObject weakPoint;
+    [SerializeField] GameObject chargeParticles;
 
     GameObject lastShot;
 
@@ -54,6 +55,16 @@ public class LaserEnemyStateShoot : State {
         DOTween.To(() => geometry.GetComponentInChildren<Rotator>().speedScale, x => geometry.GetComponentInChildren<Rotator>().speedScale = x, 5f, preShotDelay * 0.9f)
             .SetEase(Ease.Linear)
             .SetUpdate(true);
+
+
+
+        // Particle sytem
+        foreach (ParticleSystem particleSystem in chargeParticles.GetComponentsInChildren<ParticleSystem>()) {
+            particleSystem.Stop();
+            ParticleSystem.MainModule mm = particleSystem.main;
+            mm.duration = preShotDelay * 0.9f;
+            particleSystem.Play();
+        }
 
         // Color stuff.. Maybe I'll want to bring this back some day?
         //foreach (MeshRenderer mr in myGeometry.GetComponentsInChildren<MeshRenderer>()) mr.material.DOColor(chargingLaserColor, preShotDelay).SetEase(Ease.Linear);

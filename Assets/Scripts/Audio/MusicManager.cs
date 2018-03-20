@@ -11,6 +11,7 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] AudioMixer layerAMixer;
     [SerializeField] AudioMixer layerBMixer;
     [SerializeField] AudioMixer rhythmMixer;
+    [SerializeField] AudioMixer newMusicMixer;
 
     [SerializeField] FloatRange rhythmVolumeRange = new FloatRange(-5f, 5f);
     [SerializeField] FloatRange ABVolumeRange = new FloatRange(-5f, 5f);
@@ -18,9 +19,41 @@ public class MusicManager : MonoBehaviour {
     int tracksPerLayer = 2;
     bool isInFallingSequence;
 
+    MusicDebugState[] musicDebugStates;
+    int currentDebugState = 0;
+
+    [SerializeField] AudioClip[] newMusicSpeedClips;
+    int currentSpeedClip = 0;
+
+
+    private void Start() {
+        musicDebugStates = new MusicDebugState[3];
+        musicDebugStates[0] = new MusicDebugState(0f, 0f);
+        musicDebugStates[1] = new MusicDebugState(1f, 0f);
+        musicDebugStates[2] = new MusicDebugState(0f, 1f);
+    }
+
 
     private void Update() {
         if (!isInFallingSequence) { SetLayerVolumeByGunValue(); }
+
+
+        if (Input.GetKeyDown(KeyCode.M)) {
+            int nextDebugState = currentDebugState;
+            nextDebugState++;
+            if (nextDebugState > musicDebugStates.Length - 1) { nextDebugState = 0; }
+            ApplyDebugState(musicDebugStates[nextDebugState]);
+            currentDebugState = nextDebugState;
+        }
+
+        if (Input.GetKeyDown(KeyCode.K)) {
+            int nextSpeedClip = currentSpeedClip;
+            nextSpeedClip++;
+            if (nextSpeedClip > newMusicSpeedClips.Length - 1) { nextSpeedClip = 0; }
+            transform.Find("New Music").GetComponent<AudioSource>().clip = newMusicSpeedClips[nextSpeedClip];
+            transform.Find("New Music").GetComponent<AudioSource>().Play();
+            currentSpeedClip = nextSpeedClip;
+        }
     }
 
 
@@ -100,6 +133,28 @@ public class MusicManager : MonoBehaviour {
     void SetAllAudioSourcePitch(float pitch, float duration) {
         foreach (AudioSource audioSource in FindObjectsOfType<AudioSource>()) {
             audioSource.DOPitch(pitch, duration).SetUpdate(true);
+        }
+    }
+
+
+    void ApplyDebugState(MusicDebugState state) {
+        transform.Find("Layer A 1").GetComponent<AudioSource>().volume = state.oldMusicVol;
+        transform.Find("Layer A 2").GetComponent<AudioSource>().volume = state.oldMusicVol;
+        transform.Find("Layer B 1").GetComponent<AudioSource>().volume = state.oldMusicVol;
+        transform.Find("Layer B 2").GetComponent<AudioSource>().volume = state.oldMusicVol;
+        transform.Find("Rhythm 1").GetComponent<AudioSource>().volume = state.oldMusicVol;
+        transform.Find("Rhythm 2").GetComponent<AudioSource>().volume = state.oldMusicVol;
+        transform.Find("New Music").GetComponent<AudioSource>().volume = state.newMusicVol;
+    }
+
+
+    class MusicDebugState {
+        public float oldMusicVol;
+        public float newMusicVol;
+
+        public MusicDebugState(float oldMusicVol, float newMusicVol) {
+            this.oldMusicVol = oldMusicVol;
+            this.newMusicVol = newMusicVol;
         }
     }
 }

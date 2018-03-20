@@ -37,6 +37,8 @@ public class HoveringEnemyState_MovingTowardPlayer : State {
         base.Run(stateController);
         HoveringEnemy controller = stateController as HoveringEnemy;
 
+        controller.transform.position = new Vector3(controller.transform.position.x, controller.hoverHeight, controller.transform.position.z); 
+
         Vector3 playerGroundPosition = GameManager.player.transform.position;
         playerGroundPosition.y = controller.hoverHeight;
 

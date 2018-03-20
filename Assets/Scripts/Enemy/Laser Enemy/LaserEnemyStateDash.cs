@@ -42,6 +42,8 @@ public class LaserEnemyStateDash : State {
         controller.animationController.EndDashReleaseAnimation(0.3f);
         yield return new WaitForSeconds(0.3f);
 
+        yield return new WaitForSeconds(UnityEngine.Random.Range(0f, 1f));
+
         // Go to shooting state or redo this state depending on whether we have dashed enough times.
         controller.timesDashed++;
         if (controller.timesDashed >= controller.timesToDash) {

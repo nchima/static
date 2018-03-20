@@ -36,6 +36,7 @@ public class PlayerBulletTrail : MonoBehaviour {
     private void Update() {
         // Check to see if any segments need to be deleted.
         for (int i = 0; i < segments.Count; i++) {
+            segments[i].beginningPoint += GameManager.player.GetComponent<Rigidbody>().velocity;
             if (Time.time >= segments[i].deleteTime) {
                 segments.Remove(segments[i]);
                 RedrawTrail();
@@ -56,9 +57,9 @@ public class PlayerBulletTrail : MonoBehaviour {
     }
 
 
-    public void AddSegment(Vector3 beginning, Vector3 end) {
+    public void AddSegment(Vector3 beginning, Vector3 end, Vector3 velocity) {
         trailPiece.SetActive(true);
-        segments.Add(new Segment(beginning, end, Time.time + lingerDuration));
+        segments.Add(new Segment(beginning, end, Time.time + lingerDuration, velocity));
         RedrawTrail();
     }
 
@@ -67,11 +68,13 @@ public class PlayerBulletTrail : MonoBehaviour {
         public Vector3 beginningPoint;
         public Vector3 endPoint;
         public float deleteTime;
+        public Vector3 velocity;
 
-        public Segment(Vector3 beginningPoint, Vector3 endPoint, float deleteTime) {
+        public Segment(Vector3 beginningPoint, Vector3 endPoint, float deleteTime, Vector3 velocity) {
             this.beginningPoint = beginningPoint;
             this.endPoint = endPoint;
             this.deleteTime = deleteTime;
+            this.velocity = velocity;
         }
     }
 }

@@ -166,6 +166,7 @@
     <Compile Include="Assets\Scripts\Enemy Shot\LaserShot.cs" />
     <Compile Include="Assets\Scripts\Enemy Shot\NormalShot.cs" />
     <Compile Include="Assets\Scripts\Enemy\Enemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\EnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\EnemyWeakPointGrower.cs" />
     <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Hovering Enemy\HoveringEnemyAnimationController.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\ShootingEnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\SnailEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateMoving.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateShooting.cs" />
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\EnemyTransition_ReachedNavMeshDestination.cs" />
@@ -232,6 +234,7 @@
     <Compile Include="Assets\Scripts\Level\Obstacle.cs" />
     <Compile Include="Assets\Scripts\Managers\DebugManager.cs" />
     <Compile Include="Assets\Scripts\Managers\FallingSequenceManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\FlashManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GunValueManager.cs" />
     <Compile Include="Assets\Scripts\Managers\HealthManager.cs" />

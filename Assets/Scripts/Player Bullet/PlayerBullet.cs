@@ -66,7 +66,8 @@ public class PlayerBullet : MonoBehaviour {
             }
         }
 
-        m_playerBulletTrail.AddSegment(transform.position, previousPosition);
+        float modifier = 0.5f;
+        m_playerBulletTrail.AddSegment(transform.position + Random.insideUnitSphere * modifier, previousPosition + Random.insideUnitSphere * modifier, PlayerController.currentVelocity);
 
         previousPosition = transform.position;
     }
