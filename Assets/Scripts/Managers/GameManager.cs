@@ -23,7 +23,9 @@ public class GameManager : MonoBehaviour {
     [SerializeField] GameObject highScoreScreen;
     [SerializeField] GameObject gameOverScreen; 
     [SerializeField] GameObject nameEntryScreen;
-    [SerializeField] GameObject mainMenuScreen; 
+    [SerializeField] GameObject mainMenuScreen;
+    [SerializeField] GameObject endOfDemoScreen;
+    [SerializeField] GameObject pauseScreen;
 
     // RANDOM USEFUL STUFF
     public bool gameStarted = false;
@@ -31,7 +33,7 @@ public class GameManager : MonoBehaviour {
 
     // MISC REFERENCES
     [HideInInspector] public static GameManager instance;
-    [HideInInspector] public ScoreManager scoreManager;
+    [HideInInspector] public static ScoreManager scoreManager;
     [HideInInspector] public static SpecialBarManager specialBarManager;
     [HideInInspector] public static HealthManager healthManager;
     [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
@@ -42,6 +44,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static ColorPaletteManager colorPaletteManager;
     [HideInInspector] public GenerateNoise noiseGenerator;
     [HideInInspector] public static GameObject player;
+    [HideInInspector] public static FlashManager flashManager;
     [SerializeField] GameObject gunSliderBorder;
 
 
@@ -61,6 +64,7 @@ public class GameManager : MonoBehaviour {
         gun = FindObjectOfType<Gun>();
         gunValueManager = GetComponentInChildren<GunValueManager>();
         noiseGenerator = GetComponent<GenerateNoise>();
+        flashManager = GetComponentInChildren<FlashManager>();
     }
 
 
@@ -75,6 +79,35 @@ public class GameManager : MonoBehaviour {
                 StartGame();
             }
         }
+
+        else {
+            if (Input.GetKeyDown(KeyCode.Escape)) {
+                if (!gamePaused) { PauseGame(true); }
+                else { PauseGame(false); }
+            }
+        }
+    }
+
+
+    float memorizedTimeScale;
+    public static bool gamePaused;
+    public void PauseGame(bool value) {
+        if (value == true) {
+            memorizedTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+            pauseScreen.SetActive(true);
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
+            gamePaused = true;
+        }
+
+        else {
+            Time.timeScale = memorizedTimeScale;
+            pauseScreen.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            gamePaused = false;
+        }
     }
 
 
@@ -84,7 +117,10 @@ public class GameManager : MonoBehaviour {
         
         levelManager.LoadLevel(levelManager.currentLevelNumber);
 
-        while (!SceneManager.GetSceneByBuildIndex(levelManager.currentLevelNumber).isLoaded) { yield return null; }
+        yield return new WaitUntil(() => {
+            if (SceneManager.GetSceneByBuildIndex(levelManager.currentLevelNumber).isLoaded) { return true; } 
+            else { return false; }
+        });
 
         levelManager.SetEnemiesActive(false);
         fallingSequenceManager.BeginFallingInstant();
@@ -178,7 +214,7 @@ public class GameManager : MonoBehaviour {
     public void PlayerWasHurt() {
         scoreManager.GetHurt();
         specialBarManager.PlayerWasHurt();
-        healthManager.playerHealth -= 4;
+        healthManager.playerHealth -= 1;
 
         // If health is now less than zero, trigger a game over.
         if (healthManager.playerHealth <= 0) {
@@ -205,6 +241,11 @@ public class GameManager : MonoBehaviour {
 
     void ShowGameOverScreen() {
         gameOverScreen.SetActive(true);
+    }
+
+
+    public void ShowEndOfDemoScreen() {
+        endOfDemoScreen.SetActive(true);
     }
 
 

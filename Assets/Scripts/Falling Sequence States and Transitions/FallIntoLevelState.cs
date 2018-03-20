@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
+using UnityEngine.SceneManagement;
+
 public class FallIntoLevelState : State {
 
     public override void Initialize(StateController stateController) {
@@ -29,7 +31,7 @@ public class FallIntoLevelState : State {
         }
 
         // Drain color palette.
-        GameManager.colorPaletteManager.LoadFallingSequencePalette();
+        //GameManager.colorPaletteManager.LoadFallingSequencePalette();
 
         // Place the player in the correct spot above the level.
         GameManager.player.transform.position = fallingSequenceManager.playerSpawnPoint.position;
@@ -61,7 +63,7 @@ public class FallIntoLevelState : State {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
         if (GameManager.player.transform.position.y <= 600f) {
-            GameManager.instance.scoreManager.HideLevelCompleteScreen();
+            GameManager.scoreManager.HideLevelCompleteScreen();
         }
     }
 

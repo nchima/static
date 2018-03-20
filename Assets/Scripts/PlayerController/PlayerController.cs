@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
     // MOVEMENT
     [SerializeField] float accelerationSpeedGround;
     [SerializeField] float accelerationSpeedAir;
+    [SerializeField] float deccelerationSpeed = 150f;
     [SerializeField] float minSpeed;
     public float maxGroundSpeed;
     public float maxAirSpeed;
@@ -53,8 +54,8 @@ public class PlayerController : MonoBehaviour {
             float colliderRadius = GetComponent<CapsuleCollider>().radius;
 
             // If we didn't find anything, return false.
-            if (!Physics.Raycast(transform.position + transform.forward * colliderRadius, Vector3.down, out hit1, 5f, (1 << 20 | 1 << 24))) { return false; }
-            if (!Physics.Raycast(transform.position + transform.forward * -colliderRadius, Vector3.down, out hit2, 5f, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(transform.position + transform.forward * colliderRadius, Vector3.down, out hit1, 10f, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(transform.position + transform.forward * -colliderRadius, Vector3.down, out hit2, 10f, (1 << 20 | 1 << 24))) { return false; }
 
             // If both things hit something and it was the floor, we're all good baby!
             if (hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) {
@@ -81,6 +82,8 @@ public class PlayerController : MonoBehaviour {
 
 
     private void Update() {
+
+        if (GameManager.gamePaused) { return; }
 
         /* GET DIRECTIONAL INPUT */
         if (state != State.ShotgunCharge
@@ -125,7 +128,7 @@ public class PlayerController : MonoBehaviour {
             float decelerateTo = maxGroundSpeed;
             if (directionalInput.magnitude == 0) { decelerateTo = 0f; }
             if (rigidBody.velocity.magnitude > decelerateTo) {
-                Vector3 deccelerateForce = rigidBody.velocity.normalized * -125f;
+                Vector3 deccelerateForce = rigidBody.velocity.normalized * -deccelerationSpeed;
                 deccelerateForce.y = 0;
                 rigidBody.AddForce(deccelerateForce, ForceMode.Acceleration);
             }
