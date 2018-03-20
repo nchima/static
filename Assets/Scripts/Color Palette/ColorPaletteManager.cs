@@ -27,6 +27,9 @@ public class ColorPaletteManager : MonoBehaviour {
     private void Awake() {
         // Memorize original colors.
         ChangePaletteImmediate(startingPalette);
+    }
+
+    private void Start() {
         SaveCurrentPalette(originalPalette);
     }
 
@@ -94,6 +97,6 @@ public class ColorPaletteManager : MonoBehaviour {
 
     private void OnDisable() {
         // Restore memorized original colors.
-        ChangePaletteImmediate(originalPalette);
+ 
     }
 }

@@ -3,17 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class MeleeEnemyAnimationController : MonoBehaviour {
+public class MeleeEnemyAnimationController : EnemyAnimationController {
 
     [SerializeField] int chargeWindupIndex = 0;
     [SerializeField] int chargeReleaseIndex = 0;
     [SerializeField] int idleMorph1Index = 0;
     [SerializeField] int idleMorph2Index = 0;
-
-    [SerializeField] float idleMorphSpeed;
-    [SerializeField] FloatRange idleMorphNoiseRange = new FloatRange(1f, 100f);
-
-    SkinnedMeshRenderer[] blendRenderers;
 
     float currentChargeWindupValue = 0f;
     float currentChargeReleaseValue = 0f;
@@ -24,7 +19,8 @@ public class MeleeEnemyAnimationController : MonoBehaviour {
     PerlinNoise idleMorph2Noise;
 
 
-    private void Start() {
+    protected override void Start() {
+        base.Start();
         blendRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
         idleMorph1Noise = new PerlinNoise(idleMorphSpeed);
         idleMorph2Noise = new PerlinNoise(idleMorphSpeed);

@@ -3,18 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class HoveringEnemyAnimationController : MonoBehaviour {
+public class HoveringEnemyAnimationController : EnemyAnimationController {
 
     [SerializeField] int bristleIndex = 0;
     [SerializeField] int attackIndex = 0;
     [SerializeField] int idleMorph1Index = 0;
     [SerializeField] int idleMorph2Index = 0;
 
-    [SerializeField] float idleMorphSpeed;
     [SerializeField] FloatRange idleMorph1NoiseRange = new FloatRange(1f, 100f);
     [SerializeField] FloatRange idleMorph2NoiseRange = new FloatRange(1f, 100f);
-
-    SkinnedMeshRenderer[] blendRenderers;
 
     float currentBristleValue = 0f;
     float currentAttackValue = 0f;
@@ -26,8 +23,8 @@ public class HoveringEnemyAnimationController : MonoBehaviour {
     PerlinNoise idleMorph2Noise;
 
 
-    private void Start() {
-        blendRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+    protected override void Start() {
+        base.Start();
         idleMorph1Noise = new PerlinNoise(idleMorphSpeed);
         idleMorph2Noise = new PerlinNoise(idleMorphSpeed);
     }

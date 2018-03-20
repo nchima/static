@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ public class HealthManager : MonoBehaviour {
             else {
                 // Reactivate health box.
                 if (value <= 5) healthBlocks[Mathf.Clamp(value - 1, 0, 5)].SetActive(true);
-                if (value == 5) GameManager.colorPaletteManager.RestoreSavedPalette();
+                //if (value == 5) GameManager.colorPaletteManager.RestoreSavedPalette();
             }
 
             _playerHealth = value;
@@ -47,8 +48,10 @@ public class HealthManager : MonoBehaviour {
     [SerializeField] bool godMode;  // For debugging.
     [HideInInspector] public bool forceInvincibility;    // Used by other scripts to force player invincibility at certain times.
     bool currentlyInvincible;
-    [SerializeField] float invincibilityTime = 0.5f;
+    [SerializeField] float invincibilityTime = 1f;
     float invincibilityTimer = 0f;
+
+    [SerializeField] HealthBonus[] healthBonuses;
 
     // Misc references.
     [SerializeField] GameObject[] healthBlocks;
@@ -58,23 +61,39 @@ public class HealthManager : MonoBehaviour {
     private void Update() {
 
         // Handle health recharging.
-        if (playerHealth < 5) {
-            timer += Time.deltaTime;
-            if (timer >= healthRechargeRate) {
+        //if (playerHealth < 5) {
+        //    timer += Time.deltaTime;
+        //    if (timer >= healthRechargeRate) {
+        //        playerHealth++;
+        //        timer = 0f;
+        //    }
+        //}
+
+        // Check for score bonuses.
+        for (int i = 0; i < healthBonuses.Length; i++) {
+            if (!healthBonuses[i].applied && GameManager.scoreManager.score >= healthBonuses[i].requiredScore) {
+                healthBonuses[i].applied = true;
                 playerHealth++;
-                timer = 0f;
             }
         }
 
         // Check invincibility frames.
         invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
-        if (invincibilityTimer > 0) {
+        if (invincibilityTimer > 0 && currentlyInvincible == false) {
             currentlyInvincible = true;
             invincibilityTimer -= Time.deltaTime;
+            //GameManager.colorPaletteManager.RestoreSavedPalette();
+            GameManager.colorPaletteManager.Invoke("RestoreSavedPalette", 1f);
         } else {
             currentlyInvincible = false;
         }
 
         if (forceInvincibility || godMode) currentlyInvincible = true;
     }
+}
+
+[Serializable]
+class HealthBonus {
+    public int requiredScore;
+    [HideInInspector] public bool applied;
 }

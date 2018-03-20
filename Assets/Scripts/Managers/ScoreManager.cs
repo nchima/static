@@ -8,6 +8,7 @@ using DG.Tweening;
 
 public class ScoreManager : MonoBehaviour
 {
+
     // USED FOR DISPLAYING THE SCORE
     [SerializeField] private int _score = 0;
     public int score
@@ -115,10 +116,9 @@ public class ScoreManager : MonoBehaviour
         maxTimeBonus = 0;
 
         // Get all enemies and add their values to max values.
-        EnemyOld[] allEnemies = FindObjectsOfType<EnemyOld>();
-        for (int i = 0; i < allEnemies.Length; i++)
-        {
-            maxTimeBonus += allEnemies[i].killValue;
+        Enemy[] allEnemies = FindObjectsOfType<Enemy>();
+        for (int i = 0; i < allEnemies.Length; i++) {
+            maxTimeBonus += allEnemies[i].scoreKillValue;
             maxBonusTime += allEnemies[i].bonusTimeAdded;
         }
 

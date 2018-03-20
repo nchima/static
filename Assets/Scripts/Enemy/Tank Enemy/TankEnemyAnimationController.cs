@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class TankEnemyAnimationController : MonoBehaviour {
+public class TankEnemyAnimationController : EnemyAnimationController {
 
     [SerializeField] GameObject artilleryBase;
     [SerializeField] GameObject artilleryBaseSheathe;
@@ -23,8 +23,6 @@ public class TankEnemyAnimationController : MonoBehaviour {
     float currentIdleNoiseBase;
     float currentIdleNoiseSpread;
 
-    SkinnedMeshRenderer[] blendRenderers;
-
     PerlinNoise leg1IdleMorphNoise;
     PerlinNoise leg2IdleMorphNoise;
     PerlinNoise leg3IdleMorphNoise;
@@ -33,7 +31,9 @@ public class TankEnemyAnimationController : MonoBehaviour {
     PerlinNoise leg6IdleMorphNoise;
 
 
-    private void Start() {
+    protected override void Start() {
+        base.Start();
+
         currentIdleNoiseSpeed = seigeModeIdleNoiseSpeed;
         currentIdleNoiseBase = seigeModeIdleNoiseBase;
         currentIdleNoiseSpread = seigeModeIdleNoiseSpread;

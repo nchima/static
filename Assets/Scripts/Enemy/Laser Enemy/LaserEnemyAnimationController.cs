@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class LaserEnemyAnimationController : MonoBehaviour {
+public class LaserEnemyAnimationController : EnemyAnimationController {
 
     [SerializeField] int dashWindupIndex = 0;
     [SerializeField] int dashReleaseIndex = 0;
@@ -12,11 +12,6 @@ public class LaserEnemyAnimationController : MonoBehaviour {
     [SerializeField] int idleMorph1Index = 0;
     [SerializeField] int idleMorph2Index = 0;
     [SerializeField] int idleMorph3Index = 0;
-
-    [SerializeField] float idleMorphSpeed;
-    [SerializeField] FloatRange idleMorphNoiseRange = new FloatRange(1f, 100f);
-
-    SkinnedMeshRenderer[] blendRenderers;
 
     float currentDashWindupValue = 0f;
     float currentDashReleaseValue = 0f;
@@ -31,8 +26,8 @@ public class LaserEnemyAnimationController : MonoBehaviour {
     PerlinNoise idleMorph3Noise;
 
 
-    private void Start() {
-        blendRenderers = GetComponentsInChildren<SkinnedMeshRenderer>();
+    protected override void Start() {
+        base.Start();
         idleMorph1Noise = new PerlinNoise(idleMorphSpeed);
         idleMorph2Noise = new PerlinNoise(idleMorphSpeed);
         idleMorph3Noise = new PerlinNoise(idleMorphSpeed);

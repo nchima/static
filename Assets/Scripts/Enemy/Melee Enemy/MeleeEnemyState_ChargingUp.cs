@@ -12,6 +12,8 @@ public class MeleeEnemyState_ChargingUp : State {
     float rotationSpeedCurrent = 0;
     [SerializeField] float rotationSpeedMax;
 
+    [SerializeField] GameObject chargeParticles;
+
     Color attackingColorCurrent;
     Color attackingColorMax;
 
@@ -34,6 +36,14 @@ public class MeleeEnemyState_ChargingUp : State {
 
         // Play animation
         controller.m_AnimationController.StartChargeWindupAnimation(chargeUpDuration * 0.75f);
+
+        // Particle sytem
+        foreach (ParticleSystem particleSystem in chargeParticles.GetComponentsInChildren<ParticleSystem>()) {
+            particleSystem.Stop();
+            ParticleSystem.MainModule mm = particleSystem.main;
+            mm.duration = chargeUpDuration * 0.9f;
+            particleSystem.Play();
+        }
 
         // Change audio values.
         controller.humAudioSource.DOPitch(3f, chargeUpDuration * 0.9f).SetEase(Ease.InQuad);

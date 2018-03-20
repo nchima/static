@@ -19,6 +19,7 @@ public class Enemy : StateController {
                 Die();
             } else {
                 //hurtAudio.Play();
+                GetHurt();
                 TestPainChance();
                 _currentHealth = value;
             }
@@ -62,6 +63,7 @@ public class Enemy : StateController {
 
     // REFERENCES
     public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
+    [SerializeField] protected GameObject myGeometry;
 
 
     protected virtual void Start() {
@@ -98,6 +100,16 @@ public class Enemy : StateController {
         }
 
         return true;
+    }
+
+
+    void GetHurt() {
+        if (myGeometry.GetComponent<EnemyAnimationController>() == null) {
+            Debug.Log("Enemy animation controller not found.");
+            return;
+        }
+
+        myGeometry.GetComponent<EnemyAnimationController>().GetHurt();
     }
 
 

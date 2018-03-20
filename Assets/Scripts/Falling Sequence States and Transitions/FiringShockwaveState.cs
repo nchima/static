@@ -9,7 +9,7 @@ public class FiringShockwaveState : State {
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        GameManager.instance.scoreManager.HideLevelCompleteScreen();
+        GameManager.scoreManager.HideLevelCompleteScreen();
         GameManager.instance.CountEnemies();
 
         // Set up bonus time for next level.
@@ -66,7 +66,7 @@ public class FiringShockwaveState : State {
         }
 
         // Begin moving obstacles to their full height.
-        GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
+        //GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
 
         GameManager.colorPaletteManager.RestoreSavedPalette();
         //GameManager.colorPaletteManager.ChangeToRandomPalette(0.1f);

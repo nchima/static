@@ -18,7 +18,7 @@ Shader "Custom/Bullet Shader"
 		}
 
 		ZWrite Off
-		Blend OneMinusDstColor DstColor
+		Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass
 		{
@@ -54,7 +54,7 @@ Shader "Custom/Bullet Shader"
 				i.localPosition = v.position.xyz;
 				i.position = UnityObjectToClipPos(v.position);
 
-				//i.uv = TRANSFORM_TEX(v.uv, _MainTex);
+				i.uv = TRANSFORM_TEX(v.uv, _MainTex);
 				i.uvProj.xy = TRANSFORM_TEX(i.position, _MainTex);
 				i.uvProj.zw = i.position.zw;
 
@@ -65,6 +65,7 @@ Shader "Custom/Bullet Shader"
 			{
 				//float rand = tex2D(_MainTex, float2(i.localPosition.x, i.localPosition.y));
 				//return float4(rand, rand, rand, rand);
+
 				i.uvProj /= i.uvProj.w;
 				i.uvProj = (i.uvProj + 1) * 0.5;
 

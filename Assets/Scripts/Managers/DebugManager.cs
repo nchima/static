@@ -92,13 +92,13 @@ public class DebugManager : MonoBehaviour {
 
     private void Update()
     {
-        // Handle music switching.
-        if (Input.GetKeyDown(KeyCode.M))
-        {
-            if (audioState == AudioState.Normal) audioState = AudioState.SFXOnly;
-            else if (audioState == AudioState.SFXOnly) audioState = AudioState.Silent;
-            else if (audioState == AudioState.Silent) audioState = AudioState.Normal;
-        }
+        //// Handle music switching.
+        //if (Input.GetKeyDown(KeyCode.M))
+        //{
+        //    if (audioState == AudioState.Normal) audioState = AudioState.SFXOnly;
+        //    else if (audioState == AudioState.SFXOnly) audioState = AudioState.Silent;
+        //    else if (audioState == AudioState.Silent) audioState = AudioState.Normal;
+        //}
 
         // Handle visuals switching.
         if (Input.GetKeyDown(KeyCode.N))

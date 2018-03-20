@@ -16,6 +16,7 @@ public class Gun : MonoBehaviour {
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
     [SerializeField] Color bulletColor2;
+    [SerializeField] FloatRange flashIntensity = new FloatRange(0.4f, 1f);
 
     // Modifies rate of fire during slow motion sequence.
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
@@ -173,6 +174,7 @@ public class Gun : MonoBehaviour {
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
 
+        // Handle screen shake
         foreach (ScreenShake screenShake in screenShakes) {
             screenShake.SetShake(MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f), (1/burstsPerSecond) * 0.6f);
         }
@@ -186,6 +188,10 @@ public class Gun : MonoBehaviour {
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f)
             );
+
+        // Flash screen
+        float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, flashIntensity.max, flashIntensity.min);
+        GameManager.flashManager.Flash(new Color(currentFlash, currentFlash, currentFlash, currentFlash));
 
         // Auto aim for weak points.
         Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;

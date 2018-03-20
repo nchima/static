@@ -26,6 +26,11 @@ public class LevelManager : MonoBehaviour {
 
 
     public void LoadNextLevel() {
+        if (currentLevelNumber == 12) {
+            SceneManager.UnloadSceneAsync(currentLevelNumber);
+            GameManager.instance.ShowEndOfDemoScreen();
+            return;
+        }
         LoadLevel(currentLevelNumber + 1);
         currentLevelNumber++;
     }
