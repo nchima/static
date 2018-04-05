@@ -74,18 +74,16 @@ public class GameManager : MonoBehaviour {
 
 
     private void Update() {
-        if (!gameStarted) {
+        if (!gameStarted && !gamePaused) {
             if (Input.GetMouseButtonDown(0)) {
                 StartGame();
             }
         }
 
-        else {
-            if (Input.GetKeyDown(KeyCode.Escape)) {
-                if (!gamePaused) { PauseGame(true); }
-                else { PauseGame(false); }
-            }
+        if (Input.GetKeyDown(KeyCode.Escape)) {
+            if (!gamePaused) { PauseGame(true); } else { PauseGame(false); }
         }
+
     }
 
 
@@ -94,8 +92,10 @@ public class GameManager : MonoBehaviour {
     public void PauseGame(bool value) {
         if (value == true) {
             memorizedTimeScale = Time.timeScale;
+            mainMenuScreen.SetActive(false);
             Time.timeScale = 0f;
             pauseScreen.SetActive(true);
+            specialBarManager.screenHidden = true;
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             gamePaused = true;
@@ -104,6 +104,8 @@ public class GameManager : MonoBehaviour {
         else {
             Time.timeScale = memorizedTimeScale;
             pauseScreen.SetActive(false);
+            if (!gameStarted) { mainMenuScreen.SetActive(true); }
+            specialBarManager.screenHidden = false;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             gamePaused = false;
@@ -240,6 +242,7 @@ public class GameManager : MonoBehaviour {
 
 
     void ShowGameOverScreen() {
+        specialBarManager.screenHidden = true;
         gameOverScreen.SetActive(true);
     }
 
@@ -250,7 +253,8 @@ public class GameManager : MonoBehaviour {
 
 
     public void StartGame() {
-        
+        if (gamePaused) { return; }
+
         // Unpause enemies in the background.
         levelManager.SetEnemiesActive(true);
 

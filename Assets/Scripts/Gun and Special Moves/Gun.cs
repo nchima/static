@@ -180,7 +180,7 @@ public class Gun : MonoBehaviour {
         }
 
         // Show muzzle flash.
-        GameObject _muzzleFlash = Instantiate(muzzleFlash);
+        GameObject _muzzleFlash = Instantiate(muzzleFlash, GameManager.player.transform);
         _muzzleFlash.transform.position = gunTipTransform.position;
         _muzzleFlash.transform.rotation = gunTipTransform.rotation;
         _muzzleFlash.transform.localScale = new Vector3(

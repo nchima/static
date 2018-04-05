@@ -21,6 +21,7 @@ public class SpecialBarManager : MonoBehaviour {
     [SerializeField] private float getHurtPenalty = 0.1f; // How much the special bar decreases when the player is hurt.
 
     [SerializeField] private GameObject specialMoveReadyScreen;
+    [HideInInspector] public bool screenHidden = false;
 
 
     public bool bothBarsFull {
@@ -40,7 +41,7 @@ public class SpecialBarManager : MonoBehaviour {
         leftBar.Run(this);
         rightBar.Run(this);
 
-        if (bothBarsFull) {
+        if (bothBarsFull && !screenHidden) {
             specialMoveReadyScreen.SetActive(true);
             FlashBar();
         }

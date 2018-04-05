@@ -59,6 +59,7 @@ public class PlayerBulletTrail : MonoBehaviour {
 
     public void AddSegment(Vector3 beginning, Vector3 end, Vector3 velocity) {
         trailPiece.SetActive(true);
+        trailPiece.GetComponent<PlayerBulletMesh>().screenTime = lingerDuration;
         segments.Add(new Segment(beginning, end, Time.time + lingerDuration, velocity));
         RedrawTrail();
     }

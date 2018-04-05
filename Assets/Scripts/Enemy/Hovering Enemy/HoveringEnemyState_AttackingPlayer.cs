@@ -13,6 +13,10 @@ public class HoveringEnemyState_AttackingPlayer : State {
     [SerializeField] float postAttackPauseDuration = 1f;
     [SerializeField] BoxCollider hitBox;
 
+    [SerializeField] AudioSource droneAudio;
+    [SerializeField] AudioSource bristleAudio;
+    [SerializeField] AudioSource attackAudio;
+
 
     public override void Initialize(StateController stateController) {
         // Turn towards player.
@@ -34,10 +38,14 @@ public class HoveringEnemyState_AttackingPlayer : State {
         HoveringEnemy controller = stateController as HoveringEnemy;
 
         controller.m_AnimationController.StartBristleAnimation(bristleAnimationDuration);
+        droneAudio.Stop();
+        bristleAudio.Play();
 
         yield return new WaitForSeconds(bristleDuration);
 
         controller.m_AnimationController.StartAttackAnimation(attackAnimationDuration);
+        bristleAudio.Stop();
+        attackAudio.Play();
 
         yield return new WaitForSeconds(attackAnimationDuration * 0.9f);
 
@@ -63,7 +71,8 @@ public class HoveringEnemyState_AttackingPlayer : State {
         controller.m_AnimationController.StartWithdrawAnimation(attackWithdrawAnimationDuration);
 
         yield return new WaitForSeconds(postAttackPauseDuration);
-        
+
+        droneAudio.Play();
         GetComponent<TriggerTransition>().isTriggerSet = true;
 
         yield return null;
