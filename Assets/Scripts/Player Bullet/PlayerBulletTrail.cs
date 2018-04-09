@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerBulletTrail : MonoBehaviour {
 
-    [SerializeField] float lingerDuration = 0.25f;
+    float lingerDuration = 0.3f;
     float lingerTimer = 0f;
 
     static ObjectPooler meshPooler;

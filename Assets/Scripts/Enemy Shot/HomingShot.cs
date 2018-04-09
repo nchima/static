@@ -213,7 +213,6 @@ public class HomingShot : EnemyShot {
     {
         if (!canBeShotDown) return;
 
-        Debug.Log("Got shot");
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().useGravity = true;
         GetComponent<Rigidbody>().AddExplosionForce(7f, forcePoint, 2f, 1f,  ForceMode.Impulse);
