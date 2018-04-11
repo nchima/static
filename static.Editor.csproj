@@ -155,6 +155,7 @@
     <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshSurfaceEditor.cs" />
     <Compile Include="Assets\Asset Packages\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
     <Compile Include="Assets\Scripts\Editor\LevelGeneratorEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\MeshSaverEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\ScoreManagerEditor.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +165,11 @@
     <None Include="Assets\Asset Packages\DOTween\DOTween50.xml" />
     <None Include="Assets\Asset Packages\DOTween\Editor\DOTweenEditor.XML" />
     <None Include="Assets\Asset Packages\DOTween\readme.txt" />
+    <None Include="Assets\Asset Packages\Doom Loader\DoomLoader\README.TXT" />
+    <None Include="Assets\Asset Packages\Doom Loader\DoomLoader\Shaders\AlphaCut.shader" />
+    <None Include="Assets\Asset Packages\Doom Loader\DoomLoader\Shaders\Billboard.shader" />
+    <None Include="Assets\Asset Packages\Doom Loader\DoomLoader\Shaders\DefaultShader.shader" />
+    <None Include="Assets\Asset Packages\Doom Loader\DoomLoader\Shaders\SkyHole.shader" />
     <None Include="Assets\Asset Packages\Standard Assets\Characters\FirstPersonCharacter\FirstPersonCharacterGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\Characters\RollerBall\RollerBallGuidelines.txt" />
     <None Include="Assets\Asset Packages\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
