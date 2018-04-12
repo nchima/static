@@ -258,6 +258,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\SpecialMoveAmmo.cs" />
     <Compile Include="Assets\Scripts\Level\EnemiesPerLevel.cs" />
+    <Compile Include="Assets\Scripts\Level\EnemyPlacer.cs" />
     <Compile Include="Assets\Scripts\Level\FloorCreator.cs" />
     <Compile Include="Assets\Scripts\Level\FloorTile.cs" />
     <Compile Include="Assets\Scripts\Level\LevelGenerator.cs" />

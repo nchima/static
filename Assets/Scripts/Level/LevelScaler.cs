@@ -39,6 +39,8 @@ public class LevelScaler : MonoBehaviour {
                 ScaleObjectXZ(obstacleHolder.GetChild(i));
             }
         }
+
+        GetComponent<EnemyPlacer>().PlaceEnemies();
     }
 
 
