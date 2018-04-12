@@ -262,6 +262,7 @@
     <Compile Include="Assets\Scripts\Level\FloorTile.cs" />
     <Compile Include="Assets\Scripts\Level\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\Level\LevelManager.cs" />
+    <Compile Include="Assets\Scripts\Level\LevelScaler.cs" />
     <Compile Include="Assets\Scripts\Level\Obstacle.cs" />
     <Compile Include="Assets\Scripts\Managers\DebugManager.cs" />
     <Compile Include="Assets\Scripts\Managers\FallingSequenceManager.cs" />
