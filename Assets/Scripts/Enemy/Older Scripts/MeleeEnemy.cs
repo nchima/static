@@ -29,7 +29,7 @@ public class MeleeEnemy : Enemy {
 
     private void Awake() {
         m_NavMeshAgent = GetComponent<NavMeshAgent>();
-        originalColor = sheatheMeshRenderer.material.GetColor("_FlashColor1");
+        originalColor = sheatheMeshRenderer.material.GetColor("_Color");
         originalHumVolume = humAudioSource.volume;
         originalHumPitch = humAudioSource.pitch;
     }

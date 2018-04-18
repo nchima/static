@@ -4,30 +4,28 @@ using UnityEngine;
 
 public class LevelScaler : MonoBehaviour {
 
-    [SerializeField] float scaleMultiplier = 1f;
 
-
-    private void Start() {
+    public void ScaleLevel(float scaleMultiplier) {
         // Do floor
         Transform floorHolder = GameObject.Find("Floor Planes").transform;
         for (int i = 0; i < floorHolder.childCount; i++) {
-            MoveObject(floorHolder.GetChild(i));
+            MoveObject(floorHolder.GetChild(i), scaleMultiplier);
             floorHolder.GetChild(i).localScale *= scaleMultiplier;
         }
 
         // Do walls
         Transform wallHolder = GameObject.Find("Walls").transform;
         for (int i = 0; i < wallHolder.childCount; i++) {
-            MoveObject(wallHolder.GetChild(i));
-            ScaleObjectX(wallHolder.GetChild(i));
+            MoveObject(wallHolder.GetChild(i), scaleMultiplier);
+            ScaleObjectX(wallHolder.GetChild(i), scaleMultiplier);
         }
 
         // Do railings
         if (GameObject.Find("Railings") != null) {
             Transform railingHolder = GameObject.Find("Railings").transform;
             for (int i = 0; i < railingHolder.childCount; i++) {
-                MoveObject(railingHolder.GetChild(i));
-                ScaleObjectX(railingHolder.GetChild(i));
+                MoveObject(railingHolder.GetChild(i), scaleMultiplier);
+                ScaleObjectX(railingHolder.GetChild(i), scaleMultiplier);
             }
         }
 
@@ -35,8 +33,8 @@ public class LevelScaler : MonoBehaviour {
         if (GameObject.Find("Obstacle") != null) {
             Transform obstacleHolder = GameObject.Find("Obstacle").transform;
             for (int i = 0; i < obstacleHolder.childCount; i++) {
-                MoveObject(obstacleHolder.GetChild(i));
-                ScaleObjectXZ(obstacleHolder.GetChild(i));
+                MoveObject(obstacleHolder.GetChild(i), scaleMultiplier);
+                ScaleObjectXZ(obstacleHolder.GetChild(i), scaleMultiplier);
             }
         }
 
@@ -44,14 +42,14 @@ public class LevelScaler : MonoBehaviour {
     }
 
 
-    private void ScaleObjectX(Transform t) {
+    private void ScaleObjectX(Transform t, float scaleMultiplier) {
         Vector3 newLocalScale = t.localScale;
         newLocalScale.x *= scaleMultiplier;
         t.localScale = newLocalScale;
     }
 
 
-    private void ScaleObjectXZ(Transform t) {
+    private void ScaleObjectXZ(Transform t, float scaleMultiplier) {
         Vector3 newLocalScale = t.localScale;
         newLocalScale.x *= scaleMultiplier;
         newLocalScale.z *= scaleMultiplier;
@@ -59,7 +57,7 @@ public class LevelScaler : MonoBehaviour {
     }
 
 
-    private void MoveObject(Transform t) {
+    private void MoveObject(Transform t, float scaleMultiplier) {
         Vector3 origin = t.parent.position;
         origin.y = t.localPosition.y;
         Vector3 moveDirection = Vector3.Normalize(t.position - origin);

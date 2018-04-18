@@ -71,7 +71,7 @@ public class Enemy : StateController {
     }
 
     protected override void Update() {
-        base.Update();
+        base.Update();        
     }
 
     protected virtual void Die() {

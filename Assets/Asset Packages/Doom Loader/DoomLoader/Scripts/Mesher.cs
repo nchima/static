@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using UnityEditor;
 
-public class Mesher : MonoBehaviour
-{
+public class Mesher : MonoBehaviour {
     [SerializeField] GameObject wallPrefab;
     [SerializeField] GameObject railingPrefab;
     [SerializeField] GameObject floorPrefab;
@@ -14,13 +12,11 @@ public class Mesher : MonoBehaviour
     GameObject wallParent;
     GameObject floorParent;
 
-    void Awake()
-    {
+    void Awake() {
         Instance = this;
     }
 
-    public void CreateMeshes()
-    {
+    public void CreateMeshes() {
         // Create game objects to hold static level.
         level = new GameObject("Level");
         railingParent = new GameObject("Railings");
@@ -38,8 +34,7 @@ public class Mesher : MonoBehaviour
             Triangulator triangulator = new Triangulator();
 
             int index = 0;
-            foreach (Sector s in MapLoader.sectors)
-            {
+            foreach (Sector s in MapLoader.sectors) {
                 triangulator.Triangulate(s);
 
                 //floor
@@ -54,8 +49,7 @@ public class Mesher : MonoBehaviour
                     if (!MaterialManager.Instance.OverridesFlat(s.floorTexture, sectorObject, mr))
                         mr.material = MaterialManager.Instance.defaultMaterial;
 
-                    if (mr.material.mainTexture == null)
-                    {
+                    if (mr.material.mainTexture == null) {
                         MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
                         materialProperties.SetTexture("_MainTex", TextureLoader.Instance.GetFlatTexture(s.floorTexture));
                         mr.SetPropertyBlock(materialProperties);
@@ -72,8 +66,7 @@ public class Mesher : MonoBehaviour
                     int[] indices = new int[vc];
 
                     int v = 0;
-                    foreach (Vector2D p in Triangulator.vertices)
-                    {
+                    foreach (Vector2D p in Triangulator.vertices) {
                         vertices[v] = new Vector3(p.x, s.floorHeight, p.y);
                         indices[v] = v;
                         normals[v] = Vector3.up;
@@ -127,8 +120,7 @@ public class Mesher : MonoBehaviour
                     if (!MaterialManager.Instance.OverridesFlat(s.ceilingTexture, sectorObject, mr))
                         mr.material = MaterialManager.Instance.defaultMaterial;
 
-                    if (mr.material.mainTexture == null)
-                    {
+                    if (mr.material.mainTexture == null) {
                         MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
                         materialProperties.SetTexture("_MainTex", TextureLoader.Instance.GetFlatTexture(s.ceilingTexture));
                         mr.SetPropertyBlock(materialProperties);
@@ -143,8 +135,7 @@ public class Mesher : MonoBehaviour
                     int[] indices = new int[vc];
 
                     int v = 0;
-                    foreach (Vector2D p in Triangulator.vertices)
-                    {
+                    foreach (Vector2D p in Triangulator.vertices) {
                         vertices[v] = new Vector3(p.x, s.ceilingHeight, p.y);
                         indices[v] = v;
                         normals[v] = -Vector3.up;
@@ -177,10 +168,8 @@ public class Mesher : MonoBehaviour
         //walls
         {
             int index = 0;
-            foreach (Linedef l in MapLoader.linedefs)
-            {
-                if (l.Back != null)
-                {
+            foreach (Linedef l in MapLoader.linedefs) {
+                if (l.Back != null) {
                     //top part (front)
                     if (l.Front.Sector.ceilingHeight > l.Back.Sector.ceilingHeight)
                         l.TopFrontObject = CreateLineQuad
@@ -290,17 +279,16 @@ public class Mesher : MonoBehaviour
                             );
 
                     if ((l.flags & (1 << 0)) != 0)
-                    CreateInvisibleBlocker
-                        (
-                            l,
-                            Mathf.Max(l.Front.Sector.floorHeight, l.Back.Sector.floorHeight),
-                            Mathf.Min(l.Front.Sector.ceilingHeight, l.Back.Sector.ceilingHeight),
-                            "Wall_" + index + "_blocker",
-                            holder
-                        );
-                        
-                }
-                else //solid wall
+                        CreateInvisibleBlocker
+                            (
+                                l,
+                                Mathf.Max(l.Front.Sector.floorHeight, l.Back.Sector.floorHeight),
+                                Mathf.Min(l.Front.Sector.ceilingHeight, l.Back.Sector.ceilingHeight),
+                                "Wall_" + index + "_blocker",
+                                holder
+                            );
+
+                } else //solid wall
                     CreateLineQuad
                         (
                             l.Front,
@@ -322,8 +310,7 @@ public class Mesher : MonoBehaviour
         }
     }
 
-    public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname, Transform holder)
-    {
+    public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname, Transform holder) {
         if (max - min <= 0)
             return null;
 
@@ -349,17 +336,15 @@ public class Mesher : MonoBehaviour
             else
                 mr.material = MaterialManager.Instance.defaultMaterial;
 
-        if (mr.material.mainTexture == null)
-        {
+        if (mr.material.mainTexture == null) {
             mainTexture = TextureLoader.Instance.GetWallTexture(tex);
 
             MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
             materialProperties.SetTexture("_MainTex", mainTexture);
             mr.SetPropertyBlock(materialProperties);
-        }
-        else
+        } else
             mainTexture = mr.material.mainTexture;
-        
+
 
         int vc = 4;
 
@@ -374,8 +359,7 @@ public class Mesher : MonoBehaviour
         vertices[2] = new Vector3(s.Line.start.Position.x, max, s.Line.start.Position.y);
         vertices[3] = new Vector3(s.Line.end.Position.x, max, s.Line.end.Position.y);
 
-        if (mainTexture != null)
-        {
+        if (mainTexture != null) {
             float length = (s.Line.start.Position - s.Line.end.Position).GetLength();
             float height = max - min;
             float u = length / ((float)mainTexture.width / MapLoader.sizeDividor);
@@ -383,8 +367,7 @@ public class Mesher : MonoBehaviour
             float ox = (float)offsetX / (float)mainTexture.width;
             float oy = (float)offsetY / (float)mainTexture.height;
 
-            if (peg == 2)
-            {
+            if (peg == 2) {
                 float sheight = s.Sector.ceilingHeight - s.Sector.floorHeight;
                 float sv = sheight / ((float)mainTexture.height / MapLoader.sizeDividor);
 
@@ -392,16 +375,12 @@ public class Mesher : MonoBehaviour
                 uvs[1] = new Vector2(u + ox, 1 - sv);
                 uvs[2] = new Vector2(ox, 1 - sv + v);
                 uvs[3] = new Vector2(u + ox, 1 - sv + v);
-            }
-            else if (peg == 1)
-            {
+            } else if (peg == 1) {
                 uvs[0] = new Vector2(ox, oy);
                 uvs[1] = new Vector2(u + ox, oy);
                 uvs[2] = new Vector2(ox, v + oy);
                 uvs[3] = new Vector2(u + ox, v + oy);
-            }
-            else
-            {
+            } else {
                 uvs[0] = new Vector2(ox, 1 - v - oy);
                 uvs[1] = new Vector2(u + ox, 1 - v - oy);
                 uvs[2] = new Vector2(ox, 1 - oy);
@@ -409,8 +388,7 @@ public class Mesher : MonoBehaviour
             }
         }
 
-        if (invert)
-        {
+        if (invert) {
             indices[0] = 0;
             indices[1] = 1;
             indices[2] = 2;
@@ -419,9 +397,7 @@ public class Mesher : MonoBehaviour
             indices[5] = 3;
 
             uvs = new Vector2[4] { uvs[1], uvs[0], uvs[3], uvs[2] };
-        }
-        else
-        {
+        } else {
             indices[0] = 2;
             indices[1] = 1;
             indices[2] = 0;
@@ -435,8 +411,7 @@ public class Mesher : MonoBehaviour
         float x = normal.x;
         normal.x = -z;
         normal.z = x;
-        for (int i = 0; i < 4; i++)
-        {
+        for (int i = 0; i < 4; i++) {
             normals[i] = invert ? -normal : normal;
             colors[i] = Color.white * brightness;
         }
@@ -449,8 +424,7 @@ public class Mesher : MonoBehaviour
 
         mesh.RecalculateBounds();
 
-        if (blocks)
-        {
+        if (blocks) {
             MeshCollider mc = wallObject.AddComponent<MeshCollider>();
             mc.sharedMesh = mesh;
         }
@@ -482,8 +456,7 @@ public class Mesher : MonoBehaviour
         return wallObject;
     }
 
-    public Mesh CreateBillboardMesh(float width, float height, float pivotX, float pivotY)
-    {
+    public Mesh CreateBillboardMesh(float width, float height, float pivotX, float pivotY) {
         Mesh mesh = new Mesh();
         mesh.name = "Billboard";
 
@@ -522,8 +495,7 @@ public class Mesher : MonoBehaviour
         return mesh;
     }
 
-    public void CreateInvisibleBlocker(Linedef l, float min, float max, string objname, Transform holder)
-    {
+    public void CreateInvisibleBlocker(Linedef l, float min, float max, string objname, Transform holder) {
         if (max - min <= 0)
             return;
 
@@ -585,8 +557,7 @@ public class Mesher : MonoBehaviour
         mc.sharedMesh = mesh;
     }
 
-    public BoxCollider CreateLineCollider(Linedef l, float min, float max, string objname, Transform holder)
-    {
+    public BoxCollider CreateLineCollider(Linedef l, float min, float max, string objname, Transform holder) {
         if (max - min <= 0)
             return null;
 
@@ -609,17 +580,19 @@ public class Mesher : MonoBehaviour
 
 
     public static void SaveMesh(Mesh mesh, string name, bool makeNewInstance, bool optimizeMesh) {
-        string path = EditorUtility.SaveFilePanel("Save Separate Mesh Asset", "Assets/Models/Level Geo/Level Floors/", name, "asset");
+#if UNITY_EDITOR
+        string path = UnityEditor.EditorUtility.SaveFilePanel("Save Separate Mesh Asset", "Assets/Models/Level Geo/Level Floors/", name, "asset");
         if (string.IsNullOrEmpty(path)) return;
 
-        path = FileUtil.GetProjectRelativePath(path);
+        path = UnityEditor.FileUtil.GetProjectRelativePath(path);
 
         Mesh meshToSave = (makeNewInstance) ? Object.Instantiate(mesh) as Mesh : mesh;
 
         if (optimizeMesh)
-            MeshUtility.Optimize(meshToSave);
+            UnityEditor.MeshUtility.Optimize(meshToSave);
 
-        AssetDatabase.CreateAsset(meshToSave, path);
-        AssetDatabase.SaveAssets();
+        UnityEditor.AssetDatabase.CreateAsset(meshToSave, path);
+        UnityEditor.AssetDatabase.SaveAssets();
+#endif
     }
 }

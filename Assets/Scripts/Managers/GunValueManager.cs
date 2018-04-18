@@ -9,10 +9,13 @@ public class GunValueManager : MonoBehaviour {
 
     [SerializeField] GameObject wiper;
 
+
     void Update() {
 
         // Change current gun value based on mouse Y movement.
-        currentValue += Input.GetAxis("Mouse Y") * 0.1f;
+        float inputMod = 0.1f;
+        if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -0.2f; }
+        currentValue += InputManager.gunTuningValue * inputMod;
         currentValue = Mathf.Clamp(currentValue, -1f, 1f);
 
         // Handle wiper
@@ -22,7 +25,9 @@ public class GunValueManager : MonoBehaviour {
                 wiper.transform.localScale.y,
                 wiper.transform.localScale.z
             );
-        } else {
+        } 
+        
+        else {
             wiper.transform.localScale = new Vector3(
                     0f,
                     wiper.transform.localScale.y,

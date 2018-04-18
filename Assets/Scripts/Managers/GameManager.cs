@@ -75,12 +75,12 @@ public class GameManager : MonoBehaviour {
 
     private void Update() {
         if (!gameStarted && !gamePaused) {
-            if (Input.GetMouseButtonDown(0)) {
+            if (InputManager.fireButtonDown) {
                 StartGame();
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape)) {
+        if (InputManager.pauseButtonDown) {
             if (!gamePaused) { PauseGame(true); } else { PauseGame(false); }
         }
 
@@ -116,15 +116,16 @@ public class GameManager : MonoBehaviour {
     IEnumerator InitialSetup() {
         gun.enabled = false;
         player.GetComponent<PlayerController>().isMovementEnabled = false;
-        
-        levelManager.LoadLevel(levelManager.currentLevelNumber);
 
-        yield return new WaitUntil(() => {
-            if (SceneManager.GetSceneByBuildIndex(levelManager.currentLevelNumber).isLoaded) { return true; } 
-            else { return false; }
-        });
+        //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+        levelManager.LoadNextLevel();
 
-        levelManager.SetEnemiesActive(false);
+        //yield return new WaitUntil(() => {
+        //    if (SceneManager.GetSceneByBuildIndex(levelManager.levelsCompleted).isLoaded) { return true; } 
+        //    else { return false; }
+        //});
+
+        //levelManager.SetEnemiesActive(false);
         fallingSequenceManager.BeginFallingInstant();
 
         initialGravity = Physics.gravity;
@@ -132,12 +133,6 @@ public class GameManager : MonoBehaviour {
 
         yield return null;
     }
-
-
-    public void LoadNextLevel() {
-        levelManager.LoadNextLevel();
-    }
-
 
     public void PlayerUsedSpecialMove() {
         specialBarManager.PlayerUsedSpecialMove();
@@ -172,6 +167,7 @@ public class GameManager : MonoBehaviour {
 
         scoreManager.LevelComplete();
         levelManager.isLevelCompleted = true;
+        levelManager.levelsCompleted++;
 
         gun.canShoot = false;
 
@@ -180,7 +176,7 @@ public class GameManager : MonoBehaviour {
         //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
 
         // Disable the floor's collider so the player falls through it.
-        SetFloorCollidersActive(false);
+        levelManager.SetFloorCollidersActive(false);
 
         // Initiate falling sequence.
         fallingSequenceManager.BeginFalling();
@@ -205,11 +201,6 @@ public class GameManager : MonoBehaviour {
 
     public void DetermineBonusTime() {
         scoreManager.DetermineBonusTime();
-    }
-
-
-    public void SetFloorCollidersActive(bool value) {
-        levelManager.SetFloorCollidersActive(value);
     }
 
 
@@ -257,6 +248,8 @@ public class GameManager : MonoBehaviour {
 
         // Unpause enemies in the background.
         levelManager.SetEnemiesActive(true);
+
+        mainMenuScreen.SetActive(false);
 
         player.GetComponent<PlayerController>().isMovementEnabled = true;
         gun.enabled = true;

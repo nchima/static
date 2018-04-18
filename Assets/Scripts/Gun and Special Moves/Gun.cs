@@ -69,6 +69,7 @@ public class Gun : MonoBehaviour {
     Vector3 recoilPosition;
     ScreenShake[] screenShakes;
 
+
     private void Awake() {
         screenShakes = FindObjectsOfType<ScreenShake>();
     }
@@ -87,6 +88,7 @@ public class Gun : MonoBehaviour {
         originalPosition = transform.localPosition;
         recoilPosition = new Vector3(0f, -3.68f, 10.68f);
     }
+
 
     void Update() {
 
@@ -107,7 +109,7 @@ public class Gun : MonoBehaviour {
         //}
 
         // See if the player has fired a special move & if so, initialize proper variables.
-        if (GameManager.specialBarManager.bothBarsFull && (Input.GetButton("Fire2"))) {
+        if (GameManager.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
             if (GunValueManager.currentValue >= 0f && !firingMissiles && !firedMissiles) {
                 gameManager.PlayerUsedSpecialMove();
@@ -126,7 +128,7 @@ public class Gun : MonoBehaviour {
         if (firingMissiles) FireMissiles();
 
         /* Firing normal bullets */
-        if (Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) { FireBurst(); }
+        if (InputManager.fireButton) { FireBurst(); }
     }
 
 

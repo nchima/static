@@ -89,13 +89,13 @@ public class PlayerController : MonoBehaviour {
         if (state != State.ShotgunCharge
             && Physics.Raycast(transform.position + transform.forward * 0.75f, Vector3.down, 5f, 1 << 20)
             || (state == State.Falling || state == State.SpeedFalling)) {
-            directionalInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            directionalInput = InputManager.movementAxis;
         }
 
         /* HANDLE VIEW ROTATION */
         float _mouseSensitivity = mouseSensitivity;
         if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
-        mouseInput = Input.GetAxis("Mouse X") * _mouseSensitivity;
+        mouseInput = InputManager.turningValue * _mouseSensitivity;
         float rotation = mouseInput;
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;
@@ -191,11 +191,11 @@ public class PlayerController : MonoBehaviour {
 
     void HandleCursorLocking()
     {
-        if (Input.GetKeyUp(KeyCode.Escape)) {
+        if (InputManager.pauseButtonDown) {
             UnlockCursor();
         }
 
-        else if (Input.GetMouseButtonUp(0)) {
+        else if (InputManager.fireButtonDown) {
             LockCursor();
         }
     }

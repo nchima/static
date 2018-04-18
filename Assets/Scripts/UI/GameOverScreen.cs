@@ -36,7 +36,7 @@ public class GameOverScreen : MonoBehaviour
         specialMoveUIScreen.SetActive(false);
 
         // Disable floor
-        GameManager.instance.SetFloorCollidersActive(false);
+        GameManager.levelManager.SetFloorCollidersActive(false);
 
         // Turn background red.
         //GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color = new Color(GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.r + 0.1f, GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.g, GameObject.Find("Background Grain").GetComponent<MeshRenderer>().material.color.b);
@@ -46,7 +46,7 @@ public class GameOverScreen : MonoBehaviour
         transform.Find("Final Score Number").GetComponent<TextMesh>().text = scoreManager.score.ToString();
 
         // Update level complete number.
-        transform.Find("You Reached Level X Text").GetComponent<TextMesh>().text = "Y O U  R E A C H E D  L E V E L  " + GameManager.levelManager.currentLevelNumber.ToString();
+        transform.Find("You Reached Level X Text").GetComponent<TextMesh>().text = "Y O U  R E A C H E D  L E V E L  " + GameManager.levelManager.LevelNumber.ToString();
 
         // If this is a high score, show the name entry interface.
         if (scoreManager.score > 

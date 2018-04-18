@@ -23,11 +23,12 @@ public class FallIntoLevelState : State {
         GameManager.healthManager.forceInvincibility = false;
 
         // Reset gravity to starting value.
-        Physics.gravity = fallingSequenceManager.savedGravity;
+        //Physics.gravity = fallingSequenceManager.savedGravity;
 
         // Load next level.
         if (!GameManager.instance.dontChangeLevel && GameManager.levelManager.isLevelCompleted) {
-            GameManager.instance.LoadNextLevel();
+            //GameManager.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+            GameManager.levelManager.LoadNextLevel();
         }
 
         // Drain color palette.
@@ -35,12 +36,6 @@ public class FallIntoLevelState : State {
 
         // Place the player in the correct spot above the level.
         GameManager.player.transform.position = fallingSequenceManager.playerSpawnPoint.position;
-
-        // Re-enable the floor's collision (since it is disabled when the player completes a level.)
-        GameManager.instance.SetFloorCollidersActive(true);
-
-        // Update billboards.
-        GameManager.instance.GetComponent<BatchBillboard>().FindAllBillboards();
 
         // Set up variables for falling.
         fallingSequenceManager.playerTouchedDown = false;
@@ -68,5 +63,6 @@ public class FallIntoLevelState : State {
     }
 
     public override void End(StateController stateController) {
+        GameManager.levelManager.LockInLevel();
     }
 }

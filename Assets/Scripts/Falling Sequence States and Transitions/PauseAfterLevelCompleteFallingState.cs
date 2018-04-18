@@ -6,7 +6,7 @@ using UnityEngine;
 public class PauseAfterLevelCompleteFallingState : State {
 
     public override void Initialize(StateController stateController) {
-        GameManager.instance.SetFloorCollidersActive(false);
+        GameManager.levelManager.SetFloorCollidersActive(false);
         GameManager.player.GetComponent<Rigidbody>().useGravity = true;
         GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
         GameManager.player.GetComponent<PlayerController>().isMovementEnabled = false;
