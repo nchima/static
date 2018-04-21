@@ -3,7 +3,7 @@ using System.Collections;
 
 public class ScreenShake : MonoBehaviour {
 
-    [SerializeField] Vector3 shakeScale = new Vector3(1f, 1f, 1f);  // Allows me to control how much this object shakes on each axis.
+    public Vector3 shakeScale = new Vector3(1f, 1f, 1f);  // Allows me to control how much this object shakes on each axis.
 
 	float currentShake = 0f;   // How much the screen is currently shaking.
 	float shakeAmount = 0.3f;   // How much the screen should shake at it's most shakey shaking.

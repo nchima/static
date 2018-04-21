@@ -14,7 +14,7 @@ public class GunValueManager : MonoBehaviour {
 
         // Change current gun value based on mouse Y movement.
         float inputMod = 0.1f;
-        if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -0.2f; }
+        if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -0.17f; }
         currentValue += InputManager.gunTuningValue * inputMod;
         currentValue = Mathf.Clamp(currentValue, -1f, 1f);
 

@@ -107,6 +107,11 @@ public class ScoreManager : MonoBehaviour
             bonusTimer += Time.deltaTime;
             //Debug.Log(currentTimeBonus);
         }
+
+        if (Input.GetKeyDown(KeyCode.Minus)) {
+            Debug.Log("deleting scores");
+            ResetScores();
+        }
     }
 
 
@@ -305,6 +310,7 @@ public class ScoreManager : MonoBehaviour
 
     public void PrintHighScores() {
         for (int i = 0; i < 10; i++) {
+            if (PlayerPrefs.GetString("HighScoreName" + i) != null) { continue; }
             Debug.Log(PlayerPrefs.GetString("HighScoreName" + i, highScoreEntries[i].initials) + ", "
             + PlayerPrefs.GetInt("HighScoreNumber" + i, highScoreEntries[i].score) + ", "
             + PlayerPrefs.GetInt("Newest" + i, highScoreEntries[i].newest));

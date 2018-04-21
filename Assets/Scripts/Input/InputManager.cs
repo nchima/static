@@ -18,11 +18,19 @@ public class InputManager : MonoBehaviour {
 
     [HideInInspector] public static bool specialMoveButton;
     [HideInInspector] public static bool specialMoveButtonDown;
+    [HideInInspector] public static bool specialMoveButtonUp;
 
     [HideInInspector] public static bool pauseButton;
     [HideInInspector] public static bool pauseButtonDown;
 
-    bool AnyControllerButtonPressed {
+    [HideInInspector] public static bool submitButton;
+    [HideInInspector] public static bool submitButtonDown;
+
+    [HideInInspector] public static bool cancelButton;
+    [HideInInspector] public static bool cancelButtonDown;
+
+
+    public static bool AnyControllerButtonPressed {
         get {
 
             if (Input.GetAxisRaw("Horizontal Controller") != 0) { return true; }
@@ -37,13 +45,18 @@ public class InputManager : MonoBehaviour {
             return false;
         }
     }
-    bool MouseAndKeyboardUsed {
+    public static bool MouseAndKeyboardUsed {
         get {
             if (Input.anyKey) { return true; }
             if (Input.GetAxis("Mouse X") != 0) { return true; }
             if (Input.GetAxis("Mouse Y") != 0) { return true; }
 
             return false;
+        }
+    }
+    public static bool AnyInputPressed {
+        get {
+            return AnyControllerButtonPressed || MouseAndKeyboardUsed;
         }
     }
 
@@ -54,7 +67,11 @@ public class InputManager : MonoBehaviour {
 
         // Figure out which input mode to use.
         if (MouseAndKeyboardUsed) { inputMode = InputMode.MouseAndKeyboard; }
-        if (AnyControllerButtonPressed) { inputMode = InputMode.Controller; }
+        if (AnyControllerButtonPressed) {
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+            inputMode = InputMode.Controller;
+        }
 
         switch(inputMode) {
             case InputMode.MouseAndKeyboard:
@@ -73,7 +90,10 @@ public class InputManager : MonoBehaviour {
         fireButtonDown = false;
         fireButtonUp = false;
         specialMoveButtonDown = false;
+        specialMoveButtonUp = false;
         pauseButtonDown = false;
+        submitButtonDown = false;
+        cancelButtonDown = false;
     }
 
 
@@ -85,15 +105,24 @@ public class InputManager : MonoBehaviour {
 
         gunTuningValue = Input.GetAxis("Mouse Y");
 
-        pauseButton = Input.GetKey(KeyCode.Escape);
-        pauseButtonDown = Input.GetKeyDown(KeyCode.Escape);
-
         fireButton = Input.GetButton("Fire Mouse and Keyboard");
         fireButtonDown = Input.GetButtonDown("Fire Mouse and Keyboard");
         fireButtonUp = Input.GetButtonUp("Fire Mouse and Keyboard");
 
         specialMoveButton = Input.GetButton("Special Move Mouse and Keyboard");
         specialMoveButtonDown = Input.GetButtonDown("Special Move Mouse and Keyboard");
+        specialMoveButtonUp = Input.GetButtonUp("Special Move Mouse and Keyboard");
+
+        pauseButton = Input.GetKey(KeyCode.Escape);
+        pauseButtonDown = Input.GetKeyDown(KeyCode.Escape);
+
+        submitButton = Input.GetButton("Submit");
+        submitButtonDown = Input.GetButton("Submit");
+
+        cancelButton = Input.GetKey(KeyCode.Delete);
+        cancelButton = Input.GetKey(KeyCode.Backspace);
+        cancelButtonDown = Input.GetKeyDown(KeyCode.Delete);
+        cancelButtonDown = Input.GetKeyDown(KeyCode.Backspace);
     }
 
 
@@ -105,13 +134,20 @@ public class InputManager : MonoBehaviour {
 
         gunTuningValue = Input.GetAxis("Controller Right Stick Vertical");
 
-        pauseButton = Input.GetButton("Start");
-        pauseButtonDown = Input.GetButtonDown("Start");
-
         fireButton = Input.GetAxisRaw("Fire Controller") != 0;
-        fireButtonDown = fireButton;
+        fireButtonDown = Input.GetAxisRaw("Fire Controller") == 1f;
 
         specialMoveButton = Input.GetButton("Special Move Controller");
         specialMoveButtonDown = Input.GetButtonDown("Special Move Controller");
+        specialMoveButtonUp = Input.GetButtonUp("Special Move Controller");
+
+        pauseButton = Input.GetButton("Start");
+        pauseButtonDown = Input.GetButtonDown("Start");
+
+        submitButton = Input.GetButton("Special Move Controller");
+        submitButtonDown = Input.GetButtonDown("Special Move Controller");
+
+        cancelButton = Input.GetButton("Cancel");
+        cancelButtonDown = Input.GetButtonDown("Cancel");
     }
 }

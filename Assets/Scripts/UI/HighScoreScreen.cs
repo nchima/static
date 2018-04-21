@@ -6,7 +6,7 @@ public class HighScoreScreen : MonoBehaviour {
 
 	private void Update()
     {
-        if (Input.GetButtonDown("Start")) {
+        if (InputManager.pauseButtonDown || InputManager.submitButtonDown) {
             GameObject.Find("Game Manager").GetComponent<GameManager>().RestartGame();
         }
     }

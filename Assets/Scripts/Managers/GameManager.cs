@@ -19,14 +19,6 @@ public class GameManager : MonoBehaviour {
     public LevelGenerator levelGenerator;  // A reference to the level generator script.
     public static LevelManager levelManager;
 
-    // MENU SCREENS
-    [SerializeField] GameObject highScoreScreen;
-    [SerializeField] GameObject gameOverScreen; 
-    [SerializeField] GameObject nameEntryScreen;
-    [SerializeField] GameObject mainMenuScreen;
-    [SerializeField] GameObject endOfDemoScreen;
-    [SerializeField] GameObject pauseScreen;
-
     // RANDOM USEFUL STUFF
     public bool gameStarted = false;
     Vector3 initialGravity;
@@ -39,6 +31,7 @@ public class GameManager : MonoBehaviour {
     [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
     [HideInInspector] public static MusicManager musicManager;
     [HideInInspector] public static SFXManager sfxManager;
+    [HideInInspector] public static UIManager uiManager;
     [HideInInspector] public Gun gun;
     [HideInInspector] public static GunValueManager gunValueManager;
     [HideInInspector] public static ColorPaletteManager colorPaletteManager;
@@ -59,6 +52,7 @@ public class GameManager : MonoBehaviour {
         levelManager = GetComponentInChildren<LevelManager>();
         fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
         sfxManager = GetComponentInChildren<SFXManager>();
+        uiManager = GetComponentInChildren<UIManager>();
         musicManager = GetComponentInChildren<MusicManager>();
         colorPaletteManager = GetComponentInChildren<ColorPaletteManager>();
         gun = FindObjectOfType<Gun>();
@@ -81,7 +75,7 @@ public class GameManager : MonoBehaviour {
         }
 
         if (InputManager.pauseButtonDown) {
-            if (!gamePaused) { PauseGame(true); } else { PauseGame(false); }
+            if (!gamePaused && !playerIsDead) { PauseGame(true); } else { PauseGame(false); }
         }
 
     }
@@ -91,21 +85,18 @@ public class GameManager : MonoBehaviour {
     public static bool gamePaused;
     public void PauseGame(bool value) {
         if (value == true) {
+            uiManager.ShowPauseScreen();
             memorizedTimeScale = Time.timeScale;
-            mainMenuScreen.SetActive(false);
             Time.timeScale = 0f;
-            pauseScreen.SetActive(true);
-            specialBarManager.screenHidden = true;
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             gamePaused = true;
         }
 
         else {
+            uiManager.HidePauseScreen();
             Time.timeScale = memorizedTimeScale;
-            pauseScreen.SetActive(false);
-            if (!gameStarted) { mainMenuScreen.SetActive(true); }
-            specialBarManager.screenHidden = false;
+            if (!gameStarted) { uiManager.titleScreen.SetActive(true); }
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             gamePaused = false;
@@ -204,14 +195,17 @@ public class GameManager : MonoBehaviour {
     }
 
 
+    bool playerIsDead;
     public void PlayerWasHurt() {
         scoreManager.GetHurt();
         specialBarManager.PlayerWasHurt();
         healthManager.playerHealth -= 1;
 
         // If health is now less than zero, trigger a game over.
-        if (healthManager.playerHealth <= 0) {
-            ShowGameOverScreen();
+        if (healthManager.playerHealth == 0) {
+            playerIsDead = true;
+            player.GetComponent<PlayerController>().enabled = false;
+            uiManager.ShowGameOverScreen();
         }
     }
 
@@ -219,9 +213,7 @@ public class GameManager : MonoBehaviour {
     public void ShowHighScores() {
         scoreManager.RetrieveScoresForHighScoreScreen();
 
-        gameOverScreen.gameObject.SetActive(false);
-        nameEntryScreen.gameObject.SetActive(false);
-        highScoreScreen.gameObject.SetActive(true);
+        uiManager.ShowHighScoreScreen();
     }
 
 
@@ -232,14 +224,8 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    void ShowGameOverScreen() {
-        specialBarManager.screenHidden = true;
-        gameOverScreen.SetActive(true);
-    }
-
-
     public void ShowEndOfDemoScreen() {
-        endOfDemoScreen.SetActive(true);
+        uiManager.ShowEndOfDemoScreen();
     }
 
 
@@ -249,7 +235,7 @@ public class GameManager : MonoBehaviour {
         // Unpause enemies in the background.
         levelManager.SetEnemiesActive(true);
 
-        mainMenuScreen.SetActive(false);
+        uiManager.ShowTitleScreen(false);
 
         player.GetComponent<PlayerController>().isMovementEnabled = true;
         gun.enabled = true;

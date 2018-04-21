@@ -59,7 +59,7 @@ public class GameOverScreen : MonoBehaviour
 
     private void Update()
     {
-        if (!nameEntryScreen.activeSelf && Input.GetButton("Start")) {
+        if (!nameEntryScreen.activeSelf && (InputManager.submitButtonDown || InputManager.pauseButtonDown)) {
             GameObject.Find("Game Manager").GetComponent<GameManager>().RestartGame();
         }
     }

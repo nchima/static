@@ -303,6 +303,7 @@
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBar.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarManager.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarSizeController.cs" />
+    <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\Util\CollisionListener.cs" />
     <Compile Include="Assets\Scripts\Util\CollisionReporter.cs" />
     <Compile Include="Assets\Scripts\Util\DebugUtil.cs" />
