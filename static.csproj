@@ -256,13 +256,13 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerCollidedWithWallOrEnemy.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerPressedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
-    <Compile Include="Assets\Scripts\Gun and Special Moves\SpecialMoveAmmo.cs" />
     <Compile Include="Assets\Scripts\Input\InputManager.cs" />
     <Compile Include="Assets\Scripts\Level\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Level\EnemyPlacer.cs" />
     <Compile Include="Assets\Scripts\Level\FloorCreator.cs" />
     <Compile Include="Assets\Scripts\Level\FloorTile.cs" />
     <Compile Include="Assets\Scripts\Level\LevelGenerator.cs" />
+    <Compile Include="Assets\Scripts\Level\LevelInfo.cs" />
     <Compile Include="Assets\Scripts\Level\LevelManager.cs" />
     <Compile Include="Assets\Scripts\Level\LevelScaler.cs" />
     <Compile Include="Assets\Scripts\Level\Obstacle.cs" />
@@ -274,6 +274,9 @@
     <Compile Include="Assets\Scripts\Managers\HealthManager.cs" />
     <Compile Include="Assets\Scripts\Managers\IdleTimer.cs" />
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
+    <Compile Include="Assets\Scripts\Pickups\Pickup.cs" />
+    <Compile Include="Assets\Scripts\Pickups\PointPickup.cs" />
+    <Compile Include="Assets\Scripts\Pickups\SpecialMoveAmmo.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletMesh.cs" />

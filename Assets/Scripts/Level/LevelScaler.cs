@@ -5,7 +5,14 @@ using UnityEngine;
 public class LevelScaler : MonoBehaviour {
 
 
-    public void ScaleLevel(float scaleMultiplier) {
+    public void ScaleLevel(float newArea) {
+
+        Bounds currentBounds = GetComponent<EnemyPlacer>().GetLevelFloorBounds();
+        float currentArea = currentBounds.size.x * currentBounds.size.z;
+        Debug.Log("Currenta area: " + currentArea);
+        float scaleMultiplier = newArea*1000 / currentArea;
+        Debug.Log("Scale multiplier: " + scaleMultiplier);
+
         // Do floor
         Transform floorHolder = GameObject.Find("Floor Planes").transform;
         for (int i = 0; i < floorHolder.childCount; i++) {
@@ -37,8 +44,6 @@ public class LevelScaler : MonoBehaviour {
                 ScaleObjectXZ(obstacleHolder.GetChild(i), scaleMultiplier);
             }
         }
-
-        GetComponent<EnemyPlacer>().PlaceEnemies();
     }
 
 

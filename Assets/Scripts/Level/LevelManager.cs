@@ -7,6 +7,7 @@ public class LevelManager : MonoBehaviour {
 
     [SerializeField] IntRange levelSceneIndices;
     [SerializeField] float howOftenToLoadNewLevelWhenFalling = 1f;
+    [SerializeField] GameObject scoreBonusPrefab;
 
     public enum LoadingState { LoadingRandomly, Idle }
     [HideInInspector] public LoadingState loadingState = LoadingState.Idle;
@@ -28,6 +29,7 @@ public class LevelManager : MonoBehaviour {
 
     LevelScaler levelScaler;
     EnemyPlacer enemyPlacer;
+    LevelInfo[] levelInfos;
 
     // Deprecated:
     //GameObject[] levelChunks;
@@ -36,6 +38,7 @@ public class LevelManager : MonoBehaviour {
     private void Awake() {
         levelScaler = GetComponent<LevelScaler>();
         enemyPlacer = GetComponent<EnemyPlacer>();
+        levelInfos = Resources.LoadAll<LevelInfo>("Level Info");
 
         loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
     }
@@ -74,13 +77,14 @@ public class LevelManager : MonoBehaviour {
 
 
     public void LoadNextLevel() {
-        if (levelsCompleted == 30) {
+        if (levelsCompleted == 20) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
             GameManager.instance.ShowEndOfDemoScreen();
             return;
         }
 
-        LoadLevel(levelsCompleted + 1);
+        LoadLevel(levelSceneIndices.Random);
+        //LoadLevel(levelsCompleted + 1);
     }
 
 
@@ -99,8 +103,10 @@ public class LevelManager : MonoBehaviour {
         while (!load.isDone) { yield return null; }
 
         // Scale level according to, you know, whatever I guess
-        //levelScaler.ScaleLevel(1f);
-        //enemyPlacer.PlaceEnemies();
+        levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
+        enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
+        for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
+        SetEnemiesActive(false);
 
         isLevelCompleted = false;
         currentlyLoadedLevel = levelNumber;

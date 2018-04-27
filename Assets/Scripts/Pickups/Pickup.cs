@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpecialMoveAmmo : MonoBehaviour {
+public class Pickup : MonoBehaviour {
 
-    float moveForce = 200f;
-    float kickForce = 300f;
-    [SerializeField] float ammoValue = 0.1f;
-    [SerializeField] float stayDuration = 6f;
+    [SerializeField] protected float stayDuration = 6f; // How long this pickup stays in the world before disappearing.
+
+    protected float kickForce = 300f;   // How fast this pickup begins moving toward the player.
+    protected float moveForce = 200f;   // How quickly this pickup accelerates toward the player.
+
     float stayTimer = 0f;
+
     enum State { Hover, MoveToPlayer }
     State state = State.Hover;
 
@@ -19,17 +21,14 @@ public class SpecialMoveAmmo : MonoBehaviour {
             // Hover or whatever.
             stayTimer += Time.deltaTime;
             if (stayTimer >= stayDuration) { Destroy(gameObject); }
-        }
-
-        else if (state == State.MoveToPlayer) {
+        } else if (state == State.MoveToPlayer) {
             // Move towards the player or whatever.
             GetComponent<Rigidbody>().AddForce(directionToPlayer * moveForce * Time.deltaTime, ForceMode.Acceleration);
         }
     }
 
-    void GetAbsorbed() {
+    protected virtual void GetAbsorbed() {
         // Show some particles or something, IDK, play some sound whatever fine.
-        GameManager.specialBarManager.PlayerAbsorbedAmmo(ammoValue);
         Destroy(gameObject);
     }
 

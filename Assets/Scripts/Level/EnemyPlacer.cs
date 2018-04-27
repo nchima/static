@@ -14,13 +14,20 @@ public class EnemyPlacer : MonoBehaviour {
         public bool isAvailable { get { return GameManager.levelManager.LevelNumber >= firstAppearance; } }
         [HideInInspector] public float tempChance;
     }
-    [SerializeField] EnemyInfo simpleEnemyInfo;
-    [SerializeField] EnemyInfo laserEnemyInfo;
-    [SerializeField] EnemyInfo meleeEnemyInfo;
-    [SerializeField] EnemyInfo tankEnemyInfo;
-    [SerializeField] EnemyInfo hoverEnemyInfo;
-    [SerializeField] EnemyInfo bossEnemyInfo;
-    List<EnemyInfo> enemyInfos;
+    //[SerializeField] EnemyInfo simpleEnemyInfo;
+    //[SerializeField] EnemyInfo laserEnemyInfo;
+    //[SerializeField] EnemyInfo meleeEnemyInfo;
+    //[SerializeField] EnemyInfo tankEnemyInfo;
+    //[SerializeField] EnemyInfo hoverEnemyInfo;
+    //[SerializeField] EnemyInfo bossEnemyInfo;
+    //List<EnemyInfo> enemyInfos;
+
+    [SerializeField] GameObject simpleEnemyPrefab;
+    [SerializeField] GameObject laserEnemyPrefab;
+    [SerializeField] GameObject meleeEnemyPrefab;
+    [SerializeField] GameObject tankEnemyPrefab;
+    [SerializeField] GameObject hoverEnemyPrefab;
+    [SerializeField] GameObject bossEnemyPrefab;
 
     //[Serializable]
     //class LevelEnemyNumbers {
@@ -36,16 +43,32 @@ public class EnemyPlacer : MonoBehaviour {
 
 
     private void Awake() {
-        enemyInfos = new List<EnemyInfo>();
-        enemyInfos.Add(simpleEnemyInfo);
-        enemyInfos.Add(laserEnemyInfo);
-        enemyInfos.Add(meleeEnemyInfo);
-        enemyInfos.Add(tankEnemyInfo);
-        enemyInfos.Add(hoverEnemyInfo);
-        enemyInfos.Add(bossEnemyInfo);
+        //enemyInfos = new List<EnemyInfo>();
+        //enemyInfos.Add(simpleEnemyInfo);
+        //enemyInfos.Add(laserEnemyInfo);
+        //enemyInfos.Add(meleeEnemyInfo);
+        //enemyInfos.Add(tankEnemyInfo);
+        //enemyInfos.Add(hoverEnemyInfo);
+        //enemyInfos.Add(bossEnemyInfo);
     }
 
 
+    public void PlaceEnemies(LevelInfo levelInfo) {
+        Bounds floorBounds = GetLevelFloorBounds();
+        if (placedEnemies != null) { DestroyAllPlacedEnemies(); }
+        placedEnemies = new GameObject[levelInfo.TotalEnemyAmount];
+
+        // Place each type of enemy
+        for (int i = 0; i < levelInfo.simpleEnemyAmount; i++) { PlaceObject(simpleEnemyPrefab, floorBounds); }
+        for (int i = 0; i < levelInfo.laserEnemyAmount; i++) { PlaceObject(laserEnemyPrefab, floorBounds); }
+        for (int i = 0; i < levelInfo.meleeEnemyAmount; i++) { PlaceObject(meleeEnemyPrefab, floorBounds); }
+        for (int i = 0; i < levelInfo.tankEnemyAmount; i++) { PlaceObject(tankEnemyPrefab, floorBounds); }
+        for (int i = 0; i < levelInfo.hoverEnemyAmount; i++) { PlaceObject(hoverEnemyPrefab, floorBounds); }
+        for (int i = 0; i < levelInfo.bossEnemyAmount; i++) { PlaceObject(bossEnemyPrefab, floorBounds); }
+    }
+
+
+    /*
     public void PlaceEnemies() {
         Bounds floorBounds = GetLevelFloorBounds();
 
@@ -77,49 +100,50 @@ public class EnemyPlacer : MonoBehaviour {
 
         GameManager.levelManager.SetEnemiesActive(false);
     }
+    */
 
 
     // Figure out each enemy's chance of apperaing for the current level.
-    void GetEnemyChances() {
+    //void GetEnemyChances() {
 
-        // Get the total difficulty of all available enemies.
-        int totalDifficulty = 0;
-        int availableEnemies = 0;
-        foreach (EnemyInfo enemyInfo in enemyInfos) {
-            if (enemyInfo.isAvailable) {
-                totalDifficulty += enemyInfo.baseDifficulty;
+    //    // Get the total difficulty of all available enemies.
+    //    int totalDifficulty = 0;
+    //    int availableEnemies = 0;
+    //    foreach (EnemyInfo enemyInfo in enemyInfos) {
+    //        if (enemyInfo.isAvailable) {
+    //            totalDifficulty += enemyInfo.baseDifficulty;
 
-                // If this is the first level that this enemy is available, give it a 100% chance
-                if (enemyInfo.firstAppearance == GameManager.levelManager.LevelNumber) {
-                    GiveEnemyFullChance(enemyInfo);
-                    return;
-                }
+    //            // If this is the first level that this enemy is available, give it a 100% chance
+    //            if (enemyInfo.firstAppearance == GameManager.levelManager.LevelNumber) {
+    //                GiveEnemyFullChance(enemyInfo);
+    //                return;
+    //            }
 
-                availableEnemies++;
-            }
-        }
+    //            availableEnemies++;
+    //        }
+    //    }
 
-        // Figure out each enemy's chance of being spawned.
-        float last = 0f;
-        foreach (EnemyInfo enemyInfo in enemyInfos) {
-            if (enemyInfo.isAvailable && totalDifficulty > 0) {
-                float chance = 1 - (enemyInfo.baseDifficulty / totalDifficulty);
-                enemyInfo.tempChance = last + chance;
-                last = chance;
-            }
-        }
-    }
-
-
-    void GiveEnemyFullChance(EnemyInfo fullChanceEnemy) {
-        foreach(EnemyInfo enemyInfo in enemyInfos) {
-            if (enemyInfo == fullChanceEnemy) { enemyInfo.tempChance = 1f; }
-            else { enemyInfo.tempChance = 0f; }
-        }
-    }
+    //    // Figure out each enemy's chance of being spawned.
+    //    float last = 0f;
+    //    foreach (EnemyInfo enemyInfo in enemyInfos) {
+    //        if (enemyInfo.isAvailable && totalDifficulty > 0) {
+    //            float chance = 1 - (enemyInfo.baseDifficulty / totalDifficulty);
+    //            enemyInfo.tempChance = last + chance;
+    //            last = chance;
+    //        }
+    //    }
+    //}
 
 
-    Bounds GetLevelFloorBounds() {
+    //void GiveEnemyFullChance(EnemyInfo fullChanceEnemy) {
+    //    foreach(EnemyInfo enemyInfo in enemyInfos) {
+    //        if (enemyInfo == fullChanceEnemy) { enemyInfo.tempChance = 1f; }
+    //        else { enemyInfo.tempChance = 0f; }
+    //    }
+    //}
+
+
+    public Bounds GetLevelFloorBounds() {
         // Combine bounds of all floor planes
         Transform floorPlaneHolder = GameObject.Find("Floor Planes").transform;
         Bounds floorBounds = new Bounds();
@@ -130,7 +154,12 @@ public class EnemyPlacer : MonoBehaviour {
     }
 
 
-    GameObject PlaceEnemy(GameObject enemyPrefab, Bounds floorBounds) {
+    public void PlaceObject(GameObject prefab) {
+        PlaceObject(prefab, GetLevelFloorBounds());
+    }
+
+
+    public void PlaceObject(GameObject enemyPrefab, Bounds floorBounds) {
 
         Vector3 testPosition = RandomPositionOnFloorBounds(floorBounds);
 
@@ -158,10 +187,9 @@ public class EnemyPlacer : MonoBehaviour {
             if (onTopOfSomethingBad) { continue; }
 
             testPosition.y += 5f;
-            return Instantiate(enemyPrefab, testPosition, Quaternion.identity);
+            Instantiate(enemyPrefab, testPosition, Quaternion.identity);
+            return;
         }
-
-        return null;
     }
 
 
