@@ -274,6 +274,7 @@
     <Compile Include="Assets\Scripts\Managers\HealthManager.cs" />
     <Compile Include="Assets\Scripts\Managers\IdleTimer.cs" />
     <Compile Include="Assets\Scripts\Managers\ScoreManager.cs" />
+    <Compile Include="Assets\Scripts\Managers\Services.cs" />
     <Compile Include="Assets\Scripts\Pickups\Pickup.cs" />
     <Compile Include="Assets\Scripts\Pickups\PointPickup.cs" />
     <Compile Include="Assets\Scripts\Pickups\SpecialMoveAmmo.cs" />

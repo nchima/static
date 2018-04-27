@@ -20,7 +20,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
 
     public override void Initialize(StateController stateController) {
         // Turn towards player.
-        Vector3 lookTarget = GameManager.player.transform.position;
+        Vector3 lookTarget = Services.playerTransform.position;
         lookTarget.y = stateController.transform.position.y;
         stateController.transform.LookAt(lookTarget);
 
@@ -60,7 +60,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
             else {
                 timer += Time.deltaTime;
                 if (!playerDamaged && PlayerIsInHitBox(stateController)) {
-                    GameManager.instance.PlayerWasHurt();
+                    Services.gameManager.PlayerWasHurt();
                     playerDamaged = true;
                 }
 
@@ -92,7 +92,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
             );
 
         foreach (Collider collider in collidersInHitBox) {
-            if (collider.gameObject == GameManager.player) { return true; }
+            if (collider.gameObject == Services.playerGameObject) { return true; }
         }
 
         return false;

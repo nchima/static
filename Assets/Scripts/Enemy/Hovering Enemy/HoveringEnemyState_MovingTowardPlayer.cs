@@ -39,7 +39,7 @@ public class HoveringEnemyState_MovingTowardPlayer : State {
 
         controller.transform.position = new Vector3(controller.transform.position.x, controller.hoverHeight, controller.transform.position.z); 
 
-        Vector3 playerGroundPosition = GameManager.player.transform.position;
+        Vector3 playerGroundPosition = Services.playerTransform.position;
         playerGroundPosition.y = controller.hoverHeight;
 
         controller.transform.LookAt(playerGroundPosition);
@@ -83,7 +83,7 @@ public class HoveringEnemyState_MovingTowardPlayer : State {
     //    movementNoise.Iterate();
 
     //    // Move base position towards player.
-    //    Vector3 playerGroundPosition = GameManager.player.transform.position;
+    //    Vector3 playerGroundPosition = Services.playerTransform.position;
     //    playerGroundPosition.y = controller.hoverHeight;
     //    Vector3 baseDirection = Vector3.Normalize(playerGroundPosition - controller.transform.position);
     //    baseDirection.y = 0f;

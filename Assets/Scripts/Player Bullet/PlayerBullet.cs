@@ -124,10 +124,10 @@ public class PlayerBullet : MonoBehaviour {
             if (hit.collider.GetComponent<EnemyOld>() != null) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
             else if (hit.collider.GetComponent<Enemy>() != null) { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
 
-            if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
+            if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { Services.specialBarManager.AddValue(0.01f); }
 
-            if (hit.collider.GetComponent<EnemyOld>() != null) { GameManager.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
-            else { GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
+            if (hit.collider.GetComponent<EnemyOld>() != null) { Services.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
+            else { Services.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
         } 
         
         else if (hit.collider.name.Contains("Homing Shot")) {
@@ -138,10 +138,10 @@ public class PlayerBullet : MonoBehaviour {
             //Debug.Log("Bullet struck enemy weak point!");
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
-            GameManager.sfxManager.PlayBulletHitWeakPointSound();
+            Services.sfxManager.PlayBulletHitWeakPointSound();
 
             if (hit.collider.transform.parent.parent.GetComponent<Enemy>() != null) { hit.collider.transform.parent.parent.GetComponent<Enemy>().currentHealth -= 50; }
-            GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
+            Services.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
         }
         
         else {

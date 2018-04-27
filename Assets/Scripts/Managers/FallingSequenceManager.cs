@@ -63,26 +63,26 @@ public class FallingSequenceManager : StateController {
     public void InstantiateShockwave(GameObject prefab, float gunRate) {
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
-        GameManager.musicManager.PitchDownMusicForSlowMotion();
+        Services.musicManager.PitchDownMusicForSlowMotion();
 
         // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
-        GameManager.instance.gun.canShoot = true;
+        Services.gun.canShoot = true;
         DOTween.To
-            (() => GameManager.instance.gun.burstsPerSecondSloMoModifierCurrent, x => GameManager.instance.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+            (() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
 
-        Vector3 shockwavePosition = GameManager.player.transform.position;
+        Vector3 shockwavePosition = Services.playerTransform.position;
         shockwavePosition.y = 0f;
         Instantiate(prefab, shockwavePosition, Quaternion.identity);
     }
 
     public void ActivateSpeedFall() {
-        if (GameManager.player.GetComponent<PlayerController>().state == PlayerController.State.SpeedFalling) { return; }
+        if (Services.playerController.state == PlayerController.State.SpeedFalling) { return; }
         //player.GetComponent<Rigidbody>().isKinematic = false;
-        GameManager.player.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
-        GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.SpeedFalling;
+        Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
+        Services.playerController.state = PlayerController.State.SpeedFalling;
         //Physics.gravity *= speedFallGravityMultipier;
         isSpeedFallActive = true;
-        GameManager.healthManager.forceInvincibility = true;
+        Services.healthManager.forceInvincibility = true;
     }
 
     public void BeginFalling() {

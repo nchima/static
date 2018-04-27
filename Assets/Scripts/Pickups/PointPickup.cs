@@ -8,6 +8,6 @@ public class PointPickup : Pickup {
 
 	protected override void GetAbsorbed() {
         base.GetAbsorbed();
-        GameManager.scoreManager.score += pointValue;
+        Services.scoreManager.score += pointValue;
     }
 }

@@ -9,7 +9,7 @@ public class PauseMenu : MonoBehaviour {
 
 	public void ResetButton()
     {
-        GameManager.instance.PauseGame(false);
+        Services.gameManager.PauseGame(false);
 
         // Reload the scene.
 		SceneManager.LoadScene ("Main");
@@ -26,6 +26,6 @@ public class PauseMenu : MonoBehaviour {
 
 
     public void ResumeButton() {
-        GameManager.instance.PauseGame(false);
+        Services.gameManager.PauseGame(false);
     }
 }

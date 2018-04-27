@@ -62,7 +62,7 @@ public class HomingShot : EnemyShot {
             leading -= 1f;
             leading = Mathf.Clamp(leading, 0f, 99f);
 
-            //if (GameManager.instance.PositionIsInLevelBoundaries(currentTarget))
+            //if (Services.gameManager.PositionIsInLevelBoundaries(currentTarget))
             //{
                 foundTarget = true;
             //    break;
@@ -164,13 +164,13 @@ public class HomingShot : EnemyShot {
             //}
 
             //Debug.Log("Homing shot lost target.");
-            currentTarget = GameManager.player.transform.position;
+            currentTarget = Services.playerTransform.position;
             state = HomingShotState.NotLockedOn;
             return;
         }
 
-        currentTarget = GameManager.player.transform.position;
-            //+ gameManager.playerVelocity * Vector3.Distance(gameManager.player.transform.position, transform.position);
+        currentTarget = Services.playerTransform.position;
+            //+ gameManager.playerVelocity * Vector3.Distance(Services.playerTransform.position, transform.position);
 
         MoveToTarget();
 

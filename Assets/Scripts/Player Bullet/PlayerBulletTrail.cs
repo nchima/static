@@ -36,7 +36,7 @@ public class PlayerBulletTrail : MonoBehaviour {
     private void Update() {
         // Check to see if any segments need to be deleted.
         for (int i = 0; i < segments.Count; i++) {
-            segments[i].beginningPoint += GameManager.player.GetComponent<Rigidbody>().velocity;
+            segments[i].beginningPoint += Services.playerGameObject.GetComponent<Rigidbody>().velocity;
             if (Time.time >= segments[i].deleteTime) {
                 segments.Remove(segments[i]);
                 RedrawTrail();

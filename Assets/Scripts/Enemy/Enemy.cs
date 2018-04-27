@@ -41,8 +41,8 @@ public class Enemy : StateController {
     public bool canSeePlayer {
         get {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, GameManager.player.transform.position - transform.position, out hit, 200f, 1 << 8 | 1 << 16)) {
-                if (hit.transform == GameManager.player.transform) return true;
+            if (Physics.Raycast(transform.position, Services.playerTransform.position - transform.position, out hit, 200f, 1 << 8 | 1 << 16)) {
+                if (hit.transform == Services.playerTransform) return true;
             }
 
             return false;
@@ -79,7 +79,7 @@ public class Enemy : StateController {
         if (!isAlive) { return; }
 
         Instantiate(deathParticles, transform.position, Quaternion.identity);
-        GameManager.instance.PlayerKilledEnemy(scoreKillValue, specialKillValue);
+        Services.gameManager.PlayerKilledEnemy(scoreKillValue, specialKillValue);
         isAlive = false;
         Destroy(gameObject);
     }

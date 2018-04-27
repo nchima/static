@@ -6,7 +6,7 @@ using UnityEngine;
 public class Transition_LevelStarted : Transition {
     public override bool IsConditionTrue(StateController stateController) {
         Enemy enemy = stateController as Enemy;
-        if (!GameManager.instance.gameStarted || enemy.isAIPaused) { return false; }
+        if (!Services.gameManager.gameStarted || enemy.isAIPaused) { return false; }
         else { return true; }
     }
 }

@@ -68,7 +68,7 @@ public class LevelManager : MonoBehaviour {
     public void LoadRandomLevel() {
         if (levelsCompleted == 30) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
-            GameManager.instance.ShowEndOfDemoScreen();
+            Services.gameManager.ShowEndOfDemoScreen();
             return;
         }
 
@@ -79,7 +79,7 @@ public class LevelManager : MonoBehaviour {
     public void LoadNextLevel() {
         if (levelsCompleted == 20) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
-            GameManager.instance.ShowEndOfDemoScreen();
+            Services.gameManager.ShowEndOfDemoScreen();
             return;
         }
 
@@ -148,13 +148,13 @@ public class LevelManager : MonoBehaviour {
 
         loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
 
-        GameManager.levelManager.SetEnemiesActive(true);
+        Services.levelManager.SetEnemiesActive(true);
 
         // Re-enable the floor's collision (since it is disabled when the player completes a level.)
-        GameManager.levelManager.SetFloorCollidersActive(true);
+        Services.levelManager.SetFloorCollidersActive(true);
 
         // Update billboards.
-        GameManager.instance.GetComponent<BatchBillboard>().FindAllBillboards();
+        Services.gameManager.GetComponent<BatchBillboard>().FindAllBillboards();
     }
 
 

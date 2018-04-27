@@ -8,6 +8,6 @@ public class SpecialMoveAmmo : Pickup {
 
     protected override void GetAbsorbed() {
         base.GetAbsorbed();
-        GameManager.specialBarManager.PlayerAbsorbedAmmo(ammoValue);
+        Services.specialBarManager.PlayerAbsorbedAmmo(ammoValue);
     }
 }

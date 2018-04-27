@@ -44,7 +44,7 @@ public class MeleeEnemyState_Moving : State {
         }
 
         // Get the direction towards the player, then modify it by our flanking angle.
-        Vector3 directionTowardsPlayer = GameManager.player.transform.position - controller.transform.position;
+        Vector3 directionTowardsPlayer = Services.playerTransform.position - controller.transform.position;
         directionTowardsPlayer.y = 0f;
         directionTowardsPlayer = Quaternion.AngleAxis(flankingAngle, Vector3.up) * directionTowardsPlayer;
 

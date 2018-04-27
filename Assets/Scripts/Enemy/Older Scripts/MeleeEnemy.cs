@@ -53,7 +53,7 @@ public class MeleeEnemy : Enemy {
     {
         // See if we hit the player.
         if (collision.collider.tag == "Player" && (currentState is MeleeEnemyState_Attacking)) {
-            GameManager.instance.PlayerWasHurt();
+            Services.gameManager.PlayerWasHurt();
         }
 
         // See if we hit an obstacle.

@@ -15,7 +15,7 @@ public class KeepBehind : MonoBehaviour {
 
     private void Update()
     {
-        Vector3 directionFromPlayer = Vector3.Normalize(transform.parent.position - GameManager.player.transform.position);
+        Vector3 directionFromPlayer = Vector3.Normalize(transform.parent.position - Services.playerTransform.position);
         Vector3 newPosition = transform.parent.position + (directionFromPlayer * distance);
         newPosition.y = transform.parent.position.y;
         transform.position = newPosition;
@@ -23,8 +23,8 @@ public class KeepBehind : MonoBehaviour {
         // Rotate
         transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, Random.Range(-180f, 180f));
 
-        if (GameManager.fallingSequenceManager.isPlayerFalling) {
-            float newRadius = MyMath.Map(GameManager.player.transform.position.y, 0f, 1000f, originalScale, maxFallingScale);
+        if (Services.fallingSequenceManager.isPlayerFalling) {
+            float newRadius = MyMath.Map(Services.playerTransform.position.y, 0f, 1000f, originalScale, maxFallingScale);
             transform.localScale = new Vector3(newRadius, newRadius, 1f);
         }
     }

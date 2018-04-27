@@ -9,7 +9,7 @@ public class MeleeEnemyTransition_ChargeUp : Transition {
 
     // Return true if we're close enough to the player to attack.
     public override bool IsConditionTrue(StateController stateController) {
-        if (Vector3.Distance(GameManager.player.transform.position, stateController.transform.position) <= attackRange) {
+        if (Vector3.Distance(Services.playerTransform.position, stateController.transform.position) <= attackRange) {
             return true;
         } else {
             return false;

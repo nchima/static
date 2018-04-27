@@ -11,7 +11,7 @@ public class EnemyPlacer : MonoBehaviour {
         public GameObject prefab;
         public int firstAppearance;
         public int baseDifficulty;
-        public bool isAvailable { get { return GameManager.levelManager.LevelNumber >= firstAppearance; } }
+        public bool isAvailable { get { return Services.levelManager.LevelNumber >= firstAppearance; } }
         [HideInInspector] public float tempChance;
     }
     //[SerializeField] EnemyInfo simpleEnemyInfo;
@@ -98,7 +98,7 @@ public class EnemyPlacer : MonoBehaviour {
             }
         }
 
-        GameManager.levelManager.SetEnemiesActive(false);
+        Services.levelManager.SetEnemiesActive(false);
     }
     */
 
@@ -114,7 +114,7 @@ public class EnemyPlacer : MonoBehaviour {
     //            totalDifficulty += enemyInfo.baseDifficulty;
 
     //            // If this is the first level that this enemy is available, give it a 100% chance
-    //            if (enemyInfo.firstAppearance == GameManager.levelManager.LevelNumber) {
+    //            if (enemyInfo.firstAppearance == Services.levelManager.LevelNumber) {
     //                GiveEnemyFullChance(enemyInfo);
     //                return;
     //            }

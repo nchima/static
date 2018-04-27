@@ -26,7 +26,7 @@ public class MeleeEnemyState_Attacking : State {
 
         // Get the point to charge to.
         attackFinishPoint = controller.transform.position + 
-            controller.transform.forward * (Vector3.Distance(controller.transform.position, GameManager.player.transform.position) + attackDistance);
+            controller.transform.forward * (Vector3.Distance(controller.transform.position, Services.playerTransform.position) + attackDistance);
 
         // Start particles.
         ParticleSystem.EmissionModule em = meshParticleObject.GetComponent<ParticleSystem>().emission;

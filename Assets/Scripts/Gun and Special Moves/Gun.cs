@@ -109,7 +109,7 @@ public class Gun : MonoBehaviour {
         //}
 
         // See if the player has fired a special move & if so, initialize proper variables.
-        if (GameManager.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
+        if (Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
             if (GunValueManager.currentValue >= 0f && !firingMissiles && !firedMissiles) {
                 gameManager.PlayerUsedSpecialMove();
@@ -138,7 +138,7 @@ public class Gun : MonoBehaviour {
         if (missileTimer >= missileCooldown) {
             missilesFired++;
             missileTimer = 0;
-            Instantiate(missilePrefab, gunTipTransform.position, GameManager.player.transform.rotation);
+            Instantiate(missilePrefab, gunTipTransform.position, Services.playerTransform.rotation);
         } else {
             missileTimer += Time.deltaTime;
         }
@@ -182,7 +182,7 @@ public class Gun : MonoBehaviour {
         }
 
         // Show muzzle flash.
-        GameObject _muzzleFlash = Instantiate(muzzleFlash, GameManager.player.transform);
+        GameObject _muzzleFlash = Instantiate(muzzleFlash, Services.playerTransform);
         _muzzleFlash.transform.position = gunTipTransform.position;
         _muzzleFlash.transform.rotation = gunTipTransform.rotation;
         _muzzleFlash.transform.localScale = new Vector3(
@@ -193,10 +193,10 @@ public class Gun : MonoBehaviour {
 
         // Flash screen
         float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, flashIntensity.max, flashIntensity.min);
-        GameManager.flashManager.Flash(new Color(currentFlash, currentFlash, currentFlash, currentFlash));
+        Services.flashManager.Flash(new Color(currentFlash, currentFlash, currentFlash, currentFlash));
 
         // Auto aim for weak points.
-        Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
+        Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
         autoAimPoint = AutoAim("Weak Point", 0.0125f);
 
         // If we couldn't hit a weak point, auto aim for enemies instead.
@@ -210,7 +210,7 @@ public class Gun : MonoBehaviour {
         }
 
         // Add recoil to player controller.
-        //GameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
+        //Services.playerController.AddRecoil(bulletRecoil * bulletsPerBurst);
 
         timeSinceLastShot = 0f;
     }
@@ -241,7 +241,7 @@ public class Gun : MonoBehaviour {
 
     Vector3 AutoAim(string tag, float bandSize) {
         
-        Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
+        Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.transform.forward * 1000f;
 
         foreach (GameObject thisObject in GameObject.FindGameObjectsWithTag(tag)) {
 
@@ -253,7 +253,7 @@ public class Gun : MonoBehaviour {
                 Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;
 
                 // See if the distance to this enemy is less than the distance to the previous nearest enemy.
-                if (Vector3.Distance(GameManager.player.transform.position, thisPosition) < Vector3.Distance(GameManager.player.transform.position, autoAimPoint)) {
+                if (Vector3.Distance(Services.playerTransform.position, thisPosition) < Vector3.Distance(Services.playerTransform.position, autoAimPoint)) {
                     autoAimPoint = thisPosition;
                 }
             }

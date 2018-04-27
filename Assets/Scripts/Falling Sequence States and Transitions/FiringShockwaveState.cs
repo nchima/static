@@ -9,31 +9,31 @@ public class FiringShockwaveState : State {
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        GameManager.scoreManager.HideLevelCompleteScreen();
-        GameManager.instance.CountEnemies();
+        Services.scoreManager.HideLevelCompleteScreen();
+        Services.gameManager.CountEnemies();
 
         // Set up bonus time for next level.
-        GameManager.instance.DetermineBonusTime();
+        Services.gameManager.DetermineBonusTime();
 
-        //GameManager.specialBarManager.freezeDecay = false;
+        //Services.specialBarManager.freezeDecay = false;
 
-        GameManager.player.transform.position = new Vector3(GameManager.player.transform.position.x, 2.15f, GameManager.player.transform.position.z);
+        Services.playerTransform.position = new Vector3(Services.playerTransform.position.x, 2.15f, Services.playerTransform.position.z);
 
         // Begin rotating camera back to regular position.
-        GameManager.player.transform.Find("Cameras").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), fallingSequenceManager.lookUpSpeed * 0.6f, RotateMode.Fast);
+        Services.playerTransform.Find("Cameras").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), fallingSequenceManager.lookUpSpeed * 0.6f, RotateMode.Fast);
 
         // Reset movement variables.
-        GameManager.player.transform.position = new Vector3(GameManager.player.transform.position.x, 2.8f, GameManager.player.transform.position.z);
-        GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GameManager.player.GetComponent<Rigidbody>().useGravity = false;
-        GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.Normal;
-        GameManager.player.GetComponent<PlayerController>().maxAirSpeed = fallingSequenceManager.savedRegularMoveSpeed;
+        Services.playerTransform.position = new Vector3(Services.playerTransform.position.x, 2.8f, Services.playerTransform.position.z);
+        Services.playerGameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Services.playerGameObject.GetComponent<Rigidbody>().useGravity = false;
+        Services.playerController.state = PlayerController.State.Normal;
+        Services.playerController.maxAirSpeed = fallingSequenceManager.savedRegularMoveSpeed;
 
         RenderSettings.fogColor = Color.black;
 
         fallingSequenceManager.fallingSequenceTimer = 0f;
 
-        fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, GameManager.instance.gun.burstsPerSecondSloMoModifierMax);
+        fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, Services.gun.burstsPerSecondSloMoModifierMax);
     }
 
     public override void Run(StateController stateController) {
@@ -43,20 +43,20 @@ public class FiringShockwaveState : State {
     public override void End(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        GameManager.instance.ReturnToFullSpeed();
-        GameManager.musicManager.ExitFallingSequence();
-        GameManager.musicManager.RandomizeAllMusicVolumeLevels();
+        Services.gameManager.ReturnToFullSpeed();
+        Services.musicManager.ExitFallingSequence();
+        Services.musicManager.RandomizeAllMusicVolumeLevels();
 
-        GameManager.instance.gun.canShoot = true;
+        Services.gun.canShoot = true;
 
         // Allow enemies to start attacking.
-        GameManager.levelManager.SetEnemiesActive(true);
+        Services.levelManager.SetEnemiesActive(true);
 
         // Destroy any obstacles that the player is touching.
         Collider[] overlappingSolids = Physics.OverlapCapsule(
-            GameManager.player.transform.position,
-            GameManager.player.transform.position + Vector3.down * 10f,
-            GameManager.player.GetComponent<CapsuleCollider>().radius,
+            Services.playerTransform.position,
+            Services.playerTransform.position + Vector3.down * 10f,
+            Services.playerGameObject.GetComponent<CapsuleCollider>().radius,
             1 << 8);
 
         for (int i = 0; i < overlappingSolids.Length; i++) {
@@ -68,15 +68,15 @@ public class FiringShockwaveState : State {
         // Begin moving obstacles to their full height.
         //GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
 
-        GameManager.colorPaletteManager.RestoreSavedPalette();
-        //GameManager.colorPaletteManager.ChangeToRandomPalette(0.1f);
+        Services.colorPaletteManager.RestoreSavedPalette();
+        //Services.colorPaletteManager.ChangeToRandomPalette(0.1f);
 
         Physics.gravity = fallingSequenceManager.savedGravity;
 
         fallingSequenceManager.isSpeedFallActive = false;
 
-        GameManager.healthManager.forceInvincibility = false;
+        Services.healthManager.forceInvincibility = false;
 
-        GameManager.player.GetComponent<Collider>().material.bounciness = fallingSequenceManager.normalPlayerBounciness;
+        Services.playerGameObject.GetComponent<Collider>().material.bounciness = fallingSequenceManager.normalPlayerBounciness;
     }
 }

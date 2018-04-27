@@ -178,9 +178,9 @@ public class LaserShot : EnemyShot {
 
     void OnTriggerEnterChild(Collider other)
     {
-        if (state == State.Damage && other.transform == GameManager.player.transform)
+        if (state == State.Damage && other.transform == Services.playerTransform.transform)
         {
-            GameManager.instance.PlayerWasHurt();
+            Services.gameManager.PlayerWasHurt();
             GetComponentInChildren<Collider>().enabled = false;
         }
     }

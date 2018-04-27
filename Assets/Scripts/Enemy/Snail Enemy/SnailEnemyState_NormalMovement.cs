@@ -22,7 +22,7 @@ public class SnailEnemyState_NormalMovement : State {
         SnailEnemy controller = stateController as SnailEnemy;
 
         // Move forward
-        controller.m_NavMeshAgent.SetDestination(GameManager.player.transform.position);
+        controller.m_NavMeshAgent.SetDestination(Services.playerTransform.position);
 
         // Turn towards player.
         Quaternion lookAtPlayerRotation = Quaternion.LookRotation(controller.directionToPlayer);

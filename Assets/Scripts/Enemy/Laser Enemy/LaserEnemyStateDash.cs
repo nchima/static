@@ -71,10 +71,10 @@ public class LaserEnemyStateDash : State {
 
             // Get a vector towards or away from the player based on whether we are within optimal distance.
             Vector3 moveDirection = Vector3.zero;
-            if (Vector3.Distance(controller.transform.position, GameManager.player.transform.position) > optimalDistanceFromPlayer) {
-                moveDirection = GameManager.player.transform.position - controller.transform.position;
+            if (Vector3.Distance(controller.transform.position, Services.playerTransform.position) > optimalDistanceFromPlayer) {
+                moveDirection = Services.playerTransform.position - controller.transform.position;
             } else {
-                moveDirection = controller.transform.position - GameManager.player.transform.position;
+                moveDirection = controller.transform.position - Services.playerTransform.position;
             }
 
             // Make sure the move direction is parallel to the ground, then scale it.

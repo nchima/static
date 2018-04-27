@@ -14,7 +14,7 @@ public class Pickup : MonoBehaviour {
     enum State { Hover, MoveToPlayer }
     State state = State.Hover;
 
-    Vector3 directionToPlayer { get { return Vector3.Normalize(GameManager.player.transform.position - transform.position); } }
+    Vector3 directionToPlayer { get { return Vector3.Normalize(Services.playerTransform.position - transform.position); } }
 
     private void Update() {
         if (state == State.Hover) {
@@ -39,14 +39,14 @@ public class Pickup : MonoBehaviour {
 
     public void OnTriggerStayChild(Collider other) {
         // If the player crossed into my radius, start moving towards them.
-        if (state == State.Hover && other.gameObject == GameManager.player) {
+        if (state == State.Hover && other.gameObject == Services.playerGameObject) {
             BeginMovingTowardsPlayer();
         }
     }
 
     private void OnCollisionEnter(Collision collision) {
         // If I touch the player, get absorbed or whatever.
-        if (collision.collider.gameObject == GameManager.player) {
+        if (collision.collider.gameObject == Services.playerGameObject) {
             GetAbsorbed();
         }
     }

@@ -68,7 +68,7 @@ public class SimpleEnemyStateShooting : State {
         newShot.GetComponent<EnemyShot>().firedEnemy = gameObject;
 
         // Get the direction towards the player.
-        Vector3 targetPosition = GameManager.player.transform.position;
+        Vector3 targetPosition = Services.playerTransform.position;
         targetPosition = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
         Vector3 direction = targetPosition - transform.position;
 

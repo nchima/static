@@ -123,7 +123,7 @@ public class GunExperimental : MonoBehaviour {
         //      bulletWidth = MyMath.Map(gameManager.currentSine, -1f, 1f, bulletWidthMin, bulletWidthMax);
 
         // Get the power of this gun based on the player's direciton.
-        //float angleDistance = Mathf.Abs(Mathf.DeltaAngle(mainAngle, gameManager.player.transform.rotation.eulerAngles.y));
+        //float angleDistance = Mathf.Abs(Mathf.DeltaAngle(mainAngle, Services.playerTransform.rotation.eulerAngles.y));
         //Debug.Log(gameObject.name + " angle distance: " + angleDistance)
         //if (angleDistance <= maxAngleDistance) currentPower = MyMath.Map(angleDistance, 0f, maxAngleDistance, 1f, 0f);
         //else currentPower = 0f;

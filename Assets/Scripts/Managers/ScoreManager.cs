@@ -168,10 +168,10 @@ public class ScoreManager : MonoBehaviour
     void ShowLevelCompleteScreen()
     {
         levelCompletedScreen.SetActive(true);
-        levelCompletedDisplay.text = "LEVEL " + GameManager.levelManager.LevelNumber.ToString() + " COMPLETED";
+        levelCompletedDisplay.text = "LEVEL " + Services.levelManager.LevelNumber.ToString() + " COMPLETED";
         secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
         bonusScoreDisplay.text = currentTimeBonus.ToString();
-        nextLevelDisplay.text = "NOW ENTERING LEVEL " + (GameManager.levelManager.LevelNumber + 1).ToString();
+        nextLevelDisplay.text = "NOW ENTERING LEVEL " + (Services.levelManager.LevelNumber + 1).ToString();
     }
 
 

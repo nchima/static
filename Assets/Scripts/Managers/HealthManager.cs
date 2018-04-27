@@ -25,8 +25,8 @@ public class HealthManager : MonoBehaviour {
                 // Audio/visuals
                 getHurtAudio.Play();
                 GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 2f);
-                GameManager.colorPaletteManager.LoadVulnerablePalette();
-                GameManager.player.GetComponent<Rigidbody>().velocity *= 0.01f;
+                Services.colorPaletteManager.LoadVulnerablePalette();
+                Services.playerGameObject.GetComponent<Rigidbody>().velocity *= 0.01f;
                 GameObject.Find("Pain Flash").GetComponent<Animator>().SetTrigger("Pain Flash");
 
                 // Delete health box.
@@ -37,7 +37,7 @@ public class HealthManager : MonoBehaviour {
             else {
                 // Reactivate health box.
                 if (value <= 5) healthBlocks[Mathf.Clamp(value - 1, 0, 5)].SetActive(true);
-                //if (value == 5) GameManager.colorPaletteManager.RestoreSavedPalette();
+                //if (value == 5) Services.colorPaletteManager.RestoreSavedPalette();
             }
 
             _playerHealth = value;
@@ -71,7 +71,7 @@ public class HealthManager : MonoBehaviour {
 
         // Check for score bonuses.
         for (int i = 0; i < healthBonuses.Length; i++) {
-            if (!healthBonuses[i].applied && GameManager.scoreManager.score >= healthBonuses[i].requiredScore) {
+            if (!healthBonuses[i].applied && Services.scoreManager.score >= healthBonuses[i].requiredScore) {
                 healthBonuses[i].applied = true;
                 playerHealth++;
             }
@@ -82,8 +82,8 @@ public class HealthManager : MonoBehaviour {
         if (invincibilityTimer > 0 && currentlyInvincible == false) {
             currentlyInvincible = true;
             invincibilityTimer -= Time.deltaTime;
-            //GameManager.colorPaletteManager.RestoreSavedPalette();
-            GameManager.colorPaletteManager.Invoke("RestoreSavedPalette", 1f);
+            //Services.colorPaletteManager.RestoreSavedPalette();
+            Services.colorPaletteManager.Invoke("RestoreSavedPalette", 1f);
         } else {
             currentlyInvincible = false;
         }

@@ -6,11 +6,11 @@ using UnityEngine;
 public class PauseAfterLevelCompleteFallingState : State {
 
     public override void Initialize(StateController stateController) {
-        GameManager.levelManager.SetFloorCollidersActive(false);
-        GameManager.player.GetComponent<Rigidbody>().useGravity = true;
-        GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GameManager.player.GetComponent<PlayerController>().isMovementEnabled = false;
-        GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.Falling;
+        Services.levelManager.SetFloorCollidersActive(false);
+        Services.playerGameObject.GetComponent<Rigidbody>().useGravity = true;
+        Services.playerGameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Services.playerController.isMovementEnabled = false;
+        Services.playerController.state = PlayerController.State.Falling;
     }
 
     public override void Run(StateController stateController) {
@@ -18,6 +18,6 @@ public class PauseAfterLevelCompleteFallingState : State {
     }
 
     public override void End(StateController stateController) {
-        GameManager.player.GetComponent<PlayerController>().isMovementEnabled = true;
+        Services.playerController.isMovementEnabled = true;
     }
 }
