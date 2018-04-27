@@ -13,7 +13,7 @@ public class FiringShockwaveState : State {
         Services.gameManager.CountEnemies();
 
         // Set up bonus time for next level.
-        Services.gameManager.DetermineBonusTime();
+        Services.scoreManager.DetermineBonusTime();
 
         //Services.specialBarManager.freezeDecay = false;
 

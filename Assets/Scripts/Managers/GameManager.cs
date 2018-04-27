@@ -42,6 +42,11 @@ public class GameManager : MonoBehaviour {
         Services.gunValueManager = GetComponentInChildren<GunValueManager>();
         Services.noiseGenerator = GetComponent<GenerateNoise>();
         Services.flashManager = GetComponentInChildren<FlashManager>();
+        Services.billboardManager = FindObjectOfType<BatchBillboard>();
+
+        GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -50,17 +55,38 @@ public class GameManager : MonoBehaviour {
     }
 
 
+    IEnumerator InitialSetup() {
+        Services.gun.enabled = false;
+        Services.playerController.isMovementEnabled = false;
+
+        //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+        Services.levelManager.LoadNextLevel();
+
+        //yield return new WaitUntil(() => {
+        //    if (SceneManager.GetSceneByBuildIndex(levelManager.levelsCompleted).isLoaded) { return true; } 
+        //    else { return false; }
+        //});
+
+        //levelManager.SetEnemiesActive(false);
+        Services.fallingSequenceManager.BeginFallingInstant();
+
+        initialGravity = Physics.gravity;
+        Physics.gravity = Vector3.zero;
+
+        yield return null;
+    }
+
+
     private void Update() {
         if (!gameStarted && !gamePaused) {
             if (InputManager.fireButtonDown) {
-                StartGame();
+                GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
             }
         }
 
         if (InputManager.pauseButtonDown) {
-            if (!gamePaused && !playerIsDead) { PauseGame(true); } else { PauseGame(false); }
+            if (!gamePaused && !Services.healthManager.PlayerIsDead) { PauseGame(true); } else { PauseGame(false); }
         }
-
     }
 
 
@@ -87,32 +113,7 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    IEnumerator InitialSetup() {
-        Services.gun.enabled = false;
-        Services.playerController.isMovementEnabled = false;
-
-        //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-        Services.levelManager.LoadNextLevel();
-
-        //yield return new WaitUntil(() => {
-        //    if (SceneManager.GetSceneByBuildIndex(levelManager.levelsCompleted).isLoaded) { return true; } 
-        //    else { return false; }
-        //});
-
-        //levelManager.SetEnemiesActive(false);
-        Services.fallingSequenceManager.BeginFallingInstant();
-
-        initialGravity = Physics.gravity;
-        Physics.gravity = Vector3.zero;
-
-        yield return null;
-    }
-
-    public void PlayerUsedSpecialMove() {
-        Services.specialBarManager.PlayerUsedSpecialMove();
-    }
-
-
+    // MOVE TO TIME SCALE MANAGER
     public void ReturnToFullSpeed() {
         // Begin tweening time scale, gun burst rate, and music pitch back to normal.
         DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
@@ -121,39 +122,20 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void PlayerKilledEnemy(int scoreValue, float specialValue) {
-        // Add score and special bar values.
-        Services.scoreManager.PlayerKilledEnemy(scoreValue);
-        Services.specialBarManager.AddValue(specialValue);
-
+    // MOVE TO UM... ENEMY MANAGER IF I MAKE ONE
+    public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         // If player has killed all the enemies in the current level, begin the level completion sequence.
         currentEnemyAmt -= 1;
-        if (currentEnemyAmt <= 0) { LevelComplete(); }
+        if (currentEnemyAmt <= 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
+            GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
+        }        
     }
 
 
-    public void LevelComplete() {
-        if (Services.fallingSequenceManager.isPlayerFalling) return;
-        if (dontChangeLevel) return;
-
-        Services.musicManager.EnterFallingSequence();
+    // Maybe move this functionality to various managers at some point.
+    public void LevelCompletedHandler(GameEvent gameEvent) {
         levelWinAudio.Play();
-
-        Services.scoreManager.LevelComplete();
-        Services.levelManager.isLevelCompleted = true;
-        Services.levelManager.levelsCompleted++;
-
-        Services.gun.canShoot = false;
-
         GatherRemainingAmmoPickups();
-
-        //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
-
-        // Disable the floor's collider so the player falls through it.
-        Services.levelManager.SetFloorCollidersActive(false);
-
-        // Initiate falling sequence.
-        Services.fallingSequenceManager.BeginFalling();
     }
 
 
@@ -168,62 +150,8 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    //public void FreezeSpecialBarDecay(bool value) {
-    //    specialBarManager.freezeDecay = value;
-    //}
-
-
-    public void DetermineBonusTime() {
-        Services.scoreManager.DetermineBonusTime();
-    }
-
-
-    bool playerIsDead;
-    public void PlayerWasHurt() {
-        Services.scoreManager.GetHurt();
-        Services.specialBarManager.PlayerWasHurt();
-        Services.healthManager.playerHealth -= 1;
-
-        // If health is now less than zero, trigger a game over.
-        if (Services.healthManager.playerHealth == 0) {
-            playerIsDead = true;
-            Services.playerController.enabled = false;
-            Services.uiManager.ShowGameOverScreen();
-        }
-    }
-
-
-    public void ShowHighScores() {
-        Services.scoreManager.RetrieveScoresForHighScoreScreen();
-        Services.uiManager.ShowHighScoreScreen();
-    }
-
-
-    public void BulletHitEnemy() {
-        //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) return;
-        Services.scoreManager.BulletHitEnemy();
-        //sineTime += bulletHitSineIncrease;
-    }
-
-
-    public void ShowEndOfDemoScreen() {
-        Services.uiManager.ShowEndOfDemoScreen();
-    }
-
-
-    public void StartGame() {
-        if (gamePaused) { return; }
-
-        // Unpause enemies in the background.
-        Services.levelManager.SetEnemiesActive(true);
-
-        Services.uiManager.ShowTitleScreen(false);
-
-        Services.playerController.isMovementEnabled = true;
-        Services.gun.enabled = true;
-
+    public void GameStartedHandler(GameEvent gameEvent) {
         Physics.gravity = initialGravity;
-
         gameStarted = true;
     }
 
@@ -232,9 +160,6 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
     }
 
-    public void UpdateBillboards() {
-        FindObjectOfType<BatchBillboard>().FindAllBillboards();
-    }
 
     public bool PositionIsInLevelBoundaries(Vector3 position) {
         if (position.x > Services.levelGenerator.baseLevelSize / 2 ||

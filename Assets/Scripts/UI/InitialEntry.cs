@@ -28,15 +28,11 @@ public class InitialEntry : MonoBehaviour {
 
     float joystickDeadzone = 0.5f;
 
-    ScoreManager scoreManager;
     Transform gameOverScreen;
     Transform nameEntry;
 
 
-    void Start()
-    {
-        scoreManager = GameObject.Find("Game Manager").GetComponent<ScoreManager>();
-
+    void Start() {
         ActiveInitial.Active = true;
     }
 
@@ -102,25 +98,22 @@ public class InitialEntry : MonoBehaviour {
                 // Go through each initial and add it to a string.
                 string enteredInitials = "";
                 bool cancel = false;
-                foreach (Initial initial in initials)
-                {
-                    if (initial.charIndex != 0)
-                    {
+                foreach (Initial initial in initials) {
+                    if (initial.charIndex != 0) {
                         enteredInitials += letters[initial.charIndex].ToString();
                     }
 
                     // If the player hasn't had time to enter their initials then go back.
-                    else
-                    {
+                    else {
                         cancel = true;
                     }
                 }
 
                 // Tell the score controller to add this entry to its score list and then close this screen.
-                if (!cancel)
-                {
-                    scoreManager.InsertScore(enteredInitials);
-                    GameObject.Find("Game Manager").GetComponent<GameManager>().ShowHighScores();
+                if (!cancel) {
+                    Services.scoreManager.InsertScore(enteredInitials);
+                    Services.scoreManager.RetrieveScoresForHighScoreScreen();
+                    Services.uiManager.ShowHighScoreScreen();
                 }
             }
         }

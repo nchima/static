@@ -29,6 +29,12 @@ public class UIManager : MonoBehaviour {
     bool specialMoveReadyScreenActiveBeforePause;
 
 
+    public void Awake() {
+        GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+
     public void ShowTitleScreen(bool value) {
         titleScreen.SetActive(value);
     }
@@ -94,5 +100,15 @@ public class UIManager : MonoBehaviour {
 
     public void ReduceScreenShakeForGameOverScreen() {
 
+    }
+
+
+    public void GameOverHandler(GameEvent gameEvent) {
+        ShowGameOverScreen();
+    }
+
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        ShowTitleScreen(false);
     }
 }

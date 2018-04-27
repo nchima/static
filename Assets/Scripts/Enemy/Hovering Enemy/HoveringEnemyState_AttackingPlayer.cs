@@ -60,7 +60,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
             else {
                 timer += Time.deltaTime;
                 if (!playerDamaged && PlayerIsInHitBox(stateController)) {
-                    Services.gameManager.PlayerWasHurt();
+                    GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
                     playerDamaged = true;
                 }
 

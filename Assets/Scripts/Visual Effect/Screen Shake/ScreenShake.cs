@@ -105,7 +105,7 @@ public class ScreenShake : MonoBehaviour {
 
 
     // Increase shake magnitude by a certain ammount.
-	void IncreaseShake(float increaseAmount) {
+	public void IncreaseShake(float increaseAmount) {
         currentShake += increaseAmount;
         shakeTimer = 0.5f;
 	}

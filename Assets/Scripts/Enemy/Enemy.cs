@@ -79,7 +79,7 @@ public class Enemy : StateController {
         if (!isAlive) { return; }
 
         Instantiate(deathParticles, transform.position, Quaternion.identity);
-        Services.gameManager.PlayerKilledEnemy(scoreKillValue, specialKillValue);
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerKilledEnemy(scoreKillValue, specialKillValue));
         isAlive = false;
         Destroy(gameObject);
     }

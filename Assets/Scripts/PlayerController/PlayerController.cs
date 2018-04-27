@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour {
     float mouseInput;
 
     // MISC
-    Rigidbody rigidBody;
+    Rigidbody m_Rigidbody;
     public bool isAboveFloor {
         get {
             bool returnValue = false;
@@ -74,9 +74,17 @@ public class PlayerController : MonoBehaviour {
     Vector3 previousPosition;   // Used to calculate velocity.
 
 
+    private void Awake() {
+        m_Rigidbody = GetComponent<Rigidbody>();
+
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+
     private void Start() {
         targetRotation = transform.localRotation;
-        rigidBody = GetComponent<Rigidbody>();
         normalBounciness = GetComponent<Collider>().material.bounciness;
     }
 
@@ -118,30 +126,30 @@ public class PlayerController : MonoBehaviour {
 
             // Ground check
             if (!isAboveFloor) {
-                rigidBody.useGravity = true;
+                m_Rigidbody.useGravity = true;
                 return;
             } else {
-                rigidBody.useGravity = false;
+                m_Rigidbody.useGravity = false;
             }
 
             // Deceleration
             float decelerateTo = maxGroundSpeed;
             if (directionalInput.magnitude == 0) { decelerateTo = 0f; }
-            if (rigidBody.velocity.magnitude > decelerateTo) {
-                Vector3 deccelerateForce = rigidBody.velocity.normalized * -deccelerationSpeed;
+            if (m_Rigidbody.velocity.magnitude > decelerateTo) {
+                Vector3 deccelerateForce = m_Rigidbody.velocity.normalized * -deccelerationSpeed;
                 deccelerateForce.y = 0;
-                rigidBody.AddForce(deccelerateForce, ForceMode.Acceleration);
+                m_Rigidbody.AddForce(deccelerateForce, ForceMode.Acceleration);
             }
 
             // If we're going slowly enough, just stop instantly.
-            if (rigidBody.velocity.magnitude < 5) {
-                rigidBody.velocity = Vector3.zero;
+            if (m_Rigidbody.velocity.magnitude < 5) {
+                m_Rigidbody.velocity = Vector3.zero;
             }
 
             // Get actual walking force.
             Vector3 walkForce = desiredMove.normalized * accelerationSpeedGround;
             walkForce.y = 0f;
-            rigidBody.AddForce(walkForce, ForceMode.Acceleration);
+            m_Rigidbody.AddForce(walkForce, ForceMode.Acceleration);
 
             // Apply movment kick.
             CheckMovementKick();
@@ -151,25 +159,25 @@ public class PlayerController : MonoBehaviour {
                 movementKickReady = false;
                 Vector3 kickForce = desiredMove.normalized * movementKickForce;
                 kickForce.y = 0f;
-                rigidBody.AddForce(kickForce, ForceMode.VelocityChange);
+                m_Rigidbody.AddForce(kickForce, ForceMode.VelocityChange);
             }
 
             // Keep player at floor level.
-            if (isAboveFloor) { rigidBody.velocity = new Vector3(rigidBody.velocity.x, 0f, rigidBody.velocity.z); }
+            if (isAboveFloor) { m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, 0f, m_Rigidbody.velocity.z); }
 
-            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxGroundSpeed);
+            m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, maxGroundSpeed);
         }
         
         // Handle air movement.
         else if (state == State.Falling || state == State.SpeedFalling) {
-            if (desiredMove == Vector3.zero) { rigidBody.velocity = new Vector3(0f, rigidBody.velocity.y, 0f); }
-            else { rigidBody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
+            if (desiredMove == Vector3.zero) { m_Rigidbody.velocity = new Vector3(0f, m_Rigidbody.velocity.y, 0f); }
+            else { m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
         } 
         
         // Handle shotgun charge movement.
         else if (state == State.ShotgunCharge) {
             // Add forward acceleration.
-            rigidBody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
+            m_Rigidbody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
         }
 
         // Failsafe for getting teleported outside level.
@@ -226,5 +234,18 @@ public class PlayerController : MonoBehaviour {
         if (state == State.ShotgunCharge && collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle")) {
             //FindObjectOfType<Gun>().EndShotgunCharge();
         }
+    }
+
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        m_Rigidbody.velocity *= 0.01f;
+    }
+
+    public void GameOverHandler(GameEvent gameEvent) {
+        this.enabled = false;
+    }
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        isMovementEnabled = true;
     }
 }

@@ -237,6 +237,9 @@
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_Wandering.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyTransition_PlayerIsClose.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyTransition_ShotReady.cs" />
+    <Compile Include="Assets\Scripts\Event System\GameEvent.cs" />
+    <Compile Include="Assets\Scripts\Event System\GameEventManager.cs" />
+    <Compile Include="Assets\Scripts\Event System\GameEvents.cs" />
     <Compile Include="Assets\Scripts\Explosion\Explosion.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\Fall Catcher\FallCatcher.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\FallIntoLevelState.cs" />
@@ -336,7 +339,8 @@
     <Compile Include="Assets\Scripts\Visual Effect\RotateRandomly.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\Rotator.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\Screen Effects\ScreenBlurHelper.cs" />
-    <Compile Include="Assets\Scripts\Visual Effect\ScreenShake.cs" />
+    <Compile Include="Assets\Scripts\Visual Effect\Screen Shake\ScreenShake.cs" />
+    <Compile Include="Assets\Scripts\Visual Effect\Screen Shake\ScreenShakeManager.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\SubtleRandomRotation.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\TextureOffsetChanger.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\WireframeJitter.cs" />

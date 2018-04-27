@@ -41,6 +41,9 @@ public class LevelManager : MonoBehaviour {
         levelInfos = Resources.LoadAll<LevelInfo>("Level Info");
 
         loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
+
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -68,7 +71,7 @@ public class LevelManager : MonoBehaviour {
     public void LoadRandomLevel() {
         if (levelsCompleted == 30) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
-            Services.gameManager.ShowEndOfDemoScreen();
+            Services.uiManager.ShowEndOfDemoScreen();
             return;
         }
 
@@ -79,7 +82,7 @@ public class LevelManager : MonoBehaviour {
     public void LoadNextLevel() {
         if (levelsCompleted == 20) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
-            Services.gameManager.ShowEndOfDemoScreen();
+            Services.uiManager.ShowEndOfDemoScreen();
             return;
         }
 
@@ -155,6 +158,18 @@ public class LevelManager : MonoBehaviour {
 
         // Update billboards.
         Services.gameManager.GetComponent<BatchBillboard>().FindAllBillboards();
+    }
+
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        isLevelCompleted = true;
+        levelsCompleted++;
+        SetFloorCollidersActive(false);
+    }
+
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        SetEnemiesActive(true);
     }
 
 

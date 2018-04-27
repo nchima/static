@@ -27,6 +27,7 @@ public class ColorPaletteManager : MonoBehaviour {
     private void Awake() {
         // Memorize original colors.
         ChangePaletteImmediate(startingPalette);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void Start() {
@@ -83,7 +84,7 @@ public class ColorPaletteManager : MonoBehaviour {
 
     }
 
-    public void LoadVulnerablePalette() {
+    public void LoadVulnerablePaletteHandler() {
         ChangePalette(playerVulnerablePalette, 0.1f);
     }
 
@@ -97,6 +98,9 @@ public class ColorPaletteManager : MonoBehaviour {
 
     private void OnDisable() {
         // Restore memorized original colors.
- 
+    }
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        LoadVulnerablePaletteHandler();
     }
 }

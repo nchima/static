@@ -16,7 +16,6 @@ public class Gun : MonoBehaviour {
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
     [SerializeField] Color bulletColor2;
-    [SerializeField] FloatRange flashIntensity = new FloatRange(0.4f, 1f);
 
     // Modifies rate of fire during slow motion sequence.
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
@@ -72,6 +71,8 @@ public class Gun : MonoBehaviour {
 
     private void Awake() {
         screenShakes = FindObjectsOfType<ScreenShake>();
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -112,14 +113,14 @@ public class Gun : MonoBehaviour {
         if (Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
             if (GunValueManager.currentValue >= 0f && !firingMissiles && !firedMissiles) {
-                gameManager.PlayerUsedSpecialMove();
+                Services.specialBarManager.PlayerUsedSpecialMove();
                 missilesFired = 0;
                 missileTimer = 0f;
                 firingMissiles = true;
             } 
             
             else if (GunValueManager.currentValue < 0f) {
-                gameManager.PlayerUsedSpecialMove();
+                Services.specialBarManager.PlayerUsedSpecialMove();
                 FindObjectOfType<ShotgunCharge>().BeginSequence();
             }
         }
@@ -172,6 +173,8 @@ public class Gun : MonoBehaviour {
 
         bulletsHitThisBurst = 0;
 
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerFiredGun());
+
         // Play shooting sound.
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
@@ -192,8 +195,6 @@ public class Gun : MonoBehaviour {
             );
 
         // Flash screen
-        float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, flashIntensity.max, flashIntensity.min);
-        Services.flashManager.Flash(new Color(currentFlash, currentFlash, currentFlash, currentFlash));
 
         // Auto aim for weak points.
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
@@ -260,5 +261,15 @@ public class Gun : MonoBehaviour {
         }
 
         return autoAimPoint;
+    }
+
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        canShoot = false;
+    }
+
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        this.enabled = true;
     }
 }

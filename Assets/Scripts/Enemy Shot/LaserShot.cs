@@ -180,7 +180,7 @@ public class LaserShot : EnemyShot {
     {
         if (state == State.Damage && other.transform == Services.playerTransform.transform)
         {
-            Services.gameManager.PlayerWasHurt();
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
             GetComponentInChildren<Collider>().enabled = false;
         }
     }

@@ -24,11 +24,8 @@ public class MeleeEnemy : Enemy {
     [HideInInspector] public float originalHumVolume;    // The original hum volume.
     [HideInInspector] public float originalHumPitch; // The original pitch of the hum.
 
-    [HideInInspector] public NavMeshAgent m_NavMeshAgent;
-
 
     private void Awake() {
-        m_NavMeshAgent = GetComponent<NavMeshAgent>();
         originalColor = sheatheMeshRenderer.material.GetColor("_Color");
         originalHumVolume = humAudioSource.volume;
         originalHumPitch = humAudioSource.pitch;
@@ -53,7 +50,7 @@ public class MeleeEnemy : Enemy {
     {
         // See if we hit the player.
         if (collision.collider.tag == "Player" && (currentState is MeleeEnemyState_Attacking)) {
-            Services.gameManager.PlayerWasHurt();
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
         }
 
         // See if we hit an obstacle.

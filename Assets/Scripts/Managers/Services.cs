@@ -21,4 +21,5 @@ public class Services {
     public static ColorPaletteManager colorPaletteManager;
     public static GenerateNoise noiseGenerator;
     public static FlashManager flashManager;
+    public static BatchBillboard billboardManager;
 }

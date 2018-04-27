@@ -44,7 +44,7 @@ public class PlayerMissile : MonoBehaviour {
         // Orient self according to player's current rotation.
         //transform.rotation = Services.Services.playerTransform.rotation;
 
-        Services.gameManager.UpdateBillboards();
+        Services.billboardManager.FindAllBillboards();
 
         lockOnTriggerObject = transform.Find("Lock On Trigger").gameObject;
 

@@ -6,7 +6,12 @@ public class SFXManager : MonoBehaviour {
 
     [SerializeField] AudioSource bulletHitEnemyAudioSource;
     [SerializeField] AudioSource bulletHitWeakPointAudioSource;
- 
+    [SerializeField] AudioSource playerWasHurtAudioSource;
+
+    private void Start() {
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
+
     public void PlayBulletEnemyHitSoundOld(EnemyOld hitEnemy) {
 
         /* Come back later and make this compatible with new enemies. */
@@ -31,5 +36,9 @@ public class SFXManager : MonoBehaviour {
 
     public void PlayBulletHitWeakPointSound() {
         bulletHitWeakPointAudioSource.Play();
+    }
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        playerWasHurtAudioSource.Play();
     }
 }

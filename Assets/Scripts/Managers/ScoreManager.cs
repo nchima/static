@@ -66,6 +66,12 @@ public class ScoreManager : MonoBehaviour
     }
 
 
+    private void Awake() {
+        GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+    }
+
+
     void Start() {
         // Set up high score list.
         highScoreEntries = RetrieveHighScores();
@@ -133,11 +139,12 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Should be called when the player kills an enemy.
-    /// </summary>
-    public void PlayerKilledEnemy(int enemyKillValue)
-    {
+    public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
+        GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
+
+        // Round the score to an integer and update the score display.
+        score += playerKilledEnemyEvent.scoreValue;
+
         // If value of the multiplier bar has gotten to 1, raise the player's multiplier and set the multiplier bar values for the new multiplier level.
         //if (multBarValueCurr >= 1f)
         //{
@@ -146,17 +153,10 @@ public class ScoreManager : MonoBehaviour
         //    multBarValueCurr = multBarStartValCurr;
         //    multBarDecayCurr = multBarBaseDecay * multiplier;
         //}
-
-        // Round the score to an integer and update the score display.
-        score += enemyKillValue;
     }
 
 
-    /// <summary>
-    /// Is called when player beats the current level.
-    /// </summary>
-    public void LevelComplete()
-    {
+    public void LevelCompletedHandler(GameEvent gameEvent) {
         // Give the player a score boost for beating the level.
         score += currentTimeBonus;
         bonusTimerIsRunning = false;
@@ -187,14 +187,6 @@ public class ScoreManager : MonoBehaviour
     public void BulletHitEnemy()
     {
         score += 1;
-    }
-
-
-    /// <summary>
-    /// Should be called when the player gets hurt.
-    /// </summary>
-    public void GetHurt()
-    {  
     }
 
 

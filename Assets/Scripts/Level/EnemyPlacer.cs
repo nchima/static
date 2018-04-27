@@ -182,6 +182,7 @@ public class EnemyPlacer : MonoBehaviour {
             foreach (Collider c in overlaps) {
                 if (c.tag == "Player" || c.tag == "Enemy" || c.tag == "Obstacle" || c.tag == "Wall") {
                     onTopOfSomethingBad = true;
+                    break;
                 }
             }
             if (onTopOfSomethingBad) { continue; }

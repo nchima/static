@@ -36,8 +36,6 @@ public class HomingShot : EnemyShot {
     // EXPLOSION
     [SerializeField] GameObject explosionPrefab;
 
-    private Transform playerTransform;
-
 
 	new void Start ()
     {
@@ -45,8 +43,7 @@ public class HomingShot : EnemyShot {
 
         state = HomingShotState.NotLockedOn;
 
-        gameManager.UpdateBillboards();
-        playerTransform = GameObject.Find("Player").transform;
+        Services.billboardManager.FindAllBillboards();
 
         // Get an initial target position on the floor within a certain distance from the player.
         //Debug.Log(gameManager.playerVelocity);
@@ -55,9 +52,9 @@ public class HomingShot : EnemyShot {
 
         while (!foundTarget) {
             currentTarget = new Vector3(
-                (playerTransform.position.x + PlayerController.currentVelocity.x * leading) + Random.insideUnitCircle.x * inaccuracy * 2f,
+                (Services.playerTransform.position.x + PlayerController.currentVelocity.x * leading) + Random.insideUnitCircle.x * inaccuracy * 2f,
                 0f,
-                (playerTransform.position.z + PlayerController.currentVelocity.z * leading) + Random.insideUnitCircle.y * inaccuracy * 2f);
+                (Services.playerTransform.position.z + PlayerController.currentVelocity.z * leading) + Random.insideUnitCircle.y * inaccuracy * 2f);
 
             leading -= 1f;
             leading = Mathf.Clamp(leading, 0f, 99f);
@@ -115,11 +112,11 @@ public class HomingShot : EnemyShot {
     void NotLockedOn()
     {
         // See if the player is near me.
-        if (Vector3.Distance(transform.position, playerTransform.position) <= playerLockOnDistance)
+        if (Vector3.Distance(transform.position, Services.playerTransform.position) <= playerLockOnDistance)
         {
             //Debug.Log("Homing shot locking onto player.");
             //velocity = Vector3.zero;
-            currentTarget = playerTransform.position;
+            currentTarget = Services.playerTransform.position;
             state = HomingShotState.LockedOn;
             return;
         }
@@ -137,7 +134,7 @@ public class HomingShot : EnemyShot {
         if (velocity.y <= 0f)
         {
             //Debug.Log("Homing shot locking onto player.");
-            currentTarget = playerTransform.position;
+            currentTarget = Services.playerTransform.position;
             state = HomingShotState.LockedOn;
         }
 
@@ -148,7 +145,7 @@ public class HomingShot : EnemyShot {
     void LockedOn()
     {
         // See if the player has gone out of range.
-        if (Vector3.Distance(transform.position, playerTransform.position) >= playerLockOffDistance)
+        if (Vector3.Distance(transform.position, Services.playerTransform.position) >= playerLockOffDistance)
         {
             // Get a target position straight ahead and just move towards it.
             //RaycastHit hit;
@@ -174,19 +171,19 @@ public class HomingShot : EnemyShot {
 
         MoveToTarget();
 
-        blipAudioSource.pitch = MyMath.Map(Vector3.Distance(playerTransform.position, transform.position), 15f, 60f, 1f, 0.3f);
+        blipAudioSource.pitch = MyMath.Map(Vector3.Distance(Services.playerTransform.position, transform.position), 15f, 60f, 1f, 0.3f);
     }
 
 
     void Dormant()
     {
-        if (Vector3.Distance(transform.position, playerTransform.position) <= playerLockOnDistance)
+        if (Vector3.Distance(transform.position, Services.playerTransform.position) <= playerLockOnDistance)
         {
             Debug.Log("Dormant homing shot locking onto player.");
             GetComponent<Rigidbody>().isKinematic = false;
             GetComponent<Rigidbody>().useGravity = false;
             velocity = Vector3.up*5f;
-            currentTarget = playerTransform.position;
+            currentTarget = Services.playerTransform.position;
             state = HomingShotState.LockedOn;
             return;
         }
