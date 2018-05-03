@@ -20,9 +20,12 @@ public class UIManager : MonoBehaviour {
     public EventSystem eventSystem;
     public GameObject resumeButton;
 
-    public ScreenShake[] turnTheseOffPlz;
+    public ScreenShake[] screenShakesToTurnOffOnGameOver;
 
     public GameObject pauseVeil;
+
+    [SerializeField] GameObject[] keyboardControlPrompts;
+    [SerializeField] GameObject[] xBoxControlPrompts;
 
     bool titleScreenActiveBeforePause;
     bool levelCompleteScreenActiveBeforePause;
@@ -37,6 +40,18 @@ public class UIManager : MonoBehaviour {
 
     public void ShowTitleScreen(bool value) {
         titleScreen.SetActive(value);
+    }
+
+
+    public void SwitchControlPrompts(InputManager.InputMode newMode) {
+        if (newMode == InputManager.InputMode.MouseAndKeyboard) {
+            foreach (GameObject gameObject in keyboardControlPrompts) { gameObject.SetActive(true); }
+            foreach (GameObject gameObject in xBoxControlPrompts) { gameObject.SetActive(false); }
+        }
+        else if (newMode == InputManager.InputMode.Controller) {
+            foreach (GameObject gameObject in keyboardControlPrompts) { gameObject.SetActive(false); }
+            foreach (GameObject gameObject in xBoxControlPrompts) { gameObject.SetActive(true); }
+        }
     }
 
 
@@ -75,7 +90,7 @@ public class UIManager : MonoBehaviour {
         pauseVeil.SetActive(true);
         crosshair.SetActive(false);
 
-        foreach (ScreenShake turnMeOff in turnTheseOffPlz) {
+        foreach (ScreenShake turnMeOff in screenShakesToTurnOffOnGameOver) {
             turnMeOff.shakeScale = Vector3.zero;
         }
 

@@ -18,7 +18,7 @@ public class PlayerBulletMesh : MonoBehaviour {
     }
 
 
-    public  void SetTransformByEndPoints(Vector3 back, Vector3 front, float thickness) {
+    public void SetTransformByEndPoints(Vector3 back, Vector3 front, float thickness) {
 
         transform.position = Vector3.Lerp(back, front, 0.5f);
 
@@ -43,7 +43,7 @@ public class PlayerBulletMesh : MonoBehaviour {
         DOTween.To(() => blendValue, x => blendValue = x, 100f, screenTime).SetEase(Ease.InQuart);
     }
 
-
+    
     public void SetColor(Color newColor) {
         GetComponent<SkinnedMeshRenderer>().material.SetColor("_Tint", newColor);
     }

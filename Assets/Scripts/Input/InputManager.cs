@@ -66,11 +66,16 @@ public class InputManager : MonoBehaviour {
         ResetTriggers();
 
         // Figure out which input mode to use.
-        if (MouseAndKeyboardUsed) { inputMode = InputMode.MouseAndKeyboard; }
+        if (MouseAndKeyboardUsed) {
+            inputMode = InputMode.MouseAndKeyboard;
+            Services.uiManager.SwitchControlPrompts(InputMode.MouseAndKeyboard);
+        }
+
         if (AnyControllerButtonPressed) {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             inputMode = InputMode.Controller;
+            Services.uiManager.SwitchControlPrompts(InputMode.Controller);
         }
 
         switch(inputMode) {

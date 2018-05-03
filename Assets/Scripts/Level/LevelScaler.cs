@@ -9,9 +9,9 @@ public class LevelScaler : MonoBehaviour {
 
         Bounds currentBounds = GetComponent<EnemyPlacer>().GetLevelFloorBounds();
         float currentArea = currentBounds.size.x * currentBounds.size.z;
-        Debug.Log("Currenta area: " + currentArea);
+        //Debug.Log("Current area: " + currentArea);
         float scaleMultiplier = newArea*1000 / currentArea;
-        Debug.Log("Scale multiplier: " + scaleMultiplier);
+        //Debug.Log("Scale multiplier: " + scaleMultiplier);
 
         // Do floor
         Transform floorHolder = GameObject.Find("Floor Planes").transform;

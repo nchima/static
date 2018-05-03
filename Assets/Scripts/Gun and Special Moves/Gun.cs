@@ -216,6 +216,7 @@ public class Gun : MonoBehaviour {
         timeSinceLastShot = 0f;
     }
 
+
     // Firing an individual bullet.
     void FireBullet(Vector3 target, float inaccuracy) {
         // Rotate bullet spawner to get the direction of the next bullet.
@@ -244,19 +245,34 @@ public class Gun : MonoBehaviour {
         
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.transform.forward * 1000f;
 
+        // Check all gameobjects with the given tag:
         foreach (GameObject thisObject in GameObject.FindGameObjectsWithTag(tag)) {
-
+            
             // See if this object is near the middle of the screen.
             Vector3 viewportPosition = Camera.main.WorldToViewportPoint(thisObject.transform.position);
-            if ((viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize) && (viewportPosition.y >= 0f && viewportPosition.y <= 1f)) {
-
-                // For the enemies's position, use the center of its renderer.
+            bool inXRange = viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize;
+            bool inYRange = viewportPosition.y >= 0f && viewportPosition.y <= 1f;
+            bool inZRange = viewportPosition.z >= 0f;
+            if (inXRange && inYRange && inZRange) {
+                // For the enemy's position, use the center of its renderer.
                 Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;
+
+                // If this position is behind an obstacle, ignore it.
+                RaycastHit hit;
+                if (Physics.Raycast(gunTipTransform.position, Vector3.Normalize(thisPosition - gunTipTransform.position), out hit, 1000f, 1 << 8)) {
+                    if (!hit.
+                        collider.
+                        GetComponent<Enemy>()) {
+                        continue;
+                    }
+                }
 
                 // See if the distance to this enemy is less than the distance to the previous nearest enemy.
                 if (Vector3.Distance(Services.playerTransform.position, thisPosition) < Vector3.Distance(Services.playerTransform.position, autoAimPoint)) {
                     autoAimPoint = thisPosition;
                 }
+
+                Debug.Log("Auto aim activated.");
             }
         }
 

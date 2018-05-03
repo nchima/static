@@ -44,22 +44,30 @@ public class PlayerBullet : MonoBehaviour {
 
         if (justBeInstant) { nextPosition = transform.position + transform.forward * 1000f; }
 
+        //Debug.DrawLine(transform.position, nextPosition, Color.red, 1f);
+
         // Raycast first ignoring regular enemy layers in order to see if we are aimed at a weak point.
         //Debug.Log((1 << 8) | (1 << 28));
         RaycastHit hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 28));
 
+        // If we did hit a weak point:
         if (hit.collider != null && hit.collider.name.Contains("Weak Point")) {
             transform.position = hit.point;
             HandleHit(hit);
-        } else {
+        } 
+        
+        // If we did not hit a weak point.
+        else {
             // Raycast from my previous position to my new position to see if I hit an enemy's regular surface.
             hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23));
 
+            // If we hit a something.
             if (hit.collider != null) {
-                //Debug.Log(hit.collider.name + " was hit");
                 transform.position = hit.point;
                 HandleHit(hit);
-            } else {
+            } 
+            
+            else {
                 transform.position = nextPosition;
                 travelledDistance += Vector3.Distance(transform.position, previousPosition);
                 if (travelledDistance >= maxDistance) { EndBulletsExistence(); }
@@ -76,16 +84,24 @@ public class PlayerBullet : MonoBehaviour {
     RaycastHit SphereCastOnLayer(Vector3 toPosition, int layerBitmask) {
         RaycastHit hit;
 
-        Debug.DrawLine(previousPosition, toPosition, Color.red);
-
-        bool spherecast = Physics.SphereCast(
+        bool raycast = Physics.Raycast(
             previousPosition,
-            thickness,
             transform.forward,
             out hit,
             Vector3.Distance(toPosition, previousPosition),
             layerBitmask
         );
+
+        //bool spherecast = Physics.SphereCast(
+        //    previousPosition,
+        //    thickness,
+        //    transform.forward,
+        //    out hit,
+        //    Vector3.Distance(toPosition, previousPosition),
+        //    layerBitmask
+        //);
+
+        Debug.DrawLine(previousPosition, hit.point, Color.red, 1.5f);
 
         return hit;
     }

@@ -135,12 +135,12 @@ public class GameManager : MonoBehaviour {
     // Maybe move this functionality to various managers at some point.
     public void LevelCompletedHandler(GameEvent gameEvent) {
         levelWinAudio.Play();
-        GatherRemainingAmmoPickups();
+        DeleteRemainingPickups();
     }
 
 
-    void GatherRemainingAmmoPickups() {
-        foreach(SpecialMoveAmmo specialMoveAmmo in FindObjectsOfType<SpecialMoveAmmo>()) { specialMoveAmmo.BeginMovingTowardsPlayer(); }
+    void DeleteRemainingPickups() {
+        foreach(Pickup pickup in FindObjectsOfType<Pickup>()) { pickup.GetDeleted(); }
     }
 
 

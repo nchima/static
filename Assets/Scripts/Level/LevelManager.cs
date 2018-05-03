@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.AI;
 
 public class LevelManager : MonoBehaviour {
 
@@ -18,8 +19,7 @@ public class LevelManager : MonoBehaviour {
 
     [HideInInspector] public int levelsCompleted = 0;
     public int LevelNumber { get { return levelsCompleted + 1; } }
-    bool isLevelLoaded
-    {
+    bool isLevelLoaded {
         get {
             if (currentlyLoadedLevel == 0) { return false; }
             return SceneManager.GetSceneByBuildIndex(currentlyLoadedLevel).isLoaded;
@@ -38,7 +38,12 @@ public class LevelManager : MonoBehaviour {
     private void Awake() {
         levelScaler = GetComponent<LevelScaler>();
         enemyPlacer = GetComponent<EnemyPlacer>();
-        levelInfos = Resources.LoadAll<LevelInfo>("Level Info");
+
+        levelInfos = new LevelInfo[Resources.LoadAll<LevelInfo>("Level Info").Length];
+        for (int i = 0; i < levelInfos.Length; i++) {
+            string levelNumber = (i+1).ToString();
+            levelInfos[i] = Resources.Load<LevelInfo>("Level Info/Level Info " + levelNumber);
+        }
 
         loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
 
@@ -107,6 +112,9 @@ public class LevelManager : MonoBehaviour {
 
         // Scale level according to, you know, whatever I guess
         levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
+
+        yield return new WaitForSeconds(1f);
+
         enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         SetEnemiesActive(false);

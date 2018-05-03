@@ -239,6 +239,7 @@ public class PlayerController : MonoBehaviour {
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         m_Rigidbody.velocity *= 0.01f;
+        movementKickReady = true;
     }
 
     public void GameOverHandler(GameEvent gameEvent) {

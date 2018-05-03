@@ -167,6 +167,10 @@ public class EnemyPlacer : MonoBehaviour {
             // Get a location
             testPosition = RandomPositionOnFloorBounds(floorBounds);
 
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(testPosition, out hit, 500, NavMesh.AllAreas)) { testPosition = hit.position; }
+            else { continue; }
+
             // Check whether this location is over floor.
             float overlapRadius;
             if (enemyPrefab.GetComponent<NavMeshAgent>() != null) overlapRadius = enemyPrefab.GetComponent<NavMeshAgent>().radius * 1.5f;
