@@ -42,7 +42,7 @@ public class MeleeEnemy : Enemy {
 
         // Handle animation and color switching.
         meshRotator.speedScale = rotationSpeedCurrent;
-        sheatheMeshRenderer.material.color = attackingColorCurrent;
+        //sheatheMeshRenderer.material.color = attackingColorCurrent;
     }
 
 

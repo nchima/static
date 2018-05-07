@@ -19,20 +19,21 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] GameObject orthoScreen3;
     [SerializeField] GameObject backgroundScreen;
 
-    [SerializeField] ColorPalette startingPalette;
-    [SerializeField] ColorPalette originalPalette;
+    [SerializeField] ColorPalette defaultPalette;
+    [SerializeField] ColorPalette savedPalette;
     [SerializeField] ColorPalette tempSavedPalette;
     [SerializeField] ColorPalette playerVulnerablePalette;
     [SerializeField] ColorPalette fallingSequencePalette;
  
     private void Awake() {
         // Memorize original colors.
-        ChangePaletteImmediate(startingPalette);
+        ChangePaletteImmediate(defaultPalette);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     private void Start() {
-        SaveCurrentPalette(originalPalette);
+        SaveCurrentPalette(savedPalette);
     }
 
     void ChangePalette(ColorPalette newPalette, float duration) {
@@ -45,6 +46,7 @@ public class ColorPaletteManager : MonoBehaviour {
         orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(newPalette.orthoColor1, duration);
         orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(newPalette.orthoColor2, duration);
         orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(newPalette.orthoColor3, duration);
+        backgroundScreen.GetComponent<MeshRenderer>().material.DOColor(newPalette.backgroundColor, duration);
     }
 
     void ChangePaletteImmediate(ColorPalette newPalette) {
@@ -57,7 +59,7 @@ public class ColorPaletteManager : MonoBehaviour {
         orthoScreen1.GetComponent<MeshRenderer>().material.color = newPalette.orthoColor1;
         orthoScreen2.GetComponent<MeshRenderer>().material.color = newPalette.orthoColor2;
         orthoScreen3.GetComponent<MeshRenderer>().material.color = newPalette.orthoColor3;
-
+        backgroundScreen.GetComponent<MeshRenderer>().material.color = newPalette.backgroundColor;
     }
 
     void SaveCurrentPalette(ColorPalette saveTarget) {
@@ -70,9 +72,14 @@ public class ColorPaletteManager : MonoBehaviour {
         saveTarget.orthoColor1 = orthoScreen1.GetComponent<MeshRenderer>().material.GetColor("_Color");
         saveTarget.orthoColor2 = orthoScreen2.GetComponent<MeshRenderer>().material.GetColor("_Color");
         saveTarget.orthoColor3 = orthoScreen3.GetComponent<MeshRenderer>().material.GetColor("_Color");
+        saveTarget.backgroundColor = backgroundScreen.GetComponent<MeshRenderer>().material.color;
     }
 
     public void ChangeToRandomPalette(float duration) {
+        StartCoroutine(ChangeToRandomPaletteCoroutine(duration));
+    }
+
+    IEnumerator ChangeToRandomPaletteCoroutine(float duration) {
         Color[] environmentPalette = ThreeColorPalette(0.33f, 0.2f);
         wallMaterial.DOColor(environmentPalette[0], duration);
         floorMaterial.DOColor(environmentPalette[1], duration);
@@ -89,6 +96,12 @@ public class ColorPaletteManager : MonoBehaviour {
         orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[2], duration);
 
         backgroundScreen.GetComponent<MeshRenderer>().material.color = randomBackgroundColor;
+
+        yield return new WaitForSeconds(duration);
+
+        SaveCurrentPalette(savedPalette);
+
+        yield return null;
     }
 
     Color randomBackgroundColor { get { return Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 0.75f); } }
@@ -96,9 +109,6 @@ public class ColorPaletteManager : MonoBehaviour {
         float hue1 = Random.value;
         float hue2 = MyMath.Wrap01(hue1 + baseHueDifference);
         float hue3 = MyMath.Wrap01(hue2 + baseHueDifference);
-
-        Debug.Log("Hues: " + hue1 + ", " + hue2 + ", " + hue3);
-
         hue1 += Random.Range(-maxVariation, maxVariation);
         hue2 += Random.Range(-maxVariation, maxVariation);
         hue3 += Random.Range(-maxVariation, maxVariation);
@@ -109,7 +119,7 @@ public class ColorPaletteManager : MonoBehaviour {
         };
     }
 
-    public void LoadVulnerablePaletteHandler() {
+    public void LoadVulnerablePalette() {
         ChangePalette(playerVulnerablePalette, 0.1f);
     }
 
@@ -118,10 +128,14 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void RestoreSavedPalette() {
-        ChangePalette(originalPalette, 0.78f);
+        ChangePalette(savedPalette, 0.78f);
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
-        LoadVulnerablePaletteHandler();
+        LoadVulnerablePalette();
+    }
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        ChangeToRandomPalette(0.1f);
     }
 }

@@ -13,4 +13,5 @@ public class ColorPalette : ScriptableObject {
     public Color orthoColor1 = Color.red;
     public Color orthoColor2 = Color.green;
     public Color orthoColor3 = Color.blue;
+    public Color backgroundColor = Color.black;
 }
