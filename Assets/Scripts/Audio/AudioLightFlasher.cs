@@ -40,6 +40,7 @@ public class AudioLightFlasher : MonoBehaviour {
         // Change the intensity of each light.
         for (int i = 0; i < flashyLights.Length; i++) {
             flashyLights[i].light.intensity = MyMath.Map(db, decibelRange.max, decibelRange.min, flashyLights[i].intensityRange.min, flashyLights[i].intensityRange.max);
+            flashyLights[i].light.intensity = Mathf.Clamp(flashyLights[i].light.intensity, flashyLights[i].intensityRange.min, flashyLights[i].intensityRange.max);
         }
     }
 

@@ -33,8 +33,8 @@ public class ShotgunChargeState_FinalAttack : State {
         base.Run(stateController);
 
         // Keep gun state at 100% shotgun and fire it over and over.
-        GunValueManager.currentValue = -1f;
-        Services.gun.FireBurst();
+        //GunValueManager.currentValue = -1f;
+        //Services.gun.FireBurst();
     }
 
     public override void End(StateController stateController) {
@@ -48,7 +48,7 @@ public class ShotgunChargeState_FinalAttack : State {
 
 
     void FireShockwave(ShotgunCharge shotgunCharge) {
-        Services.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 50f);
+        Services.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 2f);
         Services.playerGameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
         //shotgunCharge.capturedEnemies.Clear();
         StartCoroutine(ShockwaveCoroutine());

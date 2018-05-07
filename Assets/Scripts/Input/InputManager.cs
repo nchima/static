@@ -20,6 +20,10 @@ public class InputManager : MonoBehaviour {
     [HideInInspector] public static bool specialMoveButtonDown;
     [HideInInspector] public static bool specialMoveButtonUp;
 
+    [HideInInspector] public static bool dashButton;
+    [HideInInspector] public static bool dashButtonDown;
+    [HideInInspector] public static bool dashButtonUp;
+
     [HideInInspector] public static bool pauseButton;
     [HideInInspector] public static bool pauseButtonDown;
 
@@ -38,7 +42,7 @@ public class InputManager : MonoBehaviour {
             if (Input.GetAxisRaw("Controller Right Stick Horizontal") != 0) { return true; }
             if (Input.GetAxisRaw("Controller Right Stick Vertical") != 0) { return true; }
             if (Input.GetAxisRaw("Fire Controller") != 0) { return true; }
-            if (Input.GetAxisRaw("Run Controller") != 0) { return true; }
+            if (Input.GetAxisRaw("Dash Controller") != 0) { return true; }
             if (Input.GetButton("Special Move Controller")) { return true; }
             if (Input.GetButton("Start")) { return true; }
 
@@ -96,6 +100,8 @@ public class InputManager : MonoBehaviour {
         fireButtonUp = false;
         specialMoveButtonDown = false;
         specialMoveButtonUp = false;
+        dashButtonDown = false;
+        dashButtonUp = false;
         pauseButtonDown = false;
         submitButtonDown = false;
         cancelButtonDown = false;
@@ -117,6 +123,10 @@ public class InputManager : MonoBehaviour {
         specialMoveButton = Input.GetButton("Special Move Mouse and Keyboard");
         specialMoveButtonDown = Input.GetButtonDown("Special Move Mouse and Keyboard");
         specialMoveButtonUp = Input.GetButtonUp("Special Move Mouse and Keyboard");
+
+        dashButton = Input.GetButton("Dash Mouse and Keyboard");
+        dashButtonDown = Input.GetButtonDown("Dash Mouse and Keyboard");
+        dashButtonUp = Input.GetButtonUp("Dash Mouse and Keyboard");
 
         pauseButton = Input.GetKey(KeyCode.Escape);
         pauseButtonDown = Input.GetKeyDown(KeyCode.Escape);
@@ -145,6 +155,10 @@ public class InputManager : MonoBehaviour {
         specialMoveButton = Input.GetButton("Special Move Controller");
         specialMoveButtonDown = Input.GetButtonDown("Special Move Controller");
         specialMoveButtonUp = Input.GetButtonUp("Special Move Controller");
+
+        dashButton = Input.GetButton("Dash Controller");
+        dashButtonDown = Input.GetButton("Dash Controller");
+        dashButtonUp = Input.GetButton("Dash Controller");
 
         pauseButton = Input.GetButton("Start");
         pauseButtonDown = Input.GetButtonDown("Start");

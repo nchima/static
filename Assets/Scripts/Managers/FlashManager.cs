@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class FlashManager : MonoBehaviour {
 
-    [SerializeField] float gunFlashDuration = 0.1f;
+    [SerializeField] FloatRange gunFlashDurationRange = new FloatRange(0.05f, 0.1f);
     [SerializeField] FloatRange gunFlashIntensityRange = new FloatRange(0.4f, 1f);
     [SerializeField] float painFlashDuration;
+
+    Color originalGunColor;
 
     [SerializeField] GameObject gunFlashPlane;
     [SerializeField] GameObject painFlashPlane;
@@ -16,6 +18,8 @@ public class FlashManager : MonoBehaviour {
 
 
     private void Awake() {
+        originalGunColor = gunFlashPlane.GetComponent<MeshRenderer>().material.color;
+
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerFiredGun>(PlayerFiredGunHandler);
     }
@@ -29,7 +33,7 @@ public class FlashManager : MonoBehaviour {
 
     IEnumerator FlashCoroutine(Color flashColor, GameObject flashPlane, float flashDuration) {
         flashPlane.GetComponent<MeshRenderer>().material.color = flashColor;
-        flashPlane.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", new Color(flashColor.a, flashColor.a, flashColor.a));
+        flashPlane.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", flashColor);
         yield return new WaitForSeconds(flashDuration);
         flashPlane.GetComponent<MeshRenderer>().material.color = new Color(0f, 0f, 0f, 0f);
         flashPlane.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", Color.black);
@@ -39,7 +43,17 @@ public class FlashManager : MonoBehaviour {
 
     public void PlayerFiredGunHandler(GameEvent gameEvent) {
         float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, gunFlashIntensityRange.max, gunFlashIntensityRange.min);
-        Flash(new Color(currentFlash, currentFlash, currentFlash, currentFlash), gunFlashPlane, gunFlashDuration);
+        float currentDuration = MyMath.Map(GunValueManager.currentValue, -1f, 1f, gunFlashDurationRange.max, gunFlashDurationRange.min);
+
+        gunFlashPlane.GetComponent<MeshRenderer>().material.mainTextureOffset = new Vector2(Random.Range(0f, 5f), Random.Range(0f, 5f));
+
+        Vector2 newScale = new Vector2(Random.Range(1f, 1.5f), Random.Range(1f, 1.5f));
+        gunFlashPlane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(Random.Range(1f, 1.5f) * MyMath.Either1orNegative1, Random.Range(1f, 1.5f) * MyMath.Either1orNegative1);
+
+        Color flashColor = originalGunColor;
+        flashColor.a = currentFlash;
+        
+        Flash(flashColor, gunFlashPlane, currentDuration);
     }
 
 

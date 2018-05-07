@@ -128,7 +128,7 @@ public class GameManager : MonoBehaviour {
         currentEnemyAmt -= 1;
         if (currentEnemyAmt <= 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
             GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
-        }        
+        }
     }
 
 
@@ -140,36 +140,22 @@ public class GameManager : MonoBehaviour {
 
 
     void DeleteRemainingPickups() {
-        foreach(Pickup pickup in FindObjectsOfType<Pickup>()) { pickup.GetDeleted(); }
+        foreach(Pickup pickup in FindObjectsOfType<Pickup>()) { pickup.Delete(); }
     }
 
 
     public void CountEnemies() {
-        currentEnemyAmt = FindObjectsOfType<EnemyOld>().Length;
         currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
     }
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
-        Physics.gravity = initialGravity;
+        Physics.gravity = initialGravity;   // Move to gravity manager
         gameStarted = true;
     }
 
 
     public void RestartGame() {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
-    }
-
-
-    public bool PositionIsInLevelBoundaries(Vector3 position) {
-        if (position.x > Services.levelGenerator.baseLevelSize / 2 ||
-            position.x < -Services.levelGenerator.baseLevelSize / 2 ||
-            position.z > Services.levelGenerator.baseLevelSize / 2 ||
-            position.z < -Services.levelGenerator.baseLevelSize / 2)
-        {
-            return false;
-        }
-
-        else return true;
     }
 }

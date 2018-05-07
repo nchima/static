@@ -5,10 +5,8 @@ using UnityEngine;
 
 public class Transition_ButtonReleased : Transition {
 
-    [SerializeField] string buttonName;
-
     public override bool IsConditionTrue(StateController stateController) {
-        if (InputManager.specialMoveButtonUp) { return true; }
+        if (InputManager.dashButtonUp) { return true; }
         else { return false; }
     }
 }

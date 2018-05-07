@@ -26,6 +26,16 @@ public class PlayerController : MonoBehaviour {
     float shotGunChargeSpeed = 1000f;
     float shotGunChargeMouseSensitivity = 0.76f;
 
+    // DASHING STUFF
+    [SerializeField] float dashDistance = 20f;
+    [SerializeField] float dashCooldown = 0.5f;
+    [SerializeField] float dashSpeed = 10f;
+    [SerializeField] float superDashHoldDuration = 0.1f;   // How long the player must hold the dash button to activate a super dash
+    [HideInInspector] public bool superDashCharging;
+    float superDashHoldTimer;
+    float dashCooldownTimer;
+    Coroutine dashCoroutine;
+
     // PHYSICS MATERIAL STUFF
     float normalBounciness;
 
@@ -34,7 +44,7 @@ public class PlayerController : MonoBehaviour {
     private Quaternion targetRotation;
 
     // STATE    
-    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling }
+    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling, Dashing }
     public State state;
 
     // INPUT
@@ -80,6 +90,8 @@ public class PlayerController : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+
+        dashCooldownTimer = dashCooldown;
     }
 
 
@@ -108,6 +120,27 @@ public class PlayerController : MonoBehaviour {
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;
 
+        /* HANDLE DASHING INPUT */
+        if (state == State.Normal) {
+            dashCooldownTimer += Time.deltaTime;
+            if (dashCooldownTimer >= dashCooldown) {
+                if (InputManager.dashButtonUp && !superDashCharging) {
+                    BeginDash(false);
+                }
+                else if (InputManager.dashButton) {
+                    superDashHoldTimer += Time.deltaTime;
+                    if (superDashHoldTimer > superDashHoldDuration && Services.specialBarManager.bothBarsFull) {
+                        FindObjectOfType<ShotgunCharge>().BeginSequence();
+                        superDashCharging = true;
+                        //BeginDash(true);
+                    }
+                }
+                else {
+                    superDashHoldTimer = 0f;
+                }
+            }
+        }
+
         HandleCursorLocking();
     }
 
@@ -120,8 +153,10 @@ public class PlayerController : MonoBehaviour {
         /* HANDLE MOVEMENT */
         if (!isMovementEnabled) { return; }
 
+        // Get desired movement from input.
         Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
 
+        // Normal movement state
         if (state == State.Normal) {
 
             // Ground check
@@ -153,7 +188,7 @@ public class PlayerController : MonoBehaviour {
 
             // Apply movment kick.
             CheckMovementKick();
-            if (directionalInput != Vector2.zero && movementKickReady && state != State.Falling && state != State.SpeedFalling) {
+            if (directionalInput != Vector2.zero && movementKickReady) {
                 lastKickDirection = directionalInput;
                 movementKickTimer = 0f;
                 movementKickReady = false;
@@ -180,12 +215,16 @@ public class PlayerController : MonoBehaviour {
             m_Rigidbody.AddForce(transform.forward * shotGunChargeSpeed, ForceMode.Acceleration);
         }
 
+        // Handle dashing movement.
+        else if (state == State.Dashing) {
+
+        }
+
         // Failsafe for getting teleported outside level.
         if (transform.position.x > 10000f || transform.position.z > 10000f) {
             transform.position = new Vector3(0f, transform.position.y, 0f);
         }
     }
-
 
     void CheckMovementKick() {
         // Check whether we should add movement kick.
@@ -195,7 +234,6 @@ public class PlayerController : MonoBehaviour {
             else if (Vector2.Angle(lastKickDirection, directionalInput) > 30f) movementKickReady = true;
         }
     }
-
 
     void HandleCursorLocking()
     {
@@ -207,7 +245,6 @@ public class PlayerController : MonoBehaviour {
             LockCursor();
         }
     }
-
 
     public void LockCursor() {
         Cursor.lockState = CursorLockMode.Locked;
@@ -229,16 +266,72 @@ public class PlayerController : MonoBehaviour {
         GetComponent<Rigidbody>().AddForce(forceVector, ForceMode.Impulse);
     }
 
+    void BeginDash(bool buttonHeld) {
+        state = State.Dashing;
+        dashCoroutine = StartCoroutine(DashCoroutine(buttonHeld));
+        Debug.Log("beginning dash");
+    }
+
+    IEnumerator DashCoroutine(bool buttonHeld) {
+        Vector3 dashDirection = transform.forward * directionalInput.y + transform.right * directionalInput.x;
+        if (dashDirection.magnitude < 0.2f) {
+            dashDirection = transform.forward;
+        }
+        m_Rigidbody.velocity = dashDirection * dashSpeed;
+        m_Rigidbody.useGravity = false;
+        Vector3 startingPosition = transform.position;
+        bool railingCollisionsIgnored = false;
+        if (buttonHeld) {
+            IgnoreCollisionsWithRailings(true);
+            railingCollisionsIgnored = true;
+        }
+
+        yield return new WaitUntil(() => {
+            if ((Vector3.Distance(startingPosition, transform.position) >= dashDistance) && !InputManager.dashButton) {
+                return true;
+            } else { return false; }
+        });
+
+        dashCooldownTimer = 0f;
+        movementKickReady = true;
+        m_Rigidbody.useGravity = true;
+        if (railingCollisionsIgnored) { IgnoreCollisionsWithRailings(false); }
+        state = State.Normal;
+
+        yield return null;
+    }
+
+    void EndDashEarly() {
+        if (dashCoroutine != null) { StopCoroutine(dashCoroutine); }
+        m_Rigidbody.velocity = Vector3.zero;
+        IgnoreCollisionsWithRailings(false);
+        dashCooldown = 0f;
+        movementKickReady = true;
+        state = State.Normal;
+    }
+
+    void IgnoreCollisionsWithRailings(bool ignore) {
+        foreach(GameObject railing in GameObject.FindGameObjectsWithTag("Railing")) {
+            Physics.IgnoreCollision(GetComponent<Collider>(), railing.GetComponent<Collider>(), ignore);
+        }
+    }
+
     private void OnCollisionEnter(Collision collision) {
         // If the player collides with a wall while shotgun charging, end the shotgun charge.
         if (state == State.ShotgunCharge && collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle")) {
             //FindObjectOfType<Gun>().EndShotgunCharge();
         }
+
+        if (state == State.Dashing) {
+            if (collision.collider.name.ToLower().Contains("wall") || collision.collider.name.ToLower().Contains("obstacle") || collision.collider.tag == "Enemy"
+                || collision.collider.name.ToLower().Contains("railing")) {
+                EndDashEarly();
+            }
+        }
     }
 
-
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
-        m_Rigidbody.velocity *= 0.01f;
+        EndDashEarly();
         movementKickReady = true;
     }
 

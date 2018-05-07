@@ -91,8 +91,8 @@ public class LevelManager : MonoBehaviour {
             return;
         }
 
-        LoadLevel(levelSceneIndices.Random);
-        //LoadLevel(levelsCompleted + 1);
+        //LoadLevel(levelSceneIndices.Random);
+        LoadLevel(levelsCompleted + 1);
     }
 
 
@@ -111,11 +111,11 @@ public class LevelManager : MonoBehaviour {
         while (!load.isDone) { yield return null; }
 
         // Scale level according to, you know, whatever I guess
-        levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
+        //levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
 
         yield return new WaitForSeconds(1f);
 
-        enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
+        //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         SetEnemiesActive(false);
 

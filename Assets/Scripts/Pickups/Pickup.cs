@@ -77,7 +77,7 @@ public class Pickup : MonoBehaviour {
         state = State.MoveToPlayer;
     }
 
-    public void GetDeleted() {
+    public void Delete() {
         Destroy(gameObject);
     }
 

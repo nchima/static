@@ -112,17 +112,17 @@ public class Gun : MonoBehaviour {
         // See if the player has fired a special move & if so, initialize proper variables.
         if (Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
-            if (GunValueManager.currentValue >= 0f && !firingMissiles && !firedMissiles) {
+            if (!firingMissiles && !firedMissiles) {
                 Services.specialBarManager.PlayerUsedSpecialMove();
                 missilesFired = 0;
                 missileTimer = 0f;
                 firingMissiles = true;
             } 
             
-            else if (GunValueManager.currentValue < 0f) {
-                Services.specialBarManager.PlayerUsedSpecialMove();
-                FindObjectOfType<ShotgunCharge>().BeginSequence();
-            }
+            //else if (GunValueManager.currentValue < 0f) {
+            //    Services.specialBarManager.PlayerUsedSpecialMove();
+            //    FindObjectOfType<ShotgunCharge>().BeginSequence();
+            //}
         }
 
         // Begin performing the special move.

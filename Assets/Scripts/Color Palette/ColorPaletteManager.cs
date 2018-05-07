@@ -17,6 +17,7 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] GameObject orthoScreen1;
     [SerializeField] GameObject orthoScreen2;
     [SerializeField] GameObject orthoScreen3;
+    [SerializeField] GameObject backgroundScreen;
 
     [SerializeField] ColorPalette startingPalette;
     [SerializeField] ColorPalette originalPalette;
@@ -72,16 +73,40 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void ChangeToRandomPalette(float duration) {
-        wallMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0.8f, 1f)), duration);
-        floorMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        obstacleMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        perspectiveScreen2.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        perspectiveScreen3.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        Color[] environmentPalette = ThreeColorPalette(0.33f, 0.2f);
+        wallMaterial.DOColor(environmentPalette[0], duration);
+        floorMaterial.DOColor(environmentPalette[1], duration);
+        obstacleMaterial.DOColor(environmentPalette[2], duration);
 
+        Color[] perspectiveScreenPalette = ThreeColorPalette(0.33f, 0.2f);
+        perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[0], duration);
+        perspectiveScreen2.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[1], duration);
+        perspectiveScreen3.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[2], duration);
+
+        Color[] orthoScreenPalette = ThreeColorPalette(0.33f, 0.2f);
+        orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[0], duration);
+        orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[1], duration);
+        orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[2], duration);
+
+        backgroundScreen.GetComponent<MeshRenderer>().material.color = randomBackgroundColor;
+    }
+
+    Color randomBackgroundColor { get { return Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 0.75f); } }
+    Color[] ThreeColorPalette(float baseHueDifference, float maxVariation) {
+        float hue1 = Random.value;
+        float hue2 = MyMath.Wrap01(hue1 + baseHueDifference);
+        float hue3 = MyMath.Wrap01(hue2 + baseHueDifference);
+
+        Debug.Log("Hues: " + hue1 + ", " + hue2 + ", " + hue3);
+
+        hue1 += Random.Range(-maxVariation, maxVariation);
+        hue2 += Random.Range(-maxVariation, maxVariation);
+        hue3 += Random.Range(-maxVariation, maxVariation);
+        return new Color[3] {
+            Color.HSVToRGB(hue1, 1f, 1f),
+            Color.HSVToRGB(hue2, 1f, 1f),
+            Color.HSVToRGB(hue3, 1f, 1f)
+        };
     }
 
     public void LoadVulnerablePaletteHandler() {
@@ -94,10 +119,6 @@ public class ColorPaletteManager : MonoBehaviour {
 
     public void RestoreSavedPalette() {
         ChangePalette(originalPalette, 0.78f);
-    }
-
-    private void OnDisable() {
-        // Restore memorized original colors.
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {

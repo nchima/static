@@ -8,6 +8,7 @@ public class TankEnemyAnimationController : EnemyAnimationController {
     [SerializeField] GameObject artilleryBase;
     [SerializeField] GameObject artilleryBaseSheathe;
     [SerializeField] GameObject crystal;
+    [SerializeField] GameObject crystalSheathe;
     
     float openCrystalValue = 0f;
     
@@ -32,8 +33,6 @@ public class TankEnemyAnimationController : EnemyAnimationController {
 
 
     protected override void Start() {
-        base.Start();
-
         currentIdleNoiseSpeed = seigeModeIdleNoiseSpeed;
         currentIdleNoiseBase = seigeModeIdleNoiseBase;
         currentIdleNoiseSpread = seigeModeIdleNoiseSpread;
@@ -44,6 +43,13 @@ public class TankEnemyAnimationController : EnemyAnimationController {
         leg4IdleMorphNoise = new PerlinNoise(seigeModeIdleNoiseSpeed);
         leg5IdleMorphNoise = new PerlinNoise(seigeModeIdleNoiseSpeed);
         leg6IdleMorphNoise = new PerlinNoise(seigeModeIdleNoiseSpeed);
+
+        SkinnedMeshRenderer[] crystalRenderers = crystal.GetComponentsInChildren<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer[] baseRenderers = artilleryBase.GetComponentsInChildren<SkinnedMeshRenderer>();
+        renderers = new Renderer[crystalRenderers.Length + baseRenderers.Length];
+        crystalRenderers.CopyTo(renderers, 0);
+        baseRenderers.CopyTo(renderers, crystalRenderers.Length);
+        getHurtCoroutines = new Coroutine[renderers.Length];
     }
 
 

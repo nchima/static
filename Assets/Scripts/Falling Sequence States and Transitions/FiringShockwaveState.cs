@@ -68,8 +68,8 @@ public class FiringShockwaveState : State {
         // Begin moving obstacles to their full height.
         //GameObject.Find("Obstacles").transform.DOMoveY(0f, 0.18f, false);
 
-        Services.colorPaletteManager.RestoreSavedPalette();
-        //Services.colorPaletteManager.ChangeToRandomPalette(0.1f);
+        //Services.colorPaletteManager.RestoreSavedPalette();
+        Services.colorPaletteManager.ChangeToRandomPalette(0.1f);
 
         Physics.gravity = fallingSequenceManager.savedGravity;
 
