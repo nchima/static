@@ -38,6 +38,7 @@ public class ShotgunChargeState_FinalAttack : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
 
         //shotgunCharge.isReturningToFullSpeed = false;

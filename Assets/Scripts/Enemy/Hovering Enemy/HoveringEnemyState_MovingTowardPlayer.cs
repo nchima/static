@@ -136,8 +136,4 @@ public class HoveringEnemyState_MovingTowardPlayer : State {
         if (meanderSineDirection <= 0.5f) { meanderSineDirection = -1f; }
         else { meanderSineDirection = 1f; }
     }
-
-
-    public override void End(StateController stateController) {
-    }
 }

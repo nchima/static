@@ -36,8 +36,4 @@ public class ShotgunChargeState_Charging : State {
     public override void Run(StateController stateController) {
         base.Run(stateController);
     }
-
-    public override void End(StateController stateController) {
-        
-    }
 }

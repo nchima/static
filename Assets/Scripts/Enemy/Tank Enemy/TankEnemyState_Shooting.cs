@@ -18,9 +18,6 @@ public class TankEnemyState_Shooting : State {
         StartCoroutine(ShootingCoroutine(stateController));
     }
 
-    public override void End(StateController stateController) {
-    }
-
     IEnumerator ShootingCoroutine(StateController stateController) {
         TankEnemy controller = stateController as TankEnemy;
 

@@ -84,9 +84,6 @@ public class MeleeEnemyState_Moving : State {
         controller.GetComponent<Rigidbody>().MovePosition(nextPosition);
     }
 
-    public override void End(StateController stateController) {
-    }
-
     void GetNewFlankingAngle() {
         flankingAngle = Random.Range(15f, 30f);
         if (Random.value >= 0.5f) flankingAngle *= -1;

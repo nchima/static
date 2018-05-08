@@ -6,4 +6,5 @@ public abstract class Transition : MonoBehaviour {
     public State nextState;
     public abstract bool IsConditionTrue(StateController stateController);
     public virtual void Initialize() { }
+    public virtual void Deinitialize() { }
 }

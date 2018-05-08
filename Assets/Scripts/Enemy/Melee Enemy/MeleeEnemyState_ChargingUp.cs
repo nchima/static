@@ -60,8 +60,4 @@ public class MeleeEnemyState_ChargingUp : State {
             stateController.transform.DORotate(Quaternion.LookRotation(Services.playerTransform.position - transform.position).eulerAngles, 0.5f);
         }
     }
-
-
-    public override void End(StateController stateController) {
-    }
 }

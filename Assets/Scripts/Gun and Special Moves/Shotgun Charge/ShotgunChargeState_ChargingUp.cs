@@ -14,6 +14,7 @@ public class ShotgunChargeState_ChargingUp : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         Services.playerController.superDashCharging = false;
     }
 }

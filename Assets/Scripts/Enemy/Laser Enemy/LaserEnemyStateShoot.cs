@@ -27,6 +27,7 @@ public class LaserEnemyStateShoot : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         LaserEnemy controller = stateController as LaserEnemy;
         controller.timesDashed = 0;
         controller.DetermineTimesToDash();

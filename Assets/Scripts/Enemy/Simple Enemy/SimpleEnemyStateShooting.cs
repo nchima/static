@@ -27,9 +27,6 @@ public class SimpleEnemyStateShooting : State {
     }
 
 
-    public override void End(StateController stateController) {}
-
-
     IEnumerator FiringSequence(StateController stateController) {
         SimpleEnemy controller = stateController as SimpleEnemy;
 

@@ -271,8 +271,6 @@ public class Gun : MonoBehaviour {
                 if (Vector3.Distance(Services.playerTransform.position, thisPosition) < Vector3.Distance(Services.playerTransform.position, autoAimPoint)) {
                     autoAimPoint = thisPosition;
                 }
-
-                Debug.Log("Auto aim activated.");
             }
         }
 

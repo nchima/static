@@ -40,10 +40,6 @@ public class SimpleEnemyStateMoving : State {
     }
 
 
-    public override void End(StateController stateController) {
-    }
-
-
     private void ChooseNewDestination(StateController stateController) {
         SimpleEnemy controller = stateController as SimpleEnemy;
 

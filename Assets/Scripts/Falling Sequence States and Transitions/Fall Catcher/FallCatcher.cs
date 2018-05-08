@@ -8,7 +8,11 @@ public class FallCatcher : MonoBehaviour {
     private void OnTriggerEnter(Collider other) {
         if (other.gameObject == Services.playerGameObject) {
             if (Services.healthManager.playerHealth <= 0) { return; }
-            if (Services.fallingSequenceManager.isPlayerFalling) { Services.fallingSequenceManager.BeginFallingInstant(); } else { Services.fallingSequenceManager.BeginFalling(); }
+            if (!Services.fallingSequenceManager.isPlayerFalling) {
+                Services.fallingSequenceManager.BeginFallingInstant();
+            } else {
+                Services.fallingSequenceManager.BeginFalling();
+            }
         }
     }
 }

@@ -23,7 +23,11 @@ public abstract class State : MonoBehaviour {
     public virtual void FixedRun(StateController stateController) {
     }
 
-    public abstract void End(StateController stateController);
+    public virtual void End(StateController stateController) {
+        for (int i = 0; i < transitions.Length; i++) {
+            transitions[i].Deinitialize();
+        }
+    }
 
     void CheckTransitions(StateController stateController) {
         if (transitions == null || transitions.Length == 0)  { return; }

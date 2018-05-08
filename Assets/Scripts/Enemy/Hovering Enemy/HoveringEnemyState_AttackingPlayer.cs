@@ -97,8 +97,4 @@ public class HoveringEnemyState_AttackingPlayer : State {
 
         return false;
     }
-
-
-    public override void End(StateController stateController) {
-    }
 }

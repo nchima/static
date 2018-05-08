@@ -10,8 +10,4 @@ public class State_SpeedFalling : State {
         fallingSequenceManager.ActivateSpeedFall();
         Services.musicManager.EnterSpeedFall();
     }
-
-    public override void End(StateController stateController) {
-        
-    }
 }

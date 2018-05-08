@@ -90,6 +90,7 @@ public class MeleeEnemyState_Attacking : State {
 
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         MeleeEnemy controller = stateController as MeleeEnemy;
         controller.geometryParent.transform.DOLocalRotate(Vector3.zero, 0.5f);
     }

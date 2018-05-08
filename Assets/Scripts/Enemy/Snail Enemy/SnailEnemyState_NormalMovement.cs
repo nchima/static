@@ -63,10 +63,6 @@ public class SnailEnemyState_NormalMovement : State {
     }
 
 
-    public override void End(StateController stateController) {
-    }
-
-
     void FireShotInDirection(Vector3 position, Vector3 direction, StateController stateController) {
         GameObject newShot = Instantiate(shotPrefab);
         newShot.transform.position = position;

@@ -18,6 +18,7 @@ public class PauseAfterLevelCompleteFallingState : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         Services.playerController.isMovementEnabled = true;
     }
 }

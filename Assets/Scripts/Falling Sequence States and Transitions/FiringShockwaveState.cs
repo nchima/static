@@ -41,6 +41,7 @@ public class FiringShockwaveState : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
         Services.gameManager.ReturnToFullSpeed();

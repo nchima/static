@@ -5,29 +5,14 @@ using UnityEngine;
 
 public class TriggerTransition : Transition {
 
-    bool _isTriggerSet = false;
-    public bool isTriggerSet {
-        get { return _isTriggerSet; }
-        set {
-            _isTriggerSet = value;
-            if (_isTriggerSet == true) { StartCoroutine(Reset()); }
-        }
-    }
-    [SerializeField] float resetTime = 0.1f;
-
+    public bool isTriggerSet;
 
     public override bool IsConditionTrue(StateController stateController) {
-        if (isTriggerSet) {
-            isTriggerSet = false;
-            return true;
-        } else {
-            return false;
-        }
+        return isTriggerSet;
     }
 
-    private IEnumerator Reset() {
-        yield return new WaitForSeconds(resetTime);
+    public override void Deinitialize() {
+        base.Deinitialize();
         isTriggerSet = false;
-        yield return null;
     }
 }

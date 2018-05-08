@@ -17,6 +17,7 @@ public class TankEnemyState_RunFromPlayer : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         TankEnemy controller = stateController as TankEnemy;
         controller.m_NavMeshAgent.speed = originalSpeed;
     }

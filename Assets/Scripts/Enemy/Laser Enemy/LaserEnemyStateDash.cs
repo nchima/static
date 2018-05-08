@@ -18,9 +18,12 @@ public class LaserEnemyStateDash : State {
     }
 
 
-    public override void End(StateController stateController) {
-        LaserEnemy controller = stateController as LaserEnemy;
-    }
+    //public override void Run(StateController stateController) {
+    //    base.Run(stateController);
+    //    if (coroutineFinished) {
+    //        GetComponent<TriggerTransition>().isTriggerSet = true;
+    //    }
+    //}
 
 
     IEnumerator Dash(StateController stateController) {
