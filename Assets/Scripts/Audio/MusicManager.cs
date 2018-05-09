@@ -26,6 +26,11 @@ public class MusicManager : MonoBehaviour {
     int currentSpeedClip = 0;
 
 
+    private void Awake() {
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+    }
+
+
     private void Start() {
         musicDebugStates = new MusicDebugState[3];
         musicDebugStates[0] = new MusicDebugState(0f, 0f);
@@ -145,6 +150,11 @@ public class MusicManager : MonoBehaviour {
         transform.Find("Rhythm 1").GetComponent<AudioSource>().volume = state.oldMusicVol;
         transform.Find("Rhythm 2").GetComponent<AudioSource>().volume = state.oldMusicVol;
         transform.Find("New Music").GetComponent<AudioSource>().volume = state.newMusicVol;
+    }
+
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        EnterFallingSequence();
     }
 
 

@@ -21,12 +21,17 @@ public class SpecialBarManager : MonoBehaviour {
     [SerializeField] private float getHurtPenalty = 0.1f; // How much the special bar decreases when the player is hurt.
 
     [SerializeField] private GameObject specialMoveReadyScreen;
-
+    [HideInInspector] public bool screenHidden = false;
 
     public bool bothBarsFull {
         get {
             return leftBar.currentValue >= 0.99f && rightBar.currentValue >= 0.99f;
         }
+    }
+
+
+    public void Awake() {
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
 
@@ -40,7 +45,7 @@ public class SpecialBarManager : MonoBehaviour {
         leftBar.Run(this);
         rightBar.Run(this);
 
-        if (bothBarsFull) {
+        if (bothBarsFull && !screenHidden) {
             specialMoveReadyScreen.SetActive(true);
             FlashBar();
         }
@@ -73,7 +78,7 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
-    public void PlayerWasHurt() {
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
         leftBar.currentValue -= getHurtPenalty;
         rightBar.currentValue -= getHurtPenalty;
     }
@@ -82,5 +87,12 @@ public class SpecialBarManager : MonoBehaviour {
     public void PlayerUsedSpecialMove() {
         leftBar.currentValue = 0f;
         rightBar.currentValue = 0f;
+    }
+
+
+    public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
+        GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
+
+        AddValue(playerKilledEnemyEvent.specialValue);
     }
 }

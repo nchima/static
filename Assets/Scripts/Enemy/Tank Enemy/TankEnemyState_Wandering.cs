@@ -31,11 +31,6 @@ public class TankEnemyState_Wandering : State {
         }
     }
 
-
-    public override void End(StateController stateController) {
-    }
-
-
     Vector3 GetWanderPoint(StateController stateController) {
         TankEnemy controller = stateController as TankEnemy;
         Vector3 returnPoint = centerPoint;

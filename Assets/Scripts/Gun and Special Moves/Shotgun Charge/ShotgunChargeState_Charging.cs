@@ -14,29 +14,26 @@ public class ShotgunChargeState_Charging : State {
 
         FindObjectOfType<FieldOfViewController>().TweenToNormalFOV();
 
-        // Make player temporarily invincible (Why am I setting two separate variables for this??)
-        GameManager.healthManager.forceInvincibility = true;
+        // Make player temporarily invincible
+        Services.healthManager.forceInvincibility = true;
 
         // Make the player start shotgun charging.
-        GameManager.player.GetComponent<PlayerController>().state = PlayerController.State.ShotgunCharge;
+        Services.playerController.state = PlayerController.State.ShotgunCharge;
 
         // Make sure player does move up or down.
-        GameManager.player.GetComponent<Rigidbody>().constraints |= RigidbodyConstraints.FreezePositionY;
+        Services.playerGameObject.GetComponent<Rigidbody>().constraints |= RigidbodyConstraints.FreezePositionY;
+
+        Services.specialBarManager.PlayerUsedSpecialMove();
 
         // Allow player to pass through railings.
         Physics.IgnoreLayerCollision(16, 24, true);
 
         // Add a kick to get the player going.
-        GameManager.player.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GameManager.player.GetComponent<Rigidbody>().AddForce(GameManager.player.transform.forward * shotgunCharge.kickForce, ForceMode.Impulse);
+        Services.playerGameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Services.playerTransform.forward * shotgunCharge.kickForce, ForceMode.Impulse);
     }
 
     public override void Run(StateController stateController) {
         base.Run(stateController);
-        GunValueManager.currentValue = -1f;
-    }
-
-    public override void End(StateController stateController) {
-        
     }
 }

@@ -8,20 +8,18 @@ public class MainMenuUI : MonoBehaviour {
     private void Update()
     {
         // Get controller input.
-		if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Fire1"))
-        {
-            PlayButton();
-        }
+		//if (Input.GetButtonDown("Start") || Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Fire1"))
+  //      {
+  //          PlayButton();
+  //      }
 
         // Use escape to quit game.
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+        //if (Input.GetKeyDown(KeyCode.Escape)) {
+        //    Application.Quit();
+        //}
     }
 
-    public void PlayButton()
-    {
+    public void PlayButton() {
         // Turn off the main menu.
         transform.parent.gameObject.SetActive(false);
 
@@ -29,14 +27,12 @@ public class MainMenuUI : MonoBehaviour {
     }
 
 
-	public void QuitButton()
-    {
+	public void QuitButton() {
 		Application.Quit ();
 	}
 
 
-	public void InfoButton()
-    {
+	public void InfoButton() {
 		SceneManager.LoadScene ("InfoScene");
 	}
 }

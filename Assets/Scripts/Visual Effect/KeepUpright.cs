@@ -10,7 +10,7 @@ public class KeepUpright : MonoBehaviour {
     float widthAtMaxDistance = 0.5f;
 
 	private void Update () {
-		if (GameManager.fallingSequenceManager.isPlayerFalling) {
+		if (Services.fallingSequenceManager.isPlayerFalling) {
 			transform.localScale = new Vector3 (widthAtMaxDistance * 0.1f, transform.localScale.y, widthAtMaxDistance * 0.1f);
 		} else {
 			ChangeScaleBasedOnPlayerDistance ();
@@ -18,13 +18,13 @@ public class KeepUpright : MonoBehaviour {
 
         // Keep self upright
         //transform.rotation = Quaternion.identity;
-        transform.rotation = GameManager.player.transform.Find("Cameras").transform.rotation;
+        transform.rotation = Services.playerTransform.Find("Cameras").transform.rotation;
     }
 
 
 	void ChangeScaleBasedOnPlayerDistance() {
 		// Get distance from player.
-		float distance = Vector3.Distance(transform.position, GameManager.player.transform.position);
+		float distance = Vector3.Distance(transform.position, Services.playerTransform.position);
 
 		// Change width based on distance from player.
 		if (GetComponentInParent<EnemyOld>() != null && (distance < minimumVisibleDistance && GetComponentInParent<EnemyOld> ().canSeePlayer)

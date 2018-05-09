@@ -8,7 +8,7 @@ public class Transition_MouseButtonPressed : Transition {
     [SerializeField] int mouseButton;
 
     public override bool IsConditionTrue(StateController stateController) {
-        if (Input.GetMouseButtonDown(mouseButton)) { return true; }
+        if (InputManager.fireButtonDown) { return true; }
         else { return false; }
     }
 }

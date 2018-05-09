@@ -17,20 +17,23 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] GameObject orthoScreen1;
     [SerializeField] GameObject orthoScreen2;
     [SerializeField] GameObject orthoScreen3;
+    [SerializeField] GameObject backgroundScreen;
 
-    [SerializeField] ColorPalette startingPalette;
-    [SerializeField] ColorPalette originalPalette;
+    [SerializeField] ColorPalette defaultPalette;
+    [SerializeField] ColorPalette savedPalette;
     [SerializeField] ColorPalette tempSavedPalette;
     [SerializeField] ColorPalette playerVulnerablePalette;
     [SerializeField] ColorPalette fallingSequencePalette;
  
     private void Awake() {
         // Memorize original colors.
-        ChangePaletteImmediate(startingPalette);
+        ChangePaletteImmediate(defaultPalette);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     private void Start() {
-        SaveCurrentPalette(originalPalette);
+        SaveCurrentPalette(savedPalette);
     }
 
     void ChangePalette(ColorPalette newPalette, float duration) {
@@ -43,6 +46,7 @@ public class ColorPaletteManager : MonoBehaviour {
         orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(newPalette.orthoColor1, duration);
         orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(newPalette.orthoColor2, duration);
         orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(newPalette.orthoColor3, duration);
+        backgroundScreen.GetComponent<MeshRenderer>().material.DOColor(newPalette.backgroundColor, duration);
     }
 
     void ChangePaletteImmediate(ColorPalette newPalette) {
@@ -55,7 +59,7 @@ public class ColorPaletteManager : MonoBehaviour {
         orthoScreen1.GetComponent<MeshRenderer>().material.color = newPalette.orthoColor1;
         orthoScreen2.GetComponent<MeshRenderer>().material.color = newPalette.orthoColor2;
         orthoScreen3.GetComponent<MeshRenderer>().material.color = newPalette.orthoColor3;
-
+        backgroundScreen.GetComponent<MeshRenderer>().material.color = newPalette.backgroundColor;
     }
 
     void SaveCurrentPalette(ColorPalette saveTarget) {
@@ -68,19 +72,51 @@ public class ColorPaletteManager : MonoBehaviour {
         saveTarget.orthoColor1 = orthoScreen1.GetComponent<MeshRenderer>().material.GetColor("_Color");
         saveTarget.orthoColor2 = orthoScreen2.GetComponent<MeshRenderer>().material.GetColor("_Color");
         saveTarget.orthoColor3 = orthoScreen3.GetComponent<MeshRenderer>().material.GetColor("_Color");
+        saveTarget.backgroundColor = backgroundScreen.GetComponent<MeshRenderer>().material.color;
     }
 
     public void ChangeToRandomPalette(float duration) {
-        wallMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0.8f, 1f)), duration);
-        floorMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        obstacleMaterial.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        perspectiveScreen2.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        perspectiveScreen3.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
-        orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)), duration);
+        StartCoroutine(ChangeToRandomPaletteCoroutine(duration));
+    }
 
+    IEnumerator ChangeToRandomPaletteCoroutine(float duration) {
+        Color[] environmentPalette = ThreeColorPalette(0.33f, 0.2f);
+        wallMaterial.DOColor(environmentPalette[0], duration);
+        floorMaterial.DOColor(environmentPalette[1], duration);
+        obstacleMaterial.DOColor(environmentPalette[2], duration);
+
+        Color[] perspectiveScreenPalette = ThreeColorPalette(0.33f, 0.2f);
+        perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[0], duration);
+        perspectiveScreen2.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[1], duration);
+        perspectiveScreen3.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[2], duration);
+
+        Color[] orthoScreenPalette = ThreeColorPalette(0.33f, 0.2f);
+        orthoScreen1.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[0], duration);
+        orthoScreen2.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[1], duration);
+        orthoScreen3.GetComponent<MeshRenderer>().material.DOColor(orthoScreenPalette[2], duration);
+
+        backgroundScreen.GetComponent<MeshRenderer>().material.color = randomBackgroundColor;
+
+        yield return new WaitForSeconds(duration);
+
+        SaveCurrentPalette(savedPalette);
+
+        yield return null;
+    }
+
+    Color randomBackgroundColor { get { return Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 0.75f); } }
+    Color[] ThreeColorPalette(float baseHueDifference, float maxVariation) {
+        float hue1 = Random.value;
+        float hue2 = MyMath.Wrap01(hue1 + baseHueDifference);
+        float hue3 = MyMath.Wrap01(hue2 + baseHueDifference);
+        hue1 += Random.Range(-maxVariation, maxVariation);
+        hue2 += Random.Range(-maxVariation, maxVariation);
+        hue3 += Random.Range(-maxVariation, maxVariation);
+        return new Color[3] {
+            Color.HSVToRGB(hue1, 1f, 1f),
+            Color.HSVToRGB(hue2, 1f, 1f),
+            Color.HSVToRGB(hue3, 1f, 1f)
+        };
     }
 
     public void LoadVulnerablePalette() {
@@ -92,11 +128,14 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void RestoreSavedPalette() {
-        ChangePalette(originalPalette, 0.78f);
+        ChangePalette(savedPalette, 0.78f);
     }
 
-    private void OnDisable() {
-        // Restore memorized original colors.
- 
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        LoadVulnerablePalette();
+    }
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        ChangeToRandomPalette(0.1f);
     }
 }

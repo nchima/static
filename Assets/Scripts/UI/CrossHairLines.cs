@@ -30,8 +30,8 @@ public class CrossHairLines : MonoBehaviour {
 
         foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>()) mr.material.SetColor("_Tint", currentColor);
         crosshairCircle.GetComponent<MeshRenderer>().material.SetColor("_Tint", currentColor);
-        leftLine.GetComponent<MeshRenderer>().material.mainTexture = GameManager.instance.noiseGenerator.noiseTex;
-        rightLine.GetComponent<MeshRenderer>().material.mainTexture = GameManager.instance.noiseGenerator.noiseTex;
+        leftLine.GetComponent<MeshRenderer>().material.mainTexture = Services.noiseGenerator.noiseTex;
+        rightLine.GetComponent<MeshRenderer>().material.mainTexture = Services.noiseGenerator.noiseTex;
         float currentGap = MyMath.Map(GunValueManager.currentValue, -1f, 1f, MAX_GAP, MIN_GAP);
         leftLine.transform.localPosition = new Vector3(-currentGap / 2, 0f, 0f);
         rightLine.transform.localPosition = new Vector3(currentGap / 2, 0f, 0f);

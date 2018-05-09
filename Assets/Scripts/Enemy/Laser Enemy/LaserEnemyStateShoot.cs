@@ -27,6 +27,7 @@ public class LaserEnemyStateShoot : State {
     }
 
     public override void End(StateController stateController) {
+        base.End(stateController);
         LaserEnemy controller = stateController as LaserEnemy;
         controller.timesDashed = 0;
         controller.DetermineTimesToDash();
@@ -39,7 +40,7 @@ public class LaserEnemyStateShoot : State {
         controller.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeRotation;
 
         // Get a direction in which to fire my shot.
-        Vector3 targetPosition = new Vector3(GameManager.player.transform.position.x, laserOrigin.transform.position.y, GameManager.player.transform.position.z);
+        Vector3 targetPosition = new Vector3(Services.playerTransform.position.x, laserOrigin.transform.position.y, Services.playerTransform.position.z);
         Vector3 shotDirection = Vector3.Normalize(targetPosition - laserOrigin.transform.position);
         float tempInaccuracy = inaccuracy;
         if (PlayerController.currentVelocity.magnitude < 10f) { tempInaccuracy = 0f; }

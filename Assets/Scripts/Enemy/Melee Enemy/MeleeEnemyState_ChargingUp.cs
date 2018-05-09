@@ -57,11 +57,7 @@ public class MeleeEnemyState_ChargingUp : State {
         timer += Time.deltaTime;
         if (timer <= chargeUpDuration * 0.7f) {
             // Turn towards player.
-            stateController.transform.DORotate(Quaternion.LookRotation(GameManager.player.transform.position - transform.position).eulerAngles, 0.5f);
+            stateController.transform.DORotate(Quaternion.LookRotation(Services.playerTransform.position - transform.position).eulerAngles, 0.5f);
         }
-    }
-
-
-    public override void End(StateController stateController) {
     }
 }

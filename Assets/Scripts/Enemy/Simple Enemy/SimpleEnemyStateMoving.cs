@@ -40,10 +40,6 @@ public class SimpleEnemyStateMoving : State {
     }
 
 
-    public override void End(StateController stateController) {
-    }
-
-
     private void ChooseNewDestination(StateController stateController) {
         SimpleEnemy controller = stateController as SimpleEnemy;
 
@@ -51,7 +47,7 @@ public class SimpleEnemyStateMoving : State {
         if (!controller.navMeshAgent.enabled) controller.navMeshAgent.enabled = true;
 
         // Get a random point within a circle around the player.
-        targetPosition = GameManager.player.transform.position + Random.insideUnitSphere * moveRandomness;
+        targetPosition = Services.playerTransform.position + Random.insideUnitSphere * moveRandomness;
         targetPosition.y = transform.position.y;
 
         // Get a direction to that point.

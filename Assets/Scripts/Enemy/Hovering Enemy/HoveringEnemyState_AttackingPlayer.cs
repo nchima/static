@@ -13,10 +13,14 @@ public class HoveringEnemyState_AttackingPlayer : State {
     [SerializeField] float postAttackPauseDuration = 1f;
     [SerializeField] BoxCollider hitBox;
 
+    [SerializeField] AudioSource droneAudio;
+    [SerializeField] AudioSource bristleAudio;
+    [SerializeField] AudioSource attackAudio;
+
 
     public override void Initialize(StateController stateController) {
         // Turn towards player.
-        Vector3 lookTarget = GameManager.player.transform.position;
+        Vector3 lookTarget = Services.playerTransform.position;
         lookTarget.y = stateController.transform.position.y;
         stateController.transform.LookAt(lookTarget);
 
@@ -34,10 +38,14 @@ public class HoveringEnemyState_AttackingPlayer : State {
         HoveringEnemy controller = stateController as HoveringEnemy;
 
         controller.m_AnimationController.StartBristleAnimation(bristleAnimationDuration);
+        droneAudio.Stop();
+        bristleAudio.Play();
 
         yield return new WaitForSeconds(bristleDuration);
 
         controller.m_AnimationController.StartAttackAnimation(attackAnimationDuration);
+        bristleAudio.Stop();
+        attackAudio.Play();
 
         yield return new WaitForSeconds(attackAnimationDuration * 0.9f);
 
@@ -52,7 +60,7 @@ public class HoveringEnemyState_AttackingPlayer : State {
             else {
                 timer += Time.deltaTime;
                 if (!playerDamaged && PlayerIsInHitBox(stateController)) {
-                    GameManager.instance.PlayerWasHurt();
+                    GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
                     playerDamaged = true;
                 }
 
@@ -63,7 +71,8 @@ public class HoveringEnemyState_AttackingPlayer : State {
         controller.m_AnimationController.StartWithdrawAnimation(attackWithdrawAnimationDuration);
 
         yield return new WaitForSeconds(postAttackPauseDuration);
-        
+
+        droneAudio.Play();
         GetComponent<TriggerTransition>().isTriggerSet = true;
 
         yield return null;
@@ -83,13 +92,9 @@ public class HoveringEnemyState_AttackingPlayer : State {
             );
 
         foreach (Collider collider in collidersInHitBox) {
-            if (collider.gameObject == GameManager.player) { return true; }
+            if (collider.gameObject == Services.playerGameObject) { return true; }
         }
 
         return false;
-    }
-
-
-    public override void End(StateController stateController) {
     }
 }

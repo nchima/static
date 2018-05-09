@@ -16,7 +16,6 @@ public class Gun : MonoBehaviour {
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
     [SerializeField] Color bulletColor2;
-    [SerializeField] FloatRange flashIntensity = new FloatRange(0.4f, 1f);
 
     // Modifies rate of fire during slow motion sequence.
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
@@ -69,8 +68,11 @@ public class Gun : MonoBehaviour {
     Vector3 recoilPosition;
     ScreenShake[] screenShakes;
 
+
     private void Awake() {
         screenShakes = FindObjectsOfType<ScreenShake>();
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -87,6 +89,7 @@ public class Gun : MonoBehaviour {
         originalPosition = transform.localPosition;
         recoilPosition = new Vector3(0f, -3.68f, 10.68f);
     }
+
 
     void Update() {
 
@@ -107,26 +110,26 @@ public class Gun : MonoBehaviour {
         //}
 
         // See if the player has fired a special move & if so, initialize proper variables.
-        if (GameManager.specialBarManager.bothBarsFull && (Input.GetButton("Fire2"))) {
+        if (Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
-            if (GunValueManager.currentValue >= 0f && !firingMissiles && !firedMissiles) {
-                gameManager.PlayerUsedSpecialMove();
+            if (!firingMissiles && !firedMissiles) {
+                Services.specialBarManager.PlayerUsedSpecialMove();
                 missilesFired = 0;
                 missileTimer = 0f;
                 firingMissiles = true;
             } 
             
-            else if (GunValueManager.currentValue < 0f) {
-                gameManager.PlayerUsedSpecialMove();
-                FindObjectOfType<ShotgunCharge>().BeginSequence();
-            }
+            //else if (GunValueManager.currentValue < 0f) {
+            //    Services.specialBarManager.PlayerUsedSpecialMove();
+            //    FindObjectOfType<ShotgunCharge>().BeginSequence();
+            //}
         }
 
         // Begin performing the special move.
         if (firingMissiles) FireMissiles();
 
         /* Firing normal bullets */
-        if (Input.GetButton("Fire1") || Input.GetAxisRaw("Fire1") != 0) { FireBurst(); }
+        if (InputManager.fireButton) { FireBurst(); }
     }
 
 
@@ -136,7 +139,7 @@ public class Gun : MonoBehaviour {
         if (missileTimer >= missileCooldown) {
             missilesFired++;
             missileTimer = 0;
-            Instantiate(missilePrefab, gunTipTransform.position, GameManager.player.transform.rotation);
+            Instantiate(missilePrefab, gunTipTransform.position, Services.playerTransform.rotation);
         } else {
             missileTimer += Time.deltaTime;
         }
@@ -157,9 +160,6 @@ public class Gun : MonoBehaviour {
         // Make sure enough time has passed since the last shot.
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
 
-        // Tell the crosshair to vibrate more.
-        FindObjectOfType<CrossHair>().AdjustShakeValueForShotFired();
-
         // Handle audio.
         rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
         rifleAudioSource.pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.2f, 1f);
@@ -169,6 +169,8 @@ public class Gun : MonoBehaviour {
         shotgunAudioSource.volume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 1f, 0.2f);
 
         bulletsHitThisBurst = 0;
+
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerFiredGun());
 
         // Play shooting sound.
         rifleAudioSource.Play();
@@ -180,7 +182,7 @@ public class Gun : MonoBehaviour {
         }
 
         // Show muzzle flash.
-        GameObject _muzzleFlash = Instantiate(muzzleFlash);
+        GameObject _muzzleFlash = Instantiate(muzzleFlash, Services.playerTransform);
         _muzzleFlash.transform.position = gunTipTransform.position;
         _muzzleFlash.transform.rotation = gunTipTransform.rotation;
         _muzzleFlash.transform.localScale = new Vector3(
@@ -190,12 +192,10 @@ public class Gun : MonoBehaviour {
             );
 
         // Flash screen
-        float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, flashIntensity.max, flashIntensity.min);
-        GameManager.flashManager.Flash(new Color(currentFlash, currentFlash, currentFlash, currentFlash));
 
         // Auto aim for weak points.
-        Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
-        autoAimPoint = AutoAim("Weak Point", 0.0125f);
+        Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
+        autoAimPoint = AutoAim("Weak Point", 0.125f);
 
         // If we couldn't hit a weak point, auto aim for enemies instead.
         if (!Physics.Raycast(gunTipTransform.position, autoAimPoint - gunTipTransform.position, 1000f, 1 << 28)) {
@@ -208,10 +208,11 @@ public class Gun : MonoBehaviour {
         }
 
         // Add recoil to player controller.
-        //GameManager.player.GetComponent<PlayerController>().AddRecoil(bulletRecoil * bulletsPerBurst);
+        //Services.playerController.AddRecoil(bulletRecoil * bulletsPerBurst);
 
         timeSinceLastShot = 0f;
     }
+
 
     // Firing an individual bullet.
     void FireBullet(Vector3 target, float inaccuracy) {
@@ -239,24 +240,45 @@ public class Gun : MonoBehaviour {
 
     Vector3 AutoAim(string tag, float bandSize) {
         
-        Vector3 autoAimPoint = GameManager.player.transform.position + GameManager.player.transform.forward * 1000f;
+        Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.transform.forward * 1000f;
 
+        // Check all gameobjects with the given tag:
         foreach (GameObject thisObject in GameObject.FindGameObjectsWithTag(tag)) {
-
+            
             // See if this object is near the middle of the screen.
             Vector3 viewportPosition = Camera.main.WorldToViewportPoint(thisObject.transform.position);
-            if ((viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize) && (viewportPosition.y >= 0f && viewportPosition.y <= 1f)) {
-
-                // For the enemies's position, use the center of its renderer.
+            bool inXRange = viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize;
+            bool inYRange = viewportPosition.y >= 0f && viewportPosition.y <= 1f;
+            bool inZRange = viewportPosition.z >= 0f;
+            if (inXRange && inYRange && inZRange) {
+                // For the enemy's position, use the center of its renderer.
                 Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;
 
-                // See if the distance to this enemy is less than the distance to the previous nearest enemy.
-                if (Vector3.Distance(GameManager.player.transform.position, thisPosition) < Vector3.Distance(GameManager.player.transform.position, autoAimPoint)) {
+                // If this position is behind an obstacle, ignore it.
+                RaycastHit hit;
+                if (Physics.Raycast(gunTipTransform.position, Vector3.Normalize(thisPosition - gunTipTransform.position), out hit, 1000f, 1 << 8 | 1 << 14 | 1 << 23 | 1 << 28)) {
+                    if (!hit.collider.GetComponent<Enemy>() && hit.collider.tag != "Weak Point") {
+                        continue;
+                    }
+                }
+
+                // See if the distance to this object is less than the distance to the previous nearest object.
+                if (Vector3.Distance(Services.playerTransform.position, thisPosition) < Vector3.Distance(Services.playerTransform.position, autoAimPoint)) {
                     autoAimPoint = thisPosition;
                 }
             }
         }
 
         return autoAimPoint;
+    }
+
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        canShoot = false;
+    }
+
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        this.enabled = true;
     }
 }

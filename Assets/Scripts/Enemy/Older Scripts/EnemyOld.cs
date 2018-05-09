@@ -278,7 +278,7 @@ public class EnemyOld : MonoBehaviour
         //DropSpecialMoveAmmo();
 
         Instantiate(deathParticles, transform.position, Quaternion.identity);
-        gameManager.PlayerKilledEnemy(killValue, specialValue);
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerKilledEnemy(killValue, specialValue));
         isAlive = false;
         Destroy(gameObject);
     }

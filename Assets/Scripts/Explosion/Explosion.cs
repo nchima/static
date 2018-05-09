@@ -78,9 +78,9 @@ public class Explosion : MonoBehaviour {
                 if (hit.transform != collider.transform) return;
             }
 
-            GameManager.instance.PlayerWasHurt();
-        }
-
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
+        } 
+        
         else if (collider.tag == "Enemy") {
             //Debug.Log("Enemy affected by explosion.");
             //collider.GetComponent<Enemy>().BecomePhysicsObject(1f);

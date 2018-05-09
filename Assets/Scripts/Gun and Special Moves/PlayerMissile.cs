@@ -42,9 +42,9 @@ public class PlayerMissile : MonoBehaviour {
     private void Start()
     {
         // Orient self according to player's current rotation.
-        //transform.rotation = GameManager.instance.player.transform.rotation;
+        //transform.rotation = Services.Services.playerTransform.rotation;
 
-        GameManager.instance.UpdateBillboards();
+        Services.billboardManager.FindAllBillboards();
 
         lockOnTriggerObject = transform.Find("Lock On Trigger").gameObject;
 
@@ -57,7 +57,7 @@ public class PlayerMissile : MonoBehaviour {
         noiseOffsetX = Random.Range(-100f, 100f);
         noiseOffsetY = Random.Range(-100f, 100f);
 
-        transform.rotation = GameManager.player.transform.rotation;
+        transform.rotation = Services.playerTransform.rotation;
         transform.Rotate(new Vector3(Random.Range(-2f, -15f), Random.Range(-35f, 35f), 0f));
 
         initialDirection = transform.forward;

@@ -66,6 +66,12 @@ public class ScoreManager : MonoBehaviour
     }
 
 
+    private void Awake() {
+        GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+    }
+
+
     void Start() {
         // Set up high score list.
         highScoreEntries = RetrieveHighScores();
@@ -107,6 +113,11 @@ public class ScoreManager : MonoBehaviour
             bonusTimer += Time.deltaTime;
             //Debug.Log(currentTimeBonus);
         }
+
+        if (Input.GetKeyDown(KeyCode.Minus)) {
+            Debug.Log("deleting scores");
+            ResetScores();
+        }
     }
 
 
@@ -128,11 +139,12 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Should be called when the player kills an enemy.
-    /// </summary>
-    public void PlayerKilledEnemy(int enemyKillValue)
-    {
+    public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
+        GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
+
+        // Round the score to an integer and update the score display.
+        score += playerKilledEnemyEvent.scoreValue;
+
         // If value of the multiplier bar has gotten to 1, raise the player's multiplier and set the multiplier bar values for the new multiplier level.
         //if (multBarValueCurr >= 1f)
         //{
@@ -141,17 +153,10 @@ public class ScoreManager : MonoBehaviour
         //    multBarValueCurr = multBarStartValCurr;
         //    multBarDecayCurr = multBarBaseDecay * multiplier;
         //}
-
-        // Round the score to an integer and update the score display.
-        score += enemyKillValue;
     }
 
 
-    /// <summary>
-    /// Is called when player beats the current level.
-    /// </summary>
-    public void LevelComplete()
-    {
+    public void LevelCompletedHandler(GameEvent gameEvent) {
         // Give the player a score boost for beating the level.
         score += currentTimeBonus;
         bonusTimerIsRunning = false;
@@ -163,10 +168,10 @@ public class ScoreManager : MonoBehaviour
     void ShowLevelCompleteScreen()
     {
         levelCompletedScreen.SetActive(true);
-        levelCompletedDisplay.text = "LEVEL " + GameManager.levelManager.currentLevelNumber.ToString() + " COMPLETED";
+        levelCompletedDisplay.text = "LEVEL " + Services.levelManager.LevelNumber.ToString() + " COMPLETED";
         secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
         bonusScoreDisplay.text = currentTimeBonus.ToString();
-        nextLevelDisplay.text = "NOW ENTERING LEVEL " + (GameManager.levelManager.currentLevelNumber + 1).ToString();
+        nextLevelDisplay.text = "NOW ENTERING LEVEL " + (Services.levelManager.LevelNumber + 1).ToString();
     }
 
 
@@ -182,14 +187,6 @@ public class ScoreManager : MonoBehaviour
     public void BulletHitEnemy()
     {
         score += 1;
-    }
-
-
-    /// <summary>
-    /// Should be called when the player gets hurt.
-    /// </summary>
-    public void GetHurt()
-    {  
     }
 
 
@@ -305,6 +302,7 @@ public class ScoreManager : MonoBehaviour
 
     public void PrintHighScores() {
         for (int i = 0; i < 10; i++) {
+            if (PlayerPrefs.GetString("HighScoreName" + i) != null) { continue; }
             Debug.Log(PlayerPrefs.GetString("HighScoreName" + i, highScoreEntries[i].initials) + ", "
             + PlayerPrefs.GetInt("HighScoreNumber" + i, highScoreEntries[i].score) + ", "
             + PlayerPrefs.GetInt("Newest" + i, highScoreEntries[i].newest));

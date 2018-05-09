@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ShotgunChargeTransition_PlayerPressedButton : Transition {
     public override bool IsConditionTrue(StateController stateController) {
-        bool buttonPressed = Input.GetButton("Fire1") || Input.GetButton("Fire2");
+        bool buttonPressed = InputManager.fireButtonDown || InputManager.dashButtonDown;
         bool playerIsAboveFloor = FindObjectOfType<PlayerController>().isAboveFloor;
         bool hasChargedForMinimumTime = FindObjectOfType<ShotgunCharge>().hasChargedForMinimumTime;
 

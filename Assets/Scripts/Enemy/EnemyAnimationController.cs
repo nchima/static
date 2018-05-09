@@ -10,9 +10,9 @@ public class EnemyAnimationController : MonoBehaviour {
     protected SkinnedMeshRenderer[] blendRenderers;
 
     // We need to use this because of the simple enemies; right now they don't use blend shapes.
-    private Renderer[] renderers;
+    protected Renderer[] renderers;
 
-    Coroutine[] getHurtCoroutines;
+    protected Coroutine[] getHurtCoroutines;
 
 
     protected virtual void Start() {

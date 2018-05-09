@@ -21,14 +21,7 @@ public class HealthManager : MonoBehaviour {
             if (value < _playerHealth) {
                 if (currentlyInvincible) { return; }
                 invincibilityTimer += invincibilityTime;
-
-                // Audio/visuals
-                getHurtAudio.Play();
-                GameObject.Find("Screen").BroadcastMessage("IncreaseShake", 2f);
-                GameManager.colorPaletteManager.LoadVulnerablePalette();
-                GameManager.player.GetComponent<Rigidbody>().velocity *= 0.01f;
-                GameObject.Find("Pain Flash").GetComponent<Animator>().SetTrigger("Pain Flash");
-
+                
                 // Delete health box.
                 for (int i = Mathf.Clamp(value, 0, 4); i < 5; i++) healthBlocks[i].SetActive(false);
             }
@@ -37,7 +30,7 @@ public class HealthManager : MonoBehaviour {
             else {
                 // Reactivate health box.
                 if (value <= 5) healthBlocks[Mathf.Clamp(value - 1, 0, 5)].SetActive(true);
-                //if (value == 5) GameManager.colorPaletteManager.RestoreSavedPalette();
+                //if (value == 5) Services.colorPaletteManager.RestoreSavedPalette();
             }
 
             _playerHealth = value;
@@ -53,13 +46,19 @@ public class HealthManager : MonoBehaviour {
 
     [SerializeField] HealthBonus[] healthBonuses;
 
+    public bool PlayerIsDead { get { return playerHealth <= 0; } }
+
     // Misc references.
     [SerializeField] GameObject[] healthBlocks;
     [SerializeField] AudioSource getHurtAudio;
 
 
-    private void Update() {
+    private void Awake() {
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
 
+
+    private void Update() {
         // Handle health recharging.
         //if (playerHealth < 5) {
         //    timer += Time.deltaTime;
@@ -71,7 +70,7 @@ public class HealthManager : MonoBehaviour {
 
         // Check for score bonuses.
         for (int i = 0; i < healthBonuses.Length; i++) {
-            if (!healthBonuses[i].applied && GameManager.scoreManager.score >= healthBonuses[i].requiredScore) {
+            if (!healthBonuses[i].applied && Services.scoreManager.score >= healthBonuses[i].requiredScore) {
                 healthBonuses[i].applied = true;
                 playerHealth++;
             }
@@ -82,13 +81,22 @@ public class HealthManager : MonoBehaviour {
         if (invincibilityTimer > 0 && currentlyInvincible == false) {
             currentlyInvincible = true;
             invincibilityTimer -= Time.deltaTime;
-            //GameManager.colorPaletteManager.RestoreSavedPalette();
-            GameManager.colorPaletteManager.Invoke("RestoreSavedPalette", 1f);
+            //Services.colorPaletteManager.RestoreSavedPalette();
+            Services.colorPaletteManager.Invoke("RestoreSavedPalette", 1f);
         } else {
             currentlyInvincible = false;
         }
 
         if (forceInvincibility || godMode) currentlyInvincible = true;
+    }
+
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        playerHealth -= 1;
+
+        if (PlayerIsDead) {
+            GameEventManager.instance.FireEvent(new GameEvents.GameOver());
+        }
     }
 }
 

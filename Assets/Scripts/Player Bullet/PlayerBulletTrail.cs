@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerBulletTrail : MonoBehaviour {
 
-    [SerializeField] float lingerDuration = 0.25f;
+    float lingerDuration = 0.3f;
     float lingerTimer = 0f;
 
     static ObjectPooler meshPooler;
@@ -36,7 +36,7 @@ public class PlayerBulletTrail : MonoBehaviour {
     private void Update() {
         // Check to see if any segments need to be deleted.
         for (int i = 0; i < segments.Count; i++) {
-            segments[i].beginningPoint += GameManager.player.GetComponent<Rigidbody>().velocity;
+            segments[i].beginningPoint += Services.playerGameObject.GetComponent<Rigidbody>().velocity;
             if (Time.time >= segments[i].deleteTime) {
                 segments.Remove(segments[i]);
                 RedrawTrail();
@@ -59,6 +59,7 @@ public class PlayerBulletTrail : MonoBehaviour {
 
     public void AddSegment(Vector3 beginning, Vector3 end, Vector3 velocity) {
         trailPiece.SetActive(true);
+        trailPiece.GetComponent<PlayerBulletMesh>().screenTime = lingerDuration;
         segments.Add(new Segment(beginning, end, Time.time + lingerDuration, velocity));
         RedrawTrail();
     }

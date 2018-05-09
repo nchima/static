@@ -16,51 +16,37 @@ public class GameManager : MonoBehaviour {
     // USED FOR LEVEL GENERATION
     int numberOfEnemies = 2;    // The number of enemies that spawned in the current level.
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
-    public LevelGenerator levelGenerator;  // A reference to the level generator script.
-    public static LevelManager levelManager;
-
-    // MENU SCREENS
-    [SerializeField] GameObject highScoreScreen;
-    [SerializeField] GameObject gameOverScreen; 
-    [SerializeField] GameObject nameEntryScreen;
-    [SerializeField] GameObject mainMenuScreen; 
 
     // RANDOM USEFUL STUFF
     public bool gameStarted = false;
     Vector3 initialGravity;
 
-    // MISC REFERENCES
-    [HideInInspector] public static GameManager instance;
-    [HideInInspector] public ScoreManager scoreManager;
-    [HideInInspector] public static SpecialBarManager specialBarManager;
-    [HideInInspector] public static HealthManager healthManager;
-    [HideInInspector] public static FallingSequenceManager fallingSequenceManager;
-    [HideInInspector] public static MusicManager musicManager;
-    [HideInInspector] public static SFXManager sfxManager;
-    [HideInInspector] public Gun gun;
-    [HideInInspector] public static GunValueManager gunValueManager;
-    [HideInInspector] public static ColorPaletteManager colorPaletteManager;
-    [HideInInspector] public GenerateNoise noiseGenerator;
-    [HideInInspector] public static GameObject player;
-    [SerializeField] GameObject gunSliderBorder;
-
 
     void Awake() {
-        // Get various references.
-        instance = this;
-        player = GameObject.Find("Player");
-        scoreManager = GetComponent<ScoreManager>();
-        specialBarManager = GetComponentInChildren<SpecialBarManager>();
-        healthManager = GetComponentInChildren<HealthManager>();
-        levelGenerator = GetComponent<LevelGenerator>();
-        levelManager = GetComponentInChildren<LevelManager>();
-        fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
-        sfxManager = GetComponentInChildren<SFXManager>();
-        musicManager = GetComponentInChildren<MusicManager>();
-        colorPaletteManager = GetComponentInChildren<ColorPaletteManager>();
-        gun = FindObjectOfType<Gun>();
-        gunValueManager = GetComponentInChildren<GunValueManager>();
-        noiseGenerator = GetComponent<GenerateNoise>();
+        // Set up services manager
+        Services.gameManager = this;
+        Services.playerGameObject = FindObjectOfType<PlayerController>().gameObject;
+        Services.playerTransform = FindObjectOfType<PlayerController>().transform;
+        Services.playerController = FindObjectOfType<PlayerController>();
+        Services.scoreManager = GetComponent<ScoreManager>();
+        Services.specialBarManager = GetComponentInChildren<SpecialBarManager>();
+        Services.healthManager = GetComponentInChildren<HealthManager>();
+        Services.levelManager = GetComponentInChildren<LevelManager>();
+        Services.levelGenerator = GetComponentInChildren<LevelGenerator>();
+        Services.fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
+        Services.sfxManager = GetComponentInChildren<SFXManager>();
+        Services.uiManager = GetComponentInChildren<UIManager>();
+        Services.musicManager = GetComponentInChildren<MusicManager>();
+        Services.colorPaletteManager = GetComponentInChildren<ColorPaletteManager>();
+        Services.gun = FindObjectOfType<Gun>();
+        Services.gunValueManager = GetComponentInChildren<GunValueManager>();
+        Services.noiseGenerator = GetComponent<GenerateNoise>();
+        Services.flashManager = GetComponentInChildren<FlashManager>();
+        Services.billboardManager = FindObjectOfType<BatchBillboard>();
+
+        GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -69,25 +55,20 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    private void Update() {
-        if (!gameStarted) {
-            if (Input.GetMouseButtonDown(0)) {
-                StartGame();
-            }
-        }
-    }
-
-
     IEnumerator InitialSetup() {
-        gun.enabled = false;
-        player.GetComponent<PlayerController>().isMovementEnabled = false;
-        
-        levelManager.LoadLevel(levelManager.currentLevelNumber);
+        Services.gun.enabled = false;
+        Services.playerController.isMovementEnabled = false;
 
-        while (!SceneManager.GetSceneByBuildIndex(levelManager.currentLevelNumber).isLoaded) { yield return null; }
+        //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+        Services.levelManager.LoadNextLevel();
 
-        levelManager.SetEnemiesActive(false);
-        fallingSequenceManager.BeginFallingInstant();
+        //yield return new WaitUntil(() => {
+        //    if (SceneManager.GetSceneByBuildIndex(levelManager.levelsCompleted).isLoaded) { return true; } 
+        //    else { return false; }
+        //});
+
+        //levelManager.SetEnemiesActive(false);
+        Services.fallingSequenceManager.BeginFallingInstant();
 
         initialGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;
@@ -96,149 +77,85 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    public void LoadNextLevel() {
-        levelManager.LoadNextLevel();
-    }
+    private void Update() {
+        if (!gameStarted && !gamePaused) {
+            if (InputManager.fireButtonDown) {
+                GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
+            }
+        }
 
-
-    public void PlayerUsedSpecialMove() {
-        specialBarManager.PlayerUsedSpecialMove();
-    }
-
-
-    public void ReturnToFullSpeed() {
-        // Begin tweening time scale, gun burst rate, and music pitch back to normal.
-        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        DOTween.To(() => gun.burstsPerSecondSloMoModifierCurrent, x => gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        musicManager.ReturnMusicPitchToFullSpeed();
-    }
-
-
-    public void PlayerKilledEnemy(int scoreValue, float specialValue) {
-        // Add score and special bar values.
-        scoreManager.PlayerKilledEnemy(scoreValue);
-        specialBarManager.AddValue(specialValue);
-
-        // If player has killed all the enemies in the current level, begin the level completion sequence.
-        currentEnemyAmt -= 1;
-        if (currentEnemyAmt <= 0) { LevelComplete(); }
-    }
-
-
-    public void LevelComplete() {
-        if (fallingSequenceManager.isPlayerFalling) return;
-        if (dontChangeLevel) return;
-
-        musicManager.EnterFallingSequence();
-        levelWinAudio.Play();
-
-        scoreManager.LevelComplete();
-        levelManager.isLevelCompleted = true;
-
-        gun.canShoot = false;
-
-        GatherRemainingAmmoPickups();
-
-        //if (healthManager.playerHealth < 5) healthManager.playerHealth++;
-
-        // Disable the floor's collider so the player falls through it.
-        SetFloorCollidersActive(false);
-
-        // Initiate falling sequence.
-        fallingSequenceManager.BeginFalling();
-    }
-
-
-    void GatherRemainingAmmoPickups() {
-        foreach(SpecialMoveAmmo specialMoveAmmo in FindObjectsOfType<SpecialMoveAmmo>()) { specialMoveAmmo.BeginMovingTowardsPlayer(); }
-    }
-
-
-    public void CountEnemies() {
-        currentEnemyAmt = FindObjectsOfType<EnemyOld>().Length;
-        currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
-    }
-
-
-    //public void FreezeSpecialBarDecay(bool value) {
-    //    specialBarManager.freezeDecay = value;
-    //}
-
-
-    public void DetermineBonusTime() {
-        scoreManager.DetermineBonusTime();
-    }
-
-
-    public void SetFloorCollidersActive(bool value) {
-        levelManager.SetFloorCollidersActive(value);
-    }
-
-
-    public void PlayerWasHurt() {
-        scoreManager.GetHurt();
-        specialBarManager.PlayerWasHurt();
-        healthManager.playerHealth -= 4;
-
-        // If health is now less than zero, trigger a game over.
-        if (healthManager.playerHealth <= 0) {
-            ShowGameOverScreen();
+        if (InputManager.pauseButtonDown) {
+            if (!gamePaused && !Services.healthManager.PlayerIsDead) { PauseGame(true); } else { PauseGame(false); }
         }
     }
 
 
-    public void ShowHighScores() {
-        scoreManager.RetrieveScoresForHighScoreScreen();
+    float memorizedTimeScale;
+    public static bool gamePaused;
+    public void PauseGame(bool value) {
+        if (value == true) {
+            Services.uiManager.ShowPauseScreen();
+            memorizedTimeScale = Time.timeScale;
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.Confined;
+            Cursor.visible = true;
+            gamePaused = true;
+        }
 
-        gameOverScreen.gameObject.SetActive(false);
-        nameEntryScreen.gameObject.SetActive(false);
-        highScoreScreen.gameObject.SetActive(true);
+        else {
+            Services.uiManager.HidePauseScreen();
+            Time.timeScale = memorizedTimeScale;
+            if (!gameStarted) { Services.uiManager.titleScreen.SetActive(true); }
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            gamePaused = false;
+        }
     }
 
 
-    public void BulletHitEnemy() {
-        //if (gunMethod == GunMethod.TuningBased && (currentSine < currentIdealRange.min || currentSine > currentIdealRange.max)) return;
-        scoreManager.BulletHitEnemy();
-        //sineTime += bulletHitSineIncrease;
+    // MOVE TO TIME SCALE MANAGER
+    public void ReturnToFullSpeed() {
+        // Begin tweening time scale, gun burst rate, and music pitch back to normal.
+        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+        DOTween.To(() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
+        Services.musicManager.ReturnMusicPitchToFullSpeed();
     }
 
 
-    void ShowGameOverScreen() {
-        gameOverScreen.SetActive(true);
+    // MOVE TO UM... ENEMY MANAGER IF I MAKE ONE
+    public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
+        // If player has killed all the enemies in the current level, begin the level completion sequence.
+        currentEnemyAmt -= 1;
+        if (currentEnemyAmt <= 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
+            GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
+        }
     }
 
 
-    public void StartGame() {
-        
-        // Unpause enemies in the background.
-        levelManager.SetEnemiesActive(true);
+    // Maybe move this functionality to various managers at some point.
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        levelWinAudio.Play();
+        DeleteRemainingPickups();
+    }
 
-        player.GetComponent<PlayerController>().isMovementEnabled = true;
-        gun.enabled = true;
 
-        Physics.gravity = initialGravity;
+    void DeleteRemainingPickups() {
+        foreach(Pickup pickup in FindObjectsOfType<Pickup>()) { pickup.Delete(); }
+    }
 
+
+    public void CountEnemies() {
+        currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
+    }
+
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        Physics.gravity = initialGravity;   // Move to gravity manager
         gameStarted = true;
     }
 
 
     public void RestartGame() {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
-    }
-
-    public void UpdateBillboards() {
-        FindObjectOfType<BatchBillboard>().FindAllBillboards();
-    }
-
-    public bool PositionIsInLevelBoundaries(Vector3 position) {
-        if (position.x > levelGenerator.baseLevelSize / 2 ||
-            position.x < -levelGenerator.baseLevelSize / 2 ||
-            position.z > levelGenerator.baseLevelSize / 2 ||
-            position.z < -levelGenerator.baseLevelSize / 2)
-        {
-            return false;
-        }
-
-        else return true;
     }
 }

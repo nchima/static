@@ -62,7 +62,7 @@ public class EnemyShot : MonoBehaviour {
 
         else if (collider.tag == "Player")
         {
-            gameManager.PlayerWasHurt();
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
 
             // Destroy self.
             Detonate();

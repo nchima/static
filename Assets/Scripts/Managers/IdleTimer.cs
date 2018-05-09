@@ -11,7 +11,7 @@ public class IdleTimer : MonoBehaviour {
 
     void Update () {
         // Run idle timer.
-        if (GameManager.instance.gameStarted) {
+        if (Services.gameManager.gameStarted) {
             if (timeSinceLastInput >= idleResetTime) {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
@@ -19,7 +19,7 @@ public class IdleTimer : MonoBehaviour {
             // Check all joystick buttons.
             bool buttonPressed = false;
             for (int i = 0; i < 20; i++) {
-                if (Input.GetKeyDown("joystick 1 button " + i.ToString())) {
+                if (InputManager.AnyInputPressed) {
                     buttonPressed = true;
                 }
             }

@@ -22,7 +22,7 @@ public class SnailEnemyState_NormalMovement : State {
         SnailEnemy controller = stateController as SnailEnemy;
 
         // Move forward
-        controller.m_NavMeshAgent.SetDestination(GameManager.player.transform.position);
+        controller.m_NavMeshAgent.SetDestination(Services.playerTransform.position);
 
         // Turn towards player.
         Quaternion lookAtPlayerRotation = Quaternion.LookRotation(controller.directionToPlayer);
@@ -60,10 +60,6 @@ public class SnailEnemyState_NormalMovement : State {
         Vector3 velocity = controller.m_NavMeshAgent.desiredVelocity.normalized;
         velocity *= moveSpeed;
         controller.GetComponent<Rigidbody>().MovePosition(controller.transform.position + velocity * Time.deltaTime);
-    }
-
-
-    public override void End(StateController stateController) {
     }
 
 

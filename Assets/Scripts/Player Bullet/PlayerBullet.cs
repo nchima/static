@@ -44,22 +44,30 @@ public class PlayerBullet : MonoBehaviour {
 
         if (justBeInstant) { nextPosition = transform.position + transform.forward * 1000f; }
 
+        //Debug.DrawLine(transform.position, nextPosition, Color.red, 1f);
+
         // Raycast first ignoring regular enemy layers in order to see if we are aimed at a weak point.
         //Debug.Log((1 << 8) | (1 << 28));
         RaycastHit hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 28));
 
+        // If we did hit a weak point:
         if (hit.collider != null && hit.collider.name.Contains("Weak Point")) {
             transform.position = hit.point;
             HandleHit(hit);
-        } else {
+        } 
+        
+        // If we did not hit a weak point.
+        else {
             // Raycast from my previous position to my new position to see if I hit an enemy's regular surface.
             hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23));
 
+            // If we hit a something.
             if (hit.collider != null) {
-                //Debug.Log(hit.collider.name + " was hit");
                 transform.position = hit.point;
                 HandleHit(hit);
-            } else {
+            } 
+            
+            else {
                 transform.position = nextPosition;
                 travelledDistance += Vector3.Distance(transform.position, previousPosition);
                 if (travelledDistance >= maxDistance) { EndBulletsExistence(); }
@@ -76,16 +84,24 @@ public class PlayerBullet : MonoBehaviour {
     RaycastHit SphereCastOnLayer(Vector3 toPosition, int layerBitmask) {
         RaycastHit hit;
 
-        Debug.DrawLine(previousPosition, toPosition, Color.red);
-
-        bool spherecast = Physics.SphereCast(
+        bool raycast = Physics.Raycast(
             previousPosition,
-            thickness,
             transform.forward,
             out hit,
             Vector3.Distance(toPosition, previousPosition),
             layerBitmask
         );
+
+        //bool spherecast = Physics.SphereCast(
+        //    previousPosition,
+        //    thickness,
+        //    transform.forward,
+        //    out hit,
+        //    Vector3.Distance(toPosition, previousPosition),
+        //    layerBitmask
+        //);
+
+        Debug.DrawLine(previousPosition, hit.point, Color.red, 1.5f);
 
         return hit;
     }
@@ -111,6 +127,8 @@ public class PlayerBullet : MonoBehaviour {
 
         m_playerBulletTrail.thickness = thickness;
         m_playerBulletTrail.m_Color = m_Color;
+
+        
     }
 
 
@@ -122,10 +140,10 @@ public class PlayerBullet : MonoBehaviour {
             if (hit.collider.GetComponent<EnemyOld>() != null) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
             else if (hit.collider.GetComponent<Enemy>() != null) { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
 
-            if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { GameManager.specialBarManager.AddValue(0.01f); }
+            if (!(shotgunCharge.currentState is ShotgunChargeState_FinalAttack)) { Services.specialBarManager.AddValue(0.01f); }
 
-            if (hit.collider.GetComponent<EnemyOld>() != null) { GameManager.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
-            else { GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
+            if (hit.collider.GetComponent<EnemyOld>() != null) { Services.sfxManager.PlayBulletEnemyHitSoundOld(hit.collider.GetComponent<EnemyOld>()); }
+            else { Services.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
         } 
         
         else if (hit.collider.name.Contains("Homing Shot")) {
@@ -136,10 +154,10 @@ public class PlayerBullet : MonoBehaviour {
             //Debug.Log("Bullet struck enemy weak point!");
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
-            GameManager.sfxManager.PlayBulletHitWeakPointSound();
+            Services.sfxManager.PlayBulletHitWeakPointSound();
 
             if (hit.collider.transform.parent.parent.GetComponent<Enemy>() != null) { hit.collider.transform.parent.parent.GetComponent<Enemy>().currentHealth -= 50; }
-            GameManager.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
+            Services.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
         }
         
         else {

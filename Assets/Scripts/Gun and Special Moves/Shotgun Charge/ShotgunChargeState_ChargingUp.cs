@@ -11,8 +11,10 @@ public class ShotgunChargeState_ChargingUp : State {
 
     public override void Run(StateController stateController) {
         base.Run(stateController);
-        GunValueManager.currentValue = -1f;
     }
 
-    public override void End(StateController stateController) {}
+    public override void End(StateController stateController) {
+        base.End(stateController);
+        Services.playerController.superDashCharging = false;
+    }
 }
