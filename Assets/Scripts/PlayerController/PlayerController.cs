@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour {
                 if (InputManager.dashButtonUp && !superDashCharging) {
                     BeginDash(false);
                 }
-                else if (InputManager.dashButton) {
+                else if (InputManager.dashButton && !superDashCharging) {
                     superDashHoldTimer += Time.deltaTime;
                     if (superDashHoldTimer > superDashHoldDuration && Services.specialBarManager.bothBarsFull) {
                         FindObjectOfType<ShotgunCharge>().BeginSequence();
@@ -269,7 +269,6 @@ public class PlayerController : MonoBehaviour {
     void BeginDash(bool buttonHeld) {
         state = State.Dashing;
         dashCoroutine = StartCoroutine(DashCoroutine(buttonHeld));
-        Debug.Log("beginning dash");
     }
 
     IEnumerator DashCoroutine(bool buttonHeld) {

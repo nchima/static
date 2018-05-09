@@ -14,7 +14,7 @@ public class ShotgunChargeState_Charging : State {
 
         FindObjectOfType<FieldOfViewController>().TweenToNormalFOV();
 
-        // Make player temporarily invincible (Why am I setting two separate variables for this??)
+        // Make player temporarily invincible
         Services.healthManager.forceInvincibility = true;
 
         // Make the player start shotgun charging.
