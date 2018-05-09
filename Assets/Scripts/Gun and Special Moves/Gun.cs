@@ -195,7 +195,7 @@ public class Gun : MonoBehaviour {
 
         // Auto aim for weak points.
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
-        autoAimPoint = AutoAim("Weak Point", 0.0125f);
+        autoAimPoint = AutoAim("Weak Point", 0.125f);
 
         // If we couldn't hit a weak point, auto aim for enemies instead.
         if (!Physics.Raycast(gunTipTransform.position, autoAimPoint - gunTipTransform.position, 1000f, 1 << 28)) {
@@ -253,18 +253,18 @@ public class Gun : MonoBehaviour {
             if (inXRange && inYRange && inZRange) {
                 // For the enemy's position, use the center of its renderer.
                 Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;
+                Debug.Log(thisObject.name + " is in autoaim band.");
 
                 // If this position is behind an obstacle, ignore it.
                 RaycastHit hit;
-                if (Physics.Raycast(gunTipTransform.position, Vector3.Normalize(thisPosition - gunTipTransform.position), out hit, 1000f, 1 << 8)) {
-                    if (!hit.
-                        collider.
-                        GetComponent<Enemy>()) {
+                if (Physics.Raycast(gunTipTransform.position, Vector3.Normalize(thisPosition - gunTipTransform.position), out hit, 1000f, 1 << 8 | 1 << 14 | 1 << 23 | 1 << 28)) {
+                    if (!hit.collider.GetComponent<Enemy>() && hit.collider.tag != "Weak Point") {
+                        Debug.Log("nope nope nope!");
                         continue;
                     }
                 }
 
-                // See if the distance to this enemy is less than the distance to the previous nearest enemy.
+                // See if the distance to this object is less than the distance to the previous nearest object.
                 if (Vector3.Distance(Services.playerTransform.position, thisPosition) < Vector3.Distance(Services.playerTransform.position, autoAimPoint)) {
                     autoAimPoint = thisPosition;
                 }
