@@ -160,9 +160,6 @@ public class Gun : MonoBehaviour {
         // Make sure enough time has passed since the last shot.
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
 
-        // Tell the crosshair to vibrate more.
-        FindObjectOfType<CrossHair>().AdjustShakeValueForShotFired();
-
         // Handle audio.
         rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
         rifleAudioSource.pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.2f, 1f);

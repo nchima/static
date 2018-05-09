@@ -9,7 +9,7 @@ public class Pickup : MonoBehaviour {
 
     [SerializeField] protected float stayDuration = 6f; // How long this pickup stays in the world before disappearing.
 
-    [SerializeField] GameObject pickupTrigger;
+    [SerializeField] protected GameObject pickupTrigger;
     [SerializeField] Transform pickupTrailsParent;
     [SerializeField] Renderer[] flashingRenderers;
 
