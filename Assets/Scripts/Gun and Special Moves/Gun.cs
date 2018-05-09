@@ -253,13 +253,11 @@ public class Gun : MonoBehaviour {
             if (inXRange && inYRange && inZRange) {
                 // For the enemy's position, use the center of its renderer.
                 Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;
-                Debug.Log(thisObject.name + " is in autoaim band.");
 
                 // If this position is behind an obstacle, ignore it.
                 RaycastHit hit;
                 if (Physics.Raycast(gunTipTransform.position, Vector3.Normalize(thisPosition - gunTipTransform.position), out hit, 1000f, 1 << 8 | 1 << 14 | 1 << 23 | 1 << 28)) {
                     if (!hit.collider.GetComponent<Enemy>() && hit.collider.tag != "Weak Point") {
-                        Debug.Log("nope nope nope!");
                         continue;
                     }
                 }
