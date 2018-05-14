@@ -301,6 +301,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void EndDashEarly() {
+        if (state == State.Falling || state == State.SpeedFalling) { return; }
         if (dashCoroutine != null) { StopCoroutine(dashCoroutine); }
         m_Rigidbody.velocity = Vector3.zero;
         IgnoreCollisionsWithRailings(false);
