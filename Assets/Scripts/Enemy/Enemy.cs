@@ -156,7 +156,7 @@ public class Enemy : StateController {
     }
 
 
-    void SetAIActive(bool value) {
+    public void SetAIActive(bool value) {
         ReturnToInitialState();
         isAIPaused = !value;
     }

@@ -139,8 +139,7 @@ public class PlayerMissile : MonoBehaviour {
     }
 
 
-    public void GetDestroyed()
-    {
+    public void GetDestroyed() {
         Destroy(gameObject);
         if (GetComponentInChildren<TrailRenderer>() == null) return;
         GetComponentInChildren<TrailRenderer>().autodestruct = true;
@@ -152,7 +151,6 @@ public class PlayerMissile : MonoBehaviour {
     {
         if (collider.tag == "Obstacle") /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/
         {
-            //Debug.Log("I bumped into an obstacle.");
             Detonate();
             GetDestroyed();
         }

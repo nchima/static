@@ -139,7 +139,7 @@ public class LevelManager : MonoBehaviour {
 
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
-        SetEnemiesActive(false);
+        //SetEnemiesActive(false);
 
         isLevelCompleted = false;
         currentlyLoadedLevel = levelNumber;
@@ -162,7 +162,7 @@ public class LevelManager : MonoBehaviour {
         }
 
         foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
-            enemy.isAIPaused = !value;
+            enemy.SetAIActive(value);
             enemy.enabled = value;
         }
 
