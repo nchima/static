@@ -274,7 +274,6 @@ public class Gun : MonoBehaviour {
 
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        canShoot = false;
     }
 
 

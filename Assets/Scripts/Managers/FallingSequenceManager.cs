@@ -85,6 +85,8 @@ public class FallingSequenceManager : StateController {
             Services.playerController.state = PlayerController.State.Falling;
         }
 
+        Services.gun.canShoot = false;
+
         Services.playerGameObject.GetComponent<Collider>().material.bounciness = 0f;
         Services.healthManager.forceInvincibility = false;
 
