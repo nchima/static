@@ -110,7 +110,7 @@ public class Gun : MonoBehaviour {
         //}
 
         // See if the player has fired a special move & if so, initialize proper variables.
-        if (Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
+        if (canShoot && Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
             if (!firingMissiles && !firedMissiles) {
                 Services.specialBarManager.PlayerUsedSpecialMove();
