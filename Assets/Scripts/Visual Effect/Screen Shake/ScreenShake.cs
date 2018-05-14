@@ -60,6 +60,7 @@ public class ScreenShake : MonoBehaviour {
 
             // Decrease current shake.
             currentShake = Mathf.Clamp(currentShake - Time.deltaTime * decreaseFactor, 0f, 1000f);
+            //Debug.Log("current shake: " + currentShake);
             shakeTimer -= Time.deltaTime;
 		}
 

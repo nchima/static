@@ -62,7 +62,6 @@ public class GameManager : MonoBehaviour {
         Services.fallingSequenceManager.SetUpFallingVariables();
 
         //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-        Debug.Log("doing");
         Services.levelManager.LoadNextLevel();
 
         //yield return new WaitUntil(() => {

@@ -178,7 +178,9 @@ public class Gun : MonoBehaviour {
 
         // Handle screen shake
         foreach (ScreenShake screenShake in screenShakes) {
-            screenShake.SetShake(MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f), (1 / burstsPerSecond) * 0.6f);
+            float newShake = MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f);
+            if (bulletsPerBurstRange.min == bulletsPerBurstRange.max) { newShake = 0.1f; }
+            screenShake.SetShake(newShake, (1 / burstsPerSecond) * 0.6f);
         }
 
         // Show muzzle flash.
