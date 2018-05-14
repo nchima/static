@@ -137,12 +137,13 @@ public class GameManager : MonoBehaviour {
     // Maybe move this functionality to various managers at some point.
     public void LevelCompletedHandler(GameEvent gameEvent) {
         levelWinAudio.Play();
-        DeleteRemainingPickups();
+        DeleteThings();
     }
 
 
-    void DeleteRemainingPickups() {
+    void DeleteThings() {
         foreach(Pickup pickup in FindObjectsOfType<Pickup>()) { pickup.Delete(); }
+        foreach(PlayerMissile missile in FindObjectsOfType<PlayerMissile>()) { missile.GetDestroyed(); }
     }
 
 

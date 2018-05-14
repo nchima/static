@@ -139,7 +139,7 @@ public class PlayerMissile : MonoBehaviour {
     }
 
 
-    void GetDestroyed()
+    public void GetDestroyed()
     {
         Destroy(gameObject);
         if (GetComponentInChildren<TrailRenderer>() == null) return;
