@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviour {
                 }
                 else if (InputManager.dashButton && !superDashCharging) {
                     superDashHoldTimer += Time.deltaTime;
-                    if (superDashHoldTimer > superDashHoldDuration && Services.specialBarManager.bothBarsFull) {
+                    if (superDashHoldTimer > superDashHoldDuration /*&& Services.specialBarManager.bothBarsFull*/) {
                         FindObjectOfType<ShotgunCharge>().BeginSequence();
                         superDashCharging = true;
                         //BeginDash(true);

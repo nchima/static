@@ -6,8 +6,6 @@ using UnityEngine;
 public class State_SpeedFalling : State {
 
     public override void Initialize(StateController stateController) {
-        FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
-        fallingSequenceManager.ActivateSpeedFall();
-        Services.musicManager.EnterSpeedFall();
+        
     }
 }

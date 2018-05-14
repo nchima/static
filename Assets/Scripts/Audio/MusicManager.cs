@@ -12,6 +12,7 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] AudioMixer layerBMixer;
     [SerializeField] AudioMixer rhythmMixer;
     [SerializeField] AudioMixer newMusicMixer;
+    [SerializeField] AudioSource musicAudioSource;
 
     [SerializeField] FloatRange rhythmVolumeRange = new FloatRange(-5f, 5f);
     [SerializeField] FloatRange ABVolumeRange = new FloatRange(-5f, 5f);
@@ -97,8 +98,14 @@ public class MusicManager : MonoBehaviour {
         float rhythmVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, rhythmVolumeRange.max, rhythmVolumeRange.min);
         musicMasterMixer.SetFloat("Rhythm Volume", rhythmVolume);
 
-        float lowpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 3000f, 7000f);
+        float lowpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 1000f, 9000f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", lowpassCutoffFreq);
+
+        //float highpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 10f, 11000f);
+        //masterMixer.SetFloat("Highpass Cutoff Freq", highpassCutoffFreq);
+
+        float pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.98f, 1.02f);
+        musicAudioSource.pitch = pitch;
     }
 
 

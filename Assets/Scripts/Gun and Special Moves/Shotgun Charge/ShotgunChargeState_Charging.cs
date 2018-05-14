@@ -23,7 +23,7 @@ public class ShotgunChargeState_Charging : State {
         // Make sure player does move up or down.
         Services.playerGameObject.GetComponent<Rigidbody>().constraints |= RigidbodyConstraints.FreezePositionY;
 
-        Services.specialBarManager.PlayerUsedSpecialMove();
+        //Services.specialBarManager.PlayerUsedSpecialMove();
 
         // Allow player to pass through railings.
         Physics.IgnoreLayerCollision(16, 24, true);

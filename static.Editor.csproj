@@ -178,6 +178,8 @@
     <None Include="Assets\Asset Packages\UCLAGameLab\Wireframe\Shaders\UCLA GameLab Double-Sided Wireframe.shader" />
     <None Include="Assets\Asset Packages\UCLAGameLab\Wireframe\Shaders\UCLA GameLab Wireframe Functions.cginc" />
     <None Include="Assets\Asset Packages\UCLAGameLab\Wireframe\Shaders\UCLA GameLab Wireframe.shader" />
+    <None Include="Assets\Models\ArmyPilot\ArmyPilot.mesh.xml" />
+    <None Include="Assets\Models\ArmyPilot\ArmyPilot.skeleton.xml" />
     <None Include="Assets\Shaders\Atmosphere Fucked With.shader" />
     <None Include="Assets\Shaders\Atmosphere.shader" />
     <None Include="Assets\Shaders\Bullet Shader.shader" />

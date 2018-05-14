@@ -23,7 +23,7 @@ public class ScreenShake : MonoBehaviour {
 
 	Vector3 originalPosition;
 
-	void Start()
+	void Awake()
     {
 		originalPosition = transform.position;
         currentDriftPosition = originalPosition;

@@ -6,11 +6,29 @@ using DG.Tweening;
 public class EnemyWeakPointGrower : MonoBehaviour {
 
     [SerializeField] Vector3 minSizeScale;
+    [SerializeField] float keepInFrontOffset = 2f;
+    [HideInInspector] public Enemy myDad;
     Vector3 fullSizeScale;
 
     private void Awake() {
         fullSizeScale = transform.localScale;
         transform.localScale = minSizeScale;
+    }
+
+    private void Update() {
+        if (keepInFrontOffset != 0 && transform.localScale.magnitude > 0f) {
+            // Billboard
+            transform.LookAt(Services.playerTransform);
+            transform.localRotation = Quaternion.Euler(90f, transform.localRotation.eulerAngles.y, transform.localRotation.eulerAngles.z);
+
+            // Move in front.
+            Vector3 directionToPlayer = Vector3.Normalize(transform.position - Services.playerTransform.position);
+            transform.localPosition = directionToPlayer * keepInFrontOffset;
+        }
+    }
+
+    public void SetScale(float scale) {
+        transform.localScale = Vector3.Lerp(minSizeScale, fullSizeScale, scale);
     }
 
     public void Grow(float duration) {
@@ -20,6 +38,11 @@ public class EnemyWeakPointGrower : MonoBehaviour {
 
     public void Shrink(float duration) {
         StartCoroutine(ShrinkCoroutine(duration));
+    }
+
+    public void YouHurtMyDad(int howMuchYouHurtMyDad) {
+        if (myDad == null) { Debug.Log("My Dad Equals Null"); return; }
+        myDad.currentHealth -= howMuchYouHurtMyDad;
     }
 
     IEnumerator ShrinkCoroutine(float duration) {

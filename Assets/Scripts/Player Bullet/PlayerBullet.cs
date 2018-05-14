@@ -151,12 +151,11 @@ public class PlayerBullet : MonoBehaviour {
         } 
 
         else if (hit.collider.name.Contains("Weak Point")) {
-            //Debug.Log("Bullet struck enemy weak point!");
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
             Services.sfxManager.PlayBulletHitWeakPointSound();
 
-            if (hit.collider.transform.parent.parent.GetComponent<Enemy>() != null) { hit.collider.transform.parent.parent.GetComponent<Enemy>().currentHealth -= 50; }
+            if (hit.collider.GetComponent<EnemyWeakPointGrower>() != null) { hit.collider.GetComponent<EnemyWeakPointGrower>().YouHurtMyDad(2); }
             Services.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
         }
         

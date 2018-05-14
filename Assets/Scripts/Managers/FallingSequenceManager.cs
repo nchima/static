@@ -37,8 +37,6 @@ public class FallingSequenceManager : StateController {
     float speedFallGravityMultipier = 10f;
     [HideInInspector] public bool isSpeedFallActive = false;
 
-    [HideInInspector] public bool playerTouchedDown = false;
-
     [HideInInspector] public float normalPlayerBounciness;
 
     public GameObject shockwavePrefab;
@@ -56,6 +54,7 @@ public class FallingSequenceManager : StateController {
             material.bounciness;
 
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
     protected override void Update() {
@@ -77,18 +76,43 @@ public class FallingSequenceManager : StateController {
         Instantiate(prefab, shockwavePosition, Quaternion.identity);
     }
 
-    public void ActivateSpeedFall() {
-        if (Services.playerController.state == PlayerController.State.SpeedFalling) { return; }
-        //player.GetComponent<Rigidbody>().isKinematic = false;
-        Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Vector3.down * 600f, ForceMode.VelocityChange);
-        Services.playerController.state = PlayerController.State.SpeedFalling;
-        //Physics.gravity *= speedFallGravityMultipier;
-        isSpeedFallActive = true;
-        Services.healthManager.forceInvincibility = true;
+    public void SetUpFallingVariables() {
+        // In case the game is currently running in slow motion, return to full speed.
+        Services.gameManager.ReturnToFullSpeed();
+
+        // If the player is not currently set to falling state, set them to that state.
+        if (Services.playerController.state != PlayerController.State.SpeedFalling) {
+            Services.playerController.state = PlayerController.State.Falling;
+        }
+
+        Services.playerGameObject.GetComponent<Collider>().material.bounciness = 0f;
+        Services.healthManager.forceInvincibility = false;
+
+        // Drain color palette.
+        //Services.colorPaletteManager.LoadFallingSequencePalette();
+
+        // Place the player in the correct spot above the level.
+        Services.playerTransform.position = playerSpawnPoint.position;
+
+        // Set up variables for falling.
+        savedRegularMoveSpeed = Services.playerController.maxAirSpeed;
+
+        // Turn off fog.
+        savedFogColor = RenderSettings.fogColor;
+        RenderSettings.fogColor = Color.white;
+
+        // Begin rotating player camera to face down.
+        GameObject.Find("Cameras").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
+
+        // Load next level.
+        if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
+            //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+            Services.levelManager.LoadNextLevel();
+        }
     }
 
     public void BeginFalling() {
-        fallingTrigger.isTriggerSet = true;
+        TransitionToState(GetComponentInChildren<FallIntoLevelState>());
     }
 
     public void BeginFallingInstant() {
@@ -96,6 +120,10 @@ public class FallingSequenceManager : StateController {
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
+        fallingTrigger.isTriggerSet = true;
+    }
+
+    public void GameStartedHandler(GameEvent gameEvent) {
         BeginFalling();
     }
 }

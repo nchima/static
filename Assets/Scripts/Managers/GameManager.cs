@@ -59,7 +59,10 @@ public class GameManager : MonoBehaviour {
         Services.gun.enabled = false;
         Services.playerController.isMovementEnabled = false;
 
+        Services.fallingSequenceManager.SetUpFallingVariables();
+
         //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+        Debug.Log("doing");
         Services.levelManager.LoadNextLevel();
 
         //yield return new WaitUntil(() => {
@@ -68,7 +71,7 @@ public class GameManager : MonoBehaviour {
         //});
 
         //levelManager.SetEnemiesActive(false);
-        Services.fallingSequenceManager.BeginFallingInstant();
+        //Services.fallingSequenceManager.BeginFallingInstant();
 
         initialGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;

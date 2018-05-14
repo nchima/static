@@ -37,6 +37,12 @@ public class Enemy : StateController {
     [SerializeField] float specialKillValue = 0.3f;
     public float bonusTimeAdded;    // How much time this enemy adds to the bonus timer at level generation.
 
+    // TUNING
+    [SerializeField] GameObject tuningWeakpoint;
+    [SerializeField] protected float vulnerableTuning;
+    protected const float VULNERABILITY_RANGE = 0.32f;
+    protected const float VULNERABILITY_FALLOFF = 0.2f;
+
     // MISC UTILITY
     public bool canSeePlayer {
         get {
@@ -67,11 +73,32 @@ public class Enemy : StateController {
 
 
     protected virtual void Start() {
+        tuningWeakpoint.GetComponent<EnemyWeakPointGrower>().myDad = this;
         _currentHealth = maxHealth;
     }
 
     protected override void Update() {
-        base.Update();        
+        base.Update();
+
+        if (tuningWeakpoint == null) { return; }
+
+        tuningWeakpoint.GetComponent<EnemyWeakPointGrower>().SetScale(0);
+        return;
+
+        // Handle tuning weak point value
+        float vulnerability = 1f;
+
+        if (Mathf.Abs(GunValueManager.currentValue - vulnerableTuning) > VULNERABILITY_RANGE) {
+            float distanceFromVulnerableTuning = Mathf.Abs(GunValueManager.currentValue - vulnerableTuning) - (vulnerableTuning + VULNERABILITY_RANGE);
+            distanceFromVulnerableTuning = Mathf.Clamp(distanceFromVulnerableTuning, 0f, VULNERABILITY_FALLOFF);
+            vulnerability = MyMath.Map(distanceFromVulnerableTuning, 0f, VULNERABILITY_FALLOFF, 1f, 0f);
+        }
+
+        tuningWeakpoint.GetComponent<EnemyWeakPointGrower>().SetScale(vulnerability);
+    }
+
+    public void SetTuningVulnerability(float value) {
+        vulnerableTuning = value;
     }
 
     protected virtual void Die() {
