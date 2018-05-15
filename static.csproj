@@ -245,6 +245,7 @@
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\FallIntoLevelState.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\FiringShockwaveState.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\PauseAfterLevelCompleteFallingState.cs" />
+    <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\PlayerLandedOnThingTransition.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\PlayerMissedLevelTransition.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\PlayerTouchedDownTransition.cs" />
     <Compile Include="Assets\Scripts\Falling Sequence States and Transitions\State_SpeedFalling.cs" />

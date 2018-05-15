@@ -23,6 +23,13 @@ public class PauseAfterLevelCompleteFallingState : State {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
         fallingSequenceManager.SetUpFallingVariables();
+        
+        // Load next level.
+        if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
+            //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+            Services.levelManager.LoadNextLevel();
+        }
+
         Services.playerController.isMovementEnabled = true;
     }
 }

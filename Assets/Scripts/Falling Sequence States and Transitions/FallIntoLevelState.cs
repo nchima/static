@@ -13,6 +13,7 @@ public class FallIntoLevelState : State {
         Services.playerTransform.position = fallingSequenceManager.playerSpawnPoint.position;
         Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Vector3.down * 100f, ForceMode.VelocityChange);
         Services.levelManager.SetFloorCollidersActive(true);
+        fallingSequenceManager.SetUpFallingVariables();
     }
 
     public override void Run(StateController stateController) {

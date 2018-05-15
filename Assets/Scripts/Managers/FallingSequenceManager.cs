@@ -105,12 +105,6 @@ public class FallingSequenceManager : StateController {
 
         // Begin rotating player camera to face down.
         GameObject.Find("Cameras").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
-
-        // Load next level.
-        if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
-            //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-            Services.levelManager.LoadNextLevel();
-        }
     }
 
     public void BeginFalling() {

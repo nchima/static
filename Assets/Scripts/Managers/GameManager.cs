@@ -61,6 +61,12 @@ public class GameManager : MonoBehaviour {
 
         Services.fallingSequenceManager.SetUpFallingVariables();
 
+        // Load next level.
+        if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
+            //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
+            Services.levelManager.LoadNextLevel();
+        }
+
         //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
         Services.levelManager.LoadNextLevel();
 
