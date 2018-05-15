@@ -43,7 +43,6 @@ public class MusicManager : MonoBehaviour {
     private void Update() {
         if (!isInFallingSequence) { SetLayerVolumeByGunValue(); }
 
-
         if (Input.GetKeyDown(KeyCode.M)) {
             int nextDebugState = currentDebugState;
             nextDebugState++;

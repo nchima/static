@@ -151,7 +151,8 @@ public class PlayerController : MonoBehaviour {
         previousPosition = transform.position;
 
         /* HANDLE MOVEMENT */
-        if (!isMovementEnabled || state == State.Dead) { return; }
+        if (state == State.Dead) { return; }
+        if (!isMovementEnabled) return;
 
         // Get desired movement from input.
         Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
@@ -336,6 +337,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void GameOverHandler(GameEvent gameEvent) {
+        m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         state = State.Dead;
         this.enabled = false;
     }

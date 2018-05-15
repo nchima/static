@@ -115,28 +115,6 @@ public class LevelManager : MonoBehaviour {
 
         yield return new WaitForSeconds(1f);
 
-        // Move to another script & optimize later, but for now set the tuning vulnerability of each type of enemy.
-        float rando = Random.Range(-1f, 1f);
-        foreach (SimpleEnemy enemy in FindObjectsOfType<SimpleEnemy>()) {
-            enemy.SetTuningVulnerability(rando);
-        }
-        rando = Random.Range(-1f, 1f);
-        foreach (LaserEnemy enemy in FindObjectsOfType<LaserEnemy>()) {
-            enemy.SetTuningVulnerability(rando);
-        }
-        rando = Random.Range(-1f, 1f);
-        foreach (MeleeEnemy enemy in FindObjectsOfType<MeleeEnemy>()) {
-            enemy.SetTuningVulnerability(rando);
-        }
-        rando = Random.Range(-1f, 1f);
-        foreach (TankEnemy enemy in FindObjectsOfType<TankEnemy>()) {
-            enemy.SetTuningVulnerability(rando);
-        }
-        rando = Random.Range(-1f, 1f);
-        foreach (HoveringEnemy enemy in FindObjectsOfType<HoveringEnemy>()) {
-            enemy.SetTuningVulnerability(rando);
-        }
-
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         //SetEnemiesActive(false);

@@ -7,6 +7,7 @@ public class LaserEnemy : Enemy {
 
     [SerializeField] int maxTimesToDash = 3;
     public GameObject laserPrefab;
+    [SerializeField] EnemyWeakPointGrower weakpoint;
 
     [HideInInspector] public int timesDashed = 0;
     [HideInInspector] public int timesToDash;
@@ -14,6 +15,7 @@ public class LaserEnemy : Enemy {
 
 
     void Awake () {
+        weakpoint.myDad = this;
         animationController = GetComponentInChildren<LaserEnemyAnimationController>();
 	}
 

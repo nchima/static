@@ -74,17 +74,14 @@ public class InitialEntry : MonoBehaviour {
             }
 
             // If the player pressed a horizontal direction, switch active letter.
-            else if ((InputManager.movementAxis.x < -joystickDeadzone || InputManager.cancelButtonDown))
-            {
-                Debug.Log("shfie");
+            else if ((InputManager.movementAxis.x < -joystickDeadzone || InputManager.cancelButtonDown)) {
                 ActiveInitial.Active = false;
                 activeInitalIndex--;
                 if (activeInitalIndex < 0) activeInitalIndex = initials.Length - 1;
                 ActiveInitial.Active = true;
             }
 
-            else if ((InputManager.movementAxis.x > joystickDeadzone || InputManager.fireButtonDown || InputManager.submitButtonDown))
-            {
+            else if ((InputManager.movementAxis.x > joystickDeadzone || InputManager.fireButtonDown || InputManager.submitButtonDown)) {
                 ActiveInitial.Active = false;
                 activeInitalIndex++;
                 if (activeInitalIndex > initials.Length - 1) activeInitalIndex = 0;
