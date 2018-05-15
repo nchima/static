@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour {
     private Quaternion targetRotation;
 
     // STATE    
-    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling, Dashing }
+    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling, Dashing, Dead }
     public State state;
 
     // INPUT
@@ -103,7 +103,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
 
-        if (GameManager.gamePaused) { return; }
+        if (GameManager.gamePaused || state == State.Dead) { return; }
 
         /* GET DIRECTIONAL INPUT */
         if (state != State.ShotgunCharge
@@ -151,7 +151,7 @@ public class PlayerController : MonoBehaviour {
         previousPosition = transform.position;
 
         /* HANDLE MOVEMENT */
-        if (!isMovementEnabled) { return; }
+        if (!isMovementEnabled || state == State.Dead) { return; }
 
         // Get desired movement from input.
         Vector3 desiredMove = transform.forward * directionalInput.y + transform.right * directionalInput.x;
@@ -336,6 +336,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void GameOverHandler(GameEvent gameEvent) {
+        state = State.Dead;
         this.enabled = false;
     }
 
