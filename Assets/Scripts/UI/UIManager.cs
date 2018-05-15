@@ -100,6 +100,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowHighScoreScreen() {
+        pauseVeil.SetActive(true);
         gameOverScreen.gameObject.SetActive(false);
         nameEntryScreen.gameObject.SetActive(false);
         highScoreScreen.gameObject.SetActive(true);
@@ -119,6 +120,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void GameOverHandler(GameEvent gameEvent) {
+        if (highScoreScreen.activeInHierarchy) { return; }
         ShowGameOverScreen();
     }
 
