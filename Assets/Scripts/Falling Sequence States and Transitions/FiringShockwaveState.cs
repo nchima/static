@@ -33,6 +33,9 @@ public class FiringShockwaveState : State {
 
         fallingSequenceManager.fallingSequenceTimer = 0f;
 
+        fallingSequenceManager.timesMissedLevel = 0;
+        Services.uiManager.landOnLevelScreen.SetActive(false);
+
         fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, Services.gun.burstsPerSecondSloMoModifierMax);
     }
 

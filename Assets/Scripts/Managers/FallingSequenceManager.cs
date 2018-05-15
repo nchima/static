@@ -37,6 +37,8 @@ public class FallingSequenceManager : StateController {
     float speedFallGravityMultipier = 10f;
     [HideInInspector] public bool isSpeedFallActive = false;
 
+    [HideInInspector] public int timesMissedLevel = 0;
+
     [HideInInspector] public float normalPlayerBounciness;
 
     public GameObject shockwavePrefab;
@@ -59,6 +61,9 @@ public class FallingSequenceManager : StateController {
 
     protected override void Update() {
         base.Update();
+        if (timesMissedLevel > 2) {
+            Services.uiManager.landOnLevelScreen.SetActive(true);
+        }
     }
 
     public void InstantiateShockwave(GameObject prefab, float gunRate) {

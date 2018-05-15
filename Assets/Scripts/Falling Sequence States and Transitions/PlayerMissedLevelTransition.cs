@@ -14,6 +14,8 @@ public class PlayerMissedLevelTransition : Transition {
             //}
             //Services.fallingSequenceManager.BeginFalling();
 
+            FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
+            fallingSequenceManager.timesMissedLevel++;
             return true;
         }
         else {
