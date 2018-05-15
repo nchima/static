@@ -124,20 +124,20 @@ public class PlayerController : MonoBehaviour {
         if (state == State.Normal) {
             dashCooldownTimer += Time.deltaTime;
             if (dashCooldownTimer >= dashCooldown) {
-                if (InputManager.dashButtonUp && !superDashCharging) {
+                if (InputManager.dashButtonDown && !superDashCharging) {
                     BeginDash(false);
                 }
-                else if (InputManager.dashButton && !superDashCharging) {
-                    superDashHoldTimer += Time.deltaTime;
-                    if (superDashHoldTimer > superDashHoldDuration /*&& Services.specialBarManager.bothBarsFull*/) {
-                        FindObjectOfType<ShotgunCharge>().BeginSequence();
-                        superDashCharging = true;
-                        //BeginDash(true);
-                    }
-                }
-                else {
-                    superDashHoldTimer = 0f;
-                }
+                //else if (InputManager.dashButton && !superDashCharging) {
+                //    superDashHoldTimer += Time.deltaTime;
+                //    if (superDashHoldTimer > superDashHoldDuration /*&& Services.specialBarManager.bothBarsFull*/) {
+                //        FindObjectOfType<ShotgunCharge>().BeginSequence();
+                //        superDashCharging = true;
+                //        //BeginDash(true);
+                //    }
+                //}
+                //else {
+                //    superDashHoldTimer = 0f;
+                //}
             }
         }
 
