@@ -103,6 +103,7 @@ public class MusicManager : MonoBehaviour {
         //float highpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 10f, 11000f);
         //masterMixer.SetFloat("Highpass Cutoff Freq", highpassCutoffFreq);
 
+        if (Services.fallingSequenceManager.isSpeedFallActive) { return; }
         float pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.98f, 1.02f);
         musicAudioSource.pitch = pitch;
     }
@@ -160,7 +161,6 @@ public class MusicManager : MonoBehaviour {
 
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        EnterFallingSequence();
     }
 
 

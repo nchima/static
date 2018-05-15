@@ -42,7 +42,6 @@ public class FallIntoLevelState : State {
         Services.playerController.state = PlayerController.State.SpeedFalling;
         fallingSequenceManager.isSpeedFallActive = true;
         Services.healthManager.forceInvincibility = true;
-
         Services.musicManager.EnterSpeedFall();
     }
 }
