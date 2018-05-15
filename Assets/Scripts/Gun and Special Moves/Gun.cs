@@ -161,7 +161,7 @@ public class Gun : MonoBehaviour {
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
 
         // Handle audio.
-        rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
+        //rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
         rifleAudioSource.pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.2f, 1f);
         rifleAudioSource.volume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.2f, 1f);
 
