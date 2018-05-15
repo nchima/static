@@ -186,7 +186,7 @@ public class PlayerController : MonoBehaviour {
             walkForce.y = 0f;
             m_Rigidbody.AddForce(walkForce, ForceMode.Acceleration);
 
-            // Apply movment kick.
+            // Apply movement kick.
             CheckMovementKick();
             if (directionalInput != Vector2.zero && movementKickReady) {
                 lastKickDirection = directionalInput;

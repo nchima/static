@@ -78,7 +78,7 @@ public class FallingSequenceManager : StateController {
 
     public void SetUpFallingVariables() {
         // In case the game is currently running in slow motion, return to full speed.
-        Services.gameManager.ReturnToFullSpeed();
+        if (Time.timeScale != 1f) { Services.gameManager.ReturnToFullSpeed(); }
 
         // If the player is not currently set to falling state, set them to that state.
         if (Services.playerController.state != PlayerController.State.SpeedFalling) {
