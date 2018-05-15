@@ -85,7 +85,7 @@ public class LevelManager : MonoBehaviour {
 
 
     public void LoadNextLevel() {
-        if (levelsCompleted == 20) {
+        if (levelsCompleted >= 12) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
             Services.uiManager.ShowEndOfDemoScreen();
             return;

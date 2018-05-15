@@ -46,7 +46,7 @@ public class SpecialBarManager : MonoBehaviour {
         rightBar.Run(this);
 
         if (bothBarsFull && !screenHidden) {
-            specialMoveReadyScreen.SetActive(true);
+            if (Services.playerController.state != PlayerController.State.Dead) { specialMoveReadyScreen.SetActive(true); }
             FlashBar();
         }
 
