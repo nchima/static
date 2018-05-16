@@ -26,9 +26,11 @@ namespace GameEvents {
     public class PlayerKilledEnemy : GameEvent {
         public int scoreValue;
         public float specialValue;
-        public PlayerKilledEnemy(int scoreValue, float specialValue) {
+        public Enemy enemyKilled;
+        public PlayerKilledEnemy(int scoreValue, float specialValue, Enemy enemyKilled) {
             this.scoreValue = scoreValue;
             this.specialValue = specialValue;
+            this.enemyKilled = enemyKilled;
         }
     }
 

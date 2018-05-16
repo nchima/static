@@ -8,7 +8,6 @@ using DG.Tweening;
 
 public class ScoreManager : MonoBehaviour
 {
-
     // USED FOR DISPLAYING THE SCORE
     [SerializeField] private int _score = 0;
     public int score
@@ -145,6 +144,8 @@ public class ScoreManager : MonoBehaviour
         // Round the score to an integer and update the score display.
         score += playerKilledEnemyEvent.scoreValue;
 
+        Services.scorePopupManager.CreateEnemyPopup(playerKilledEnemyEvent.enemyKilled.transform.position, playerKilledEnemyEvent.scoreValue);
+
         // If value of the multiplier bar has gotten to 1, raise the player's multiplier and set the multiplier bar values for the new multiplier level.
         //if (multBarValueCurr >= 1f)
         //{
@@ -184,8 +185,7 @@ public class ScoreManager : MonoBehaviour
     /// <summary>
     /// Should be called when a bullet hits an enemy.
     /// </summary>
-    public void BulletHitEnemy()
-    {
+    public void BulletHitEnemy() {
         score += 1;
     }
 

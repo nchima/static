@@ -22,4 +22,5 @@ public class Services {
     public static GenerateNoise noiseGenerator;
     public static FlashManager flashManager;
     public static BatchBillboard billboardManager;
+    public static ScorePopupManager scorePopupManager;
 }

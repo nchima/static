@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour {
         Services.noiseGenerator = GetComponent<GenerateNoise>();
         Services.flashManager = GetComponentInChildren<FlashManager>();
         Services.billboardManager = FindObjectOfType<BatchBillboard>();
+        Services.scorePopupManager = GetComponentInChildren<ScorePopupManager>();
 
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);

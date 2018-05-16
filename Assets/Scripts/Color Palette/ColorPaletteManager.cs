@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using DG.Tweening;
 
 public class ColorPaletteManager : MonoBehaviour {
+
+    [SerializeField] bool useRandomPalettes;
 
     // Environment materials.
     [SerializeField] Material wallMaterial;
@@ -24,6 +27,8 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] ColorPalette tempSavedPalette;
     [SerializeField] ColorPalette playerVulnerablePalette;
     [SerializeField] ColorPalette fallingSequencePalette;
+
+    ColorPalette[] levelPalettes;
  
     private void Awake() {
         // Memorize original colors.
@@ -34,6 +39,18 @@ public class ColorPaletteManager : MonoBehaviour {
 
     private void Start() {
         SaveCurrentPalette(savedPalette);
+
+        levelPalettes = new ColorPalette[Resources.LoadAll<ColorPalette>("Level Color Palettes").Length];
+        for (int i = 1; i < levelPalettes.Length; i++) {
+            string levelNumber = (i + 1).ToString();
+            levelPalettes[i] = Resources.Load<ColorPalette>("Level Color Palettes/Color Palette Level " + levelNumber);
+        }
+    }
+
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.Alpha5)) {
+            SaveCurrentPaletteAsNewAsset();
+        }
     }
 
     void ChangePalette(ColorPalette newPalette, float duration) {
@@ -131,11 +148,26 @@ public class ColorPaletteManager : MonoBehaviour {
         ChangePalette(savedPalette, 0.78f);
     }
 
+    void SaveCurrentPaletteAsNewAsset() {
+        ColorPalette paletteToSave = new ColorPalette();
+        SaveCurrentPalette(paletteToSave);
+        AssetDatabase.CreateAsset(paletteToSave, "Assets/Resources/Level Color Palettes/Color Palette Level X.asset");
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = paletteToSave;
+    }
+
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         LoadVulnerablePalette();
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        ChangeToRandomPalette(0.1f);
+        if (useRandomPalettes || levelPalettes.Length < Services.levelManager.levelsCompleted) {
+            Debug.Log("using random palette for next level.");
+            ChangeToRandomPalette(0.1f);
+        }
+        else { ChangePalette(levelPalettes[Services.levelManager.levelsCompleted - 1], 0.1f); }
     }
 }
