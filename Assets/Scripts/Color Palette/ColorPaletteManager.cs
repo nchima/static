@@ -146,7 +146,7 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void RestoreSavedPalette() {
-        ChangePalette(savedPalette, 0.78f);
+        ChangePalette(levelPalettes[levelPaletteIndex], 0.78f);
     }
 
     void SaveCurrentPaletteAsNewAsset() {
