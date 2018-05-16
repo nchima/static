@@ -64,8 +64,8 @@ public class PlayerController : MonoBehaviour {
             float colliderRadius = GetComponent<CapsuleCollider>().radius;
 
             // If we didn't find anything, return false.
-            if (!Physics.Raycast(transform.position + transform.forward * colliderRadius, Vector3.down, out hit1, 10f, (1 << 20 | 1 << 24))) { return false; }
-            if (!Physics.Raycast(transform.position + transform.forward * -colliderRadius, Vector3.down, out hit2, 10f, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(transform.position + transform.forward * colliderRadius, Vector3.down, out hit1, 20f, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(transform.position + transform.forward * -colliderRadius, Vector3.down, out hit2, 20f, (1 << 20 | 1 << 24))) { return false; }
 
             // If both things hit something and it was the floor, we're all good baby!
             if (hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) {
