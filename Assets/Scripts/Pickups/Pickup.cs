@@ -66,14 +66,14 @@ public class Pickup : MonoBehaviour {
         Destroy(gameObject);
     }
 
-    public void BeginMovingTowardsPlayer() {
+    public virtual void BeginMovingTowardsPlayer() {
         //GetComponent<Rigidbody>().AddForce(directionToPlayer * kickForce, ForceMode.Impulse);
         //foreach(Renderer renderer in flashingRenderers) { renderer.gameObject.layer = LayerMask.NameToLayer("Enemy Sheathe"); }
         foreach(Transform trail in pickupTrails) {
             trail.gameObject.SetActive(true);
             if (trail.GetComponent<PickupTrail>() != null) { trail.GetComponent<PickupTrail>().BeginMovingTowardsPlayer(); }
-            Destroy(gameObject);
         }
+        Destroy(gameObject);
         state = State.MoveToPlayer;
     }
 

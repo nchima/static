@@ -16,8 +16,10 @@ public class PointPickup : Pickup {
         CircleDrawer.Draw(circleRenderer, radius, radius, 20, 0.2f);
     }
 
-    protected override void GetAbsorbed() {
-        base.GetAbsorbed();
+    public override void BeginMovingTowardsPlayer() {
+        Services.scoreManager.IncreaseMultiplier();
+        Services.scorePopupManager.CreatePositionalPopup(transform.position, pointValue);
         Services.scoreManager.score += pointValue;
+        base.BeginMovingTowardsPlayer();
     }
 }

@@ -21,6 +21,7 @@ public class ScoreManager : MonoBehaviour
         {
             int inputValue = value - _score;
             inputValue = Mathf.RoundToInt(inputValue * multiplier);
+            Debug.Log("adding: " + inputValue);
             _score += inputValue;
             scoreDisplay.text = _score.ToString();
         }
@@ -30,7 +31,7 @@ public class ScoreManager : MonoBehaviour
 
     [SerializeField] private TextMesh multNumber; // The TextMesh which displays the player's current multiplier.
     float _multiplier = 1f;  // The multiplier that the player starts the game with.
-    float multiplier
+    public float multiplier
     {
         get { return _multiplier; }
         set
@@ -41,6 +42,9 @@ public class ScoreManager : MonoBehaviour
             _multiplier = value;
         }
     }
+    [SerializeField] float multiplierIncreaseValue = 0.1f;
+    [SerializeField] float comboTimer = 0f;
+    [SerializeField] float comboTime = 1f;
 
     // HIGH SCORE LIST
     [SerializeField] public List<ScoreEntry> highScoreEntries;
@@ -68,6 +72,7 @@ public class ScoreManager : MonoBehaviour
     private void Awake() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
 
@@ -107,6 +112,11 @@ public class ScoreManager : MonoBehaviour
         //else if (specialBar.transform.localScale.y > 0.5f) multiplier = 2;
         //else multiplier = 1;
 
+        comboTimer -= Time.deltaTime;
+        if (comboTimer <= 0f) {
+            multiplier = 1f;
+        }
+
         if (bonusTimerIsRunning)
         {
             bonusTimer += Time.deltaTime;
@@ -144,16 +154,15 @@ public class ScoreManager : MonoBehaviour
         // Round the score to an integer and update the score display.
         score += playerKilledEnemyEvent.scoreValue;
 
-        Services.scorePopupManager.CreateEnemyPopup(playerKilledEnemyEvent.enemyKilled.transform.position, playerKilledEnemyEvent.scoreValue);
+        Services.scorePopupManager.CreatePositionalPopup(playerKilledEnemyEvent.enemyKilled.transform.position, playerKilledEnemyEvent.scoreValue);
 
-        // If value of the multiplier bar has gotten to 1, raise the player's multiplier and set the multiplier bar values for the new multiplier level.
-        //if (multBarValueCurr >= 1f)
-        //{
-        //    multiplier += 0.1f;
-        //    multBarStartValCurr = multBarStartVal / multiplier;
-        //    multBarValueCurr = multBarStartValCurr;
-        //    multBarDecayCurr = multBarBaseDecay * multiplier;
-        //}
+        IncreaseMultiplier();
+    }
+
+
+    public void IncreaseMultiplier() {
+        multiplier += multiplierIncreaseValue;
+        comboTimer = comboTime;
     }
 
 
@@ -163,6 +172,12 @@ public class ScoreManager : MonoBehaviour
         bonusTimerIsRunning = false;
 
         ShowLevelCompleteScreen();
+    }
+
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        multiplier = 1f;
+        comboTimer = 0f;
     }
 
 

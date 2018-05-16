@@ -29,6 +29,7 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] ColorPalette fallingSequencePalette;
 
     ColorPalette[] levelPalettes;
+    int levelPaletteIndex = 0;
  
     private void Awake() {
         // Memorize original colors.
@@ -164,10 +165,12 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        if (useRandomPalettes || levelPalettes.Length < Services.levelManager.levelsCompleted) {
+        levelPaletteIndex++;
+
+        if (useRandomPalettes || levelPaletteIndex >= levelPalettes.Length) {
             Debug.Log("using random palette for next level.");
             ChangeToRandomPalette(0.1f);
         }
-        else { ChangePalette(levelPalettes[Services.levelManager.levelsCompleted - 1], 0.1f); }
+        else { ChangePalette(levelPalettes[levelPaletteIndex], 0.1f); }
     }
 }

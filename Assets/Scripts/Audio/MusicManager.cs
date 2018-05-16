@@ -29,6 +29,7 @@ public class MusicManager : MonoBehaviour {
 
     private void Awake() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -90,12 +91,12 @@ public class MusicManager : MonoBehaviour {
 
 
     void SetLayerVolumeByGunValue() {
-        float layerABVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, ABVolumeRange.min, ABVolumeRange.max);
-        musicMasterMixer.SetFloat("Layer A Volume", layerABVolume);
-        musicMasterMixer.SetFloat("Layer B Volume", layerABVolume);
+        //float layerABVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, ABVolumeRange.min, ABVolumeRange.max);
+        //musicMasterMixer.SetFloat("Layer A Volume", layerABVolume);
+        //musicMasterMixer.SetFloat("Layer B Volume", layerABVolume);
 
-        float rhythmVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, rhythmVolumeRange.max, rhythmVolumeRange.min);
-        musicMasterMixer.SetFloat("Rhythm Volume", rhythmVolume);
+        //float rhythmVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, rhythmVolumeRange.max, rhythmVolumeRange.min);
+        //musicMasterMixer.SetFloat("Rhythm Volume", rhythmVolume);
 
         float lowpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 1000f, 9000f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", lowpassCutoffFreq);
@@ -161,6 +162,13 @@ public class MusicManager : MonoBehaviour {
 
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
+    }
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        musicMasterMixer.SetFloat("Layer A Volume", -80f);
+        musicMasterMixer.SetFloat("Layer B Volume", -80f);
+        musicMasterMixer.SetFloat("Rhythm Volume", -80f);
+        musicAudioSource.Play();
     }
 
 

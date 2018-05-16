@@ -113,7 +113,7 @@ public class LevelManager : MonoBehaviour {
         // Scale level according to, you know, whatever I guess
         //levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
 
-        //yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
 
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
