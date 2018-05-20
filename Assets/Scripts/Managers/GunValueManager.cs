@@ -13,9 +13,9 @@ public class GunValueManager : MonoBehaviour {
     void Update() {
 
         // Change current gun value based on mouse Y movement.
-        float inputMod = 0.1f;
-        if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -0.17f; }
-        currentValue += InputManager.gunTuningValue * inputMod;
+        float inputMod = 2f;
+        if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -2f; }
+        currentValue += InputManager.gunTuningValue * inputMod * (Time.deltaTime);
         currentValue = Mathf.Clamp(currentValue, -1f, 1f);
 
         // Handle wiper

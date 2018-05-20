@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
+//using UnityEditor;
 using DG.Tweening;
 
 public class ColorPaletteManager : MonoBehaviour {
@@ -34,8 +34,16 @@ public class ColorPaletteManager : MonoBehaviour {
     private void Awake() {
         // Memorize original colors.
         ChangePaletteImmediate(defaultPalette);
+    }
+
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     private void Start() {
@@ -146,18 +154,19 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void RestoreSavedPalette() {
-        ChangePalette(levelPalettes[levelPaletteIndex], 0.78f);
+        if (levelPaletteIndex == 0) { ChangePalette(defaultPalette, 0.78f); } 
+        else { ChangePalette(levelPalettes[levelPaletteIndex], 0.78f); }
     }
 
     void SaveCurrentPaletteAsNewAsset() {
         ColorPalette paletteToSave = new ColorPalette();
         SaveCurrentPalette(paletteToSave);
-        AssetDatabase.CreateAsset(paletteToSave, "Assets/Resources/Level Color Palettes/Color Palette Level X.asset");
+        //AssetDatabase.CreateAsset(paletteToSave, "Assets/Resources/Level Color Palettes/Color Palette Level X.asset");
 
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        EditorUtility.FocusProjectWindow();
-        Selection.activeObject = paletteToSave;
+        //AssetDatabase.SaveAssets();
+        //AssetDatabase.Refresh();
+        //EditorUtility.FocusProjectWindow();
+        //Selection.activeObject = paletteToSave;
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {

@@ -54,7 +54,9 @@ public class FallingSequenceManager : StateController {
             FindObjectOfType<PlayerController>().
             GetComponent<CapsuleCollider>().
             material.bounciness;
+    }
 
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
@@ -126,5 +128,10 @@ public class FallingSequenceManager : StateController {
 
     public void GameStartedHandler(GameEvent gameEvent) {
         BeginFalling();
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 }

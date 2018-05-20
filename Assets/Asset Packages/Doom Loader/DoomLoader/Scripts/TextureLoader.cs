@@ -9,7 +9,7 @@ public class TextureLoader : MonoBehaviour
     public static TextureLoader Instance;
     public Texture illegal;
 
-    void Awake()
+    public void Initialize()
     {
         Instance = this;
         

@@ -10,7 +10,14 @@ public class ScreenShakeManager : MonoBehaviour {
 
     private void Awake() {
         screenShakeScripts = FindObjectsOfType<ScreenShake>();
+    }
+
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     public void IncreaseShake(float value) {

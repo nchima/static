@@ -30,8 +30,12 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
-    public void Awake() {
+    public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
 

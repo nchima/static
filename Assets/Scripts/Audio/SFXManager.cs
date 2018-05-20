@@ -8,8 +8,12 @@ public class SFXManager : MonoBehaviour {
     [SerializeField] AudioSource bulletHitWeakPointAudioSource;
     [SerializeField] AudioSource playerWasHurtAudioSource;
 
-    private void Start() {
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     public void PlayBulletEnemyHitSoundOld(EnemyOld hitEnemy) {

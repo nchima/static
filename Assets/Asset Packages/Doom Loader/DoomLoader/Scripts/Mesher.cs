@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEditor;
 
 public class Mesher : MonoBehaviour {
     [SerializeField] GameObject wallPrefab;
@@ -12,11 +13,11 @@ public class Mesher : MonoBehaviour {
     GameObject wallParent;
     GameObject floorParent;
 
-    void Awake() {
+    public void Initialize() {
         Instance = this;
     }
 
-    public void CreateMeshes() {
+    public void CreateMeshes(string mapName) {
         // Create game objects to hold static level.
         level = new GameObject("Level");
         railingParent = new GameObject("Railings");
@@ -26,8 +27,8 @@ public class Mesher : MonoBehaviour {
         floorParent = new GameObject("Floor Planes");
         floorParent.transform.parent = level.transform;
 
-        Transform holder = new GameObject("MapMeshes").transform;
-        holder.transform.SetParent(transform);
+        //Transform holder = new GameObject("MapMeshes").transform;
+        //holder.transform.SetParent(transform);
 
         //sectors
         {
@@ -39,21 +40,21 @@ public class Mesher : MonoBehaviour {
 
                 //floor
                 {
-                    GameObject sectorObject = new GameObject("Sector_" + index + "_floor");
-                    sectorObject.transform.SetParent(holder);
-                    MeshRenderer mr = sectorObject.AddComponent<MeshRenderer>();
-                    MeshFilter meshFilter = sectorObject.AddComponent<MeshFilter>();
+                    //GameObject sectorObject = new GameObject("Sector_" + index + "_floor");
+                    //sectorObject.transform.SetParent(holder);
+                    //MeshRenderer mr = sectorObject.AddComponent<MeshRenderer>();
+                    //MeshFilter meshFilter = sectorObject.AddComponent<MeshFilter>();
                     Mesh mesh = new Mesh();
-                    meshFilter.mesh = mesh;
+                    //meshFilter.mesh = mesh;
 
-                    if (!MaterialManager.Instance.OverridesFlat(s.floorTexture, sectorObject, mr))
-                        mr.material = MaterialManager.Instance.defaultMaterial;
+                    //if (!MaterialManager.Instance.OverridesFlat(s.floorTexture, sectorObject, mr))
+                    //    mr.material = MaterialManager.Instance.defaultMaterial;
 
-                    if (mr.material.mainTexture == null) {
-                        MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
-                        materialProperties.SetTexture("_MainTex", TextureLoader.Instance.GetFlatTexture(s.floorTexture));
-                        mr.SetPropertyBlock(materialProperties);
-                    }
+                    //if (mr.material.mainTexture == null) {
+                    //    MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
+                    //    materialProperties.SetTexture("_MainTex", TextureLoader.Instance.GetFlatTexture(s.floorTexture));
+                    //    mr.SetPropertyBlock(materialProperties);
+                    //}
 
                     mesh.name = "Sector_" + index + "_floor_mesh";
 
@@ -83,17 +84,18 @@ public class Mesher : MonoBehaviour {
 
                     mesh.RecalculateBounds();
 
-                    MeshCollider mc = sectorObject.AddComponent<MeshCollider>();
-                    mc.sharedMesh = mesh;
+                    //MeshCollider mc = sectorObject.AddComponent<MeshCollider>();
+                    //mc.sharedMesh = mesh;
 
-                    SectorController controller = sectorObject.AddComponent<SectorController>();
-                    s.floorObject = sectorObject;
-                    controller.sector = s;
-                    controller.Init();
+                    //SectorController controller = sectorObject.AddComponent<SectorController>();
+                    //s.floorObject = sectorObject;
+                    //controller.sector = s;
+                    //controller.Init();
 
                     // Save the floor mesh
                     if (vertices.Length > 0 && s.floorHeight <= 0f) {
-                        GameObject floorObject = Instantiate(floorPrefab, floorParent.transform);
+                        GameObject floorObject = PrefabUtility.InstantiatePrefab(floorPrefab as GameObject) as GameObject;
+                        floorObject.transform.parent = floorParent.transform;
                         floorObject.transform.position = Vector3.zero;
                         floorObject.transform.localScale = Vector3.one;
                         floorObject.GetComponent<MeshFilter>().mesh = mesh;
@@ -101,65 +103,65 @@ public class Mesher : MonoBehaviour {
                         floorObject.transform.GetChild(0).GetComponent<MeshFilter>().mesh = mesh;
                         MeshCollider newMeshCollider = floorObject.AddComponent<MeshCollider>();
                         newMeshCollider.sharedMesh = mesh;
-                        Destroy(floorObject.GetComponent<BoxCollider>());
-                        SaveMesh(mesh, "newMesh", false, false);
+                        DestroyImmediate(floorObject.GetComponent<BoxCollider>());
+                        SaveMesh(mesh, mapName + " Floor " + index, false, false);
                     }
                 }
 
                 //ceiling
-                Triangulator.vertices.Reverse();
-                {
-                    GameObject sectorObject = new GameObject("Sector_" + index + "_ceiling");
-                    sectorObject.transform.SetParent(holder);
-                    MeshRenderer mr = sectorObject.AddComponent<MeshRenderer>();
-                    MeshFilter meshFilter = sectorObject.AddComponent<MeshFilter>();
-                    Mesh mesh = new Mesh();
-                    meshFilter.mesh = mesh;
-                    mesh.name = "Sector_" + index + "_ceiling_mesh";
+                //Triangulator.vertices.Reverse();
+                //{
+                //    GameObject sectorObject = new GameObject("Sector_" + index + "_ceiling");
+                //    sectorObject.transform.SetParent(holder);
+                //    //MeshRenderer mr = sectorObject.AddComponent<MeshRenderer>();
+                //    MeshFilter meshFilter = sectorObject.AddComponent<MeshFilter>();
+                //    Mesh mesh = new Mesh();
+                //    meshFilter.mesh = mesh;
+                //    mesh.name = "Sector_" + index + "_ceiling_mesh";
 
-                    if (!MaterialManager.Instance.OverridesFlat(s.ceilingTexture, sectorObject, mr))
-                        mr.material = MaterialManager.Instance.defaultMaterial;
+                    //if (!MaterialManager.Instance.OverridesFlat(s.ceilingTexture, sectorObject, mr))
+                    //    mr.material = MaterialManager.Instance.defaultMaterial;
 
-                    if (mr.material.mainTexture == null) {
-                        MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
-                        materialProperties.SetTexture("_MainTex", TextureLoader.Instance.GetFlatTexture(s.ceilingTexture));
-                        mr.SetPropertyBlock(materialProperties);
-                    }
+                    //if (mr.material.mainTexture == null) {
+                    //    MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
+                    //    materialProperties.SetTexture("_MainTex", TextureLoader.Instance.GetFlatTexture(s.ceilingTexture));
+                    //    mr.SetPropertyBlock(materialProperties);
+                    //}
 
-                    int vc = Triangulator.vertices.Count;
+                //    int vc = Triangulator.vertices.Count;
 
-                    Vector3[] vertices = new Vector3[vc];
-                    Vector3[] normals = new Vector3[vc];
-                    Vector2[] uvs = new Vector2[vc];
-                    Color[] colors = new Color[vc];
-                    int[] indices = new int[vc];
+                //    Vector3[] vertices = new Vector3[vc];
+                //    Vector3[] normals = new Vector3[vc];
+                //    Vector2[] uvs = new Vector2[vc];
+                //    Color[] colors = new Color[vc];
+                //    int[] indices = new int[vc];
 
-                    int v = 0;
-                    foreach (Vector2D p in Triangulator.vertices) {
-                        vertices[v] = new Vector3(p.x, s.ceilingHeight, p.y);
-                        indices[v] = v;
-                        normals[v] = -Vector3.up;
-                        uvs[v] = new Vector2(p.x / MapLoader.flatUVdividor, p.y / MapLoader.flatUVdividor);
-                        colors[v] = Color.white * s.brightness;
-                        v++;
-                    }
+                //    int v = 0;
+                //    foreach (Vector2D p in Triangulator.vertices) {
+                //        vertices[v] = new Vector3(p.x, s.ceilingHeight, p.y);
+                //        indices[v] = v;
+                //        normals[v] = -Vector3.up;
+                //        uvs[v] = new Vector2(p.x / MapLoader.flatUVdividor, p.y / MapLoader.flatUVdividor);
+                //        colors[v] = Color.white * s.brightness;
+                //        v++;
+                //    }
 
-                    mesh.vertices = vertices;
-                    mesh.triangles = indices;
-                    mesh.normals = normals;
-                    mesh.uv = uvs;
-                    mesh.colors = colors;
+                //    mesh.vertices = vertices;
+                //    mesh.triangles = indices;
+                //    mesh.normals = normals;
+                //    mesh.uv = uvs;
+                //    mesh.colors = colors;
 
-                    mesh.RecalculateBounds();
+                //    mesh.RecalculateBounds();
 
-                    MeshCollider mc = sectorObject.AddComponent<MeshCollider>();
-                    mc.sharedMesh = mesh;
+                //    MeshCollider mc = sectorObject.AddComponent<MeshCollider>();
+                //    mc.sharedMesh = mesh;
 
-                    SectorController controller = sectorObject.AddComponent<SectorController>();
-                    s.ceilingObject = sectorObject;
-                    controller.sector = s;
-                    controller.Init();
-                }
+                //    SectorController controller = sectorObject.AddComponent<SectorController>();
+                //    s.ceilingObject = sectorObject;
+                //    controller.sector = s;
+                //    controller.Init();
+                //}
 
                 index++;
             }
@@ -184,8 +186,8 @@ public class Mesher : MonoBehaviour {
                                 false,
                                 l.Front.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_top_front",
-                                holder
+                                "Wall_" + index + "_top_front"
+                                //holder
                             );
 
                     //top part (back)
@@ -202,8 +204,8 @@ public class Mesher : MonoBehaviour {
                                 true,
                                 l.Back.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_top_back",
-                                holder
+                                "Wall_" + index + "_top_back"
+                                //holder
                             );
 
                     //bottom part (front)
@@ -220,8 +222,8 @@ public class Mesher : MonoBehaviour {
                                 false,
                                 l.Front.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_bot_front",
-                                holder
+                                "Wall_" + index + "_bot_front"
+                                //holder
                             );
 
                     //bottom part (back)
@@ -238,8 +240,8 @@ public class Mesher : MonoBehaviour {
                                 true,
                                 l.Back.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_bot_back",
-                                holder
+                                "Wall_" + index + "_bot_back"
+                                //holder
                             );
 
                     //middle (front)
@@ -256,8 +258,8 @@ public class Mesher : MonoBehaviour {
                                 false,
                                 l.Front.Sector.brightness,
                                 false,
-                                "Wall_" + index + "_mid_front",
-                                holder
+                                "Wall_" + index + "_mid_front"
+                                //holder
                             );
 
                     //middle (back)
@@ -274,8 +276,8 @@ public class Mesher : MonoBehaviour {
                                 true,
                                 l.Back.Sector.brightness,
                                 false,
-                                "Wall_" + index + "_mid_back",
-                                holder
+                                "Wall_" + index + "_mid_back"
+                                //holder
                             );
 
                     if ((l.flags & (1 << 0)) != 0)
@@ -284,8 +286,8 @@ public class Mesher : MonoBehaviour {
                                 l,
                                 Mathf.Max(l.Front.Sector.floorHeight, l.Back.Sector.floorHeight),
                                 Mathf.Min(l.Front.Sector.ceilingHeight, l.Back.Sector.ceilingHeight),
-                                "Wall_" + index + "_blocker",
-                                holder
+                                "Wall_" + index + "_blocker"
+                                //holder
                             );
 
                 } else //solid wall
@@ -301,8 +303,8 @@ public class Mesher : MonoBehaviour {
                             false,
                             l.Front.Sector.brightness,
                             true,
-                            "Wall_" + index,
-                            holder
+                            "Wall_" + index
+                            //holder
                         );
 
                 index++;
@@ -310,7 +312,7 @@ public class Mesher : MonoBehaviour {
         }
     }
 
-    public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname, Transform holder) {
+    public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname /*Transform holder*/) {
         if (max - min <= 0)
             return null;
 
@@ -320,30 +322,30 @@ public class Mesher : MonoBehaviour {
         if (tex == "-")
             tex = "DOORTRAK";
 
-        GameObject wallObject = new GameObject(objname);
-        s.gameObject = wallObject;
-        wallObject.transform.SetParent(holder);
-        MeshRenderer mr = wallObject.AddComponent<MeshRenderer>();
-        MeshFilter meshFilter = wallObject.AddComponent<MeshFilter>();
+        //GameObject wallObject = new GameObject(objname);
+        //s.gameObject = wallObject;
+        //wallObject.transform.SetParent(holder);
+        //MeshRenderer mr = wallObject.AddComponent<MeshRenderer>();
+        //MeshFilter meshFilter = wallObject.AddComponent<MeshFilter>();
         Mesh mesh = new Mesh();
-        meshFilter.mesh = mesh;
+        //meshFilter.mesh = mesh;
         mesh.name = objname + "_mesh";
-        Texture mainTexture = null;
+        //Texture mainTexture = null;
 
-        if (!MaterialManager.Instance.OverridesWall(tex, wallObject, mr))
-            if (TextureLoader.NeedsAlphacut.ContainsKey(tex))
-                mr.material = MaterialManager.Instance.alphacutMaterial;
-            else
-                mr.material = MaterialManager.Instance.defaultMaterial;
+        //if (!MaterialManager.Instance.OverridesWall(tex, wallObject, mr))
+        //    if (TextureLoader.NeedsAlphacut.ContainsKey(tex))
+        //        mr.material = MaterialManager.Instance.alphacutMaterial;
+        //    else
+        //        mr.material = MaterialManager.Instance.defaultMaterial;
 
-        if (mr.material.mainTexture == null) {
-            mainTexture = TextureLoader.Instance.GetWallTexture(tex);
+        //if (mr.material.mainTexture == null) {
+        //    mainTexture = TextureLoader.Instance.GetWallTexture(tex);
 
-            MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
-            materialProperties.SetTexture("_MainTex", mainTexture);
-            mr.SetPropertyBlock(materialProperties);
-        } else
-            mainTexture = mr.material.mainTexture;
+        //    MaterialPropertyBlock materialProperties = new MaterialPropertyBlock();
+        //    materialProperties.SetTexture("_MainTex", mainTexture);
+        //    mr.SetPropertyBlock(materialProperties);
+        //} else
+        //    mainTexture = mr.material.mainTexture;
 
 
         int vc = 4;
@@ -359,52 +361,52 @@ public class Mesher : MonoBehaviour {
         vertices[2] = new Vector3(s.Line.start.Position.x, max, s.Line.start.Position.y);
         vertices[3] = new Vector3(s.Line.end.Position.x, max, s.Line.end.Position.y);
 
-        if (mainTexture != null) {
-            float length = (s.Line.start.Position - s.Line.end.Position).GetLength();
-            float height = max - min;
-            float u = length / ((float)mainTexture.width / MapLoader.sizeDividor);
-            float v = height / ((float)mainTexture.height / MapLoader.sizeDividor);
-            float ox = (float)offsetX / (float)mainTexture.width;
-            float oy = (float)offsetY / (float)mainTexture.height;
+        //if (mainTexture != null) {
+        //    float length = (s.Line.start.Position - s.Line.end.Position).GetLength();
+        //    float height = max - min;
+        //    float u = length / ((float)mainTexture.width / MapLoader.sizeDividor);
+        //    float v = height / ((float)mainTexture.height / MapLoader.sizeDividor);
+        //    float ox = (float)offsetX / (float)mainTexture.width;
+        //    float oy = (float)offsetY / (float)mainTexture.height;
 
-            if (peg == 2) {
-                float sheight = s.Sector.ceilingHeight - s.Sector.floorHeight;
-                float sv = sheight / ((float)mainTexture.height / MapLoader.sizeDividor);
+        //    if (peg == 2) {
+        //        float sheight = s.Sector.ceilingHeight - s.Sector.floorHeight;
+        //        float sv = sheight / ((float)mainTexture.height / MapLoader.sizeDividor);
 
-                uvs[0] = new Vector2(ox, 1 - sv);
-                uvs[1] = new Vector2(u + ox, 1 - sv);
-                uvs[2] = new Vector2(ox, 1 - sv + v);
-                uvs[3] = new Vector2(u + ox, 1 - sv + v);
-            } else if (peg == 1) {
-                uvs[0] = new Vector2(ox, oy);
-                uvs[1] = new Vector2(u + ox, oy);
-                uvs[2] = new Vector2(ox, v + oy);
-                uvs[3] = new Vector2(u + ox, v + oy);
-            } else {
-                uvs[0] = new Vector2(ox, 1 - v - oy);
-                uvs[1] = new Vector2(u + ox, 1 - v - oy);
-                uvs[2] = new Vector2(ox, 1 - oy);
-                uvs[3] = new Vector2(u + ox, 1 - oy);
-            }
-        }
+        //        uvs[0] = new Vector2(ox, 1 - sv);
+        //        uvs[1] = new Vector2(u + ox, 1 - sv);
+        //        uvs[2] = new Vector2(ox, 1 - sv + v);
+        //        uvs[3] = new Vector2(u + ox, 1 - sv + v);
+        //    } else if (peg == 1) {
+        //        uvs[0] = new Vector2(ox, oy);
+        //        uvs[1] = new Vector2(u + ox, oy);
+        //        uvs[2] = new Vector2(ox, v + oy);
+        //        uvs[3] = new Vector2(u + ox, v + oy);
+        //    } else {
+        //        uvs[0] = new Vector2(ox, 1 - v - oy);
+        //        uvs[1] = new Vector2(u + ox, 1 - v - oy);
+        //        uvs[2] = new Vector2(ox, 1 - oy);
+        //        uvs[3] = new Vector2(u + ox, 1 - oy);
+        //    }
+        //}
 
-        if (invert) {
-            indices[0] = 0;
-            indices[1] = 1;
-            indices[2] = 2;
-            indices[3] = 2;
-            indices[4] = 1;
-            indices[5] = 3;
+        //if (invert) {
+        //    indices[0] = 0;
+        //    indices[1] = 1;
+        //    indices[2] = 2;
+        //    indices[3] = 2;
+        //    indices[4] = 1;
+        //    indices[5] = 3;
 
-            uvs = new Vector2[4] { uvs[1], uvs[0], uvs[3], uvs[2] };
-        } else {
-            indices[0] = 2;
-            indices[1] = 1;
-            indices[2] = 0;
-            indices[3] = 3;
-            indices[4] = 1;
-            indices[5] = 2;
-        }
+        //    uvs = new Vector2[4] { uvs[1], uvs[0], uvs[3], uvs[2] };
+        //} else {
+        //    indices[0] = 2;
+        //    indices[1] = 1;
+        //    indices[2] = 0;
+        //    indices[3] = 3;
+        //    indices[4] = 1;
+        //    indices[5] = 2;
+        //}
 
         Vector3 normal = (vertices[0] - vertices[1]).normalized;
         float z = normal.z;
@@ -416,18 +418,18 @@ public class Mesher : MonoBehaviour {
             colors[i] = Color.white * brightness;
         }
 
-        mesh.vertices = vertices;
-        mesh.triangles = indices;
-        mesh.normals = normals;
-        mesh.uv = uvs;
-        mesh.colors = colors;
+        //mesh.vertices = vertices;
+        //mesh.triangles = indices;
+        //mesh.normals = normals;
+        //mesh.uv = uvs;
+        //mesh.colors = colors;
 
-        mesh.RecalculateBounds();
+        //mesh.RecalculateBounds();
 
-        if (blocks) {
-            MeshCollider mc = wallObject.AddComponent<MeshCollider>();
-            mc.sharedMesh = mesh;
-        }
+        //if (blocks) {
+        //    MeshCollider mc = wallObject.AddComponent<MeshCollider>();
+        //    mc.sharedMesh = mesh;
+        //}
 
         /* CREATE STATIC LEVEL */
 
@@ -435,8 +437,13 @@ public class Mesher : MonoBehaviour {
         bool isWall = Vector3.Distance(vertices[0], vertices[2]) > 1f;
 
         GameObject newObject;
-        if (isWall) newObject = Instantiate(wallPrefab, wallParent.transform);
-        else newObject = Instantiate(railingPrefab, railingParent.transform);
+        if (isWall) {
+            newObject = PrefabUtility.InstantiatePrefab(wallPrefab as GameObject) as GameObject;
+            newObject.transform.parent = wallParent.transform;
+        } else {
+            newObject = (GameObject) PrefabUtility.InstantiatePrefab(railingPrefab as GameObject) as GameObject;
+            newObject.transform.parent = wallParent.transform;
+        }
 
         float newObjectHeight = 10f;
         if (!isWall) newObjectHeight = 1f;
@@ -453,7 +460,7 @@ public class Mesher : MonoBehaviour {
         Vector3 newScale = new Vector3(Vector3.Distance(vertices[0], vertices[1]), newObjectHeight, 1f);
         newObject.transform.localScale = newScale;
 
-        return wallObject;
+        return newObject;
     }
 
     public Mesh CreateBillboardMesh(float width, float height, float pivotX, float pivotY) {
@@ -495,7 +502,7 @@ public class Mesher : MonoBehaviour {
         return mesh;
     }
 
-    public void CreateInvisibleBlocker(Linedef l, float min, float max, string objname, Transform holder) {
+    public void CreateInvisibleBlocker(Linedef l, float min, float max, string objname/*, Transform holder*/) {
         if (max - min <= 0)
             return;
 
@@ -503,7 +510,7 @@ public class Mesher : MonoBehaviour {
             return;
 
         GameObject blocker = new GameObject(objname);
-        blocker.transform.SetParent(holder);
+        //blocker.transform.SetParent(holder);
         blocker.layer = 9;
         Mesh mesh = new Mesh();
         mesh.name = objname + "_mesh";

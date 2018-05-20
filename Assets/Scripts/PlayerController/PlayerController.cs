@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour {
 
     // TURNING
     [SerializeField] float mouseSensitivity;
+    [SerializeField] float controllerSensitivity;
     private Quaternion targetRotation;
 
     // STATE    
@@ -86,12 +87,19 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake() {
         m_Rigidbody = GetComponent<Rigidbody>();
+        dashCooldownTimer = dashCooldown;
+    }
 
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
 
-        dashCooldownTimer = dashCooldown;
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -114,8 +122,9 @@ public class PlayerController : MonoBehaviour {
 
         /* HANDLE VIEW ROTATION */
         float _mouseSensitivity = mouseSensitivity;
+        if (InputManager.inputMode == InputManager.InputMode.Controller) { _mouseSensitivity = controllerSensitivity; }
         if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
-        mouseInput = InputManager.turningValue * _mouseSensitivity;
+        mouseInput = InputManager.turningValue * _mouseSensitivity * Time.deltaTime;
         float rotation = mouseInput;
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;

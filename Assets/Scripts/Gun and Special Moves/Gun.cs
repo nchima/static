@@ -71,8 +71,16 @@ public class Gun : MonoBehaviour {
 
     private void Awake() {
         screenShakes = FindObjectsOfType<ScreenShake>();
+    }
+
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -127,6 +135,8 @@ public class Gun : MonoBehaviour {
 
         // Begin performing the special move.
         if (firingMissiles) FireMissiles();
+
+        Debug.Log("update");
 
         /* Firing normal bullets */
         if (InputManager.fireButton) { FireBurst(); }
@@ -197,11 +207,11 @@ public class Gun : MonoBehaviour {
 
         // Auto aim for weak points.
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
-        autoAimPoint = AutoAim("Weak Point", 0.125f);
+        autoAimPoint = AutoAim("Weak Point", 0.225f);
 
         // If we couldn't hit a weak point, auto aim for enemies instead.
         if (!Physics.Raycast(gunTipTransform.position, autoAimPoint - gunTipTransform.position, 1000f, 1 << 28)) {
-            autoAimPoint = AutoAim("Enemy", 0.025f);
+            autoAimPoint = AutoAim("Enemy", 0.125f);
         }
 
         // Fire the specified number of bullets.

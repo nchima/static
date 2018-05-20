@@ -53,8 +53,12 @@ public class HealthManager : MonoBehaviour {
     [SerializeField] AudioSource getHurtAudio;
 
 
-    private void Awake() {
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
 

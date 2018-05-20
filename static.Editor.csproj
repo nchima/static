@@ -157,6 +157,7 @@
     <Compile Include="Assets\Scripts\Editor\LevelGeneratorEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MeshSaverEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\ScoreManagerEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\WadLoaderEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Asset Packages\DOTween\DOTween.XML" />

@@ -21,7 +21,6 @@ public class ScoreManager : MonoBehaviour
         {
             int inputValue = value - _score;
             inputValue = Mathf.RoundToInt(inputValue * multiplier);
-            Debug.Log("adding: " + inputValue);
             _score += inputValue;
             scoreDisplay.text = _score.ToString();
         }
@@ -69,10 +68,16 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    private void Awake() {
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
 

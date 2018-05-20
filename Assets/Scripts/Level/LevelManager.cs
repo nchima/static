@@ -46,9 +46,16 @@ public class LevelManager : MonoBehaviour {
         }
 
         loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
+    }
 
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -63,7 +70,7 @@ public class LevelManager : MonoBehaviour {
     //    }
     //}
 
-    
+
     private void LoadRandomly() {
         loadRandomLevelTimer += Time.deltaTime;
         if (loadRandomLevelTimer >= howOftenToLoadNewLevelWhenFalling) {

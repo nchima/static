@@ -33,9 +33,14 @@ public class UIManager : MonoBehaviour {
     bool specialMoveReadyScreenActiveBeforePause;
 
 
-    public void Awake() {
+    public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+    public void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 

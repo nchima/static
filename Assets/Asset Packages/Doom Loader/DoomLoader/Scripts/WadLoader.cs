@@ -8,10 +8,10 @@ public class WadLoader : MonoBehaviour
 {
     public static WadLoader Instance;
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    //void Awake()
+    //{
+    //    Instance = this;
+    //}
 
     public Color ambientLightColor = Color.white;
     public bool deathmatch;
@@ -20,8 +20,10 @@ public class WadLoader : MonoBehaviour
     public string autoloadMap = "E1M1";
     public GameObject PlayerObject;
 
-    void Start()
+    public void ConvertMap()
     {
+        Instance = this;
+
         Shader.SetGlobalColor("_AMBIENTLIGHT", ambientLightColor);
 
         if (string.IsNullOrEmpty(autoloadWad))
@@ -30,24 +32,28 @@ public class WadLoader : MonoBehaviour
         if (!Load(autoloadWad))
             return;
 
-        TextureLoader.Instance.LoadAndBuildAll();
+        GetComponent<TextureLoader>().Initialize();
+        GetComponent<Mesher>().Initialize();
+        GetComponent<MapLoader>().Initialize();
+
+        //TextureLoader.Instance.LoadAndBuildAll();
 
         if (!string.IsNullOrEmpty(autoloadMap))
             if (MapLoader.Instance.Load(autoloadMap))
             {
-                Mesher.Instance.CreateMeshes();
+                Mesher.Instance.CreateMeshes(autoloadWad);
 
-                MapLoader.Instance.ApplyLinedefBehavior();
+                //MapLoader.Instance.ApplyLinedefBehavior();
 
-                ThingManager.Instance.CreateThings(deathmatch);
+                //ThingManager.Instance.CreateThings(deathmatch);
 
-                if (PlayerStart.PlayerStarts[0] == null)
-                    Debug.LogError("PlayerStart1 == null");
-                else
-                {
-                    PlayerObject.transform.position = PlayerStart.PlayerStarts[0].transform.position;
-                    PlayerObject.transform.rotation = PlayerStart.PlayerStarts[0].transform.rotation;
-                }
+                //if (PlayerStart.PlayerStarts[0] == null)
+                //    Debug.LogError("PlayerStart1 == null");
+                //else
+                //{
+                //    PlayerObject.transform.position = PlayerStart.PlayerStarts[0].transform.position;
+                //    PlayerObject.transform.rotation = PlayerStart.PlayerStarts[0].transform.rotation;
+                //}
 
                 //PlayerObject.GetComponent<AudioSource>().clip = SoundLoader.LoadSound("DSPISTOL");
                 //PlayerObject.GetComponent<AudioSource>().Play();

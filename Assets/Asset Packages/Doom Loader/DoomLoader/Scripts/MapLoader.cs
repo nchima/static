@@ -8,7 +8,7 @@ public class MapLoader : MonoBehaviour
 {
     public static MapLoader Instance;
 
-    void Awake()
+    public void Initialize()
     {
         Instance = this;
     }

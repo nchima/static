@@ -44,10 +44,18 @@ public class GameManager : MonoBehaviour {
         Services.flashManager = GetComponentInChildren<FlashManager>();
         Services.billboardManager = FindObjectOfType<BatchBillboard>();
         Services.scorePopupManager = GetComponentInChildren<ScorePopupManager>();
+    }
 
+    private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
 
@@ -57,7 +65,7 @@ public class GameManager : MonoBehaviour {
 
 
     IEnumerator InitialSetup() {
-        Services.gun.enabled = false;
+        //Services.gun.enabled = false;
         Services.playerController.isMovementEnabled = false;
 
         Services.fallingSequenceManager.SetUpFallingVariables();

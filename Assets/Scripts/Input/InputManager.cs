@@ -156,9 +156,9 @@ public class InputManager : MonoBehaviour {
         specialMoveButtonDown = Input.GetButtonDown("Special Move Controller");
         specialMoveButtonUp = Input.GetButtonUp("Special Move Controller");
 
-        dashButton = Input.GetButton("Dash Controller");
-        dashButtonDown = Input.GetButton("Dash Controller");
-        dashButtonUp = Input.GetButton("Dash Controller");
+        dashButton = Input.GetAxisRaw("Dash Controller") != 0;
+        dashButtonDown = Input.GetAxisRaw("Dash Controller") != 0;
+        //dashButtonUp = Input.GetButton("Dash Controller");
 
         pauseButton = Input.GetButton("Start");
         pauseButtonDown = Input.GetButtonDown("Start");
