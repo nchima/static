@@ -13,6 +13,7 @@
 
 #endregion
 
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using System;
 
@@ -531,10 +532,6 @@ public class Triangulator
             if (CheckValidEar(t, reflexes)) cv.AddEarTip(eartips);
         }
 
-/*#if DEBUG
-        if (OnShowPolygon != null) OnShowPolygon(verts);
-#endif*/
-
         // Process ears until done
         while ((eartips.Count > 0) && (verts.Count > 2))
         {
@@ -554,13 +551,6 @@ public class Triangulator
             v.Remove();
             EarClipVertex v1 = t[0];
             EarClipVertex v2 = t[2];
-
-/*#if DEBUG
-            if (TriangleHasArea(t))
-            {
-                if (OnShowEarClip != null) OnShowEarClip(t, verts);
-            }
-#endif*/
 
             // Test first neighbour
             EarClipVertex[] t1 = GetTriangle(v1);
@@ -596,10 +586,6 @@ public class Triangulator
             if (!v1.IsReflex && (/*!t1a || */CheckValidEar(t1, reflexes))) v1.AddEarTip(eartips); else v1.RemoveEarTip();
             if (!v2.IsReflex && (/*!t2a || */CheckValidEar(t2, reflexes))) v2.AddEarTip(eartips); else v2.RemoveEarTip();
         }
-
-/*#if DEBUG
-        if (OnShowRemaining != null) OnShowRemaining(verts);
-#endif*/
 
         // Dispose remaining vertices
         foreach (EarClipVertex ecv in verts) ecv.Dispose();
@@ -799,3 +785,4 @@ public class Triangulator
 
     #endregion
 }
+#endif

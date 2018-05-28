@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -130,3 +131,4 @@ public class WadLoader : MonoBehaviour
         return true;
     }
 }
+#endif

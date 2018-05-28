@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 
 public class Platform88Controller : MonoBehaviour 
 {
@@ -76,3 +77,4 @@ public class Platform88Controller : MonoBehaviour
         }
     }
 }
+#endif

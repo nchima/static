@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 
 public class TextureAnimation : MonoBehaviour 
 {
@@ -78,3 +79,4 @@ public class TextureAnimation : MonoBehaviour
         }
     }
 }
+#endif

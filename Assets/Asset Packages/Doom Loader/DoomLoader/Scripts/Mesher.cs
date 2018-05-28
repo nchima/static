@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using UnityEditor;
 
 public class Mesher : MonoBehaviour {
@@ -603,3 +604,5 @@ public class Mesher : MonoBehaviour {
 #endif
     }
 }
+
+#endif

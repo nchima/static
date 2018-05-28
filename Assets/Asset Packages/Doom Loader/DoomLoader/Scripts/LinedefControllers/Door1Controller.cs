@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 
 public class Door1LinedefController : MonoBehaviour, PokeableLinedef
 {
@@ -93,3 +94,4 @@ public class Door1SectorController : MonoBehaviour
         }
     }
 }
+#endif

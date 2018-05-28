@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 
 public class Floor36Controller : MonoBehaviour 
 {
@@ -66,3 +67,4 @@ public class Floor36Controller : MonoBehaviour
         }
     }
 }
+#endif

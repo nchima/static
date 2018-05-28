@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using System.Collections.Generic;
 
 public class ThingManager : MonoBehaviour 
@@ -46,3 +47,4 @@ public class ThingManager : MonoBehaviour
         }
     }
 }
+#endif

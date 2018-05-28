@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
 
@@ -85,3 +86,4 @@ public class ThingController : MonoBehaviour
         mr.SetPropertyBlock(materialProperties);
     }
 }
+#endif

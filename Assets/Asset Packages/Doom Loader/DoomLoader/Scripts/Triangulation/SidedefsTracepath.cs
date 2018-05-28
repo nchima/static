@@ -13,6 +13,7 @@
 
 #endregion
 
+#if UNITY_EDITOR
 using System.Collections.Generic;
 
 public sealed class SidedefsTracePath : List<Sidedef>
@@ -91,3 +92,4 @@ public sealed class SidedefsTracePath : List<Sidedef>
 
     #endregion
 }
+#endif

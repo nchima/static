@@ -13,6 +13,7 @@
 
 #endregion
 
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 
@@ -142,3 +143,4 @@ public sealed class EarClipVertex
 
     #endregion
 }
+#endif

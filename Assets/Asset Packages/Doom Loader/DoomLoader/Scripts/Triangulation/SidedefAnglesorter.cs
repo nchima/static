@@ -14,6 +14,7 @@
 #endregion
 
 using System;
+#if UNITY_EDITOR
 using System.Collections.Generic;
 
 public sealed class SidedefAngleSorter : IComparer<Sidedef>
@@ -75,3 +76,4 @@ public sealed class SidedefAngleSorter : IComparer<Sidedef>
         return Math.Sign(ay - ax);
     }
 }
+#endif

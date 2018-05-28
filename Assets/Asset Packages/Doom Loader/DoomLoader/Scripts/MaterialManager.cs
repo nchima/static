@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using System.Collections.Generic;
 
 public class MaterialManager : MonoBehaviour 
@@ -94,3 +95,4 @@ public struct MaterialAnimation
     public string[] textureFrames;
     public float frameTime;
 }
+#endif

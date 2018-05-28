@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 
 public class PlayerStart : ThingController 
 {
@@ -14,3 +15,4 @@ public class PlayerStart : ThingController
         PlayerStarts[PlayerNumber - 1] = this;
     }
 }
+#endif

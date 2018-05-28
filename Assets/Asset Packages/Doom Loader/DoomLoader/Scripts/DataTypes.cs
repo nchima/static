@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Thing
@@ -203,3 +204,4 @@ public class Sidedef
             Line.Back = this;
     }
 }
+# endif

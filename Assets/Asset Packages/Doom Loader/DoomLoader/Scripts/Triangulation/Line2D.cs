@@ -13,6 +13,7 @@
 
 #endregion
 
+#if UNITY_EDITOR
 using System;
 
 public struct Line2D
@@ -313,3 +314,4 @@ public struct Line2D
 
     #endregion
 }
+#endif
