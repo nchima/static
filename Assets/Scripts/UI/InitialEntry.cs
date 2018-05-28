@@ -91,20 +91,20 @@ public class InitialEntry : MonoBehaviour {
             sinceLastKeypress = 0f;
 
             // If the player is finished they should press fire.
-            if (AllInitialsEntered() && InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.fireButtonDown)
+            if (/*AllInitialsEntered() && */InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.fireButtonDown)
             {
                 // Go through each initial and add it to a string.
                 string enteredInitials = "";
                 bool cancel = false;
                 foreach (Initial initial in initials) {
-                    if (initial.charIndex != 0) {
+                    //if (initial.charIndex != 0) {
                         enteredInitials += letters[initial.charIndex].ToString();
-                    }
+                    //}
 
                     // If the player hasn't had time to enter their initials then go back.
-                    else {
-                        cancel = true;
-                    }
+                    //else {
+                    //    cancel = true;
+                    //}
                 }
 
                 // Tell the score controller to add this entry to its score list and then close this screen.

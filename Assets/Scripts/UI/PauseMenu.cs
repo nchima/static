@@ -7,7 +7,14 @@ public class PauseMenu : MonoBehaviour {
     //* THIS SCRIPT WILL EVENTUALLY CONTAIN CODE FOR A THEORETICAL PAUSE MENU - RIGHT NOW IT JUST RESETS THE SCENE WHEN THE PLAYER PRESSES ESCAPE *//
 
 
-	public void ResetButton()
+    private void Update() {
+        if (Input.GetKeyDown(KeyCode.R)) {
+            ResetButton();
+        }
+    }
+
+
+    public void ResetButton()
     {
         Services.gameManager.PauseGame(false);
 

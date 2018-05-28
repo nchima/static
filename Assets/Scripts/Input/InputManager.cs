@@ -65,6 +65,11 @@ public class InputManager : MonoBehaviour {
     }
 
 
+    void Awake() {
+        inputMode = InputMode.MouseAndKeyboard;
+    }
+
+
     private void Update() {
 
         ResetTriggers();

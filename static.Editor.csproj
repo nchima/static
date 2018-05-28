@@ -109,6 +109,9 @@
     <Reference Include="UnityEditor.Graphs">
       <HintPath>Library\UnityAssemblies\UnityEditor.Graphs.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.Android.Extensions">
+      <HintPath>Library\UnityAssemblies\UnityEditor.Android.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.WebGL.Extensions">
       <HintPath>Library\UnityAssemblies\UnityEditor.WebGL.Extensions.dll</HintPath>
     </Reference>
@@ -154,6 +157,40 @@
     <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshModifierVolumeEditor.cs" />
     <Compile Include="Assets\Asset Packages\Auto Navmesh\NavMeshComponents\Editor\NavMeshSurfaceEditor.cs" />
     <Compile Include="Assets\Asset Packages\Editor\CrossPlatformInput\CrossPlatformInputInitialize.cs" />
+    <Compile Include="Assets\Asset Packages\MidiJack\Editor\MidiJackWindow.cs" />
+    <Compile Include="Assets\Asset Packages\OscJack\Editor\OscJackWindow.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\AnimatorGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\CameraGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\ConstantMotionGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\GenericCurveGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\GenericGradientGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\GenericTriggerGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\GlobalSettingGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\JitterMotionGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\LightGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\MaterialGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\ParticleSystemGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\SpawnerGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Gear\TransformGearEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Injector\AudioInjectorEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Injector\BeatInjectorEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Injector\OscInjectorEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Internal\GenericLinkDrawer.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Internal\ModifierDrawer.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Internal\RemoteDrawer.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Internal\TriggerDrawer.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Reaktor\ReaktorEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\BandPassFilterEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\ConstantMotionEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\GenericAudioInputEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\JitterMotionEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\ObjectParticleSystem.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\PlanterEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\ReaktionWindow.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\SelfDestructionEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\SpawnerEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\TurbulentMotionEditor.cs" />
+    <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\VariableMotionEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\LevelGeneratorEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MeshSaverEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\ScoreManagerEditor.cs" />

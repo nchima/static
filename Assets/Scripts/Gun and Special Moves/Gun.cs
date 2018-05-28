@@ -136,8 +136,6 @@ public class Gun : MonoBehaviour {
         // Begin performing the special move.
         if (firingMissiles) FireMissiles();
 
-        Debug.Log("update");
-
         /* Firing normal bullets */
         if (InputManager.fireButton) { FireBurst(); }
     }
