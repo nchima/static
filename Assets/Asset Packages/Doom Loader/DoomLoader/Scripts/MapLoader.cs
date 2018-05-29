@@ -247,25 +247,29 @@ public class MapLoader : MonoBehaviour
 
         //SKY FIX
         {
-            foreach (Linedef l in linedefs)
-            {
-                if (l.Back == null)
-                    continue;
+            //foreach (Linedef l in linedefs)
+            //{
+            //    if (l.Back == null)
+            //        continue;
 
-                if (IsSkyTexture(l.Front.Sector.ceilingTexture))
-                    if (IsSkyTexture(l.Back.Sector.ceilingTexture))
-                    {
-                        l.Front.tHigh = "F_SKY1";
-                        l.Back.tHigh = "F_SKY1";
-                    }
+            //    if (IsSkyTexture(
+            //        l.
+            //        Front.
+            //        Sector.
+            //        ceilingTexture))
+            //        if (IsSkyTexture(l.Back.Sector.ceilingTexture))
+            //        {
+            //            l.Front.tHigh = "F_SKY1";
+            //            l.Back.tHigh = "F_SKY1";
+            //        }
 
-                if (IsSkyTexture(l.Front.Sector.floorTexture))
-                    if (IsSkyTexture(l.Back.Sector.floorTexture))
-                    {
-                        l.Front.tLow = "F_SKY1";
-                        l.Back.tLow = "F_SKY1";
-                    }
-            }
+            //    if (IsSkyTexture(l.Front.Sector.floorTexture))
+            //        if (IsSkyTexture(l.Back.Sector.floorTexture))
+            //        {
+            //            l.Front.tLow = "F_SKY1";
+            //            l.Back.tLow = "F_SKY1";
+            //        }
+            //}
         }
 
         //modify geometry to accomodate expected changes

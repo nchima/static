@@ -14,8 +14,8 @@ public class TextureLoader : MonoBehaviour
     {
         Instance = this;
         
-        for (int i = 0; i < OverrideParatemers.Length; i++)
-            _overrideParameters.Add(OverrideParatemers[i].textureName, OverrideParatemers[i]);
+        //for (int i = 0; i < OverrideParatemers.Length; i++)
+        //    _overrideParameters.Add(OverrideParatemers[i].textureName, OverrideParatemers[i]);
 
         foreach (SpriteOverride so in _OverrideSprites)
             OverrideSprites.Add(so.spriteName, so.sprite);

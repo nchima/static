@@ -3,9 +3,13 @@ using UnityEngine;
 using UnityEditor;
 
 public class Mesher : MonoBehaviour {
+    [SerializeField] float obstacleHeight = 25f;
+
     [SerializeField] GameObject wallPrefab;
     [SerializeField] GameObject railingPrefab;
     [SerializeField] GameObject floorPrefab;
+    [SerializeField] GameObject obstacleTopPrefab;
+    [SerializeField] GameObject obstacleSidePrefab;
 
     public static Mesher Instance;
 
@@ -93,19 +97,29 @@ public class Mesher : MonoBehaviour {
                     //controller.sector = s;
                     //controller.Init();
 
-                    // Save the floor mesh
-                    if (vertices.Length > 0 && s.floorHeight <= 0f) {
-                        GameObject floorObject = PrefabUtility.InstantiatePrefab(floorPrefab as GameObject) as GameObject;
-                        floorObject.transform.parent = floorParent.transform;
-                        floorObject.transform.position = Vector3.zero;
-                        floorObject.transform.localScale = Vector3.one;
-                        floorObject.GetComponent<MeshFilter>().mesh = mesh;
-                        Debug.Log(floorObject.GetComponentInChildren<MeshFilter>().gameObject.name);
-                        floorObject.transform.GetChild(0).GetComponent<MeshFilter>().mesh = mesh;
-                        MeshCollider newMeshCollider = floorObject.AddComponent<MeshCollider>();
-                        newMeshCollider.sharedMesh = mesh;
-                        DestroyImmediate(floorObject.GetComponent<BoxCollider>());
-                        SaveMesh(mesh, mapName + " Floor " + index, false, false);
+                    // Detemine sector type
+                    int sectorType = 0; // 0: Floor, 1: Obstacle, 2: Hole, 3: Error
+                    if (s.floorHeight == 0f) { sectorType = 0; }
+                    else if (s.floorHeight == 0.3125f) { sectorType = 1; }
+                    else if (s.floorHeight == 0.625f) { sectorType = 2; }
+                    else {
+                        sectorType = 3;
+                        Debug.LogError("Sector has floor height which does not correspond to Static level. Use 0 for floor, 10 for obstacle, and 20 for hole");
+                    }
+
+                    // Save as floor
+                    if (sectorType == 0) {
+                        CreateFloorMesh(mesh, mapName, index, false);
+                    }
+
+                    // Save as obstacle
+                    else if (sectorType == 1) {
+                        CreateFloorMesh(mesh, mapName, index, true);
+                    }
+
+                    // Do nothing :)
+                    else {
+                        // :)
                     }
                 }
 
@@ -172,7 +186,7 @@ public class Mesher : MonoBehaviour {
         {
             int index = 0;
             foreach (Linedef l in MapLoader.linedefs) {
-                if (l.Back != null) {
+                if (l.Back != null && l.Front != null) {
                     //top part (front)
                     if (l.Front.Sector.ceilingHeight > l.Back.Sector.ceilingHeight)
                         l.TopFrontObject = CreateLineQuad
@@ -188,7 +202,7 @@ public class Mesher : MonoBehaviour {
                                 l.Front.Sector.brightness,
                                 true,
                                 "Wall_" + index + "_top_front"
-                                //holder
+                            //holder
                             );
 
                     //top part (back)
@@ -206,7 +220,7 @@ public class Mesher : MonoBehaviour {
                                 l.Back.Sector.brightness,
                                 true,
                                 "Wall_" + index + "_top_back"
-                                //holder
+                            //holder
                             );
 
                     //bottom part (front)
@@ -224,7 +238,7 @@ public class Mesher : MonoBehaviour {
                                 l.Front.Sector.brightness,
                                 true,
                                 "Wall_" + index + "_bot_front"
-                                //holder
+                            //holder
                             );
 
                     //bottom part (back)
@@ -242,7 +256,7 @@ public class Mesher : MonoBehaviour {
                                 l.Back.Sector.brightness,
                                 true,
                                 "Wall_" + index + "_bot_back"
-                                //holder
+                            //holder
                             );
 
                     //middle (front)
@@ -260,7 +274,7 @@ public class Mesher : MonoBehaviour {
                                 l.Front.Sector.brightness,
                                 false,
                                 "Wall_" + index + "_mid_front"
-                                //holder
+                            //holder
                             );
 
                     //middle (back)
@@ -278,7 +292,7 @@ public class Mesher : MonoBehaviour {
                                 l.Back.Sector.brightness,
                                 false,
                                 "Wall_" + index + "_mid_back"
-                                //holder
+                            //holder
                             );
 
                     if ((l.flags & (1 << 0)) != 0)
@@ -288,10 +302,11 @@ public class Mesher : MonoBehaviour {
                                 Mathf.Max(l.Front.Sector.floorHeight, l.Back.Sector.floorHeight),
                                 Mathf.Min(l.Front.Sector.ceilingHeight, l.Back.Sector.ceilingHeight),
                                 "Wall_" + index + "_blocker"
-                                //holder
+                            //holder
                             );
 
                 } else //solid wall
+                    if (l.Front == null) { return; }
                     CreateLineQuad
                         (
                             l.Front,
@@ -305,13 +320,42 @@ public class Mesher : MonoBehaviour {
                             l.Front.Sector.brightness,
                             true,
                             "Wall_" + index
-                            //holder
+                        //holder
                         );
 
                 index++;
             }
         }
     }
+
+    void CreateFloorMesh(Mesh mesh, string mapName, int index, bool isObstacle) {
+        GameObject floorObject;
+        if (isObstacle) {
+            floorObject = PrefabUtility.InstantiatePrefab(obstacleTopPrefab as GameObject) as GameObject;
+        } else {
+            floorObject = PrefabUtility.InstantiatePrefab(floorPrefab as GameObject) as GameObject;
+        }
+        floorObject.transform.parent = floorParent.transform;
+
+        if (isObstacle) {
+            floorObject.transform.position = new Vector3(0f, obstacleHeight, 0f);
+        } else {
+            floorObject.transform.position = Vector3.zero;
+        }
+
+        floorObject.transform.localScale = Vector3.one;
+
+        floorObject.GetComponent<MeshFilter>().mesh = mesh;
+        floorObject.transform.GetChild(0).GetComponent<MeshFilter>().mesh = mesh;
+
+        MeshCollider newMeshCollider = floorObject.AddComponent<MeshCollider>();
+        newMeshCollider.sharedMesh = mesh;
+
+        DestroyImmediate(floorObject.GetComponent<BoxCollider>());
+
+        SaveMesh(mesh, mapName + " Floor " + index, false, false);
+    }
+
 
     public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname /*Transform holder*/) {
         if (max - min <= 0)
@@ -347,7 +391,6 @@ public class Mesher : MonoBehaviour {
         //    mr.SetPropertyBlock(materialProperties);
         //} else
         //    mainTexture = mr.material.mainTexture;
-
 
         int vc = 4;
 
@@ -437,17 +480,50 @@ public class Mesher : MonoBehaviour {
         // Figure out whether it will be a wall or a railing
         bool isWall = Vector3.Distance(vertices[0], vertices[2]) > 1f;
 
-        GameObject newObject;
-        if (isWall) {
-            newObject = PrefabUtility.InstantiatePrefab(wallPrefab as GameObject) as GameObject;
-            newObject.transform.parent = wallParent.transform;
-        } else {
-            newObject = (GameObject) PrefabUtility.InstantiatePrefab(railingPrefab as GameObject) as GameObject;
-            newObject.transform.parent = wallParent.transform;
+        float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
+        //Debug.Log("distance btwn vertices: " + distanceBetweenVertices);
+        int wallType = 0;   // 0 = Railing, 1 = Wall, 2 = Obstacle side
+
+        if (distanceBetweenVertices == 0.625f) { wallType = 0; }
+        else if (distanceBetweenVertices == 3.375f) { wallType = 1; }
+        else if (distanceBetweenVertices == 4) { wallType = 2; }
+        else { Debug.Log("Unrecognized wall type."); }
+
+        if (s.IsFront) {
+            Debug.Log("doing.");
+            if (s.Other == null) { wallType = 1; }
+            else if (s.Other.Sector.floorHeight == 0.3125f) { wallType = 2; }
+            else if (s.Other.Sector.floorHeight == 0.625f) { wallType = 0; }
         }
 
-        float newObjectHeight = 10f;
-        if (!isWall) newObjectHeight = 1f;
+        GameObject newObject;
+        float newObjectHeight = 0f;
+
+        // Railing
+        if (wallType == 0) {
+            newObject = PrefabUtility.InstantiatePrefab(railingPrefab as GameObject) as GameObject;
+            newObject.transform.parent = wallParent.transform;
+            newObjectHeight = 1f;
+        }
+
+        // Wall
+        else if (wallType == 1) {
+            newObject = PrefabUtility.InstantiatePrefab(wallPrefab as GameObject) as GameObject;
+            newObject.transform.parent = wallParent.transform;
+            newObjectHeight = 10f;
+        }
+        
+        // Obstacle type
+        else if (wallType == 2) {
+            newObject = PrefabUtility.InstantiatePrefab(obstacleSidePrefab as GameObject) as GameObject;
+            newObject.transform.parent = wallParent.transform;
+            newObjectHeight = obstacleHeight;
+        }
+
+        else {
+            Debug.LogError("Could not figure out what wall type this thingy was supposed to be.");
+            return null;
+        }
 
         // Get center of new object
         Vector3 newObjectCenter = Vector3.Lerp(vertices[0], vertices[3], 0.5f);
@@ -463,6 +539,7 @@ public class Mesher : MonoBehaviour {
 
         return newObject;
     }
+
 
     public Mesh CreateBillboardMesh(float width, float height, float pivotX, float pivotY) {
         Mesh mesh = new Mesh();
