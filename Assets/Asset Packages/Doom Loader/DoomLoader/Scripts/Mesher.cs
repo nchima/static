@@ -16,6 +16,7 @@ public class Mesher : MonoBehaviour {
     GameObject level;
     GameObject railingParent;
     GameObject wallParent;
+    GameObject obstacleParent;
     GameObject floorParent;
 
     public void Initialize() {
@@ -27,6 +28,8 @@ public class Mesher : MonoBehaviour {
         level = new GameObject("Level");
         railingParent = new GameObject("Railings");
         railingParent.transform.parent = level.transform;
+        obstacleParent = new GameObject("Obstacles");
+        obstacleParent.transform.parent = level.transform;
         wallParent = new GameObject("Walls");
         wallParent.transform.parent = level.transform;
         floorParent = new GameObject("Floor Planes");
@@ -509,19 +512,19 @@ public class Mesher : MonoBehaviour {
         // Wall
         else if (wallType == 1) {
             newObject = PrefabUtility.InstantiatePrefab(wallPrefab as GameObject) as GameObject;
-            newObject.transform.parent = wallParent.transform;
+            newObject.transform.parent = railingParent.transform;
             newObjectHeight = 10f;
         }
         
         // Obstacle type
         else if (wallType == 2) {
             newObject = PrefabUtility.InstantiatePrefab(obstacleSidePrefab as GameObject) as GameObject;
-            newObject.transform.parent = wallParent.transform;
+            newObject.transform.parent = obstacleParent.transform;
             newObjectHeight = obstacleHeight;
         }
 
         else {
-            Debug.LogError("Could not figure out what wall type this thingy was supposed to be.");
+            Debug.LogError("Unrecognized wall type.");
             return null;
         }
 
