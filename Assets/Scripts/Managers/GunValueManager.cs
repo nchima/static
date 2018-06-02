@@ -15,6 +15,7 @@ public class GunValueManager : MonoBehaviour {
         // Change current gun value based on mouse Y movement.
         float inputMod = 10f;
         if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -2.9f; }
+        inputMod *= (1 / Time.timeScale);
         currentValue += InputManager.gunTuningValue * inputMod * (Time.deltaTime);
         currentValue = Mathf.Clamp(currentValue, -1f, 1f);
 
@@ -25,7 +26,7 @@ public class GunValueManager : MonoBehaviour {
                 wiper.transform.localScale.y,
                 wiper.transform.localScale.z
             );
-        } 
+        }
         
         else {
             wiper.transform.localScale = new Vector3(

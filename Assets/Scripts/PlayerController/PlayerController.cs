@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour {
         float _mouseSensitivity = mouseSensitivity;
         if (InputManager.inputMode == InputManager.InputMode.Controller) { _mouseSensitivity = controllerSensitivity; }
         if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
-        mouseInput = InputManager.turningValue * _mouseSensitivity * Time.deltaTime;
+        mouseInput = (InputManager.turningValue * (1 / Time.timeScale)) * _mouseSensitivity * Time.deltaTime;
         float rotation = mouseInput;
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;
