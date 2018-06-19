@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour {
         Services.flashManager = GetComponentInChildren<FlashManager>();
         Services.billboardManager = FindObjectOfType<BatchBillboard>();
         Services.scorePopupManager = GetComponentInChildren<ScorePopupManager>();
+        Services.extraScreenManager = GetComponentInChildren<ExtraScreenManager>();
     }
 
     private void OnEnable() {
@@ -68,7 +69,8 @@ public class GameManager : MonoBehaviour {
         //Services.gun.enabled = false;
         Services.playerController.isMovementEnabled = false;
 
-        Services.fallingSequenceManager.SetUpFallingVariables();
+        Services.extraScreenManager.SetScreensActive(true);
+        Services.extraScreenManager.SetRotationScale(1f);
 
         // Load next level.
         if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
@@ -168,6 +170,10 @@ public class GameManager : MonoBehaviour {
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        Services.uiManager.hud.SetActive(true);
+        Services.playerController.isMovementEnabled = true;
+        Services.extraScreenManager.ReturnToZeroAndDeactivate(0.5f);
+        Services.fallingSequenceManager.SetUpFallingVariables();
         Physics.gravity = initialGravity;   // Move to gravity manager
         gameStarted = true;
     }

@@ -37,23 +37,20 @@ public class MeleeEnemyState_Attacking : State {
 
         distanceCharged = 0f;
 
-        StartCoroutine(AttackCoroutine(controller));
+        attackCoroutine = StartCoroutine(AttackCoroutine(controller));
     }
 
 
     public override void Run(StateController stateController) {
         base.Run(stateController);
 
-        // Move forward.
-
         // Make sure particles rotate with mesh.
         ParticleSystem.MainModule mm = meshParticleObject.GetComponent<ParticleSystem>().main;
         mm.startRotation = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
     }
 
-
+    Coroutine attackCoroutine;
     IEnumerator AttackCoroutine(MeleeEnemy controller) {
-
         yield return new WaitUntil(() => {
             if (distanceCharged >= attackDistance) {
                 return true;
@@ -92,6 +89,7 @@ public class MeleeEnemyState_Attacking : State {
     public override void End(StateController stateController) {
         base.End(stateController);
         MeleeEnemy controller = stateController as MeleeEnemy;
+        if (attackCoroutine != null) { StopCoroutine(attackCoroutine); }
         controller.geometryParent.transform.DOLocalRotate(Vector3.zero, 0.5f);
     }
 }

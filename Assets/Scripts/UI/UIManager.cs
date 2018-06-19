@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour {
     public GameObject highScoreScreen;
     public GameObject endOfDemoScreen;
     public GameObject landOnLevelScreen;
+    public GameObject hud;
     public GameObject crosshair;
 
     public EventSystem eventSystem;

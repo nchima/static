@@ -5,6 +5,8 @@ using DG.Tweening;
 
 public class SpecialBarManager : MonoBehaviour {
 
+    [SerializeField] bool debug_AlwaysMax;
+
     [SerializeField] SpecialBar leftBar;
     [SerializeField] SpecialBar rightBar;
 
@@ -25,6 +27,7 @@ public class SpecialBarManager : MonoBehaviour {
 
     public bool bothBarsFull {
         get {
+            if (debug_AlwaysMax) { return true; }
             return leftBar.currentValue >= 0.99f && rightBar.currentValue >= 0.99f;
         }
     }

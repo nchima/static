@@ -145,7 +145,7 @@ public class InputManager : MonoBehaviour {
         cancelButtonDown = Input.GetKeyDown(KeyCode.Backspace);
     }
 
-
+    
     void GetControllerInput() {
         movementAxis.x = Input.GetAxis("Horizontal Controller");
         movementAxis.y = Input.GetAxis("Vertical Controller");

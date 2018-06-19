@@ -149,8 +149,7 @@ public class LaserShot : EnemyShot {
         }
     }
 
-    public void ReadyPostDamage()
-    {
+    public void ReadyPostDamage() {
         timer = 0f;
         state = State.PostDamage;
 
@@ -166,20 +165,20 @@ public class LaserShot : EnemyShot {
         currentMaterialOffsetSpeed = new Vector2(MATERIAL_OFFSET_SPEED_DAMAGE_STATE_X * 0.1f, MATERIAL_OFFSET_SPEED_DAMAGE_STATE_Y * 0.1f);
     }
 
-    void PostDamage()
-    {
+    void PostDamage() {
         timer += Time.deltaTime;
-        if (timer >= postDamageDuration)
-        {
+        if (timer >= postDamageDuration) {
             Destroy(gameObject);
         }
     }
 
 
-    void OnTriggerEnterChild(Collider other)
-    {
-        if (state == State.Damage && other.transform == Services.playerTransform.transform)
-        {
+    void OnTriggerEnterChild(Collider other) {
+        if (other.GetComponent<PlayerMissile>() != null) {
+            Deflect();
+        }
+
+        if (state == State.Damage && other.transform == Services.playerTransform.transform) {
             GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
             GetComponentInChildren<Collider>().enabled = false;
         }

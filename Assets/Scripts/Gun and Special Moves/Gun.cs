@@ -12,6 +12,7 @@ public class Gun : MonoBehaviour {
     [SerializeField] FloatRange bulletThicknessRange = new FloatRange(0.1f, 0.3f);
     [SerializeField] FloatRange bulletExplosionRadiusRange = new FloatRange(0f, 5f);
     [SerializeField] IntRange explosionDamageRange = new IntRange(1, 5);
+    [SerializeField] FloatRange missileFireIntervalRange = new FloatRange(0f, 0.15f);
     [SerializeField] int bulletDamage = 1;
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
@@ -31,7 +32,6 @@ public class Gun : MonoBehaviour {
     Color specialMoveReadyColor2 = Color.red;
 
     /* MISSILE STUFF */
-    [SerializeField] float missileCooldown = 0.15f;  // Time in between firing individual missiles.
     [SerializeField] int missilesPerBurst = 20;
     int missilesFired = 0;
     float missileTimer;
@@ -120,7 +120,7 @@ public class Gun : MonoBehaviour {
         // See if the player has fired a special move & if so, initialize proper variables.
         if (canShoot && Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
 
-            if (!firingMissiles && !firedMissiles) {
+            if (!firingMissiles /*&& !firedMissiles*/) {
                 Services.specialBarManager.PlayerUsedSpecialMove();
                 missilesFired = 0;
                 missileTimer = 0f;
@@ -144,12 +144,15 @@ public class Gun : MonoBehaviour {
     void FireMissiles() {
         if (!firingMissiles) return;
 
-        if (missileTimer >= missileCooldown) {
-            missilesFired++;
-            missileTimer = 0;
-            Instantiate(missilePrefab, gunTipTransform.position, Services.playerTransform.rotation);
-        } else {
+        if (missileTimer >= GunValueManager.MapToFloatRange(missileFireIntervalRange)) {
+            FireMissile();
+        }
+        else {
             missileTimer += Time.deltaTime;
+        }
+
+        while (GunValueManager.MapToFloatRange(missileFireIntervalRange) == 0 && missilesFired < missilesPerBurst) {
+            FireMissile();
         }
 
         if (missilesFired >= missilesPerBurst) {
@@ -157,6 +160,15 @@ public class Gun : MonoBehaviour {
             firedMissiles = true;
         }
     }
+
+
+    void FireMissile() {
+        missilesFired++;
+        missileTimer = 0;
+        PlayerMissile newMissile = Instantiate(missilePrefab, gunTipTransform.position, Services.playerTransform.rotation).GetComponent<PlayerMissile>();
+        newMissile.GetFired();
+    }
+
 
     public void FireBurst() {
 
