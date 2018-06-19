@@ -155,8 +155,8 @@ public class PlayerMissile : MonoBehaviour {
         desiredVelocity = tempTarget - transform.position;
 
         // Rotation [May need to bring this code back if I decide to use a directional model]
-        //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(Vector3.Normalize(transform.position - targetPosition)), 45f);
-        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), 0.2f);
+        //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(Vector3.Normalize(transform.position - (transform.position + desiredVelocity))), 360f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(transform.position - (transform.position + desiredVelocity)), 1f);
     }
 
 
