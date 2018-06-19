@@ -16,37 +16,36 @@ public class EnemyShot : MonoBehaviour {
     protected GameManager gameManager;
 
 
-    public void Start()
-    {
+    public void Start() {
         gameManager = GameObject.Find("Game Manager").GetComponent<GameManager>();
     }
 
 
-    public void Update()
-    {
+    public void Update() {
         // See if I have lived long enough and should be deleted.
-        if (currentLifetime < maxLifetime)
-        {
+        if (currentLifetime < maxLifetime) {
             currentLifetime += Time.deltaTime;
         }
 
-        else
-        {
+        else {
             Destroy(gameObject);
         }
     }
 
 
-    public virtual void Detonate()
-    {
-        // Destroy self.
+    public virtual void Detonate() {
         Instantiate(strikeParticles, transform.position, Quaternion.identity);
         Destroy(gameObject);
     }
 
 
-    void OnTriggerEnter(Collider collider)
-    {
+    public virtual void Deflect() {
+        // For right now, just detonate. I can add unique deflection effects later.
+        Detonate();
+    }
+
+
+    protected virtual void OnTriggerEnter(Collider collider) {
         if (collider.tag == "Obstacle" || collider.tag == "Wall" || (collider.name.ToLower().Contains("floor") && collideWithFloor)) {
             //Debug.Log("I bumped into an obstacle.");
             Detonate();
@@ -60,12 +59,15 @@ public class EnemyShot : MonoBehaviour {
         //    Detonate();
         //}
 
-        else if (collider.tag == "Player")
-        {
+        else if (collider.tag == "Player") {
             GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
 
             // Destroy self.
             Detonate();
+        }
+
+        else if (collider.GetComponent<PlayerMissile>()) {
+            Deflect();
         }
     }
 }

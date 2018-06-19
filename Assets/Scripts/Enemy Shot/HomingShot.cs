@@ -37,8 +37,7 @@ public class HomingShot : EnemyShot {
     [SerializeField] GameObject explosionPrefab;
 
 
-	new void Start ()
-    {
+	new void Start () {
         base.Start();
 
         state = HomingShotState.NotLockedOn;
@@ -206,25 +205,39 @@ public class HomingShot : EnemyShot {
     }
 
 
-    public void GotShot(Vector3 forcePoint)
-    {
+    public void GotShot(Vector3 forcePoint) {
         if (!canBeShotDown) return;
 
+        GetShotDown(forcePoint);
+    }
+
+
+    public override void Deflect() {
+    }
+
+
+    void GetShotDown(Vector3 forcePoint) {
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().useGravity = true;
-        GetComponent<Rigidbody>().AddExplosionForce(7f, forcePoint, 2f, 1f,  ForceMode.Impulse);
+        GetComponent<Rigidbody>().AddExplosionForce(7f, forcePoint, 2f, 1f, ForceMode.Impulse);
         blipAudioSource.pitch = 3f;
         Invoke("Detonate", 4f);
         state = HomingShotState.WasShot;
     }
 
 
-    public override void Detonate()
-    {
+    public override void Detonate() {
         if (state != HomingShotState.LockedOn && state != HomingShotState.WasShot) return;
-
         base.Detonate();
-
         Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+    }
+
+
+    protected override void OnTriggerEnter(Collider collider) {
+        base.OnTriggerEnter(collider);
+
+        if (collider.GetComponent<PlayerMissile>() != null) {
+            GetShotDown(collider.ClosestPoint(transform.position));
+        }
     }
 }

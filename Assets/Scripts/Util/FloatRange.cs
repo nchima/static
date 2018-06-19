@@ -21,4 +21,8 @@ public class FloatRange {
     public float Random {
         get { return UnityEngine.Random.Range(min, max); }
     }
+
+    public float MapTo(float input, float min, float max) {
+        return MyMath.Map(input, min, max, this.min, this.max);
+    }
 }

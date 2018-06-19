@@ -6,7 +6,6 @@ public class GunValueManager : MonoBehaviour {
 
     [HideInInspector] public static float currentValue = 0f;
     float previousGunValue = 0f;
-
     [SerializeField] GameObject wiper;
 
 
@@ -43,5 +42,14 @@ public class GunValueManager : MonoBehaviour {
             );
 
         previousGunValue = currentValue;
+    }
+
+    
+    public static float MapToFloatRange(FloatRange floatRange) {
+        return MyMath.Map(currentValue, -1f, 1f, floatRange.min, floatRange.max);
+    }
+
+    public static float MapToFloatRangeInverted(FloatRange floatRange) {
+        return MyMath.Map(currentValue, -1f, 1f, floatRange.max, floatRange.min);
     }
 }

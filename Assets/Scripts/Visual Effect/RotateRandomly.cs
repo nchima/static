@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class RotateRandomly : MonoBehaviour {
 
-    private void Update()
-    {
-        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + Random.insideUnitSphere);
+    [HideInInspector] public float rotationScale = 1f;
+
+    private void Update() {
+        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles + Random.insideUnitSphere * rotationScale);
     }
 }

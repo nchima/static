@@ -4,141 +4,180 @@ using UnityEngine;
 
 public class PlayerMissile : MonoBehaviour {
 
-    enum State { MovingForward, SteeringTowardsTarget }
-    State currentState = State.MovingForward;
+    /* INSPECTOR */
 
-    /* MOVEMENT */
-    [SerializeField] private float initialSpeed = 10f;
-    [SerializeField] private float accelerationSpeed = 1f;
-    [SerializeField] private float turnSpeed = 5f;
-    [SerializeField] private float lockedOnTurnSpeedMultiplier = 5f;
-    [SerializeField] private float maxSpeed = 65f;
+    // Tweening variables.
+    [SerializeField] private FloatRange initialSpeedRange = new FloatRange(1f, 20f);
+    [SerializeField] private FloatRange turnSpeedRange = new FloatRange(0f, 4f);
+    [SerializeField] private FloatRange lockedOnTurnSpeedMultiplierRange = new FloatRange(0f, 20f);
+    [SerializeField] private FloatRange maxSpeedRange = new FloatRange(10f, 40f);
+    [SerializeField] private FloatRange lifetimeDurationRange = new FloatRange(1f, 3f);
+    [SerializeField] private FloatRange decelerationOverLifetimeMultiplierRange = new FloatRange(0.9f, 1f);
+    [SerializeField] private FloatRange meanderNoiseRange = new FloatRange(0.1f, 0.9f);
+    [SerializeField] private FloatRange visualWidthRange = new FloatRange(1f, 2f);
+    [SerializeField] private FloatRange colliderWidthRange = new FloatRange(2f, 4f);
+    [SerializeField] private FloatRange upwardTiltRange = new FloatRange(4f, 9.5f);
+    [SerializeField] private FloatRange spreadXRange = new FloatRange(20f, 35f);
 
+    // References
+    [SerializeField] private GameObject explosionPrefab;
+    [SerializeField] private GameObject lockOnTrigger;
+    [SerializeField] private GameObject sphereVisuals;
+
+
+    /* PRIVATE VARIALBES */
+
+    // State
+    private enum State { NotLockedOn, LockedOn }
+    private State currentState = State.NotLockedOn;
+
+    // Firing
+    private float upwardTilt;
+    private float spreadX;
+
+    // Movement
+    private float initialSpeed;
+    private float turnSpeed;
+    private float lockedOnTurnSpeedMultiplier;
+    private float maxSpeed;
+    private float decelerationOverLifetimeMultiplier;
     private Vector3 acceleration;
     private Vector3 velocity;
     private Vector3 desiredVelocity;
+    private Vector3 initialDirection;
 
-    Transform targetEnemy;
+    // Locking on
+    private Transform targetEnemy;
     private GameObject lockedOnEnemy;
     private Vector3 lockOnTarget;
+    private Vector3 initialTargetPosition;
     private float lockOnDistance = 15f;
 
-    private Vector3 initialTargetPosition;
-    Vector3 initialDirection;
-
-    bool collideWithFloor = false;
-
-    [SerializeField] private GameObject explosionPrefab;
-    GameObject lockOnTriggerObject;
-
-    [SerializeField] float stayAliveFor = 10f;
-    float lifeTimer = 0f;
-
+    // Perlin noise
     float noiseOffsetX;
     float noiseOffsetY;
     float noiseTimeX = 0f;
     float noiseTimeY = 0f;
+    float meanderNoise;
 
-    private void Start()
-    {
-        // Orient self according to player's current rotation.
-        //transform.rotation = Services.Services.playerTransform.rotation;
+    // Timer
+    private float lifetimeDuration;
+    private float lifetimeTimer;
 
+    // Misc
+    private bool collideWithFloor = false;
+
+
+    public void GetFired() {
+        // Set up variables modified by player's gun value.
+        initialSpeed = GunValueManager.MapToFloatRange(initialSpeedRange);
+        turnSpeed = GunValueManager.MapToFloatRange(turnSpeedRange);
+        lockedOnTurnSpeedMultiplier = GunValueManager.MapToFloatRange(lockedOnTurnSpeedMultiplierRange);
+        maxSpeed = GunValueManager.MapToFloatRange(maxSpeedRange);
+        meanderNoise = GunValueManager.MapToFloatRange(meanderNoiseRange);
+        lifetimeDuration = GunValueManager.MapToFloatRange(lifetimeDurationRange);
+        upwardTilt = GunValueManager.MapToFloatRange(upwardTiltRange);
+        spreadX = GunValueManager.MapToFloatRange(spreadXRange);
+        decelerationOverLifetimeMultiplier = GunValueManager.MapToFloatRange(decelerationOverLifetimeMultiplierRange);
+
+        // Adjust size of visuals
+        Vector3 newVisualScale = sphereVisuals.transform.localScale;
+        newVisualScale.x = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
+        newVisualScale.y = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
+        sphereVisuals.transform.localScale = newVisualScale;
+
+        // Adjust size of collider
+        Vector3 newColliderSize = GetComponent<BoxCollider>().size;
+        newColliderSize.x = GunValueManager.MapToFloatRange(colliderWidthRange);
+        newColliderSize.y = GunValueManager.MapToFloatRange(colliderWidthRange);
+        GetComponent<BoxCollider>().size = newColliderSize;
+
+        // Add this missile's circular sprite to the billboard manager.
         Services.billboardManager.FindAllBillboards();
 
-        lockOnTriggerObject = transform.Find("Lock On Trigger").gameObject;
-
-        //RaycastHit hit;
-        //if (Physics.Raycast(transform.position, transform.forward, out hit, 200f, 1 << 8))
-        //{
-        //    initialTargetPosition = hit.point;
-        //}
-
+        // Set up perlin noise
         noiseOffsetX = Random.Range(-100f, 100f);
         noiseOffsetY = Random.Range(-100f, 100f);
 
+        // Get initial direction
         transform.rotation = Services.playerTransform.rotation;
-        transform.Rotate(new Vector3(Random.Range(-2f, -15f), Random.Range(-35f, 35f), 0f));
-
+        transform.Rotate(new Vector3(-upwardTilt - Random.Range(-7.5f, 7.5f), Random.Range(-spreadX, spreadX), 0f));
         initialDirection = transform.forward;
-        //initialDirection.y = 1f;
         velocity = initialDirection * initialSpeed;
-
     }
 
 
-    void Update()
-    {
-        lifeTimer += Time.deltaTime;
-        if (lifeTimer >= stayAliveFor) GetDestroyed();
+    void Update() {
+        // Get destroyed if lifetime is expired.
+        lifetimeTimer += Time.deltaTime;
+        if (lifetimeTimer >= lifetimeDuration) { GetDestroyed(); }
 
-        // Update position of lock on trigger (always keep it at ground level and in front of missile)
-        float lockOnTriggerRadius = lockOnTriggerObject.GetComponent<SphereCollider>().radius;
-        lockOnTriggerObject.transform.localPosition = new Vector3(0f, 0f, lockOnTriggerRadius);
-        lockOnTriggerObject.transform.position = new Vector3(lockOnTriggerObject.transform.position.x, lockOnTriggerRadius / 4f, lockOnTriggerObject.transform.position.z);
-        //lockOnTriggerObject.transform.position = newLockOnTriggerPosition;
+        // Update position of lock-on trigger (always keep it at ground level and in front of missile)
+        float lockOnTriggerRadius = lockOnTrigger.GetComponent<SphereCollider>().radius;
+        lockOnTrigger.transform.localPosition = new Vector3(0f, 0f, lockOnTriggerRadius);
+        lockOnTrigger.transform.position = new Vector3(lockOnTrigger.transform.position.x, lockOnTriggerRadius / 4f, lockOnTrigger.transform.position.z);
 
-        switch (currentState)
-        {
-            case State.MovingForward:
-                MoveForward();
+        // Update desired velocity direction based on current state.
+        switch (currentState) {
+            case State.NotLockedOn:
+                MoveWithoutTarget();
                 break;
-            case State.SteeringTowardsTarget:
+            case State.LockedOn:
                 SteerTowardsTarget();
                 break;
         }
 
+        // Steer towards desired velocity.
         desiredVelocity = desiredVelocity.normalized * maxSpeed;
-
         Vector3 steerForce = desiredVelocity - velocity;
-        if (currentState == State.MovingForward) steerForce = Vector3.ClampMagnitude(steerForce, turnSpeed);
-        else steerForce = Vector3.ClampMagnitude(steerForce, turnSpeed * lockedOnTurnSpeedMultiplier);
+        if (currentState == State.NotLockedOn) { steerForce = Vector3.ClampMagnitude(steerForce, turnSpeed); } 
+        else { steerForce = Vector3.ClampMagnitude(steerForce, turnSpeed * lockedOnTurnSpeedMultiplier); }
 
+        // Accelerate
         acceleration += steerForce;
-
         velocity += acceleration;
-        //velocity = Vector3.ClampMagnitude(velocity, maxSpeed);
+        velocity *= decelerationOverLifetimeMultiplier;
 
+        // Move
         GetComponent<Rigidbody>().MovePosition(transform.position + velocity * Time.deltaTime);
 
+        // Update perlin noise
         noiseTimeX += Time.deltaTime;
         noiseTimeY += Time.deltaTime;
     }
 
 
-    void MoveForward()
-    {
+    void MoveWithoutTarget() {
+        // Steer towards a random direction using perlin noise.
         Vector3 tempTarget = transform.position + initialDirection;
-        tempTarget.y += MyMath.Map(Mathf.PerlinNoise(noiseTimeX + noiseOffsetX, 0f), 0f, 1f, -0.9f, 0.9f);
-        tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -0.9f, 0.9f);
+        tempTarget.y += MyMath.Map(Mathf.PerlinNoise(noiseTimeX + noiseOffsetX, 0f), 0f, 1f, -meanderNoise, meanderNoise);
+        tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -meanderNoise, meanderNoise);
         desiredVelocity = tempTarget - transform.position;
+
+        // Rotation [May need to bring this code back if I decide to use a directional model]
         //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(Vector3.Normalize(transform.position - targetPosition)), 45f);
         //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), 0.2f);
-        return;
     }
 
 
-    void SteerTowardsTarget()
-    {
-        // See if my target has been destroyed.
-        if (lockedOnEnemy == null)
-        {
-            currentState = State.MovingForward;
+    void SteerTowardsTarget() {
+        // If this missile's target has been destroyed, switch out of unlock state.
+        if (lockedOnEnemy == null) {
+            currentState = State.NotLockedOn;
             return;
         }
 
         desiredVelocity = lockedOnEnemy.transform.position - transform.position;
-        //if (targetEnemy != null) steerForce = Vector3.Normalize(desiredVelocity - velocity) * turnSpeed;
     }
 
 
-    void Detonate()
-    {
+    // Instantiates an explosion prefab
+    void Detonate() {
         Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-        //Destroy(gameObject);
     }
 
 
+    // Deletes game object.
     public void GetDestroyed() {
         Destroy(gameObject);
         if (GetComponentInChildren<TrailRenderer>() == null) return;
@@ -147,29 +186,24 @@ public class PlayerMissile : MonoBehaviour {
     }
 
 
-    void OnTriggerEnter(Collider collider)
-    {
-        if (collider.tag == "Obstacle") /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/
-        {
+    void OnTriggerEnter(Collider collider) {
+        if (collider.tag == "Obstacle") /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/ {
             Detonate();
             GetDestroyed();
         }
 
-        else if (collider.tag == "Enemy")
-        {
+        else if (collider.tag == "Enemy") {
             Detonate();
         }
     }
 
 
-    void OnTriggerEnterChild(Collider collider)
-    {
-        if (collider.tag == "Enemy")
-        {
-            if (currentState == State.MovingForward)
-            {
+    void OnTriggerEnterChild(Collider collider) {
+        // If an enters the lock-on trigger, lock on.
+        if (collider.tag == "Enemy") {
+            if (currentState == State.NotLockedOn) {
                 lockedOnEnemy = collider.gameObject;
-                currentState = State.SteeringTowardsTarget;
+                currentState = State.LockedOn;
             }
         }
     }

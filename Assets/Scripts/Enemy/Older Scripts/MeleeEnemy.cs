@@ -24,6 +24,8 @@ public class MeleeEnemy : Enemy {
     [HideInInspector] public float originalHumVolume;    // The original hum volume.
     [HideInInspector] public float originalHumPitch; // The original pitch of the hum.
 
+    [HideInInspector] public bool hitByPlayerMissileTrigger;
+
 
     private void Awake() {
         originalColor = sheatheMeshRenderer.material.GetColor("_Color");
@@ -54,9 +56,13 @@ public class MeleeEnemy : Enemy {
         }
 
         // See if we hit an obstacle.
-        else if ((collision.collider.tag == "Obstacle" || collision.collider.tag == "Wall") && currentState is MeleeEnemyState_Attacking) {
+        else if ((collision.collider.tag == "Obstacle" || collision.collider.tag == "Wall" || collision.collider.tag == "Railing") && currentState is MeleeEnemyState_Attacking) {
             Debug.Log("Melee enemy hit obstacle.");
             GetComponent<Rigidbody>().MovePosition(transform.position);
+        }
+
+        if (collision.collider.GetComponent<PlayerMissile>() && currentState is MeleeEnemyState_Attacking || currentState is MeleeEnemyState_ChargingUp) {
+            hitByPlayerMissileTrigger = true;
         }
     }
 

@@ -23,4 +23,5 @@ public class Services {
     public static FlashManager flashManager;
     public static BatchBillboard billboardManager;
     public static ScorePopupManager scorePopupManager;
+    public static ExtraScreenManager extraScreenManager;
 }
