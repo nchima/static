@@ -45,28 +45,23 @@ Shader "Custom/Dennis2" {
 		// This adds instancing support for this shader so we can batch all the objects. You need to check 'Enable Instancing' on materials that use the shader.
 		// See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
 		// #pragma instancing_options assumeuniformscaling
-		UNITY_INSTANCING_BUFFER_START(Props)
+		UNITY_INSTANCING_CBUFFER_START(Props)
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _Color)
-#define _Color_arr Props
 			UNITY_DEFINE_INSTANCED_PROP(fixed4, _Emission)
-#define _Emission_arr Props
 			UNITY_DEFINE_INSTANCED_PROP(float, _Explode)
-#define _Explode_arr Props
 			UNITY_DEFINE_INSTANCED_PROP(float, _RandomSeed)
-#define _RandomSeed_arr Props
 			UNITY_DEFINE_INSTANCED_PROP(float4, _TextureOffset)
-#define _TextureOffset_arr Props
-		UNITY_INSTANCING_BUFFER_END(Props)
+		UNITY_INSTANCING_CBUFFER_END
 
 		//just generates a nice Perlin noise from a texture. It's offset using the _RandomSeed instance property (hopefully different for every object).
 		float noise( in float3 x )
 		{
-		    x += float3(UNITY_ACCESS_INSTANCED_PROP(_RandomSeed_arr, _RandomSeed),0,0);
+		    x += float3(UNITY_ACCESS_INSTANCED_PROP(_RandomSeed),0,0);
 		    float3 p = floor(x);
 		    float3 f = frac(x);
 			f = f*f*(3.0-2.0*f);
 			float2 uv = TRANSFORM_TEX((p.xy+float2(37.0,17.0)*p.z) + f.xy,_NoiseTex); 
-			uv += UNITY_ACCESS_INSTANCED_PROP(_TextureOffset_arr, _TextureOffset).xy;
+			uv += UNITY_ACCESS_INSTANCED_PROP(_TextureOffset).xy;
 			float2 rg = tex2Dlod( _NoiseTex, float4((uv+float2(0.5,0.5))/1.0,0,0)).yx;
 			return lerp( rg.x, rg.y, f.z );
 		
@@ -76,7 +71,7 @@ Shader "Custom/Dennis2" {
 			float3 oldPos = v.vertex.xyz; 
 
 			//extrude the verts along the surface normal, using the noise texture and the _Explode and _ExplodeDistance properties
-        	v.vertex.xyz += v.normal * pow(noise(float3(v.vertex.xyz)),1)*UNITY_ACCESS_INSTANCED_PROP(_Explode_arr, _Explode)*_ExplodeDistance;
+        	v.vertex.xyz += v.normal * pow(noise(float3(v.vertex.xyz)),1)*UNITY_ACCESS_INSTANCED_PROP(_Explode)*_ExplodeDistance;
 
         	//measure how far we moved the vertex... we'll use this to set the pixel transparent for verts that moved a long way
         	float dist = length(oldPos-v.vertex.xyz)/_ExplodeCutoff;
@@ -87,13 +82,13 @@ Shader "Custom/Dennis2" {
 			
 			if (IN.color.a < 0.5) discard; //don't draw the pixel if it got moved a lot by the explosion 
 
-			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * UNITY_ACCESS_INSTANCED_PROP(_Color_arr, _Color);
+			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * UNITY_ACCESS_INSTANCED_PROP(_Color);
 			o.Albedo = c.rgb; //use the per-instance color and the main texture to set the albedo color
 
 			o.Metallic = _Metallic;
 			o.Smoothness = _Glossiness;
 
-			o.Emission = UNITY_ACCESS_INSTANCED_PROP(_Emission_arr, _Emission); //set the emission color using the material property block
+			o.Emission = UNITY_ACCESS_INSTANCED_PROP(_Emission); //set the emission color using the material property block
 			 
 			o.Alpha =  c.a;
 		}

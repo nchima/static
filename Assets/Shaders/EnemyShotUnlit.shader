@@ -6,11 +6,10 @@
 
 	SubShader
 	{
-		Tags{ "Queue" = "Opaque" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
+		Tags{ "Queue" = "Geometry" "IgnoreProjector" = "True" "RenderType" = "Opaque" }
 		LOD 200
 
-		Pass
-		{
+		Pass {
 			ZWrite On
 			ColorMask 0
 		}

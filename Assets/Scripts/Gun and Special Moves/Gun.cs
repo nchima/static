@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class Gun : MonoBehaviour {
 
+    /* INSPECTOR */
+
     [SerializeField] IntRange bulletsPerBurstRange = new IntRange(2, 50);   // How many bullets are fired per shot.
     [SerializeField] FloatRange burstsPerSecondRange = new FloatRange(2f, 9f);  // How many shots can be fired per second.
     [SerializeField] FloatRange bulletSpreadRange = new FloatRange(1f, 10f);
@@ -13,6 +15,7 @@ public class Gun : MonoBehaviour {
     [SerializeField] FloatRange bulletExplosionRadiusRange = new FloatRange(0f, 5f);
     [SerializeField] IntRange explosionDamageRange = new IntRange(1, 5);
     [SerializeField] FloatRange missileFireIntervalRange = new FloatRange(0f, 0.15f);
+    [SerializeField] FloatRange shieldExplosionRadiusRange = new FloatRange(0f, 40f);
     [SerializeField] int bulletDamage = 1;
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
@@ -22,7 +25,6 @@ public class Gun : MonoBehaviour {
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
     [SerializeField] public float burstsPerSecondSloMoModifierMax = 2f;   
 
-    [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
 
     /* GENERAL SPECIAL MOVE STUFF */
     public float specialMoveSineRange = 0.1f;
@@ -30,6 +32,7 @@ public class Gun : MonoBehaviour {
     public bool missilesAreReady;
     Color specialMoveReadyColor1 = Color.yellow;
     Color specialMoveReadyColor2 = Color.red;
+    [SerializeField] GameObject specialMoveShieldPrefab;
 
     /* MISSILE STUFF */
     [SerializeField] int missilesPerBurst = 20;
@@ -41,6 +44,7 @@ public class Gun : MonoBehaviour {
     // USED DURING SHOOTING
     int bulletsPerBurst;
     int bulletsHitThisBurst = 0;
+    [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
 
     /* AUDIO STUFF */
     public AudioSource rifleAudioSource;
@@ -143,6 +147,10 @@ public class Gun : MonoBehaviour {
 
     void FireMissiles() {
         if (!firingMissiles) return;
+
+        // Spawn shield explosion.
+        Explosion specialMoveShield = Instantiate(specialMoveShieldPrefab, Services.playerTransform.position, Quaternion.identity, Services.playerTransform).GetComponent<Explosion>();
+        specialMoveShield.explosionRadius = GunValueManager.MapToFloatRange(shieldExplosionRadiusRange);
 
         if (missileTimer >= GunValueManager.MapToFloatRange(missileFireIntervalRange)) {
             FireMissile();

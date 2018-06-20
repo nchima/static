@@ -33,7 +33,7 @@ public class MeleeEnemyState_Moving : State {
         float tempMoveSpeed = moveSpeed;
 
         // Move faster if we can see the player.
-        if (!controller.canSeePlayer) { tempMoveSpeed *= 0.5f; }
+        //if (!controller.canSeePlayer) { tempMoveSpeed *= 0.5f; }
 
         // See if it's time to change our move direction.
         changeDirectionTimer += Time.deltaTime;
@@ -81,6 +81,7 @@ public class MeleeEnemyState_Moving : State {
         //Vector3 velocity = (Vector3.Normalize(navMeshAgent.desiredVelocity) + Vector3.Normalize(gameManager.playerVelocity)*2.5f) * moveSpeed * Time.deltaTime;
         //Vector3 nextPosition = transform.position + velocity;
 
+        Debug.Log("I'm moving this far: " + Vector3.Distance(transform.position, nextPosition));
         controller.GetComponent<Rigidbody>().MovePosition(nextPosition);
     }
 
