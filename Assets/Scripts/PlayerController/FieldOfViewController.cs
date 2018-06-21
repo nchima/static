@@ -5,6 +5,8 @@ using DG.Tweening;
 
 public class FieldOfViewController : MonoBehaviour {
 
+    [SerializeField] Transform pullbackPoint;
+
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
     FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
 
@@ -66,13 +68,19 @@ public class FieldOfViewController : MonoBehaviour {
         currentOrthoSize = MyMath.Map(sineValue, 1f, -1f, orthographicSizeRange.min, orthographicSizeRange.max);
     }
 
+    Vector3 originalLocalPosition = new Vector3(0f, 1.1f, 0f);
     public void TweenToShotgunChargeFOV() {
         TweenFieldOfView(shotgunChargeFOVRange.max, shotgunChargeOrthoSizeRange.max, 0.4f);
+        originalLocalPosition = transform.localPosition;
+        transform.DOLocalMove(pullbackPoint.transform.localPosition, 0.4f);
+        transform.DOLocalRotate(pullbackPoint.transform.localRotation.eulerAngles, 0.4f);
         freezeUpdate = true;
     }
 
     public void TweenToNormalFOV() {
         TweenFieldOfView(shotgunChargeFOVRange.min, shotgunChargeOrthoSizeRange.min, 0.14f);
+        transform.DOLocalMove(originalLocalPosition, 0.14f);
+        transform.DOLocalRotate(Vector3.zero, 0.14f);
         freezeUpdate = false;
     }
 

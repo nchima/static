@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class FloatRange {
@@ -24,5 +25,9 @@ public class FloatRange {
 
     public float MapTo(float input, float min, float max) {
         return MyMath.Map(input, min, max, this.min, this.max);
+    }
+
+    public float Clamp(float value) {
+        return Mathf.Clamp(value, min, max);
     }
 }

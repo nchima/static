@@ -298,6 +298,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Gun.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\GunExperimental.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\PlayerMissile.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ChargeDashLine.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunCharge.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeSphere.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeState_Charging.cs" />
@@ -306,6 +307,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerCollidedWithWallOrEnemy.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerPressedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_ReachedEndPoint.cs" />
     <Compile Include="Assets\Scripts\Input\InputManager.cs" />
     <Compile Include="Assets\Scripts\Level\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Level\EnemyPlacer.cs" />

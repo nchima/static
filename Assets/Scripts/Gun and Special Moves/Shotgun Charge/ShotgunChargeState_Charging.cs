@@ -5,14 +5,19 @@ using UnityEngine;
 
 public class ShotgunChargeState_Charging : State {
 
+    Vector3 previousPlayerPosition;
+
     public override void Initialize(StateController stateController) {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
         
         shotgunCharge.sphere.MoveIntoChargePosition();
-
+        shotgunCharge.StoreDashDistance();
+        shotgunCharge.currentDistanceDashed = 0f;
+        previousPlayerPosition = Services.playerTransform.position;
         shotgunCharge.isCharging = true;
 
         FindObjectOfType<FieldOfViewController>().TweenToNormalFOV();
+
 
         // Make player temporarily invincible
         Services.healthManager.forceInvincibility = true;
@@ -35,5 +40,8 @@ public class ShotgunChargeState_Charging : State {
 
     public override void Run(StateController stateController) {
         base.Run(stateController);
+        ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
+        shotgunCharge.currentDistanceDashed += Vector3.Distance(Services.playerTransform.position, previousPlayerPosition);
+        previousPlayerPosition = Services.playerTransform.position;
     }
 }

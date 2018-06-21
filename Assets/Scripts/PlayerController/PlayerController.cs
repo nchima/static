@@ -133,7 +133,7 @@ public class PlayerController : MonoBehaviour {
         if (state == State.Normal) {
             dashCooldownTimer += Time.deltaTime;
             if (dashCooldownTimer >= dashCooldown) {
-                if (InputManager.dashButtonDown && !superDashCharging) {
+                if (InputManager.dashButtonUp && !superDashCharging) {
                     BeginDash(false);
                 } else if (InputManager.dashButton && !superDashCharging) {
                     superDashHoldTimer += Time.deltaTime;
@@ -215,7 +215,7 @@ public class PlayerController : MonoBehaviour {
         else if (state == State.Falling || state == State.SpeedFalling) {
             if (desiredMove == Vector3.zero) { m_Rigidbody.velocity = new Vector3(0f, m_Rigidbody.velocity.y, 0f); }
             else { m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
-        } 
+        }
         
         // Handle shotgun charge movement.
         else if (state == State.ShotgunCharge) {

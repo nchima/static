@@ -34,7 +34,7 @@ public class PlayerBullet : MonoBehaviour {
     }
 
 
-    private void FixedUpdate() {
+    private void Update() {
         FixedUpdateMove();
     }
 

@@ -49,17 +49,18 @@ public class ShotgunChargeState_FinalAttack : State {
 
 
     void FireShockwave(ShotgunCharge shotgunCharge) {
-        Services.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 2f);
+        //Services.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 2f);
         Services.playerGameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
         //shotgunCharge.capturedEnemies.Clear();
+        shotgunCharge.dashLine.SetActive(false);
         StartCoroutine(ShockwaveCoroutine());
     }
 
 
     IEnumerator ShockwaveCoroutine() {
-        yield return new WaitForSeconds(0.25f);
+        //yield return new WaitForSeconds(0.25f);
         Services.gameManager.ReturnToFullSpeed();
-        yield return new WaitForSeconds(0.25f);
+        //yield return new WaitForSeconds(0.25f);
         GetComponent<TriggerTransition>().isTriggerSet = true;
         yield return null;
     }

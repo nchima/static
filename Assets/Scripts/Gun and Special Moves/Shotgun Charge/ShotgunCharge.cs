@@ -24,6 +24,10 @@ public class ShotgunCharge : StateController {
     }
 
     [SerializeField] TriggerTransition chargeTrigger;
+    public ChargeDashLine dashLine { get { return GetComponentInChildren<ChargeDashLine>(); } }
+
+    [HideInInspector] public float currentDashEndDistance;
+    [HideInInspector] public float currentDistanceDashed;
 
     Transform player;
 
@@ -59,6 +63,10 @@ public class ShotgunCharge : StateController {
         chargeTrigger.isTriggerSet = true;
     }
 
+
+    public void StoreDashDistance() {
+        currentDashEndDistance = dashLine.distance;
+    }
 
     //public void OnTriggerEnter(Collider other) {
     //    // If we collide into an enemy while charging, capture it.

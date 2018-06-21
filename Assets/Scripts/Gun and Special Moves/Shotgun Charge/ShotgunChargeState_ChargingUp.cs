@@ -6,6 +6,8 @@ using UnityEngine;
 public class ShotgunChargeState_ChargingUp : State {
 
     public override void Initialize(StateController stateController) {
+        ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
+        shotgunCharge.dashLine.SetActive(true);
         FindObjectOfType<FieldOfViewController>().TweenToShotgunChargeFOV();
     }
 
