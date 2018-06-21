@@ -92,7 +92,7 @@ public class Explosion : MonoBehaviour {
         }
 
         else if (LayerMask.LayerToName(collider.gameObject.layer).Contains("ShootableBullet")) {
-            collider.SendMessage("Detonate", SendMessageOptions.DontRequireReceiver);
+            //collider.SendMessage("Detonate", SendMessageOptions.DontRequireReceiver);
         }
     }
 }

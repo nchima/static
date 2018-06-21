@@ -253,6 +253,7 @@
     <Compile Include="Assets\Scripts\Enemy\Laser Enemy\LaserEnemyStateDash.cs" />
     <Compile Include="Assets\Scripts\Enemy\Laser Enemy\LaserEnemyStateShoot.cs" />
     <Compile Include="Assets\Scripts\Enemy\Laser Enemy\LaserEnemyTransitionFromDash.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyState_Attacking.cs" />
     <Compile Include="Assets\Scripts\Enemy\Melee Enemy\MeleeEnemyState_ChargingUp.cs" />
@@ -264,7 +265,6 @@
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\EnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\EnemySpawner.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\LaserEnemyOld.cs" />
-    <Compile Include="Assets\Scripts\Enemy\Older Scripts\MeleeEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\NavMeshEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\ShootingEnemyOld.cs" />
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\SnailEnemy.cs" />

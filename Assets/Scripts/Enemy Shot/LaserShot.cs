@@ -174,7 +174,7 @@ public class LaserShot : EnemyShot {
 
 
     void OnTriggerEnterChild(Collider other) {
-        if (other.GetComponent<PlayerMissile>() != null) {
+        if (other.tag == "Player Missile") {
             Deflect();
         }
 

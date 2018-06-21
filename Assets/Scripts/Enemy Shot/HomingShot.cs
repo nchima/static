@@ -49,21 +49,21 @@ public class HomingShot : EnemyShot {
 
         bool foundTarget = false;
 
-        while (!foundTarget) {
-            currentTarget = new Vector3(
-                (Services.playerTransform.position.x + PlayerController.currentVelocity.x * leading) + Random.insideUnitCircle.x * inaccuracy * 2f,
-                0f,
-                (Services.playerTransform.position.z + PlayerController.currentVelocity.z * leading) + Random.insideUnitCircle.y * inaccuracy * 2f);
+        //while (!foundTarget) {
+        //    currentTarget = new Vector3(
+        //        (Services.playerTransform.position.x + PlayerController.currentVelocity.x * leading) + Random.insideUnitCircle.x * inaccuracy * 2f,
+        //        0f,
+        //        (Services.playerTransform.position.z + PlayerController.currentVelocity.z * leading) + Random.insideUnitCircle.y * inaccuracy * 2f);
 
-            leading -= 1f;
-            leading = Mathf.Clamp(leading, 0f, 99f);
+        //    leading -= 1f;
+        //    leading = Mathf.Clamp(leading, 0f, 99f);
 
-            //if (Services.gameManager.PositionIsInLevelBoundaries(currentTarget))
-            //{
-                foundTarget = true;
-            //    break;
-            //}
-        }
+        //    //if (Services.gameManager.PositionIsInLevelBoundaries(currentTarget))
+        //    //{
+        //        foundTarget = true;
+        //    //    break;
+        //    //}
+        //}
 
         //velocity = Vector3.Normalize(playerTransform.position - transform.position) * minSpeed;
         velocity = new Vector3(0f, 30f, 0f);
@@ -217,9 +217,10 @@ public class HomingShot : EnemyShot {
 
 
     void GetShotDown(Vector3 forcePoint) {
+        Debug.Log("homing missile getting shot down.");
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().useGravity = true;
-        GetComponent<Rigidbody>().AddExplosionForce(7f, forcePoint, 2f, 1f, ForceMode.Impulse);
+        GetComponent<Rigidbody>().AddForce((transform.position - Services.playerTransform.position).normalized * 50f, ForceMode.Impulse);
         blipAudioSource.pitch = 3f;
         Invoke("Detonate", 4f);
         state = HomingShotState.WasShot;
@@ -234,10 +235,28 @@ public class HomingShot : EnemyShot {
 
 
     protected override void OnTriggerEnter(Collider collider) {
-        base.OnTriggerEnter(collider);
-
-        if (collider.GetComponent<PlayerMissile>() != null) {
+        if (collider.tag == "Player Missile") {
             GetShotDown(collider.ClosestPoint(transform.position));
         }
+
+        if (collider.tag == "Obstacle" || collider.tag == "Wall" || (collider.name.ToLower().Contains("floor") && collideWithFloor)) {
+            //Debug.Log("I bumped into an obstacle.");
+            Detonate();
+        }
+
+        // Uncomment this to allow enemies to harm each other.
+        //else if (collider.tag.Contains("Enem") && collider.gameObject != firedEnemy)
+        //{
+        //    if (collider.GetComponent<EnemyOld>()) { collider.GetComponent<EnemyOld>().HP -= Random.Range(5, 15); }
+        //    else { collider.GetComponent<Enemy>().currentHealth -= Random.Range(5, 15); }
+        //    Detonate();
+        //}
+
+        else if (collider.tag == "Player") {
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
+
+            // Destroy self.
+            Detonate();
+        }         
     }
 }

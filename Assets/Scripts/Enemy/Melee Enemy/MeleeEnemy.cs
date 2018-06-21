@@ -60,8 +60,12 @@ public class MeleeEnemy : Enemy {
             Debug.Log("Melee enemy hit obstacle.");
             GetComponent<Rigidbody>().MovePosition(transform.position);
         }
+    }
 
-        if (collision.collider.GetComponent<PlayerMissile>() && currentState is MeleeEnemyState_Attacking || currentState is MeleeEnemyState_ChargingUp) {
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.tag == "Player Missile" && (currentState is MeleeEnemyState_Attacking || currentState is MeleeEnemyState_ChargingUp)) {
+            Debug.Log("deflect trigger");
             hitByPlayerMissileTrigger = true;
         }
     }

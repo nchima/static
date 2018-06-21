@@ -7,7 +7,7 @@ public class EnemyShot : MonoBehaviour {
     protected float maxLifetime = 30f;   // How long I live before I am deleted.
     protected float currentLifetime;  // Used to track how long I have currently been alive.
 
-    [SerializeField] bool collideWithFloor = false;
+    [SerializeField] protected bool collideWithFloor = false;
 
     [SerializeField] protected GameObject strikeParticles;    // The particles that spawn when I hit an enemy.
 
@@ -41,7 +41,7 @@ public class EnemyShot : MonoBehaviour {
 
     public virtual void Deflect() {
         // For right now, just detonate. I can add unique deflection effects later.
-        Detonate();
+        Destroy(gameObject);
     }
 
 
@@ -66,7 +66,7 @@ public class EnemyShot : MonoBehaviour {
             Detonate();
         }
 
-        else if (collider.GetComponent<PlayerMissile>()) {
+        else if (collider.tag == "Player Missile") {
             Deflect();
         }
     }

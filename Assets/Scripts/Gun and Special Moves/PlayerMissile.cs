@@ -45,6 +45,7 @@ public class PlayerMissile : MonoBehaviour {
     private Vector3 velocity;
     private Vector3 desiredVelocity;
     private Vector3 initialDirection;
+    private float rotationSpeed = 40f;
 
     // Locking on
     private Transform targetEnemy;
@@ -64,8 +65,16 @@ public class PlayerMissile : MonoBehaviour {
     private float lifetimeDuration;
     private float lifetimeTimer;
 
+    // References
+    SkinnedMeshRenderer m_SkinnedMeshRenderer;
+
     // Misc
     private bool collideWithFloor = false;
+
+
+    private void Awake() {
+        m_SkinnedMeshRenderer = sphereVisuals.GetComponentInChildren<SkinnedMeshRenderer>();
+    }
 
 
     public void GetFired() {
@@ -80,11 +89,15 @@ public class PlayerMissile : MonoBehaviour {
         spreadX = GunValueManager.MapToFloatRange(spreadXRange);
         decelerationOverLifetimeMultiplier = GunValueManager.MapToFloatRange(decelerationOverLifetimeMultiplierRange);
 
+        // Get random rotation
+        RotateMesh();
+
         // Adjust size of visuals
         Vector3 newVisualScale = sphereVisuals.transform.localScale;
         newVisualScale.x = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
         newVisualScale.y = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
         sphereVisuals.transform.localScale = newVisualScale;
+        m_SkinnedMeshRenderer.SetBlendShapeWeight(0, GunValueManager.MapTo(100f, 0f));
 
         // Adjust size of collider
         Vector3 newColliderSize = GetComponent<BoxCollider>().size;
@@ -140,6 +153,7 @@ public class PlayerMissile : MonoBehaviour {
 
         // Move
         GetComponent<Rigidbody>().MovePosition(transform.position + velocity * Time.deltaTime);
+        RotateMesh();
 
         // Update perlin noise
         noiseTimeX += Time.deltaTime;
@@ -154,9 +168,11 @@ public class PlayerMissile : MonoBehaviour {
         tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -meanderNoise, meanderNoise);
         desiredVelocity = tempTarget - transform.position;
 
+        sphereVisuals.transform.LookAt(transform.position + desiredVelocity);
+
         // Rotation [May need to bring this code back if I decide to use a directional model]
         //transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(Vector3.Normalize(transform.position - (transform.position + desiredVelocity))), 360f);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(transform.position - (transform.position + desiredVelocity)), 1f);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(transform.position - (transform.position + desiredVelocity)), 1f);
     }
 
 
@@ -166,6 +182,8 @@ public class PlayerMissile : MonoBehaviour {
             currentState = State.NotLockedOn;
             return;
         }
+
+        sphereVisuals.transform.LookAt(lockedOnEnemy.transform.position);
 
         desiredVelocity = lockedOnEnemy.transform.position - transform.position;
     }
@@ -183,6 +201,13 @@ public class PlayerMissile : MonoBehaviour {
         if (GetComponentInChildren<TrailRenderer>() == null) return;
         GetComponentInChildren<TrailRenderer>().autodestruct = true;
         GetComponentInChildren<TrailRenderer>().transform.SetParent(null);
+    }
+
+
+    void RotateMesh() {
+        Vector3 newRotation = sphereVisuals.transform.rotation.eulerAngles;
+        newRotation.z = Random.Range(-180f, 180f);
+        sphereVisuals.transform.rotation = Quaternion.Euler(newRotation);
     }
 
 

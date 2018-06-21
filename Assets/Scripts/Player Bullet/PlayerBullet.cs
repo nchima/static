@@ -146,9 +146,9 @@ public class PlayerBullet : MonoBehaviour {
             else { Services.sfxManager.PlayBulletHitEnemySound(hit.collider.GetComponent<Enemy>()); }
         } 
         
-        else if (hit.collider.name.Contains("Homing Shot")) {
-            hit.collider.gameObject.GetComponent<HomingShot>().GotShot(hit.point);
-        } 
+        //else if (hit.collider.name.Contains("Homing Shot")) {
+        //    hit.collider.gameObject.GetComponent<HomingShot>().GotShot(hit.point);
+        //} 
 
         else if (hit.collider.name.Contains("Weak Point")) {
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));

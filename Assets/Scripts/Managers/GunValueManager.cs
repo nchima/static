@@ -52,4 +52,8 @@ public class GunValueManager : MonoBehaviour {
     public static float MapToFloatRangeInverted(FloatRange floatRange) {
         return MyMath.Map(currentValue, -1f, 1f, floatRange.max, floatRange.min);
     }
+
+    public static float MapTo(float min, float max) {
+        return MyMath.Map(currentValue, -1f, 1f, min, max);
+    }
 }
