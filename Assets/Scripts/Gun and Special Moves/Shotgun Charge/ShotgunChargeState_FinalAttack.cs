@@ -52,7 +52,6 @@ public class ShotgunChargeState_FinalAttack : State {
         //Services.fallingSequenceManager.InstantiateShockwave(shockwavePrefab, 2f);
         Services.playerGameObject.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePosition;
         //shotgunCharge.capturedEnemies.Clear();
-        shotgunCharge.dashLine.SetActive(false);
         StartCoroutine(ShockwaveCoroutine());
     }
 

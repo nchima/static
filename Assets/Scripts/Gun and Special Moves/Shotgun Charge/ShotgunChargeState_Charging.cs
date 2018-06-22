@@ -13,6 +13,7 @@ public class ShotgunChargeState_Charging : State {
         shotgunCharge.sphere.MoveIntoChargePosition();
         shotgunCharge.StoreDashDistance();
         shotgunCharge.currentDistanceDashed = 0f;
+        shotgunCharge.dashLine.AttachToParent(false);
         previousPlayerPosition = Services.playerTransform.position;
         shotgunCharge.isCharging = true;
 
@@ -43,5 +44,12 @@ public class ShotgunChargeState_Charging : State {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
         shotgunCharge.currentDistanceDashed += Vector3.Distance(Services.playerTransform.position, previousPlayerPosition);
         previousPlayerPosition = Services.playerTransform.position;
+    }
+
+    public override void End(StateController stateController) {
+        base.End(stateController);
+        ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
+        shotgunCharge.dashLine.AttachToParent(true);
+        shotgunCharge.dashLine.SetActive(false);
     }
 }

@@ -24,7 +24,7 @@ public class ShotgunCharge : StateController {
     }
 
     [SerializeField] TriggerTransition chargeTrigger;
-    public ChargeDashLine dashLine { get { return GetComponentInChildren<ChargeDashLine>(); } }
+    public ChargeDashLine dashLine;
 
     [HideInInspector] public float currentDashEndDistance;
     [HideInInspector] public float currentDistanceDashed;
