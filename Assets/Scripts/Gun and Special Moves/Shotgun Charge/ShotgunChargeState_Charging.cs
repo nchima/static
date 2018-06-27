@@ -11,6 +11,8 @@ public class ShotgunChargeState_Charging : State {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
 
         Services.playerController.dashRechargeTimer = 0f;
+
+        Services.musicManager.BeginDash();
         
         shotgunCharge.sphere.MoveIntoChargePosition();
         shotgunCharge.StoreDashDistance();
@@ -53,5 +55,8 @@ public class ShotgunChargeState_Charging : State {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
         shotgunCharge.dashLine.AttachToParent(true);
         shotgunCharge.dashLine.SetActive(false);
+        Services.gun.canShoot = true;
+        Services.uiManager.crosshair.SetActive(true);
+        Services.musicManager.ExitDash();
     }
 }

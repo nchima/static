@@ -76,8 +76,8 @@ public class FieldOfViewController : MonoBehaviour {
 
         if (moveCameraTween != null && moveCameraTween.IsPlaying()) { moveCameraTween.Kill(); }
         if (rotateCameraTween != null && rotateCameraTween.IsPlaying()) { rotateCameraTween.Kill(); }
-        moveCameraTween = transform.DOLocalMove(pullbackPoint.transform.localPosition, 0.4f);
-        rotateCameraTween = transform.DOLocalRotate(pullbackPoint.transform.localRotation.eulerAngles, 0.4f);
+        moveCameraTween = transform.DOLocalMove(pullbackPoint.transform.localPosition, 0.4f).SetEase(Ease.OutQuad);
+        rotateCameraTween = transform.DOLocalRotate(pullbackPoint.transform.localRotation.eulerAngles, 0.4f).SetEase(Ease.OutElastic);
 
         freezeUpdate = true;
     }

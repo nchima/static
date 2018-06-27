@@ -17,8 +17,10 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] FloatRange rhythmVolumeRange = new FloatRange(-5f, 5f);
     [SerializeField] FloatRange ABVolumeRange = new FloatRange(-5f, 5f);
 
+    enum State { Normal, SpeedFall, FallingSequence, DashCharging, Dashing }
+    State state = State.Normal;
+
     int tracksPerLayer = 2;
-    bool isInFallingSequence;
 
     MusicDebugState[] musicDebugStates;
     int currentDebugState = 0;
@@ -47,7 +49,7 @@ public class MusicManager : MonoBehaviour {
 
 
     private void Update() {
-        if (!isInFallingSequence) { SetLayerVolumeByGunValue(); }
+        if (state == State.Normal) { SetLayerVolumeByGunValue(); }
 
         if (Input.GetKeyDown(KeyCode.M)) {
             int nextDebugState = currentDebugState;
@@ -69,12 +71,12 @@ public class MusicManager : MonoBehaviour {
 
 
     public void EnterFallingSequence() {
-        isInFallingSequence = true;
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);
         masterMixer.SetFloat("Pitch", 0.5f);
         masterMixer.SetFloat("Master Volume", -5f);
         RandomizeAllMusicVolumeLevels();
+        state = State.FallingSequence;
     }
 
 
@@ -84,6 +86,7 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Lowpass Resonance", 3f);
         masterMixer.SetFloat("Master Volume", 0f);
         SetAllAudioSourcePitch(3f, 0.1f);
+        state = State.SpeedFall;
     }
 
 
@@ -91,7 +94,37 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
         masterMixer.SetFloat("Pitch", 1f);
-        isInFallingSequence = false;
+        state = State.Normal;
+    }
+
+
+    public void EnterDashCharge() {
+        masterMixer.SetFloat("Lowpass Cutoff Freq", 23f);
+        masterMixer.SetFloat("Lowpass Resonance", 10f);
+        masterMixer.SetFloat("Highpass Cutoff Freq", 2000f);
+        masterMixer.SetFloat("Highpass Resonance", 10f);
+        //SetAllAudioSourcePitch(0.5f, 0.6f);
+        state = State.DashCharging;
+    }
+
+
+    public void BeginDash() {
+        masterMixer.SetFloat("Pitch", 1f);
+        masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
+        masterMixer.SetFloat("Lowpass Resonance", 3f);
+        masterMixer.SetFloat("Master Volume", 0f);
+        SetAllAudioSourcePitch(3f, 0.1f);
+        state = State.Dashing;
+    }
+
+
+    public void ExitDash() {
+        masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
+        masterMixer.SetFloat("Lowpass Resonance", 3f);
+        masterMixer.SetFloat("Highpass Cutoff Freq", 4685f);
+        masterMixer.SetFloat("Highpass Resonance", 1f);
+        masterMixer.SetFloat("Pitch", 0.1f);
+        state = State.Normal;
     }
 
 
@@ -121,6 +154,7 @@ public class MusicManager : MonoBehaviour {
         RandomizeAllTrackVolumeLevels(layerBMixer);
         RandomizeAllTrackVolumeLevels(rhythmMixer);
     }
+
 
     // Unused.
     void SelectRandomTrack(AudioMixer mixer) {
@@ -168,6 +202,7 @@ public class MusicManager : MonoBehaviour {
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
     }
+
 
     public void GameStartedHandler(GameEvent gameEvent) {
         musicMasterMixer.SetFloat("Layer A Volume", -80f);
