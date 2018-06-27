@@ -9,6 +9,8 @@ public class ShotgunChargeState_Charging : State {
 
     public override void Initialize(StateController stateController) {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
+
+        Services.playerController.dashRechargeTimer = 0f;
         
         shotgunCharge.sphere.MoveIntoChargePosition();
         shotgunCharge.StoreDashDistance();

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using DG.Tweening;
 
 public class PlayerController : MonoBehaviour {
@@ -31,6 +32,9 @@ public class PlayerController : MonoBehaviour {
     [SerializeField] float dashCooldown = 0.5f;
     [SerializeField] float dashSpeed = 10f;
     [SerializeField] float superDashHoldDuration = 0.1f;   // How long the player must hold the dash button to activate a super dash
+    [SerializeField] Image dashReadyIndicator;
+    const float DASH_RECHARGE_TIME = .001f;
+    public float dashRechargeTimer = 5f;
     [HideInInspector] public bool superDashCharging;
     float superDashHoldTimer;
     float dashCooldownTimer;
@@ -113,6 +117,10 @@ public class PlayerController : MonoBehaviour {
 
         if (GameManager.gamePaused || state == State.Dead) { return; }
 
+        dashRechargeTimer += Time.deltaTime;
+        dashRechargeTimer = Mathf.Clamp(dashRechargeTimer, 0f, DASH_RECHARGE_TIME);
+        dashReadyIndicator.fillAmount = MyMath.Map(dashRechargeTimer, 0f, DASH_RECHARGE_TIME, 0f, 1f);
+
         /* GET DIRECTIONAL INPUT */
         if (state != State.ShotgunCharge
             && Physics.Raycast(transform.position + transform.forward * 0.75f, Vector3.down, 5f, 1 << 20)
@@ -132,7 +140,7 @@ public class PlayerController : MonoBehaviour {
         /* HANDLE DASHING INPUT */
         if (state == State.Normal) {
             dashCooldownTimer += Time.deltaTime;
-            if (dashCooldownTimer >= dashCooldown) {
+            if (dashCooldownTimer >= dashCooldown && dashRechargeTimer >= DASH_RECHARGE_TIME) {
                 if (InputManager.dashButtonUp && !superDashCharging) {
                     BeginDash(false);
                 } else if (InputManager.dashButton && !superDashCharging) {

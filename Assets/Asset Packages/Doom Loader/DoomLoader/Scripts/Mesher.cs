@@ -480,8 +480,8 @@ public class Mesher : MonoBehaviour {
 
         /* CREATE STATIC LEVEL */
 
-        // Figure out whether it will be a wall or a railing
-        bool isWall = Vector3.Distance(vertices[0], vertices[2]) > 1f;
+        // Figure out whether it will be a wall
+        //bool isWall = Vector3.Distance(vertices[0], vertices[2]) > 1f;
 
         float distanceBetweenVertices = Vector3.Distance(vertices[0], vertices[2]);
         //Debug.Log("distance btwn vertices: " + distanceBetweenVertices);
