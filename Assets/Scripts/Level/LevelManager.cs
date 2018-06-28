@@ -92,13 +92,12 @@ public class LevelManager : MonoBehaviour {
 
 
     public void LoadNextLevel() {
-        if (levelsCompleted >= 12) {
+        if (SceneManager.GetSceneByBuildIndex(levelsCompleted + 1).IsValid()) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
             Services.uiManager.ShowEndOfDemoScreen();
             return;
         }
 
-        //LoadLevel(levelSceneIndices.Random);
         LoadLevel(levelsCompleted + 1);
     }
 

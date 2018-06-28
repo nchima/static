@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using UnityEditor;
 using DG.Tweening;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class ColorPaletteManager : MonoBehaviour {
 
@@ -57,9 +59,11 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     private void Update() {
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.Alpha5)) {
             SaveCurrentPaletteAsNewAsset();
         }
+# endif
     }
 
     void ChangePalette(ColorPalette newPalette, float duration) {
@@ -154,19 +158,23 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void RestoreSavedPalette() {
-        if (levelPaletteIndex == 0) { ChangePalette(defaultPalette, 0.78f); } 
-        else { ChangePalette(levelPalettes[levelPaletteIndex], 0.78f); }
+        float duration = 0.78f;
+        if (levelPaletteIndex == 0) { ChangePalette(defaultPalette, duration); } 
+        else if (levelPalettes[levelPaletteIndex] == null) { ChangePalette(savedPalette, duration); }
+        else { ChangePalette(levelPalettes[levelPaletteIndex], duration); }
     }
 
     void SaveCurrentPaletteAsNewAsset() {
         ColorPalette paletteToSave = new ColorPalette();
         SaveCurrentPalette(paletteToSave);
-        //AssetDatabase.CreateAsset(paletteToSave, "Assets/Resources/Level Color Palettes/Color Palette Level X.asset");
 
-        //AssetDatabase.SaveAssets();
-        //AssetDatabase.Refresh();
-        //EditorUtility.FocusProjectWindow();
-        //Selection.activeObject = paletteToSave;
+#if UNITY_EDITOR
+        AssetDatabase.CreateAsset(paletteToSave, "Assets/Resources/Level Color Palettes/Color Palette Level X.asset");
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+        EditorUtility.FocusProjectWindow();
+        Selection.activeObject = paletteToSave;
+#endif
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
