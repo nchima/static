@@ -10,6 +10,8 @@ public class SpecialBarManager : MonoBehaviour {
     [SerializeField] SpecialBar leftBar;
     [SerializeField] SpecialBar rightBar;
 
+    [SerializeField] GameObject[] savedShotBoxes;
+
     // GAMEPLAY STUFF
     public float startValue = 0.4f;    // How large of a special the player starts the game with.
 
@@ -32,6 +34,21 @@ public class SpecialBarManager : MonoBehaviour {
         }
     }
 
+    [SerializeField] int maxSavedShots = 2;
+    private int shotsSaved;
+    public int ShotsSaved {
+        get {
+            return shotsSaved;
+        }
+
+        set {
+            shotsSaved = Mathf.Clamp(value, 0, maxSavedShots);
+            if (shotsSaved == 1) { savedShotBoxes[0].SetActive(true); }
+            else { savedShotBoxes[0].SetActive(false); }
+        }
+    }
+
+
 
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
@@ -52,9 +69,17 @@ public class SpecialBarManager : MonoBehaviour {
         leftBar.Run(this);
         rightBar.Run(this);
 
-        if (bothBarsFull && !screenHidden) {
-            if (Services.playerController.state != PlayerController.State.Dead) { specialMoveReadyScreen.SetActive(true); }
-            FlashBar();
+        if (bothBarsFull && !screenHidden && Services.playerController.state != PlayerController.State.Dead) {
+            if (ShotsSaved < maxSavedShots) {
+                //specialMoveReadyScreen.SetActive(true);
+                ShotsSaved++;
+                leftBar.currentValue = 0f;
+                rightBar.currentValue = 0f;
+            }
+
+            else {
+                savedShotBoxes[1].SetActive(true);
+            }
         }
 
         else {
@@ -92,8 +117,15 @@ public class SpecialBarManager : MonoBehaviour {
 
 
     public void PlayerUsedSpecialMove() {
-        leftBar.currentValue = 0f;
-        rightBar.currentValue = 0f;
+        if (ShotsSaved == maxSavedShots && bothBarsFull) {
+            leftBar.currentValue = 0f;
+            rightBar.currentValue = 0f;
+            savedShotBoxes[1].SetActive(false);
+            Debug.Log("doing. shots saved: " + ShotsSaved + ", max saved shots: " + maxSavedShots);
+
+        } else {
+            ShotsSaved--;
+        }
     }
 
 

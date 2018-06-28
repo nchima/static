@@ -15,11 +15,8 @@ public class SpecialMoveManager : MonoBehaviour {
     [SerializeField] private GameObject missilePrefab;
     [SerializeField] GameObject specialMoveShieldPrefab;
 
-    /* GENERAL SPECIAL MOVE STUFF */
-    [HideInInspector] public bool shotgunChargeIsReady;
-    [HideInInspector] public bool missilesAreReady;
 
-    /* MISSILE STUFF */
+    /* OTHER */
     int missilesFired = 0;
     float missileTimer;
     bool firingMissiles = false;
@@ -27,7 +24,8 @@ public class SpecialMoveManager : MonoBehaviour {
 
     private void Update() {
         // See if the player has fired a special move & if so, initialize proper variables.
-        if (InputManager.specialMoveButtonDown && Services.gun.canShoot && Services.specialBarManager.bothBarsFull && !firingMissiles) {
+        bool hasAmmo = Services.specialBarManager.bothBarsFull || Services.specialBarManager.ShotsSaved > 0;
+        if (InputManager.specialMoveButtonDown && Services.gun.canShoot && !firingMissiles && hasAmmo) {
             Services.specialBarManager.PlayerUsedSpecialMove();
             missilesFired = 0;
             missileTimer = 0f;
