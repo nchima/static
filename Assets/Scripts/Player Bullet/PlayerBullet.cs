@@ -12,10 +12,6 @@ public class PlayerBullet : MonoBehaviour {
     [SerializeField] GameObject strikeWeakPointPrefab;
     [SerializeField] GameObject strikeWallPrefab;
 
-    [SerializeField] GameObject explosionPrefab;
-    float explosionRadius;
-    float explosionDamage;
-
     [SerializeField] GameObject headVisuals;
     [SerializeField] FloatRange headSizeRange = new FloatRange(0f, 0.75f);
 
@@ -107,15 +103,13 @@ public class PlayerBullet : MonoBehaviour {
     }
 
 
-    public void GetFired(Vector3 _position, Vector3 _direction, float _thickness, float _speed, float _explosionRadius, float _explosionDamage, Color _color) {
+    public void GetFired(Vector3 _position, Vector3 _direction, float _thickness, float _speed, Color _color) {
         transform.position = _position;
         transform.forward = _direction;
         thickness = _thickness;
         speed = _speed;
         travelledDistance = 0f;
         previousPosition = transform.position;
-        explosionRadius = _explosionRadius;
-        explosionDamage = _explosionDamage;
         headVisuals.transform.localScale = Vector3.one * MyMath.Map(GunValueManager.currentValue, -1f, 1f, headSizeRange.min, headSizeRange.max);
         m_Color = _color;
         headVisuals.GetComponentInChildren<Renderer>().material.SetColor("_Tint", m_Color);
@@ -162,15 +156,6 @@ public class PlayerBullet : MonoBehaviour {
         else {
             Instantiate(strikeWallPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
         }
-
-        // Instantiate explosion
-        //if (explosionRadius > 0f) {
-        //    GameObject newExplosion = Instantiate(explosionPrefab, hit.point, Quaternion.identity);
-        //    newExplosion.GetComponent<Explosion>().explosionRadius = explosionRadius;
-        //    newExplosion.GetComponent<Explosion>().SetColor(m_Color);
-        //    newExplosion.GetComponent<Explosion>().damageMin = 1;
-        //    newExplosion.GetComponent<Explosion>().damageMax = (int) explosionDamage;
-        //}
 
         EndBulletsExistence();
     }

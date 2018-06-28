@@ -6,40 +6,18 @@ using System.Collections.Generic;
 public class Gun : MonoBehaviour {
 
     /* INSPECTOR */
-
     [SerializeField] IntRange bulletsPerBurstRange = new IntRange(2, 50);   // How many bullets are fired per shot.
     [SerializeField] FloatRange burstsPerSecondRange = new FloatRange(2f, 9f);  // How many shots can be fired per second.
     [SerializeField] FloatRange bulletSpreadRange = new FloatRange(1f, 10f);
     [SerializeField] FloatRange bulletSpeedRange = new FloatRange(300f, 600f);
     [SerializeField] FloatRange bulletThicknessRange = new FloatRange(0.1f, 0.3f);
-    [SerializeField] FloatRange bulletExplosionRadiusRange = new FloatRange(0f, 5f);
-    [SerializeField] IntRange explosionDamageRange = new IntRange(1, 5);
-    [SerializeField] FloatRange missileFireIntervalRange = new FloatRange(0f, 0.15f);
-    [SerializeField] FloatRange shieldExplosionRadiusRange = new FloatRange(0f, 40f);
     [SerializeField] int bulletDamage = 1;
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
     [SerializeField] Color bulletColor2;
+    [SerializeField] public float burstsPerSecondSloMoModifierMax = 2f;   // Modifies rate of fire during slow motion sequence.
 
-    // Modifies rate of fire during slow motion sequence.
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
-    [SerializeField] public float burstsPerSecondSloMoModifierMax = 2f;   
-
-
-    /* GENERAL SPECIAL MOVE STUFF */
-    public float specialMoveSineRange = 0.1f;
-    public bool shotgunChargeIsReady;
-    public bool missilesAreReady;
-    Color specialMoveReadyColor1 = Color.yellow;
-    Color specialMoveReadyColor2 = Color.red;
-    [SerializeField] GameObject specialMoveShieldPrefab;
-
-    /* MISSILE STUFF */
-    [SerializeField] int missilesPerBurst = 20;
-    int missilesFired = 0;
-    float missileTimer;
-    bool firingMissiles = false;
-    bool firedMissiles = false;
 
     // USED DURING SHOOTING
     int bulletsPerBurst;
@@ -57,12 +35,10 @@ public class Gun : MonoBehaviour {
     [SerializeField] GameObject bulletStrikeEnemyPrefab;
     public AudioSource bulletStrikeAudio;
     public GameObject muzzleFlash;
-    [SerializeField] private GameObject missilePrefab;
 
     /* REFERENCES */
-    GameManager gameManager;
-    Transform bulletSpawnTransform; // The point where bullets originate (ie the tip of the player's gun)
-    Transform gunTipTransform;
+    [HideInInspector] public Transform bulletSpawnTransform; // The point where bullets originate (ie the tip of the player's gun)
+    [HideInInspector] public Transform tip;
     GameObject screen;
 
     /* MISC */
@@ -91,10 +67,7 @@ public class Gun : MonoBehaviour {
     void Start() {
         // Get the point from which bullets will spawn.
         bulletSpawnTransform = GameObject.Find("BulletSpawnPoint").transform;
-        gunTipTransform = GameObject.Find("Tip").transform;
-
-        // Get a reference to the score controller.
-        gameManager = FindObjectOfType<GameManager>();
+        tip = GameObject.Find("Tip").transform;
 
         screen = GameObject.Find("Screen");
 
@@ -104,77 +77,9 @@ public class Gun : MonoBehaviour {
 
 
     void Update() {
-
-        // Run shot timer.
         timeSinceLastShot += Time.deltaTime;
 
-        // Reset special moves if sine is in middle of bar.
-        if (GunValueManager.currentValue < 0.1f && GunValueManager.currentValue > -0.1f) {
-            firedMissiles = false;
-        }
-
-        /* FIRING SPECIAL MOVES */
-
-        // Make gun flash (this doesn't matter right now.)
-        //foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>()) {
-        //    if (shotgunChargeIsReady || missilesAreReady) mr.material.color = Color.Lerp(specialMoveReadyColor1, specialMoveReadyColor2, Random.Range(0f, 1f));
-        //    else mr.material.color = Color.black;
-        //}
-
-        // See if the player has fired a special move & if so, initialize proper variables.
-        if (canShoot && Services.specialBarManager.bothBarsFull && InputManager.specialMoveButtonDown) {
-
-            if (!firingMissiles /*&& !firedMissiles*/) {
-                Services.specialBarManager.PlayerUsedSpecialMove();
-                missilesFired = 0;
-                missileTimer = 0f;
-                firingMissiles = true;
-            } 
-            
-            //else if (GunValueManager.currentValue < 0f) {
-            //    Services.specialBarManager.PlayerUsedSpecialMove();
-            //    FindObjectOfType<ShotgunCharge>().BeginSequence();
-            //}
-        }
-
-        // Begin performing the special move.
-        if (firingMissiles) FireMissiles();
-
-        /* Firing normal bullets */
         if (InputManager.fireButton) { FireBurst(); }
-    }
-
-
-    void FireMissiles() {
-        if (!firingMissiles) return;
-
-        // Spawn shield explosion.
-        Explosion specialMoveShield = Instantiate(specialMoveShieldPrefab, Services.playerTransform.position, Quaternion.identity, Services.playerTransform).GetComponent<Explosion>();
-        specialMoveShield.explosionRadius = GunValueManager.MapToFloatRange(shieldExplosionRadiusRange);
-
-        if (missileTimer >= GunValueManager.MapToFloatRange(missileFireIntervalRange)) {
-            FireMissile();
-        }
-        else {
-            missileTimer += Time.deltaTime;
-        }
-
-        while (GunValueManager.MapToFloatRange(missileFireIntervalRange) == 0 && missilesFired < missilesPerBurst) {
-            FireMissile();
-        }
-
-        if (missilesFired >= missilesPerBurst) {
-            firingMissiles = false;
-            firedMissiles = true;
-        }
-    }
-
-
-    void FireMissile() {
-        missilesFired++;
-        missileTimer = 0;
-        PlayerMissile newMissile = Instantiate(missilePrefab, gunTipTransform.position, Services.playerTransform.rotation).GetComponent<PlayerMissile>();
-        newMissile.GetFired();
     }
 
 
@@ -213,8 +118,8 @@ public class Gun : MonoBehaviour {
 
         // Show muzzle flash.
         GameObject _muzzleFlash = Instantiate(muzzleFlash, Services.playerTransform);
-        _muzzleFlash.transform.position = gunTipTransform.position;
-        _muzzleFlash.transform.rotation = gunTipTransform.rotation;
+        _muzzleFlash.transform.position = tip.position;
+        _muzzleFlash.transform.rotation = tip.rotation;
         _muzzleFlash.transform.localScale = new Vector3(
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f),
@@ -228,7 +133,7 @@ public class Gun : MonoBehaviour {
         autoAimPoint = AutoAim("Weak Point", 0.225f);
 
         // If we couldn't hit a weak point, auto aim for enemies instead.
-        if (!Physics.Raycast(gunTipTransform.position, autoAimPoint - gunTipTransform.position, 1000f, 1 << 28)) {
+        if (!Physics.Raycast(tip.position, autoAimPoint - tip.position, 1000f, 1 << 28)) {
             autoAimPoint = AutoAim("Enemy", 0.125f);
         }
 
@@ -261,8 +166,6 @@ public class Gun : MonoBehaviour {
             bulletSpawnTransform.forward,
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
-            MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletExplosionRadiusRange.min, bulletExplosionRadiusRange.max),
-            MyMath.Map(GunValueManager.currentValue, -1f, 1f, explosionDamageRange.min, explosionDamageRange.max),
             Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f))
         );
     }
@@ -286,7 +189,7 @@ public class Gun : MonoBehaviour {
 
                 // If this position is behind an obstacle, ignore it.
                 RaycastHit hit;
-                if (Physics.Raycast(gunTipTransform.position, Vector3.Normalize(thisPosition - gunTipTransform.position), out hit, 1000f, 1 << 8 | 1 << 14 | 1 << 23 | 1 << 28)) {
+                if (Physics.Raycast(tip.position, Vector3.Normalize(thisPosition - tip.position), out hit, 1000f, 1 << 8 | 1 << 14 | 1 << 23 | 1 << 28)) {
                     if (!hit.collider.GetComponent<Enemy>() && hit.collider.tag != "Weak Point") {
                         continue;
                     }

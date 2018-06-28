@@ -308,6 +308,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerPressedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_ReachedEndPoint.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\SpecialMoveManager.cs" />
     <Compile Include="Assets\Scripts\Input\InputManager.cs" />
     <Compile Include="Assets\Scripts\Level\EnemiesPerLevel.cs" />
     <Compile Include="Assets\Scripts\Level\EnemyPlacer.cs" />
