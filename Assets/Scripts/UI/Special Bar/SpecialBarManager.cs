@@ -49,7 +49,6 @@ public class SpecialBarManager : MonoBehaviour {
     }
 
 
-
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }

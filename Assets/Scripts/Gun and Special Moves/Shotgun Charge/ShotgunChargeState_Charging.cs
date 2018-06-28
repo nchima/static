@@ -11,7 +11,7 @@ public class ShotgunChargeState_Charging : State {
         ShotgunCharge shotgunCharge = stateController as ShotgunCharge;
 
         Services.playerController.dashRechargeTimer = 0f;
-
+        Services.specialBarManager.PlayerUsedSpecialMove();
         Services.musicManager.BeginDash();
         
         shotgunCharge.sphere.MoveIntoChargePosition();
