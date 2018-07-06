@@ -270,6 +270,7 @@
     <Compile Include="Assets\Scripts\Enemy\Older Scripts\SnailEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyAnimationController.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyPyramidBlender.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateMoving.cs" />
     <Compile Include="Assets\Scripts\Enemy\Simple Enemy\SimpleEnemyStateShooting.cs" />
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\EnemyTransition_ReachedNavMeshDestination.cs" />

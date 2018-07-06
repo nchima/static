@@ -8,6 +8,7 @@ public class SimpleEnemy : Enemy {
     [HideInInspector] public NavMeshAgent navMeshAgent;
     public GameObject shotPrefab;
     public GameObject chargeParticles;
+    public SimpleEnemyAnimationController animationController { get { return myGeometry.GetComponent<SimpleEnemyAnimationController>(); } }
 
 
     private void Awake() {

@@ -33,7 +33,9 @@ public class SimpleEnemyStateShooting : State {
         if (controller.navMeshAgent != null) controller.navMeshAgent.enabled = false;
 
         // Begin the charging up animation.
-        if (controller.GetComponent<Animator>() != null) controller.GetComponent<Animator>().SetTrigger("ChargeUp");
+        //if (controller.GetComponent<Animator>() != null) controller.GetComponent<Animator>().SetTrigger("ChargeUp");
+        controller.animationController.StartAttackAnimation(preShotDelay, postShotDelay);
+
         foreach (ParticleSystem particleSystem in controller.chargeParticles.GetComponentsInChildren<ParticleSystem>()) {
             particleSystem.Stop();
             particleSystem.Play();
