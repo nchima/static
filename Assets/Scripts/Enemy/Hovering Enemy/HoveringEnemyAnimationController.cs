@@ -22,6 +22,9 @@ public class HoveringEnemyAnimationController : EnemyAnimationController {
     PerlinNoise idleMorph1Noise;
     PerlinNoise idleMorph2Noise;
 
+    Tween tween1;
+    Tween tween2;
+
 
     protected override void Start() {
         base.Start();
@@ -52,17 +55,25 @@ public class HoveringEnemyAnimationController : EnemyAnimationController {
 
 
     public void StartBristleAnimation(float duration) {
-        DOTween.To(() => currentBristleValue, x => currentBristleValue = x, 90, duration).SetEase(Ease.InExpo);
+        tween1 = DOTween.To(() => currentBristleValue, x => currentBristleValue = x, 90, duration).SetEase(Ease.InExpo);
     }
 
 
     public void StartAttackAnimation(float duration) {
-        DOTween.To(() => currentAttackValue, x => currentAttackValue = x, 100f, duration).SetEase(Ease.InExpo);
-        DOTween.To(() => currentBristleValue, x => currentBristleValue = x, 0f, duration).SetEase(Ease.InExpo);
+        tween1 = DOTween.To(() => currentAttackValue, x => currentAttackValue = x, 100f, duration).SetEase(Ease.InExpo);
+        tween2 = DOTween.To(() => currentBristleValue, x => currentBristleValue = x, 0f, duration).SetEase(Ease.InExpo);
     }
 
 
     public void StartWithdrawAnimation(float duration) {
-        DOTween.To(() => currentAttackValue, x => currentAttackValue = x, 0f, duration).SetEase(Ease.InExpo);
+        tween1 = DOTween.To(() => currentAttackValue, x => currentAttackValue = x, 0f, duration).SetEase(Ease.InExpo);
+    }
+
+
+    public void ResetAll() {
+        currentAttackValue = 0f;
+        currentBristleValue = 0f;
+        tween1.Kill();
+        tween2.Kill();
     }
 }

@@ -17,7 +17,7 @@ public class SimpleEnemyAnimationController : EnemyAnimationController {
     float timeInNextPauseState;
     float pauseTimer = 0f;
     FloatRange vibrationTimeRange = new FloatRange(0.2f, 0.4f);
-    float vibrationIntensityRange = 10f;
+    float vibrationIntensityRange = 20f;
 
 
     protected override void Start() {
@@ -122,6 +122,10 @@ public class SimpleEnemyAnimationController : EnemyAnimationController {
 
         // Shrink
         transform.DOScale(1f, postShotDelay);
+
+        DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear);
+        DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear);
+        DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear);
 
         // Rotate slower and slower until timer expires.
         timer = 0f;

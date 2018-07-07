@@ -124,9 +124,9 @@ public class Enemy : StateController {
 
 
     IEnumerator PainCoroutine() {
-        SetAIActive(false);
+        //SetAIActive(false);
         yield return new WaitForSeconds(painTime);
-        SetAIActive(true);
+        //SetAIActive(true);
         yield return null;
     }
 

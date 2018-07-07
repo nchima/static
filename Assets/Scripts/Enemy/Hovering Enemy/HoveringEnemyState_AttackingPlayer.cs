@@ -29,23 +29,29 @@ public class HoveringEnemyState_AttackingPlayer : State {
         if (Physics.SphereCast(stateController.transform.position, stateController.GetComponent<SphereCollider>().radius, transform.forward, out hit, 10f, 1 << 8)) {
             GetComponent<TriggerTransition>().isTriggerSet = true;
         } else {
-            StartCoroutine(AttackCoroutine(stateController));
+            if (attackCoroutine != null) { StopCoroutine(attackCoroutine); }
+            attackCoroutine = StartCoroutine(AttackCoroutine(stateController));
         }
     }
 
 
+    Coroutine attackCoroutine;
     IEnumerator AttackCoroutine(StateController stateController) {
         HoveringEnemy controller = stateController as HoveringEnemy;
 
+        // Bristle
         controller.m_AnimationController.StartBristleAnimation(bristleAnimationDuration);
+        controller.weakpoint.Grow(bristleAnimationDuration * 0.25f);
         droneAudio.Stop();
         bristleAudio.Play();
 
         yield return new WaitForSeconds(bristleDuration);
 
+        // Attack
         controller.m_AnimationController.StartAttackAnimation(attackAnimationDuration);
         bristleAudio.Stop();
         attackAudio.Play();
+        controller.weakpoint.Shrink(attackAnimationDuration * 0.2f);
 
         yield return new WaitForSeconds(attackAnimationDuration * 0.9f);
 
@@ -96,5 +102,14 @@ public class HoveringEnemyState_AttackingPlayer : State {
         }
 
         return false;
+    }
+
+
+    public override void End(StateController stateController) {
+        base.End(stateController);
+        HoveringEnemy controller = stateController as HoveringEnemy;
+        controller.weakpoint.Shrink(0.001f);
+        controller.m_AnimationController.ResetAll();
+        if (attackCoroutine != null) { StopCoroutine(attackCoroutine); }
     }
 }

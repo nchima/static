@@ -149,7 +149,7 @@ public class PlayerBullet : MonoBehaviour {
 
             Services.sfxManager.PlayBulletHitWeakPointSound();
 
-            if (hit.collider.GetComponent<EnemyWeakPointGrower>() != null) { hit.collider.GetComponent<EnemyWeakPointGrower>().YouHurtMyDad(5); }
+            if (hit.collider.GetComponent<EnemyWeakPointGrower>() != null) { hit.collider.GetComponent<EnemyWeakPointGrower>().YouHurtMyDad(2); }
             Services.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
         }
         

@@ -20,7 +20,7 @@ public class Gun : MonoBehaviour {
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
 
     // USED DURING SHOOTING
-    int bulletsPerBurst;
+    public int bulletsPerBurst { get { return Mathf.RoundToInt(MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletsPerBurstRange.max, bulletsPerBurstRange.min)); } }
     int bulletsHitThisBurst = 0;
     [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
 
@@ -86,7 +86,6 @@ public class Gun : MonoBehaviour {
     public void FireBurst() {
 
         // Get new firing variables based on current oscillation.
-        bulletsPerBurst = Mathf.RoundToInt(MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletsPerBurstRange.max, bulletsPerBurstRange.min));
         float burstsPerSecond = MyMath.Map(GunValueManager.currentValue, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
         float inaccuracy = MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
 

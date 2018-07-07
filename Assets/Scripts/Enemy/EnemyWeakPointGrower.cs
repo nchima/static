@@ -7,8 +7,12 @@ public class EnemyWeakPointGrower : MonoBehaviour {
 
     [SerializeField] Vector3 minSizeScale;
     [SerializeField] float keepInFrontOffset = 2f;
+
     [HideInInspector] public Enemy myDad;
     Vector3 fullSizeScale;
+
+    int hitsLastFrame;
+
 
     private void Awake() {
         fullSizeScale = transform.localScale;
@@ -24,6 +28,13 @@ public class EnemyWeakPointGrower : MonoBehaviour {
             // Move in front.
             Vector3 directionToPlayer = Vector3.Normalize(transform.position - Services.playerTransform.position);
             transform.localPosition = directionToPlayer * keepInFrontOffset;
+        }
+
+        // See if I was struck by almost all of the player's bullets at once
+        if (hitsLastFrame >= Services.gun.bulletsPerBurst - 2) {
+            myDad.currentHealth = 0;
+        } else {
+            hitsLastFrame = 0;
         }
     }
 
@@ -42,6 +53,7 @@ public class EnemyWeakPointGrower : MonoBehaviour {
 
     public void YouHurtMyDad(int howMuchYouHurtMyDad) {
         if (myDad == null) { Debug.Log("My Dad Equals Null"); return; }
+        hitsLastFrame++;
         myDad.currentHealth -= howMuchYouHurtMyDad;
     }
 
