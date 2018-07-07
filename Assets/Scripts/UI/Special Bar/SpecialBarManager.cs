@@ -110,6 +110,8 @@ public class SpecialBarManager : MonoBehaviour {
 
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
+
         leftBar.currentValue -= getHurtPenalty;
         rightBar.currentValue -= getHurtPenalty;
     }

@@ -348,6 +348,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
+
         EndDashEarly();
         movementKickReady = true;
     }

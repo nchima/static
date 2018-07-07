@@ -178,6 +178,8 @@ public class ColorPaletteManager : MonoBehaviour {
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
+
         LoadVulnerablePalette();
     }
 

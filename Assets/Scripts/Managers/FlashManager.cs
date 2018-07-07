@@ -65,6 +65,7 @@ public class FlashManager : MonoBehaviour {
 
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
         painFlashPlane.GetComponent<Animator>().SetTrigger("Pain Flash");
     }
 }

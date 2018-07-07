@@ -27,6 +27,7 @@ public class ScreenShakeManager : MonoBehaviour {
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
         IncreaseShake(playerHurtShakeAmount);
     }
 }

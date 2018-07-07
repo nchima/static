@@ -5,57 +5,41 @@ using UnityEngine;
 
 public class HealthManager : MonoBehaviour {
 
-    // How quickly each 'block' of health recharges.
-    [SerializeField] float healthRechargeRate;
-    float timer;
+    /* INSPECTOR */
+    [SerializeField] float healthRechargeRate; // How quickly each 'block' of health recharges.
+    [SerializeField] float invincibilityTime = 1f;  // How long the player is invincible after being hit.
+    [SerializeField] bool godMode;  // Used for debugging only.
+    [SerializeField] int firstHealthBonusScore = 10000;  // The score at which the player earns their first health bonus.
+    [SerializeField] int subsequentHealthBonusesScore = 15000;   // After the first health bonus, the player earns health every ____ points.
 
-    // Player's health.
-    int _playerHealth = 5;
-    public int playerHealth {
-        get {
-            return _playerHealth;
-        }
-
-        set {
-            // If health is decreasing.
-            if (value < _playerHealth) {
-                if (currentlyInvincible) { return; }
-                invincibilityTimer += invincibilityTime;
-                
-                // Delete health box.
-                for (int i = Mathf.Clamp(value, 0, 4); i < 5; i++) healthBlocks[i].SetActive(false);
-            }
-
-            // If health is increasing.
-            else {
-                // Reactivate health box.
-                if (value <= 5) healthBlocks[Mathf.Clamp(value - 1, 0, 5)].SetActive(true);
-                //if (value == 5) Services.colorPaletteManager.RestoreSavedPalette();
-            }
-
-            _playerHealth = value;
-        }
-    }
-
-    // Used for invincibility frames.
-    [SerializeField] bool godMode;  // For debugging.
-    [HideInInspector] public bool forceInvincibility;    // Used by other scripts to force player invincibility at certain times.
-    bool currentlyInvincible;
-    [SerializeField] float invincibilityTime = 1f;
-    float invincibilityTimer = 0f;
-
-    [SerializeField] HealthBonus[] healthBonuses;
-
-    public bool PlayerIsDead { get { return playerHealth <= 0; } }
-
-    // Misc references.
+    // References
     [SerializeField] GameObject[] healthBlocks;
     [SerializeField] AudioSource getHurtAudio;
+
+    /* MISC */
+    // Player's health.
+    [HideInInspector] public int currentHealth = 5;
+    int currentMaxHealth = 5;
+    float healthRechargeTimer = 0f;
+
+    bool isInWarningState = false;
+
+    // Health bonuses
+    bool isFirstHealthBonusApplied;
+    int subsequentHealthBonusesApplied = 0;
+
+    // Invincibility frames.
+    [HideInInspector] public bool forceInvincibility;    // Used by other scripts to force player invincibility at certain times.
+    [HideInInspector] public bool isInvincible;
+    float invincibilityTimer = 0f;
+
+    public bool PlayerIsDead { get { return currentHealth <= 0 || currentMaxHealth <= 0; } }
 
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
+
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
@@ -64,48 +48,78 @@ public class HealthManager : MonoBehaviour {
 
     private void Update() {
         // Handle health recharging.
-        //if (playerHealth < 5) {
-        //    timer += Time.deltaTime;
-        //    if (timer >= healthRechargeRate) {
-        //        playerHealth++;
-        //        timer = 0f;
-        //    }
-        //}
+        if (currentHealth < currentMaxHealth) {
+            healthRechargeTimer += Time.deltaTime;
+            if (healthRechargeTimer >= healthRechargeRate) {
+                // Add one health point
+                currentHealth++;
+                UpdateHealthBoxes();
+                healthRechargeTimer = 0f;
 
-        // Check for score bonuses.
-        for (int i = 0; i < healthBonuses.Length; i++) {
-            if (!healthBonuses[i].applied && Services.scoreManager.score >= healthBonuses[i].requiredScore) {
-                healthBonuses[i].applied = true;
-                playerHealth++;
+                // If current health has reached max health, exit warning state.
+                if (currentHealth == currentMaxHealth) {
+                    isInWarningState = false;
+                    Services.colorPaletteManager.RestoreSavedPalette();
+                }
             }
         }
 
+        // Check for score bonuses.
+        if (Services.scoreManager.score >= firstHealthBonusScore + subsequentHealthBonusesApplied * subsequentHealthBonusesScore) {
+            AddMaxHealth();
+            subsequentHealthBonusesApplied++;
+        }
+        
         // Check invincibility frames.
         invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
-        if (invincibilityTimer > 0 && currentlyInvincible == false) {
-            currentlyInvincible = true;
+        if (invincibilityTimer > 0 && isInvincible == false) {
+            isInvincible = true;
             invincibilityTimer -= Time.deltaTime;
-            //Services.colorPaletteManager.RestoreSavedPalette();
-            Services.colorPaletteManager.Invoke("RestoreSavedPalette", 1f);
         } else {
-            currentlyInvincible = false;
+            isInvincible = false;
         }
 
-        if (forceInvincibility || godMode) currentlyInvincible = true;
+        if (forceInvincibility || godMode) isInvincible = true;
+    }
+
+
+    void UpdateHealthBoxes() {
+        for (int i = 0; i < healthBlocks.Length; i++) {
+            if (i >= currentHealth) { healthBlocks[i].SetActive(false); }
+            else { healthBlocks[i].SetActive(true); }
+        }
+    }
+
+
+    void AddMaxHealth() {
+        currentMaxHealth = Mathf.Clamp(currentMaxHealth++, 0, 5);
+        currentHealth = currentMaxHealth;
+        UpdateHealthBoxes();
     }
 
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
-        playerHealth -= 1;
+        if (isInvincible) { return; }
+
+        // If the player is in warning state, die immediately.
+        if (isInWarningState) {
+            currentHealth = 0;
+            currentMaxHealth = 0;
+        }
+
+        currentMaxHealth--;
+        currentHealth = 1;
+
+        invincibilityTimer = 0f;
+        healthRechargeTimer = 0f;
+
+        isInWarningState = true;
+
+        UpdateHealthBoxes();
 
         if (PlayerIsDead) {
             GameEventManager.instance.FireEvent(new GameEvents.GameOver());
         }
     }
-}
 
-[Serializable]
-class HealthBonus {
-    public int requiredScore;
-    [HideInInspector] public bool applied;
 }

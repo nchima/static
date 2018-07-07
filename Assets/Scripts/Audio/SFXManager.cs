@@ -43,6 +43,8 @@ public class SFXManager : MonoBehaviour {
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
+
         playerWasHurtAudioSource.Play();
     }
 }

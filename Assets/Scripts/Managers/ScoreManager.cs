@@ -181,6 +181,8 @@ public class ScoreManager : MonoBehaviour
 
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
+
         multiplier = 1f;
         comboTimer = 0f;
     }
