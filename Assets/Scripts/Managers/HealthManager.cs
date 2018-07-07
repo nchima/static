@@ -13,7 +13,7 @@ public class HealthManager : MonoBehaviour {
     [SerializeField] int subsequentHealthBonusesScore = 15000;   // After the first health bonus, the player earns health every ____ points.
 
     // References
-    [SerializeField] GameObject[] healthBlocks;
+    [SerializeField] HealthBox[] healthBlocks;
     [SerializeField] AudioSource getHurtAudio;
 
     /* MISC */
@@ -85,8 +85,8 @@ public class HealthManager : MonoBehaviour {
 
     void UpdateHealthBoxes() {
         for (int i = 0; i < healthBlocks.Length; i++) {
-            if (i >= currentHealth) { healthBlocks[i].SetActive(false); }
-            else { healthBlocks[i].SetActive(true); }
+            if (i >= currentHealth) { healthBlocks[i].BecomeEmpty(); } 
+            else { healthBlocks[i].BecomeFull(); }
         }
     }
 

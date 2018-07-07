@@ -355,6 +355,7 @@
     <Compile Include="Assets\Scripts\UI\CrossHair.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHairLines.cs" />
     <Compile Include="Assets\Scripts\UI\GameOverScreen.cs" />
+    <Compile Include="Assets\Scripts\UI\HealthBox.cs" />
     <Compile Include="Assets\Scripts\UI\HighScoreScreen.cs" />
     <Compile Include="Assets\Scripts\UI\Initial.cs" />
     <Compile Include="Assets\Scripts\UI\InitialEntry.cs" />

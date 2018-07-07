@@ -49,8 +49,8 @@ public class FlashManager : MonoBehaviour {
 
 
     public void PlayerFiredGunHandler(GameEvent gameEvent) {
-        float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, gunFlashIntensityRange.max, gunFlashIntensityRange.min);
-        float currentDuration = MyMath.Map(GunValueManager.currentValue, -1f, 1f, gunFlashDurationRange.max, gunFlashDurationRange.min);
+        float currentFlash = MyMath.Map(GunValueManager.currentValue, -1f, 1f, gunFlashIntensityRange.min, gunFlashIntensityRange.max);
+        float currentDuration = MyMath.Map(GunValueManager.currentValue, -1f, 1f, gunFlashDurationRange.min, gunFlashDurationRange.max);
 
         gunFlashPlane.GetComponent<MeshRenderer>().material.mainTextureOffset = new Vector2(Random.Range(0f, 5f), Random.Range(0f, 5f));
 
