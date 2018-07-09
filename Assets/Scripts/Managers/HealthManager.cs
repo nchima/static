@@ -69,12 +69,11 @@ public class HealthManager : MonoBehaviour {
             AddMaxHealth();
             subsequentHealthBonusesApplied++;
         }
-        
+
         // Check invincibility frames.
-        invincibilityTimer = Mathf.Clamp(invincibilityTimer, 0f, invincibilityTime);
-        if (invincibilityTimer > 0 && isInvincible == false) {
+        invincibilityTimer += Time.deltaTime;
+        if (invincibilityTimer < invincibilityTime) {
             isInvincible = true;
-            invincibilityTimer -= Time.deltaTime;
         } else {
             isInvincible = false;
         }
@@ -111,6 +110,7 @@ public class HealthManager : MonoBehaviour {
         currentHealth = 1;
 
         invincibilityTimer = 0f;
+        isInvincible = true;
         healthRechargeTimer = 0f;
 
         isInWarningState = true;
