@@ -6,6 +6,7 @@ public class HealthBox : MonoBehaviour {
 
     [SerializeField] GameObject myEmptySelf;
     [SerializeField] GameObject myFullSelf;
+    [SerializeField] GameObject myX;
 
     public void BecomeEmpty() {
         myEmptySelf.SetActive(true);
@@ -15,5 +16,13 @@ public class HealthBox : MonoBehaviour {
     public void BecomeFull(){
         myEmptySelf.SetActive(false);
         myFullSelf.SetActive(true);
+    }
+
+    public void BecomeXedOut() {
+        myX.SetActive(true);
+    }
+
+    public void BecomeUnXedOut() {
+        myX.SetActive(false);
     }
 }

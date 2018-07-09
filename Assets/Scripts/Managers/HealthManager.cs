@@ -84,7 +84,9 @@ public class HealthManager : MonoBehaviour {
 
     void UpdateHealthBoxes() {
         for (int i = 0; i < healthBlocks.Length; i++) {
-            if (i >= currentHealth) { healthBlocks[i].BecomeEmpty(); } 
+            if (i >= currentMaxHealth) { healthBlocks[i].BecomeXedOut(); }
+            else { healthBlocks[i].BecomeUnXedOut(); }
+            if (i >= currentHealth) { healthBlocks[i].BecomeEmpty(); }
             else { healthBlocks[i].BecomeFull(); }
         }
     }
