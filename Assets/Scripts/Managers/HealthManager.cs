@@ -59,6 +59,7 @@ public class HealthManager : MonoBehaviour {
                 // If current health has reached max health, exit warning state.
                 if (currentHealth == currentMaxHealth) {
                     isInWarningState = false;
+                    Services.uiManager.healthWarningScreen.SetActive(false);
                     Services.colorPaletteManager.RestoreSavedPalette();
                 }
             }
@@ -107,6 +108,8 @@ public class HealthManager : MonoBehaviour {
             currentHealth = 0;
             currentMaxHealth = 0;
         }
+
+        Services.uiManager.healthWarningScreen.SetActive(true);
 
         currentMaxHealth--;
         currentHealth = 1;
