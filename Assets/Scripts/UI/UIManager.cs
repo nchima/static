@@ -16,6 +16,7 @@ public class UIManager : MonoBehaviour {
     public GameObject highScoreScreen;
     public GameObject endOfDemoScreen;
     public GameObject landOnLevelScreen;
+    public GameObject healthWarningScreen;
     public GameObject hud;
     public GameObject crosshair;
 
@@ -32,6 +33,7 @@ public class UIManager : MonoBehaviour {
     bool titleScreenActiveBeforePause;
     bool levelCompleteScreenActiveBeforePause;
     bool specialMoveReadyScreenActiveBeforePause;
+    bool healthWarningScreenActiveBeforePause;
 
 
     public void OnEnable() {
@@ -70,10 +72,12 @@ public class UIManager : MonoBehaviour {
         titleScreenActiveBeforePause = titleScreen.activeSelf;
         levelCompleteScreenActiveBeforePause = levelCompleteScreen.activeSelf;
         specialMoveReadyScreenActiveBeforePause = specialMoveReadyScreen.activeSelf;
+        healthWarningScreenActiveBeforePause = healthWarningScreen.activeSelf;
 
         titleScreen.SetActive(false);
         levelCompleteScreen.SetActive(false);
         specialMoveReadyScreen.SetActive(false);
+        healthWarningScreen.SetActive(false);
 
         if (InputManager.inputMode == InputManager.InputMode.Controller) {
             eventSystem.SetSelectedGameObject(resumeButton);
@@ -89,6 +93,7 @@ public class UIManager : MonoBehaviour {
         titleScreen.SetActive(titleScreenActiveBeforePause);
         levelCompleteScreen.SetActive(levelCompleteScreenActiveBeforePause);
         specialMoveReadyScreen.SetActive(specialMoveReadyScreenActiveBeforePause);
+        healthWarningScreen.SetActive(healthWarningScreenActiveBeforePause);
     }
 
 
@@ -103,6 +108,7 @@ public class UIManager : MonoBehaviour {
 
         levelCompleteScreen.SetActive(false);
         specialMoveReadyScreen.SetActive(false);
+        healthWarningScreen.SetActive(false);
     }
 
 
@@ -111,6 +117,7 @@ public class UIManager : MonoBehaviour {
         gameOverScreen.gameObject.SetActive(false);
         nameEntryScreen.gameObject.SetActive(false);
         highScoreScreen.gameObject.SetActive(true);
+        healthWarningScreen.SetActive(false);
     }
 
 
@@ -118,6 +125,7 @@ public class UIManager : MonoBehaviour {
         endOfDemoScreen.SetActive(true);
         levelCompleteScreen.SetActive(false);
         specialMoveReadyScreen.SetActive(false);
+        healthWarningScreen.SetActive(false);
     }
 
 

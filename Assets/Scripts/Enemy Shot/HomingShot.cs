@@ -217,7 +217,6 @@ public class HomingShot : EnemyShot {
 
 
     void GetShotDown(Vector3 forcePoint) {
-        Debug.Log("homing missile getting shot down.");
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().useGravity = true;
         GetComponent<Rigidbody>().AddForce((transform.position - Services.playerTransform.position).normalized * 50f, ForceMode.Impulse);

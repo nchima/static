@@ -57,7 +57,7 @@ public class FlashManager : MonoBehaviour {
         Vector2 newScale = new Vector2(Random.Range(1f, 1.5f), Random.Range(1f, 1.5f));
         gunFlashPlane.GetComponent<MeshRenderer>().material.mainTextureScale = new Vector2(Random.Range(1f, 1.5f) * MyMath.Either1orNegative1, Random.Range(1f, 1.5f) * MyMath.Either1orNegative1);
 
-        Color flashColor = originalGunColor;
+        Color flashColor = Random.ColorHSV();
         flashColor.a = currentFlash;
         
         Flash(flashColor, gunFlashPlane, currentDuration);
