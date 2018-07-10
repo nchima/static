@@ -9,8 +9,8 @@ public class CrossHair : MonoBehaviour {
     int circleSegments { get { return Mathf.FloorToInt(GunValueManager.MapToFloatRangeInverted(circleSegmentsRange)); } }
     [SerializeField] float maxRadius = 1.25f;
     [SerializeField] float minRadius = 0.34f;
-    float xradius;
-    float yradius;
+    float xRadius;
+    float yRadius;
     LineRenderer line;
 
     float shakeValueResting = 0.05f;
@@ -33,19 +33,38 @@ public class CrossHair : MonoBehaviour {
 
         line.positionCount = circleSegments + 1;
         line.useWorldSpace = false;
-        CircleDrawer.Draw(line, xradius, yradius, circleSegments, shakeValue);
+        CircleDrawer.Draw(line, xRadius, yRadius, circleSegments, shakeValue);
 
         shakeValue = shakeRange.min;
     }
 
 
-    private void Update()
-    {
-        xradius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
-        yradius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
-        CircleDrawer.DrawCrosshair(line, xradius, yradius, circleSegments, shakeValue);
+    int lastCircleSegments = 0;
+    private void Update() {
+        xRadius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
+        yRadius = MyMath.Map(GunValueManager.currentValue, -1f, 1f, maxRadius, minRadius);
 
-        //transform.Rotate(new Vector3(0f, Random.Range(-180f, 180f), 0f));
+        if (circleSegments != lastCircleSegments && circleSegments != circleSegmentsRange.min) {
+            Vector3 newRotation = transform.localRotation.eulerAngles;
+            newRotation.x = Random.Range(-180f, 180f);
+            transform.localRotation = Quaternion.Euler(newRotation);
+        } else if (circleSegments == circleSegmentsRange.min) {
+            Debug.Log("stabilizing crosshair.");
+            Vector3 newRotation = transform.localRotation.eulerAngles;
+            newRotation.x = 20f;
+            transform.localRotation = Quaternion.Euler(newRotation);
+        }
+
+        lastCircleSegments = circleSegments;
+
+        // Rotate crosshair a little just for fun
+        Vector3 newNewRotation = transform.localRotation.eulerAngles;
+        newNewRotation.y = Random.Range(66.5f, 106.5f);
+        newNewRotation.z = Random.Range(66.5f, 106.5f);
+        transform.localRotation = Quaternion.Euler(newNewRotation);
+
+
+        CircleDrawer.DrawCrosshair(line, xRadius, yRadius, circleSegments, shakeValue);
 
         // Lerp shake value back towards resting value
         shakeValue = Mathf.Lerp(shakeValue, shakeValueResting, 0.4f);
