@@ -15,7 +15,8 @@ public class HealthManager : MonoBehaviour {
     // References
     [SerializeField] HealthBox[] healthBlocks;
     [SerializeField] AudioSource getHurtAudio;
-
+    [SerializeField] GameObject regainPrompt;
+        
     /* MISC */
     // Player's health.
     [HideInInspector] public int currentHealth = 5;
@@ -27,6 +28,7 @@ public class HealthManager : MonoBehaviour {
     // Health bonuses
     bool isFirstHealthBonusApplied;
     int subsequentHealthBonusesApplied = 0;
+    int nextBonus { get { return firstHealthBonusScore + subsequentHealthBonusesApplied * subsequentHealthBonusesScore; } }
 
     // Invincibility frames.
     [HideInInspector] public bool forceInvincibility;    // Used by other scripts to force player invincibility at certain times.
@@ -57,16 +59,17 @@ public class HealthManager : MonoBehaviour {
                 healthRechargeTimer = 0f;
 
                 // If current health has reached max health, exit warning state.
-                if (currentHealth == currentMaxHealth) {
-                    isInWarningState = false;
-                    Services.uiManager.healthWarningScreen.SetActive(false);
-                    Services.colorPaletteManager.RestoreSavedPalette();
-                }
+                CheckWarningState();
             }
         }
 
+        // Update regain prompt
+        if (regainPrompt.activeInHierarchy) {
+            regainPrompt.GetComponentInChildren<TextMesh>().text = Mathf.Abs(nextBonus - Services.scoreManager.score).ToString();
+        }
+
         // Check for score bonuses.
-        if (Services.scoreManager.score >= firstHealthBonusScore + subsequentHealthBonusesApplied * subsequentHealthBonusesScore) {
+        if (Services.scoreManager.score >= nextBonus) {
             AddMaxHealth();
             subsequentHealthBonusesApplied++;
         }
@@ -90,13 +93,41 @@ public class HealthManager : MonoBehaviour {
             if (i >= currentHealth) { healthBlocks[i].BecomeEmpty(); }
             else { healthBlocks[i].BecomeFull(); }
         }
+
+        MoveRegainPrompt();
     }
 
 
     void AddMaxHealth() {
-        currentMaxHealth = Mathf.Clamp(currentMaxHealth++, 0, 5);
+        currentMaxHealth = Mathf.Clamp(currentMaxHealth + 1, 0, 5);
         currentHealth = currentMaxHealth;
         UpdateHealthBoxes();
+        CheckWarningState();
+    }
+
+
+    void CheckWarningState() {
+        if (currentHealth == currentMaxHealth) {
+            isInWarningState = false;
+            Services.uiManager.healthWarningScreen.SetActive(false);
+            Services.colorPaletteManager.RestoreSavedPalette();
+        }
+    }
+
+
+    public void MoveRegainPrompt() {
+        Vector3 promptOffset = new Vector3(1.3f, 0f, 0f);
+
+        if (currentMaxHealth >= 5) {
+            regainPrompt.SetActive(false);
+            return;
+        } else if (currentMaxHealth < 0) {
+            return;
+        }
+
+        regainPrompt.SetActive(true);
+        GameObject target = healthBlocks[currentMaxHealth].gameObject;
+        regainPrompt.transform.localPosition = target.transform.localPosition + promptOffset;
     }
 
 
@@ -126,5 +157,4 @@ public class HealthManager : MonoBehaviour {
             GameEventManager.instance.FireEvent(new GameEvents.GameOver());
         }
     }
-
 }
