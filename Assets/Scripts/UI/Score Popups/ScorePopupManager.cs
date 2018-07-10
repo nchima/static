@@ -16,6 +16,7 @@ public class ScorePopupManager : MonoBehaviour {
 
         Vector3 newPosition = playerCamera.WorldToViewportPoint(position);
         newPosition = screenCamera.ViewportToWorldPoint(newPosition);
+        newPosition = popupContainer.InverseTransformPoint(newPosition);
         newPosition.x = Mathf.Clamp(newPosition.x, -7f, 7f);
         newPosition.y += Random.Range(1f, 3.5f) * MyMath.Either1orNegative1;
         //newPosition.y = Mathf.Clamp(newPosition.y, -4.5f, 4.5f);
