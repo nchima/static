@@ -104,7 +104,8 @@ public class GameManager : MonoBehaviour {
         }
 
         if (InputManager.pauseButtonDown) {
-            if (!gamePaused && !Services.healthManager.PlayerIsDead) { PauseGame(true); } else { PauseGame(false); }
+            if (!gamePaused && !Services.healthManager.PlayerIsDead) { PauseGame(true); } 
+            else { PauseGame(false); }
         }
     }
 
@@ -115,7 +116,7 @@ public class GameManager : MonoBehaviour {
         if (value == true) {
             Services.uiManager.ShowPauseScreen();
             memorizedTimeScale = Time.timeScale;
-            Time.timeScale = 0f;
+            Time.timeScale = 0.00000000000000001f;
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             gamePaused = true;

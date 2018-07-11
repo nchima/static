@@ -34,14 +34,14 @@ public class SteamExample : MonoBehaviour {
 
 
     private void Update() {
-        Debug.Log("Doing.");
-
-        if (Input.GetKeyDown(KeyCode.H)) {
-            // To trigger the CallResult, we need call the function on steam, and then store the results in a handle...
-            SteamAPICall_t handle = SteamUserStats.GetNumberOfCurrentPlayers();
-            // ...Then associate that handle with our CallResult (which will trigger the delegate function we wrote below).
-            m_NumberOfCurrentPlayers.Set(handle);
-            Debug.Log("Called GetNumberOfCurrentPlayers()");
+        if (SteamManager.Initialized) {
+            if (Input.GetKeyDown(KeyCode.H)) {
+                // To trigger the CallResult, we need call the function on steam, and then store the results in a handle...
+                SteamAPICall_t handle = SteamUserStats.GetNumberOfCurrentPlayers();
+                // ...Then associate that handle with our CallResult (which will trigger the delegate function we wrote below).
+                m_NumberOfCurrentPlayers.Set(handle);
+                //Debug.Log("Called GetNumberOfCurrentPlayers()");
+            }
         }
     }
 
