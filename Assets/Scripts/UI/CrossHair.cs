@@ -49,7 +49,6 @@ public class CrossHair : MonoBehaviour {
             newRotation.x = Random.Range(-180f, 180f);
             transform.localRotation = Quaternion.Euler(newRotation);
         } else if (circleSegments == circleSegmentsRange.min) {
-            Debug.Log("stabilizing crosshair.");
             Vector3 newRotation = transform.localRotation.eulerAngles;
             newRotation.x = 20f;
             transform.localRotation = Quaternion.Euler(newRotation);

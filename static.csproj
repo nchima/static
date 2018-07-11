@@ -90,6 +90,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="static.Plugins.csproj">
+      <Project>{FC28CEB1-47FC-0CD4-8C8C-31D2090CB2A6}</Project>
+      <Name>static.Plugins</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Assets\Asset Packages\Auto Navmesh\Examples\Scripts\AgentLinkMover.cs" />
     <Compile Include="Assets\Asset Packages\Auto Navmesh\Examples\Scripts\ClickToMove.cs" />
     <Compile Include="Assets\Asset Packages\Auto Navmesh\Examples\Scripts\DestroyOnTrigger.cs" />
@@ -345,6 +351,8 @@
     <Compile Include="Assets\Scripts\State\State_Idle.cs" />
     <Compile Include="Assets\Scripts\State\StateController.cs" />
     <Compile Include="Assets\Scripts\State\Transition.cs" />
+    <Compile Include="Assets\Scripts\Steamworks.NET\SteamExample.cs" />
+    <Compile Include="Assets\Scripts\Steamworks.NET\SteamManager.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_ButtonReleased.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_Collision.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_LevelStarted.cs" />
@@ -425,6 +433,7 @@
     <None Include="Assets\Asset Packages\UCLAGameLab\Wireframe\Shaders\UCLA GameLab Wireframe.shader" />
     <None Include="Assets\Models\ArmyPilot\ArmyPilot.mesh.xml" />
     <None Include="Assets\Models\ArmyPilot\ArmyPilot.skeleton.xml" />
+    <None Include="Assets\Plugins\Steamworks.NET\redist\steam_appid.txt" />
     <None Include="Assets\Shaders\Atmosphere Fucked With.shader" />
     <None Include="Assets\Shaders\Atmosphere.shader" />
     <None Include="Assets\Shaders\Bullet Shader.shader" />
