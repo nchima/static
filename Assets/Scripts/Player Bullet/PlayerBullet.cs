@@ -115,8 +115,9 @@ public class PlayerBullet : MonoBehaviour {
         headVisuals.GetComponentInChildren<Renderer>().material.SetColor("_Tint", m_Color);
 
         if (m_playerBulletTrail == null) {
-            GameObject newObject = new GameObject();
-            m_playerBulletTrail = newObject.AddComponent<PlayerBulletTrail>();
+            GameObject trail = new GameObject("Player Bullet Trail");
+            trail.transform.parent = transform.parent;
+            m_playerBulletTrail = trail.AddComponent<PlayerBulletTrail>();
         }
 
         m_playerBulletTrail.thickness = thickness;
