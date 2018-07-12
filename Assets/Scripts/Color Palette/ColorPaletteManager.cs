@@ -160,7 +160,7 @@ public class ColorPaletteManager : MonoBehaviour {
     public void RestoreSavedPalette() {
         float duration = 0.78f;
         if (levelPaletteIndex == 0) { ChangePalette(defaultPalette, duration); } 
-        else if (levelPalettes[levelPaletteIndex] == null) { ChangePalette(savedPalette, duration); }
+        else if (levelPaletteIndex > levelPalettes.Length-1) { ChangePalette(savedPalette, duration); }
         else { ChangePalette(levelPalettes[levelPaletteIndex], duration); }
     }
 

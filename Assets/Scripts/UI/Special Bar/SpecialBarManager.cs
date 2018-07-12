@@ -122,7 +122,6 @@ public class SpecialBarManager : MonoBehaviour {
             leftBar.currentValue = 0f;
             rightBar.currentValue = 0f;
             savedShotBoxes[1].SetActive(false);
-            Debug.Log("doing. shots saved: " + ShotsSaved + ", max saved shots: " + maxSavedShots);
 
         } else {
             ShotsSaved--;

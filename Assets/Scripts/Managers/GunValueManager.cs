@@ -17,7 +17,6 @@ public class GunValueManager : MonoBehaviour {
         if (Time.timeScale == 0) { inputMod = 0; }
         else { inputMod *= (1 / Time.timeScale); }
         currentValue += InputManager.gunTuningValue * inputMod * (Time.deltaTime);
-        Debug.Log(currentValue);
         currentValue = Mathf.Clamp(currentValue, -1f, 1f);
 
         // Handle wiper
