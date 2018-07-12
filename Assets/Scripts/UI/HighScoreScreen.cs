@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class HighScoreScreen : MonoBehaviour {
 
-	private void Update()
+    private void Update()
     {
         if (InputManager.pauseButtonDown || InputManager.submitButtonDown) {
-            GameObject.Find("Game Manager").GetComponent<GameManager>().RestartGame();
+            Services.gameManager.GetComponent<GameManager>().RestartGame();
         }
     }
 }

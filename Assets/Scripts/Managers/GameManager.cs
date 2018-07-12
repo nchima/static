@@ -113,10 +113,11 @@ public class GameManager : MonoBehaviour {
     float memorizedTimeScale;
     public static bool gamePaused;
     public void PauseGame(bool value) {
+        Debug.Log("pausing game: " + value);
         if (value == true) {
             Services.uiManager.ShowPauseScreen();
             memorizedTimeScale = Time.timeScale;
-            Time.timeScale = 0.00000000000000001f;
+            Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             gamePaused = true;

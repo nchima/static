@@ -12,7 +12,8 @@ public class PauseMenu : MonoBehaviour {
         Services.gameManager.PauseGame(false);
 
         // Reload the scene.
-		SceneManager.LoadScene ("Main");
+        Services.gameManager.RestartGame();
+        SceneManager.LoadScene ("Main");
 
         // Unlock and show cursor.
         Cursor.lockState = CursorLockMode.None;

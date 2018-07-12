@@ -49,8 +49,7 @@ public class GameOverScreen : MonoBehaviour
         transform.Find("You Reached Level X Text").GetComponent<TextMesh>().text = "Y O U  R E A C H E D  L E V E L  " + Services.levelManager.LevelNumber.ToString();
 
         // If this is a high score, show the name entry interface.
-        if (scoreManager.score > 
-            scoreManager.highScoreEntries[9].score)
+        if (scoreManager.score > scoreManager.highScoreEntries[9].score)
         {
             nameEntryScreen.SetActive(true);
         }
@@ -60,7 +59,7 @@ public class GameOverScreen : MonoBehaviour
     private void Update()
     {
         if (!nameEntryScreen.activeSelf && (InputManager.submitButtonDown || InputManager.pauseButtonDown)) {
-            GameObject.Find("Game Manager").GetComponent<GameManager>().RestartGame();
+            Services.gameManager.GetComponent<GameManager>().RestartGame();
         }
     }
 }

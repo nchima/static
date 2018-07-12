@@ -26,7 +26,8 @@ public class ChargeDashLine : MonoBehaviour {
     private void Update() {
         float inputMod = 100f;
         if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -2.9f; }
-        inputMod *= (1 / Time.timeScale);
+        if (Time.timeScale == 0) { inputMod = 0; }
+        else { inputMod *= (1 / Time.timeScale); }
         distance += InputManager.gunTuningValue * inputMod * Time.deltaTime;
         distance = minMaxDistance.Clamp(distance);
 
