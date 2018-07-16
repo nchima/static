@@ -31,7 +31,7 @@ public class EnemyWeakPointGrower : MonoBehaviour {
         }
 
         // See if I was struck by almost all of the player's bullets at once
-        if (hitsLastFrame >= Services.gun.bulletsPerBurst - 2) {
+        if (hitsLastFrame >= Services.gun.bulletsPerBurst - 5) {
             myDad.currentHealth = 0;
         } else {
             hitsLastFrame = 0;
