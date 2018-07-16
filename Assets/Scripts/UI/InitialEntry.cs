@@ -109,9 +109,7 @@ public class InitialEntry : MonoBehaviour {
 
                 // Tell the score controller to add this entry to its score list and then close this screen.
                 if (!cancel) {
-                    Services.scoreManager.InsertScore(enteredInitials);
-                    Services.scoreManager.RetrieveScoresForHighScoreScreen();
-                    Services.uiManager.ShowHighScoreScreen();
+                    Services.scoreManager.InsertScoreLocal(enteredInitials);
                 }
             }
         }

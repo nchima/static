@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviour {
         Services.billboardManager = FindObjectOfType<BatchBillboard>();
         Services.scorePopupManager = GetComponentInChildren<ScorePopupManager>();
         Services.extraScreenManager = GetComponentInChildren<ExtraScreenManager>();
+        Services.steamLeaderboardManager = GetComponentInChildren<SteamLeaderboardManager>();
     }
 
     private void OnEnable() {

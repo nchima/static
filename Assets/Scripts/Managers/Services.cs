@@ -24,4 +24,5 @@ public class Services {
     public static BatchBillboard billboardManager;
     public static ScorePopupManager scorePopupManager;
     public static ExtraScreenManager extraScreenManager;
+    public static SteamLeaderboardManager steamLeaderboardManager;
 }

@@ -352,7 +352,7 @@
     <Compile Include="Assets\Scripts\State\StateController.cs" />
     <Compile Include="Assets\Scripts\State\Transition.cs" />
     <Compile Include="Assets\Scripts\Steamworks.NET\SteamExample.cs" />
-    <Compile Include="Assets\Scripts\Steamworks.NET\SteamLeaderboard.cs" />
+    <Compile Include="Assets\Scripts\Steamworks.NET\SteamLeaderboardManager.cs" />
     <Compile Include="Assets\Scripts\Steamworks.NET\SteamManager.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_ButtonReleased.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_Collision.cs" />

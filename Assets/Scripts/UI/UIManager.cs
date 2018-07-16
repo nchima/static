@@ -98,6 +98,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowGameOverScreen() {
+        hud.SetActive(false);
         gameOverScreen.SetActive(true);
         pauseVeil.SetActive(true);
         crosshair.SetActive(false);
