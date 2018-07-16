@@ -24,6 +24,7 @@ public class ScoreManager : MonoBehaviour
         set {
             int inputValue = value - _score;
             inputValue = Mathf.RoundToInt(inputValue * multiplier);
+            Services.healthManager.ApplyPointsToBonus(inputValue);
             _score += inputValue;
             scoreDisplay.text = _score.ToString();
         }
