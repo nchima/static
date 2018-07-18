@@ -91,7 +91,6 @@ public class ScoreManager : MonoBehaviour
 
         // Set up the score and multiplier number displays.
         scoreDisplay.text = score.ToString();
-        highScoreDisplay.text = GetHighestScore().name + ": " + GetHighestScore().score.ToString();
         multNumber.text = multiplier.ToString() + "X";
     }
 
@@ -112,6 +111,29 @@ public class ScoreManager : MonoBehaviour
             Debug.Log("deleting scores");
             ResetScores();
         }
+    }
+
+
+    public void UpdateHighScoreDisplay() {
+        if (leaderboardType == LeaderboardType.Local) {
+            highScoreDisplay.text = GetHighestScore().name + ": " + GetHighestScore().score.ToString();
+        } else if (leaderboardType == LeaderboardType.Steam) {
+            StartCoroutine(UpdateHighScoreDisplayCoroutine());
+        }
+    }
+
+
+    IEnumerator UpdateHighScoreDisplayCoroutine() {
+        Services.steamLeaderboardManager.DownloadLeaderboardEntries(0, 0);
+
+        // Wait until leaderboard has been downloaded
+        yield return new WaitUntil(() => {
+            if (Services.steamLeaderboardManager.isScoreEntriesDownloaded) { return true; } else { return false; }
+        });
+
+        highScoreDisplay.text = Services.steamLeaderboardManager.GetDownloadedLeaderboardEntry(0).m_nScore.ToString();
+
+        yield return null;
     }
 
 
@@ -167,8 +189,7 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    void ShowLevelCompleteScreen()
-    {
+    void ShowLevelCompleteScreen() {
         levelCompletedScreen.SetActive(true);
         levelCompletedDisplay.text = "LEVEL " + Services.levelManager.LevelNumber.ToString() + " COMPLETED";
         secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";

@@ -180,6 +180,7 @@ public class GameManager : MonoBehaviour {
         Services.playerController.GetComponent<Rigidbody>().isKinematic = false;
         Services.extraScreenManager.ReturnToZeroAndDeactivate(0.5f);
         Services.fallingSequenceManager.SetUpFallingVariables();
+        Services.scoreManager.UpdateHighScoreDisplay();
         Physics.gravity = initialGravity;   // Move to gravity manager
         Debug.Log("game start");
         gameStarted = true;
