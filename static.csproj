@@ -361,6 +361,9 @@
     <Compile Include="Assets\Scripts\Transitions\Transition_WaitForSecondsRange.cs" />
     <Compile Include="Assets\Scripts\Transitions\TriggerTransition.cs" />
     <Compile Include="Assets\Scripts\Transitions\WaitForSecondsTransition.cs" />
+    <Compile Include="Assets\Scripts\UI\ButtonTextModifier.cs" />
+    <Compile Include="Assets\Scripts\UI\ControlsScreen.cs" />
+    <Compile Include="Assets\Scripts\UI\CreditsScreen.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHair.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHairLines.cs" />
     <Compile Include="Assets\Scripts\UI\GameOverScreen.cs" />
@@ -376,6 +379,7 @@
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBar.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarManager.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarSizeController.cs" />
+    <Compile Include="Assets\Scripts\UI\TitleScreenButtons.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\Util\CircleDrawer.cs" />
     <Compile Include="Assets\Scripts\Util\CollisionListener.cs" />

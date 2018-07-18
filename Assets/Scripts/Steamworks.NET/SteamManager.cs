@@ -145,8 +145,6 @@ public class SteamManager : MonoBehaviour {
 		if (!m_bInitialized) {
 			return;
 		}
-
-        if (Time.timeScale == 0) { Debug.Log("Running callbacks even though  time scale is 0"); }
 		
         // Run Steam client callbacks
 		SteamAPI.RunCallbacks();

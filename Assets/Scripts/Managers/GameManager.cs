@@ -98,14 +98,8 @@ public class GameManager : MonoBehaviour {
 
 
     private void Update() {
-        if (!gameStarted && !gamePaused) {
-            if (InputManager.fireButtonDown) {
-                GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
-            }
-        }
-
-        if (InputManager.pauseButtonDown) {
-            if (!gamePaused && !Services.healthManager.PlayerIsDead) { PauseGame(true); } 
+        if (InputManager.pauseButtonDown && gameStarted && !Services.healthManager.PlayerIsDead) {
+            if (!gamePaused) { PauseGame(true); } 
             else { PauseGame(false); }
         }
     }
@@ -173,11 +167,14 @@ public class GameManager : MonoBehaviour {
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         Services.uiManager.hud.SetActive(true);
         Services.playerController.isMovementEnabled = true;
         Services.extraScreenManager.ReturnToZeroAndDeactivate(0.5f);
         Services.fallingSequenceManager.SetUpFallingVariables();
         Physics.gravity = initialGravity;   // Move to gravity manager
+        Debug.Log("game start");
         gameStarted = true;
     }
 

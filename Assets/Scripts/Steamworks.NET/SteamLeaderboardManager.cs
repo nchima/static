@@ -14,7 +14,7 @@ public class SteamLeaderboardManager : MonoBehaviour {
     private CallResult<LeaderboardScoresDownloaded_t> OnLeaderboardScoresDownloadedCallResult;
     private CallResult<LeaderboardScoreUploaded_t> OnLeaderboardScoreUploadedCallResult;
 
-    bool isLeaderboardInitialized;
+    [HideInInspector] public bool isLeaderboardInitialized;
     [HideInInspector] public bool isScoreEntriesDownloaded;
     [HideInInspector] public bool isScoreUploaded;
 
@@ -63,7 +63,7 @@ public class SteamLeaderboardManager : MonoBehaviour {
         if (pCallback.m_bLeaderboardFound != 0 && !bIOFailure) {
             // Save a reference to the leaderboard.
             m_SteamLeaderboard = pCallback.m_hSteamLeaderboard;
-            Debug.Log("Found leaderboard.");
+            Debug.Log("Found leaderboard: " + leaderboardName);
             isLeaderboardInitialized = true;
         }
     }

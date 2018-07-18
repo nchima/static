@@ -254,6 +254,8 @@ public class PlayerController : MonoBehaviour {
 
     void HandleCursorLocking()
     {
+        if (!Services.gameManager.gameStarted) { return; }
+
         if (InputManager.pauseButtonDown) {
             UnlockCursor();
         }

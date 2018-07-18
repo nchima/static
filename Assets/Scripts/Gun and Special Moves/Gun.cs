@@ -84,6 +84,7 @@ public class Gun : MonoBehaviour {
 
 
     public void FireBurst() {
+        if (!Services.gameManager.gameStarted) { return; }
 
         // Get new firing variables based on current oscillation.
         float burstsPerSecond = MyMath.Map(GunValueManager.currentValue, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;

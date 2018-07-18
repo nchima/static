@@ -225,6 +225,11 @@ public class ScoreManager : MonoBehaviour
 
     IEnumerator UploadAndDownloadScoresCoroutine() {
 
+        yield return new WaitUntil(() => {
+            if (Services.steamLeaderboardManager.isLeaderboardInitialized) { return true; }
+            else { return false; }
+        });
+
         // Upload score
         Services.steamLeaderboardManager.UploadScore(score);
 
@@ -234,16 +239,20 @@ public class ScoreManager : MonoBehaviour
             else { return false; }
         });
 
+        StartCoroutine(DownloadScores());
+
+        yield return null;
+    }
+
+
+    IEnumerator DownloadScores() {
         // Download scores
         Services.steamLeaderboardManager.DownloadLeaderboardEntries(-4, 5);
 
         // Wait until leaderboard has been downloaded
         yield return new WaitUntil(() => {
-            if (Services.steamLeaderboardManager.isScoreEntriesDownloaded) { return true; }
-            else { return false; }
+            if (Services.steamLeaderboardManager.isScoreEntriesDownloaded) { return true; } else { return false; }
         });
-
-        Debug.Log("Uploaded and downloaded score. Displaying.");
 
         // Use downloaded scores to fill a new list of score entries.
         List<ScoreEntry> newHighScoreList = new List<ScoreEntry>();
@@ -267,8 +276,8 @@ public class ScoreManager : MonoBehaviour
 
         // Update list
         highScoreEntries = newHighScoreList;
-        highScoreListText.GetComponent<TextMesh>().text = GetScoreListAsString();
-
+        highScoreListText.GetComponent<Text>().text = GetScoreListAsString();
+        
         yield return null;
     }
 
@@ -290,8 +299,10 @@ public class ScoreManager : MonoBehaviour
 
 
     public void RetrieveScoresForHighScoreScreen() {
-
-        if (leaderboardType == LeaderboardType.Steam) { return; }
+        if (leaderboardType == LeaderboardType.Steam) {
+            StartCoroutine(DownloadScores());
+            return;
+        }
         
         highScoreEntries = RetrieveHighScores();
 
