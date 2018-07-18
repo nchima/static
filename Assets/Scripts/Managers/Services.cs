@@ -8,6 +8,7 @@ public class Services {
     public static Transform playerTransform;
     public static PlayerController playerController;
     public static ScoreManager scoreManager;
+    public static SpecialMoveManager specialMoveManager;
     public static SpecialBarManager specialBarManager;
     public static HealthManager healthManager;
     public static FallingSequenceManager fallingSequenceManager;

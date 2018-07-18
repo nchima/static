@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour {
         Services.playerTransform = FindObjectOfType<PlayerController>().transform;
         Services.playerController = FindObjectOfType<PlayerController>();
         Services.scoreManager = GetComponent<ScoreManager>();
+        Services.specialMoveManager = GetComponentInChildren<SpecialMoveManager>();
         Services.specialBarManager = GetComponentInChildren<SpecialBarManager>();
         Services.healthManager = GetComponentInChildren<HealthManager>();
         Services.levelManager = GetComponentInChildren<LevelManager>();
