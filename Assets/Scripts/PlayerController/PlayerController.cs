@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
     public float maxGroundSpeed;
     public float maxAirSpeed;
     [SerializeField] float maxFallingSpeed;
-    [HideInInspector] public bool isMovementEnabled = true;
+    [HideInInspector] public bool isMovementEnabled = false;
     Vector3 unrotatedVelocity = Vector3.zero;
 
     [SerializeField] float movementKickForce = 5f;

@@ -15,7 +15,9 @@ public class FiringShockwaveState : State {
         // Set up bonus time for next level.
         Services.scoreManager.DetermineBonusTime();
 
-        //Services.specialBarManager.freezeDecay = false;
+        foreach(Camera cam in FindObjectOfType<FieldOfViewController>().orthographicCams) {
+            cam.enabled = true;
+        }
 
         Services.playerTransform.position = new Vector3(Services.playerTransform.position.x, 2.15f, Services.playerTransform.position.z);
 

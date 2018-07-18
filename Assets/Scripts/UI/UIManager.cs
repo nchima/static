@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 public class UIManager : MonoBehaviour {
 
     // SCREENS
+    public GameObject seizureWarningScreen;
     public GameObject titleScreen;
     public GameObject controlsScreen;
     public GameObject creditsScreen;
@@ -50,6 +51,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowTitleScreen(bool value) {
+        seizureWarningScreen.SetActive(false);
         titleScreen.SetActive(value);
     }
 

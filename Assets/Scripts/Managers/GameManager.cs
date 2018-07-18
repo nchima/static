@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 using UnityStandardAssets.Characters.FirstPerson;
 using DG.Tweening;
 using UnityEngine.Audio;
+using UnityEngine.Analytics;
+
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
@@ -61,15 +63,13 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    private void Start() {
+    public void LoadGame() {
         StartCoroutine(InitialSetup());
     }
 
 
     IEnumerator InitialSetup() {
         //Services.gun.enabled = false;
-        Services.playerController.isMovementEnabled = false;
-
         Services.extraScreenManager.SetScreensActive(true);
         Services.extraScreenManager.SetRotationScale(1f);
 
@@ -150,6 +150,11 @@ public class GameManager : MonoBehaviour {
 
     // Maybe move this functionality to various managers at some point.
     public void LevelCompletedHandler(GameEvent gameEvent) {
+        Debug.Log("analytics event");
+        Analytics.CustomEvent("Level Complete", new Dictionary<string, object> { 
+            { "Level Number", Services.levelManager.LevelNumber }
+        });
+
         levelWinAudio.Play();
         DeleteThings();
     }
@@ -171,6 +176,7 @@ public class GameManager : MonoBehaviour {
         Cursor.visible = false;
         Services.uiManager.hud.SetActive(true);
         Services.playerController.isMovementEnabled = true;
+        Services.playerController.GetComponent<Rigidbody>().isKinematic = false;
         Services.extraScreenManager.ReturnToZeroAndDeactivate(0.5f);
         Services.fallingSequenceManager.SetUpFallingVariables();
         Physics.gravity = initialGravity;   // Move to gravity manager
