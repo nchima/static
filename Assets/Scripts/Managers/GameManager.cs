@@ -182,6 +182,7 @@ public class GameManager : MonoBehaviour {
         Services.fallingSequenceManager.SetUpFallingVariables();
         Services.scoreManager.UpdateHighScoreDisplay();
         Physics.gravity = initialGravity;   // Move to gravity manager
+        FindObjectOfType<FallIntoLevelState>().speedFallTrigger = true;
         Debug.Log("game start");
         gameStarted = true;
     }
