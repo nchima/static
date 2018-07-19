@@ -117,7 +117,7 @@ public class LaserEnemyStateDash : State {
         }
 
         // Failsafe:
-        Debug.Log("Laser enemy could not find a suitable position to move to.");
+        //Debug.Log("Laser enemy could not find a suitable position to move to.");
         return controller.transform.position;
     }
 }

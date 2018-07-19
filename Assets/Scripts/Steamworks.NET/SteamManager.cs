@@ -145,8 +145,8 @@ public class SteamManager : MonoBehaviour {
 		if (!m_bInitialized) {
 			return;
 		}
-
-		// Run Steam client callbacks
+		
+        // Run Steam client callbacks
 		SteamAPI.RunCallbacks();
 	}
 }

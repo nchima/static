@@ -8,6 +8,7 @@ public class Services {
     public static Transform playerTransform;
     public static PlayerController playerController;
     public static ScoreManager scoreManager;
+    public static SpecialMoveManager specialMoveManager;
     public static SpecialBarManager specialBarManager;
     public static HealthManager healthManager;
     public static FallingSequenceManager fallingSequenceManager;
@@ -24,4 +25,5 @@ public class Services {
     public static BatchBillboard billboardManager;
     public static ScorePopupManager scorePopupManager;
     public static ExtraScreenManager extraScreenManager;
+    public static SteamLeaderboardManager steamLeaderboardManager;
 }

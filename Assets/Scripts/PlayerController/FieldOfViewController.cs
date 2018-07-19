@@ -11,7 +11,7 @@ public class FieldOfViewController : MonoBehaviour {
     FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
 
     List<Camera> perspectiveCams;
-    List<Camera> orthographicCams;
+    [HideInInspector] public List<Camera> orthographicCams;
 
     FloatRange shotgunChargeFOVRange = new FloatRange(85f, 100f);
     FloatRange shotgunChargeOrthoSizeRange = new FloatRange(32f, 50f);
@@ -53,7 +53,7 @@ public class FieldOfViewController : MonoBehaviour {
         orthographicCams = new List<Camera>();
         Camera[] camerasInChildren = GetComponentsInChildren<Camera>();
         for (int i = 0; i < camerasInChildren.Length; i++) {
-            if (camerasInChildren[i].orthographic) { orthographicCams.Add(camerasInChildren[i]); }
+            if (camerasInChildren[i].orthographic) { camerasInChildren[i].enabled = false;  orthographicCams.Add(camerasInChildren[i]); }
             else { perspectiveCams.Add(camerasInChildren[i]); }
         }
     }

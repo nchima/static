@@ -25,7 +25,7 @@ public class ScreenShake : MonoBehaviour {
 
 	void Awake()
     {
-		originalPosition = transform.position;
+		originalPosition = transform.localPosition;
         currentDriftPosition = originalPosition;
 
         driftNoiseOffset = Random.insideUnitSphere * 100f;
@@ -101,7 +101,7 @@ public class ScreenShake : MonoBehaviour {
             currentDriftPosition = originalPosition;
         }
 
-        transform.position = currentDriftPosition;
+        transform.localPosition = currentDriftPosition;
     }
 
 

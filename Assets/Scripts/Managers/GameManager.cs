@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 using UnityStandardAssets.Characters.FirstPerson;
 using DG.Tweening;
 using UnityEngine.Audio;
+using UnityEngine.Analytics;
+
 public class GameManager : MonoBehaviour {
 
     // DEBUG STUFF
@@ -29,6 +31,7 @@ public class GameManager : MonoBehaviour {
         Services.playerTransform = FindObjectOfType<PlayerController>().transform;
         Services.playerController = FindObjectOfType<PlayerController>();
         Services.scoreManager = GetComponent<ScoreManager>();
+        Services.specialMoveManager = GetComponentInChildren<SpecialMoveManager>();
         Services.specialBarManager = GetComponentInChildren<SpecialBarManager>();
         Services.healthManager = GetComponentInChildren<HealthManager>();
         Services.levelManager = GetComponentInChildren<LevelManager>();
@@ -45,6 +48,7 @@ public class GameManager : MonoBehaviour {
         Services.billboardManager = FindObjectOfType<BatchBillboard>();
         Services.scorePopupManager = GetComponentInChildren<ScorePopupManager>();
         Services.extraScreenManager = GetComponentInChildren<ExtraScreenManager>();
+        Services.steamLeaderboardManager = GetComponentInChildren<SteamLeaderboardManager>();
     }
 
     private void OnEnable() {
@@ -60,15 +64,13 @@ public class GameManager : MonoBehaviour {
     }
 
 
-    private void Start() {
+    public void LoadGame() {
         StartCoroutine(InitialSetup());
     }
 
 
     IEnumerator InitialSetup() {
         //Services.gun.enabled = false;
-        Services.playerController.isMovementEnabled = false;
-
         Services.extraScreenManager.SetScreensActive(true);
         Services.extraScreenManager.SetRotationScale(1f);
 
@@ -97,14 +99,9 @@ public class GameManager : MonoBehaviour {
 
 
     private void Update() {
-        if (!gameStarted && !gamePaused) {
-            if (InputManager.fireButtonDown) {
-                GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
-            }
-        }
-
-        if (InputManager.pauseButtonDown) {
-            if (!gamePaused && !Services.healthManager.PlayerIsDead) { PauseGame(true); } else { PauseGame(false); }
+        if (InputManager.pauseButtonDown && gameStarted && !Services.healthManager.PlayerIsDead) {
+            if (!gamePaused) { PauseGame(true); } 
+            else { PauseGame(false); }
         }
     }
 
@@ -112,6 +109,7 @@ public class GameManager : MonoBehaviour {
     float memorizedTimeScale;
     public static bool gamePaused;
     public void PauseGame(bool value) {
+        Debug.Log("pausing game: " + value);
         if (value == true) {
             Services.uiManager.ShowPauseScreen();
             memorizedTimeScale = Time.timeScale;
@@ -153,6 +151,11 @@ public class GameManager : MonoBehaviour {
 
     // Maybe move this functionality to various managers at some point.
     public void LevelCompletedHandler(GameEvent gameEvent) {
+        Debug.Log("analytics event");
+        Analytics.CustomEvent("Level Complete", new Dictionary<string, object> { 
+            { "Level Number", Services.levelManager.LevelNumber }
+        });
+
         levelWinAudio.Play();
         DeleteThings();
     }
@@ -170,11 +173,17 @@ public class GameManager : MonoBehaviour {
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         Services.uiManager.hud.SetActive(true);
         Services.playerController.isMovementEnabled = true;
+        Services.playerController.GetComponent<Rigidbody>().isKinematic = false;
         Services.extraScreenManager.ReturnToZeroAndDeactivate(0.5f);
         Services.fallingSequenceManager.SetUpFallingVariables();
+        Services.scoreManager.UpdateHighScoreDisplay();
         Physics.gravity = initialGravity;   // Move to gravity manager
+        FindObjectOfType<FallIntoLevelState>().speedFallTrigger = true;
+        Debug.Log("game start");
         gameStarted = true;
     }
 

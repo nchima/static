@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 
 public class FallIntoLevelState : State {
 
+    public bool speedFallTrigger = false;
+
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
         Services.playerTransform.position = fallingSequenceManager.playerSpawnPoint.position;
@@ -20,8 +22,9 @@ public class FallIntoLevelState : State {
         base.Run(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        if (InputManager.fireButtonDown && !fallingSequenceManager.isSpeedFallActive) {
+        if (InputManager.fireButtonDown && !fallingSequenceManager.isSpeedFallActive || speedFallTrigger) {
             BeginSpeedFall(stateController);
+            speedFallTrigger = false;
         }
 
         if (Services.playerTransform.position.y <= 600f) {

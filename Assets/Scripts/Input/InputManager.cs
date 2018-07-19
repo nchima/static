@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class InputManager : MonoBehaviour {
 
@@ -70,6 +72,8 @@ public class InputManager : MonoBehaviour {
     }
 
 
+    const float UI_INPUT_COOLDOWN = 0.1f;
+    float uiInputTimer = UI_INPUT_COOLDOWN;
     private void Update() {
 
         ResetTriggers();
@@ -96,6 +100,25 @@ public class InputManager : MonoBehaviour {
                 break;
             default:
                 break;
+        }
+
+        // Handle UI input
+        uiInputTimer += Time.deltaTime;
+        if (movementAxis == Vector2.zero) { uiInputTimer = UI_INPUT_COOLDOWN; }
+        if (uiInputTimer >= UI_INPUT_COOLDOWN) {
+
+            AxisEventData ad = new AxisEventData(EventSystem.current);
+            ad.moveDir = MoveDirection.None;
+            if (movementAxis.x < 0) { ad.moveDir = MoveDirection.Left; } 
+            else if (movementAxis.x > 0) { ad.moveDir = MoveDirection.Right; } 
+            else if (movementAxis.y < 0) { ad.moveDir = MoveDirection.Down; } 
+            else if (movementAxis.y > 0) { ad.moveDir = MoveDirection.Up; }
+
+            if (ad.moveDir != MoveDirection.None) {
+                //ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.deselectHandler);
+                ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.moveHandler);
+                uiInputTimer = 0f;
+            }
         }
     } 
 

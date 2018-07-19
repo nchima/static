@@ -29,6 +29,7 @@ public class HealthManager : MonoBehaviour {
     bool isFirstHealthBonusApplied;
     int subsequentHealthBonusesApplied = 0;
     int nextBonus { get { return firstHealthBonusScore + subsequentHealthBonusesApplied * subsequentHealthBonusesScore; } }
+    int pointsAppliedTowardsBonus;
 
     // Invincibility frames.
     [HideInInspector] public bool forceInvincibility;    // Used by other scripts to force player invincibility at certain times.
@@ -65,11 +66,11 @@ public class HealthManager : MonoBehaviour {
 
         // Update regain prompt
         if (regainPrompt.activeInHierarchy) {
-            regainPrompt.GetComponentInChildren<TextMesh>().text = Mathf.Abs(nextBonus - Services.scoreManager.score).ToString();
+            regainPrompt.GetComponentInChildren<TextMesh>().text = Mathf.Abs(nextBonus - pointsAppliedTowardsBonus).ToString();
         }
 
         // Check for score bonuses.
-        if (Services.scoreManager.score >= nextBonus) {
+        if (pointsAppliedTowardsBonus >= nextBonus) {
             AddMaxHealth();
             subsequentHealthBonusesApplied++;
         }
@@ -128,6 +129,12 @@ public class HealthManager : MonoBehaviour {
         regainPrompt.SetActive(true);
         GameObject target = healthBlocks[currentMaxHealth].gameObject;
         regainPrompt.transform.localPosition = target.transform.localPosition + promptOffset;
+    }
+
+
+    public void ApplyPointsToBonus(int points) {
+        if (currentMaxHealth == 5) { return; }
+        pointsAppliedTowardsBonus += points;
     }
 
 

@@ -7,7 +7,10 @@ using UnityEngine.EventSystems;
 public class UIManager : MonoBehaviour {
 
     // SCREENS
+    public GameObject seizureWarningScreen;
     public GameObject titleScreen;
+    public GameObject controlsScreen;
+    public GameObject creditsScreen;
     public GameObject levelCompleteScreen;
     public GameObject specialMoveReadyScreen;
     public GameObject pauseScreen;
@@ -48,6 +51,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowTitleScreen(bool value) {
+        seizureWarningScreen.SetActive(false);
         titleScreen.SetActive(value);
     }
 
@@ -68,6 +72,7 @@ public class UIManager : MonoBehaviour {
         pauseScreen.SetActive(true);
         pauseVeil.SetActive(true);
         crosshair.SetActive(false);
+        hud.SetActive(false);
 
         titleScreenActiveBeforePause = titleScreen.activeSelf;
         levelCompleteScreenActiveBeforePause = levelCompleteScreen.activeSelf;
@@ -85,10 +90,23 @@ public class UIManager : MonoBehaviour {
     }
 
 
+    public void ShowControlsScreen(bool value) {
+        titleScreen.SetActive(!value);
+        controlsScreen.SetActive(value);
+    }
+
+
+    public void ShowCreditsScreen(bool value) {
+        titleScreen.SetActive(!value);
+        creditsScreen.SetActive(value);
+    }
+
+
     public void HidePauseScreen() {
         pauseScreen.SetActive(false);
         pauseVeil.SetActive(false);
         crosshair.SetActive(true);
+        hud.SetActive(true);
 
         titleScreen.SetActive(titleScreenActiveBeforePause);
         levelCompleteScreen.SetActive(levelCompleteScreenActiveBeforePause);
@@ -98,6 +116,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowGameOverScreen() {
+        hud.SetActive(false);
         gameOverScreen.SetActive(true);
         pauseVeil.SetActive(true);
         crosshair.SetActive(false);
@@ -113,7 +132,9 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowHighScoreScreen() {
+        titleScreen.SetActive(false);
         pauseVeil.SetActive(true);
+        endOfDemoScreen.SetActive(false);
         gameOverScreen.gameObject.SetActive(false);
         nameEntryScreen.gameObject.SetActive(false);
         highScoreScreen.gameObject.SetActive(true);
@@ -122,6 +143,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void ShowEndOfDemoScreen() {
+        hud.SetActive(false);
         endOfDemoScreen.SetActive(true);
         levelCompleteScreen.SetActive(false);
         specialMoveReadyScreen.SetActive(false);
@@ -141,6 +163,7 @@ public class UIManager : MonoBehaviour {
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        pauseVeil.SetActive(false);
         ShowTitleScreen(false);
     }
 }

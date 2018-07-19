@@ -5,22 +5,26 @@ using UnityStandardAssets.Characters.FirstPerson;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Steamworks;
 
 public class ScoreManager : MonoBehaviour
 {
+    // STEAM V LOCAL LEADERBOARDS
+    public enum LeaderboardType { Steam, Local }
+    public LeaderboardType leaderboardType = LeaderboardType.Steam;
+
     // USED FOR DISPLAYING THE SCORE
-    [SerializeField] private int _score = 0;
+    private int _score = 0;
     public int score
     {
-        get
-        {
+        get {
             return _score;
         }
 
-        set
-        {
+        set {
             int inputValue = value - _score;
             inputValue = Mathf.RoundToInt(inputValue * multiplier);
+            Services.healthManager.ApplyPointsToBonus(inputValue);
             _score += inputValue;
             scoreDisplay.text = _score.ToString();
         }
@@ -87,36 +91,11 @@ public class ScoreManager : MonoBehaviour
 
         // Set up the score and multiplier number displays.
         scoreDisplay.text = score.ToString();
-        highScoreDisplay.text = GetHighestScore().initials + ": " + GetHighestScore().score.ToString();
         multNumber.text = multiplier.ToString() + "X";
     }
 
 
-    void Update()
-    {
-        // If the multiplier bar value has gone below zero, lower the player's multiplier.
-        //if (multBarValueCurr <= 0f && multiplier > 1f)
-        //{
-        //    // Lower the multiplier.
-        //    multiplier -= 0.1f;
-
-        //    // Get the values for the new multiplier level.
-        //    multBarStartValCurr = multBarStartVal / multiplier;
-        //    multBarValueCurr = multBarStartValCurr;
-        //    multBarDecayCurr = multBarBaseDecay * multiplier;
-        //    multNumber.text = multiplier.ToString() + "X";
-        //}
-
-        //multiplierBar.transform.DOLocalMoveY(newYPos, multBarTweenSpeed);
-
-        // Set multiplier bar value based on it's current size.
-        //if (specialBar.transform.localScale.y > 6f) multiplier = 6;
-        //else if (specialBar.transform.localScale.y > 4.4f) multiplier = 5;
-        //else if (specialBar.transform.localScale.y > 2.6f) multiplier = 4;
-        //else if (specialBar.transform.localScale.y > 1.35f) multiplier = 3;
-        //else if (specialBar.transform.localScale.y > 0.5f) multiplier = 2;
-        //else multiplier = 1;
-
+    void Update() {
         comboTimer -= Time.deltaTime;
         if (comboTimer <= 0f) {
             multiplier = 1f;
@@ -135,8 +114,30 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    public void DetermineBonusTime()
-    {
+    public void UpdateHighScoreDisplay() {
+        if (leaderboardType == LeaderboardType.Local) {
+            highScoreDisplay.text = GetHighestScore().name + ": " + GetHighestScore().score.ToString();
+        } else if (leaderboardType == LeaderboardType.Steam) {
+            StartCoroutine(UpdateHighScoreDisplayCoroutine());
+        }
+    }
+
+
+    IEnumerator UpdateHighScoreDisplayCoroutine() {
+        Services.steamLeaderboardManager.DownloadLeaderboardEntries(0, 0);
+
+        // Wait until leaderboard has been downloaded
+        yield return new WaitUntil(() => {
+            if (Services.steamLeaderboardManager.isScoreEntriesDownloaded) { return true; } else { return false; }
+        });
+
+        highScoreDisplay.text = Services.steamLeaderboardManager.GetDownloadedLeaderboardEntry(0).m_nScore.ToString();
+
+        yield return null;
+    }
+
+
+    public void DetermineBonusTime() {
         maxBonusTime = 0;
         maxTimeBonus = 0;
 
@@ -188,8 +189,7 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    void ShowLevelCompleteScreen()
-    {
+    void ShowLevelCompleteScreen() {
         levelCompletedScreen.SetActive(true);
         levelCompletedDisplay.text = "LEVEL " + Services.levelManager.LevelNumber.ToString() + " COMPLETED";
         secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
@@ -222,14 +222,16 @@ public class ScoreManager : MonoBehaviour
 
         // Initialize 10 empty score entries in the highScore List.
         for (int i = 0; i < 10; i++) {
-            newHighScoreList.Add(new ScoreEntry("AAA", 0, 0));
+            newHighScoreList.Add(new ScoreEntry(i + 1, "AAA", 0, 0));
         }
 
-        // Load saved high scores from PlayerPrefs.
-        for (int i = 0; i < 10; i++) {
-            // Check to see if this score entry has previously been saved.
-            if (PlayerPrefs.GetString("HighScoreName" + i) != "") {
-                newHighScoreList[i] = new ScoreEntry(PlayerPrefs.GetString("HighScoreName" + i), PlayerPrefs.GetInt("HighScoreNumber" + i), PlayerPrefs.GetInt("Newest" + i));
+        if (leaderboardType == LeaderboardType.Local) {
+            // Load saved high scores from PlayerPrefs.
+            for (int i = 0; i < 10; i++) {
+                // Check to see if this score entry has previously been saved.
+                if (PlayerPrefs.GetString("HighScoreName" + i) != "") {
+                    newHighScoreList[i] = new ScoreEntry(i + 1, PlayerPrefs.GetString("HighScoreName" + i), PlayerPrefs.GetInt("HighScoreNumber" + i), PlayerPrefs.GetInt("Newest" + i));
+                }
             }
         }
 
@@ -237,43 +239,123 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    // Saves high scores
-    void SaveHighScores()
-    {
+    public void UploadAndDownloadScores() {
+        StartCoroutine(UploadAndDownloadScoresCoroutine());
+    }
+
+
+    IEnumerator UploadAndDownloadScoresCoroutine() {
+
+        yield return new WaitUntil(() => {
+            if (Services.steamLeaderboardManager.isLeaderboardInitialized) { return true; }
+            else { return false; }
+        });
+
+        // Upload score
+        Services.steamLeaderboardManager.UploadScore(score);
+
+        // Wait until score has been uploaded.
+        yield return new WaitUntil(() => {
+            if (Services.steamLeaderboardManager.isScoreUploaded) { return true; } 
+            else { return false; }
+        });
+
+        StartCoroutine(DownloadScores());
+
+        yield return null;
+    }
+
+
+    IEnumerator DownloadScores() {
+        // Download scores
+        Services.steamLeaderboardManager.DownloadLeaderboardEntries(-4, 5);
+
+        // Wait until leaderboard has been downloaded
+        yield return new WaitUntil(() => {
+            if (Services.steamLeaderboardManager.isScoreEntriesDownloaded) { return true; } else { return false; }
+        });
+
+        // Use downloaded scores to fill a new list of score entries.
+        List<ScoreEntry> newHighScoreList = new List<ScoreEntry>();
         for (int i = 0; i < 10; i++) {
-            PlayerPrefs.SetString("HighScoreName" + i, highScoreEntries[i].initials);
-            PlayerPrefs.SetInt("HighScoreNumber" + i, highScoreEntries[i].score);
-            PlayerPrefs.SetInt("Newest" + i, highScoreEntries[i].newest);
+            LeaderboardEntry_t entry = Services.steamLeaderboardManager.GetDownloadedLeaderboardEntry(i);
+            if (SteamFriends.GetFriendPersonaName(entry.m_steamIDUser) != "") {
+                string username = SteamFriends.GetFriendPersonaName(entry.m_steamIDUser);
+                bool isUsersScore = SteamFriends.GetFriendPersonaName(entry.m_steamIDUser) == SteamFriends.GetPersonaName();
+                int peePee = 0;
+                if (isUsersScore) { peePee = 1; }
+                ScoreEntry newScoreEntry = new ScoreEntry(entry.m_nGlobalRank, username, entry.m_nScore, peePee);
+                newHighScoreList.Add(newScoreEntry);
+            }
+
+            // If the score entry was empty.
+            else {
+                ScoreEntry newScoreEntry = new ScoreEntry(0, "NO DATA", 0, 0);
+                newHighScoreList.Add(newScoreEntry);
+            }
+        }
+
+        // Update list
+        highScoreEntries = newHighScoreList;
+        highScoreListText.GetComponent<Text>().text = GetScoreListAsString();
+        
+        yield return null;
+    }
+
+
+    // Saves high scores
+    void SaveHighScores() {
+        if (leaderboardType == LeaderboardType.Local) {
+            for (int i = 0; i < 10; i++) {
+                PlayerPrefs.SetString("HighScoreName" + i, highScoreEntries[i].name);
+                PlayerPrefs.SetInt("HighScoreNumber" + i, highScoreEntries[i].score);
+                PlayerPrefs.SetInt("Newest" + i, highScoreEntries[i].newest);
+            }
+        } 
+        
+        else if (leaderboardType == LeaderboardType.Steam && SteamManager.Initialized) {
+            //Services.steamLeaderboardManager.UploadScore(score);
         }
     }
 
 
     public void RetrieveScoresForHighScoreScreen() {
+        if (leaderboardType == LeaderboardType.Steam) {
+            StartCoroutine(DownloadScores());
+            return;
+        }
+        
         highScoreEntries = RetrieveHighScores();
 
+        highScoreListText.GetComponent<TextMesh>().text = GetScoreListAsString();
+        SaveHighScores();
+    }
+
+
+    string GetScoreListAsString() {
         string scoreList = "";
 
         for (int i = 0; i < highScoreEntries.Count; i++) {
             if (highScoreEntries[i].newest == 1) { scoreList += ">"; }
-            scoreList += highScoreEntries[i].initials + ": " + highScoreEntries[i].score;
+            else { scoreList += " "; }
+            scoreList += highScoreEntries[i].rank + ". ";
+            scoreList += highScoreEntries[i].name + ": " + highScoreEntries[i].score;
             if (highScoreEntries[i].newest == 1) { scoreList += "<"; }
             scoreList += "\n";
 
             highScoreEntries[i].newest = 0;
         }
 
-        highScoreListText.GetComponent<TextMesh>().text = scoreList;
-        SaveHighScores();
+        return scoreList;
     }
 
 
     // Insters a score into the list.
-    public void InsertScore(string initials)
-    {
+    public void InsertScoreLocal(string initials) {
         highScoreEntries = RetrieveHighScores();
 
         // Add score to list
-        highScoreEntries.Add(new ScoreEntry(initials, score, 1));
+        highScoreEntries.Add(new ScoreEntry(highScoreEntries.Count+1, initials, score, 1));
 
         SortScores();
 
@@ -282,15 +364,13 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    ScoreEntry GetHighestScore()
-    {
+    ScoreEntry GetHighestScore() {
         SortScores();
         return highScoreEntries[0];
     }
 
 
-    void SortScores()
-    {
+    void SortScores() {
         // Add and sort list
         highScoreEntries.Sort(delegate (ScoreEntry b, ScoreEntry a)
         {
@@ -305,14 +385,13 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    public void ResetScores()
-    {
+    public void ResetScores() {
         highScoreEntries = RetrieveHighScores();
 
         for (int i = 0; i < 10; i++)
         {
             highScoreEntries[i].score = 0;
-            highScoreEntries[i].initials = "AAA";
+            highScoreEntries[i].name = "AAA";
             highScoreEntries[i].newest = 0;
         }
 
@@ -325,7 +404,7 @@ public class ScoreManager : MonoBehaviour
     public void PrintHighScores() {
         for (int i = 0; i < 10; i++) {
             if (PlayerPrefs.GetString("HighScoreName" + i) != null) { continue; }
-            Debug.Log(PlayerPrefs.GetString("HighScoreName" + i, highScoreEntries[i].initials) + ", "
+            Debug.Log(PlayerPrefs.GetString("HighScoreName" + i, highScoreEntries[i].name) + ", "
             + PlayerPrefs.GetInt("HighScoreNumber" + i, highScoreEntries[i].score) + ", "
             + PlayerPrefs.GetInt("Newest" + i, highScoreEntries[i].newest));
         }
@@ -334,13 +413,15 @@ public class ScoreManager : MonoBehaviour
 
     public class ScoreEntry
     {
-        public string initials;
+        public string name;
+        public int rank;
         public int score;
         public int newest; // Int as bool... 0 = false, 1 = true
 
-        public ScoreEntry(string initials, int score, int newest)
+        public ScoreEntry(int rank, string name, int score, int newest)
         {
-            this.initials = initials;
+            this.rank = rank;
+            this.name = name;
             this.score = score;
             this.newest = newest;
         }

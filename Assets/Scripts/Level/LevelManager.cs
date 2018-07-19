@@ -92,7 +92,7 @@ public class LevelManager : MonoBehaviour {
 
 
     public void LoadNextLevel() {
-        if (SceneManager.GetSceneByBuildIndex(levelsCompleted + 1).IsValid()) {
+        if ((levelsCompleted + 1 > SceneManager.sceneCountInBuildSettings-1)) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
             Services.uiManager.ShowEndOfDemoScreen();
             return;

@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
     public float maxGroundSpeed;
     public float maxAirSpeed;
     [SerializeField] float maxFallingSpeed;
-    [HideInInspector] public bool isMovementEnabled = true;
+    [HideInInspector] public bool isMovementEnabled = false;
     Vector3 unrotatedVelocity = Vector3.zero;
 
     [SerializeField] float movementKickForce = 5f;
@@ -140,13 +140,19 @@ public class PlayerController : MonoBehaviour {
         if (state == State.Normal) {
             dashCooldownTimer += Time.deltaTime;
             if (dashCooldownTimer >= dashCooldown && dashRechargeTimer >= DASH_RECHARGE_TIME) {
-                if (InputManager.dashButtonUp && !isSuperDashCharging) {
+                if (InputManager.dashButtonDown && !isSuperDashCharging) {
                     BeginDash(false);
-                } else if (InputManager.dashButton && !isSuperDashCharging) {
+                }
+
+                if (InputManager.dashButton && !isSuperDashCharging) {
                     superDashHoldTimer += Time.deltaTime;
                     if (superDashHoldTimer > superDashHoldDuration /*&& Services.specialBarManager.bothBarsFull*/) {
-                        FindObjectOfType<ShotgunCharge>().BeginSequence();
-                        isSuperDashCharging = true;
+                        if (!Services.specialMoveManager.HasAmmo) { return; }
+                        Services.specialBarManager.PlayerUsedSpecialMove();
+                        Services.levelManager.SetFloorCollidersActive(false);
+                        //FindObjectOfType<ShotgunCharge>().BeginSequence();
+                        //Services.fallingSequenceManager.BeginFalling();
+                        //isSuperDashCharging = true;
                         //BeginDash(true);
                     }
                 } else {
@@ -254,6 +260,8 @@ public class PlayerController : MonoBehaviour {
 
     void HandleCursorLocking()
     {
+        if (!Services.gameManager.gameStarted) { return; }
+
         if (InputManager.pauseButtonDown) {
             UnlockCursor();
         }
@@ -290,23 +298,26 @@ public class PlayerController : MonoBehaviour {
 
     IEnumerator DashCoroutine(bool buttonHeld) {
         Vector3 dashDirection = transform.forward * directionalInput.y + transform.right * directionalInput.x;
-        if (dashDirection.magnitude < 0.2f) {
-            dashDirection = transform.forward;
-        }
-        m_Rigidbody.velocity = dashDirection * dashSpeed;
-        m_Rigidbody.useGravity = false;
-        Vector3 startingPosition = transform.position;
         bool railingCollisionsIgnored = false;
-        if (buttonHeld) {
-            IgnoreCollisionsWithRailings(true);
-            railingCollisionsIgnored = true;
-        }
 
-        yield return new WaitUntil(() => {
-            if ((Vector3.Distance(startingPosition, transform.position) >= dashDistance) && !InputManager.dashButton) {
-                return true;
-            } else { return false; }
-        });
+        if (dashDirection.magnitude < 0.2f) {
+            // Do nothing
+            //dashDirection = transform.forward;
+        } else {
+            m_Rigidbody.velocity = dashDirection * dashSpeed;
+            m_Rigidbody.useGravity = false;
+            Vector3 startingPosition = transform.position;
+            if (buttonHeld) {
+                IgnoreCollisionsWithRailings(true);
+                railingCollisionsIgnored = true;
+            }
+
+            yield return new WaitUntil(() => {
+                if ((Vector3.Distance(startingPosition, transform.position) >= dashDistance) && !InputManager.dashButton) {
+                    return true;
+                } else { return false; }
+            });
+        }
 
         dashCooldownTimer = 0f;
         movementKickReady = true;
