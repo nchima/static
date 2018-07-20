@@ -380,6 +380,7 @@
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBar.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarManager.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarSizeController.cs" />
+    <Compile Include="Assets\Scripts\UI\SpecialMoveEarnedPrompt.cs" />
     <Compile Include="Assets\Scripts\UI\TitleScreenButtons.cs" />
     <Compile Include="Assets\Scripts\UI\UIManager.cs" />
     <Compile Include="Assets\Scripts\Util\CircleDrawer.cs" />

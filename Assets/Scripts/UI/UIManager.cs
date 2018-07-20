@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class UIManager : MonoBehaviour {
 
@@ -12,7 +11,6 @@ public class UIManager : MonoBehaviour {
     public GameObject controlsScreen;
     public GameObject creditsScreen;
     public GameObject levelCompleteScreen;
-    public GameObject specialMoveReadyScreen;
     public GameObject pauseScreen;
     public GameObject gameOverScreen;
     public GameObject nameEntryScreen;
@@ -23,9 +21,6 @@ public class UIManager : MonoBehaviour {
     public GameObject hud;
     public GameObject crosshair;
 
-    public EventSystem eventSystem;
-    public GameObject resumeButton;
-
     public ScreenShake[] screenShakesToTurnOffOnGameOver;
 
     public GameObject pauseVeil;
@@ -35,7 +30,6 @@ public class UIManager : MonoBehaviour {
 
     bool titleScreenActiveBeforePause;
     bool levelCompleteScreenActiveBeforePause;
-    bool specialMoveReadyScreenActiveBeforePause;
     bool healthWarningScreenActiveBeforePause;
 
 
@@ -76,17 +70,11 @@ public class UIManager : MonoBehaviour {
 
         titleScreenActiveBeforePause = titleScreen.activeSelf;
         levelCompleteScreenActiveBeforePause = levelCompleteScreen.activeSelf;
-        specialMoveReadyScreenActiveBeforePause = specialMoveReadyScreen.activeSelf;
         healthWarningScreenActiveBeforePause = healthWarningScreen.activeSelf;
 
         titleScreen.SetActive(false);
         levelCompleteScreen.SetActive(false);
-        specialMoveReadyScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
-
-        if (InputManager.inputMode == InputManager.InputMode.Controller) {
-            eventSystem.SetSelectedGameObject(resumeButton);
-        }
     }
 
 
@@ -110,7 +98,6 @@ public class UIManager : MonoBehaviour {
 
         titleScreen.SetActive(titleScreenActiveBeforePause);
         levelCompleteScreen.SetActive(levelCompleteScreenActiveBeforePause);
-        specialMoveReadyScreen.SetActive(specialMoveReadyScreenActiveBeforePause);
         healthWarningScreen.SetActive(healthWarningScreenActiveBeforePause);
     }
 
@@ -126,7 +113,6 @@ public class UIManager : MonoBehaviour {
         }
 
         levelCompleteScreen.SetActive(false);
-        specialMoveReadyScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
     }
 
@@ -146,7 +132,6 @@ public class UIManager : MonoBehaviour {
         hud.SetActive(false);
         endOfDemoScreen.SetActive(true);
         levelCompleteScreen.SetActive(false);
-        specialMoveReadyScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
     }
 

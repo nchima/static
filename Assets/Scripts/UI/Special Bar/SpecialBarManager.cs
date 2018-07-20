@@ -11,6 +11,7 @@ public class SpecialBarManager : MonoBehaviour {
     [SerializeField] SpecialBar rightBar;
 
     [SerializeField] GameObject[] savedShotBoxes;
+    [SerializeField] SpecialMoveEarnedPrompt earnedPrompt;
 
     // GAMEPLAY STUFF
     public float startValue = 0.4f;    // How large of a special the player starts the game with.
@@ -24,13 +25,12 @@ public class SpecialBarManager : MonoBehaviour {
     [SerializeField] private float bulletHitValue = 0.01f;    // How much the player's special increases for hitting an enemy with one bullet.
     [SerializeField] private float getHurtPenalty = 0.1f; // How much the special bar decreases when the player is hurt.
 
-    [SerializeField] private GameObject specialMoveReadyScreen;
     [HideInInspector] public bool screenHidden = false;
 
     public bool bothBarsFull {
         get {
             if (debug_AlwaysMax) { return true; }
-            return leftBar.currentValue >= 0.99f && rightBar.currentValue >= 0.99f;
+            return leftBar.CurrentValue >= 0.99f && rightBar.CurrentValue >= 0.99f;
         }
     }
 
@@ -43,7 +43,11 @@ public class SpecialBarManager : MonoBehaviour {
 
         set {
             shotsSaved = Mathf.Clamp(value, 0, maxSavedShots);
-            if (shotsSaved == 1) { savedShotBoxes[0].SetActive(true); }
+            if (shotsSaved == 1) {
+                savedShotBoxes[0].SetActive(true);
+                earnedPrompt.gameObject.SetActive(true);
+                earnedPrompt.Activate();
+            }
             else { savedShotBoxes[0].SetActive(false); }
         }
     }
@@ -70,26 +74,21 @@ public class SpecialBarManager : MonoBehaviour {
 
         if (bothBarsFull && !screenHidden && Services.playerController.state != PlayerController.State.Dead) {
             if (ShotsSaved < maxSavedShots) {
-                //specialMoveReadyScreen.SetActive(true);
                 ShotsSaved++;
-                leftBar.currentValue = 0f;
-                rightBar.currentValue = 0f;
+                leftBar.CurrentValue = 0f;
+                rightBar.CurrentValue = 0f;
             }
 
             else {
                 savedShotBoxes[1].SetActive(true);
             }
         }
-
-        else {
-            specialMoveReadyScreen.SetActive(false);
-        }
     }
 
 
     public void PlayerAbsorbedAmmo(float value) {
-        leftBar.currentValue += value;
-        rightBar.currentValue += value;
+        leftBar.CurrentValue += value;
+        rightBar.CurrentValue += value;
     }
 
 
@@ -104,23 +103,23 @@ public class SpecialBarManager : MonoBehaviour {
         float leftValue = value * (1 - mappedGunValue);
         float rightValue = value * mappedGunValue;
 
-        leftBar.currentValue += leftValue;
-        rightBar.currentValue += rightValue;
+        leftBar.CurrentValue += leftValue;
+        rightBar.CurrentValue += rightValue;
     }
 
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
-        leftBar.currentValue -= getHurtPenalty;
-        rightBar.currentValue -= getHurtPenalty;
+        leftBar.CurrentValue -= getHurtPenalty;
+        rightBar.CurrentValue -= getHurtPenalty;
     }
 
 
     public void PlayerUsedSpecialMove() {
         if (ShotsSaved == maxSavedShots && bothBarsFull) {
-            leftBar.currentValue = 0f;
-            rightBar.currentValue = 0f;
+            leftBar.CurrentValue = 0f;
+            rightBar.CurrentValue = 0f;
             savedShotBoxes[1].SetActive(false);
 
         } else {
