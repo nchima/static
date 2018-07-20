@@ -34,10 +34,8 @@ public class FallIntoLevelState : State {
         // Move the player off of any obstacles they might land on.
         RaycastHit hit;
         if (Physics.SphereCast(Services.playerTransform.position, Services.playerTransform.GetComponent<CapsuleCollider>().radius, Vector3.down, out hit, 10f)) {
-            Debug.Log("hit something: " + hit.collider.gameObject.name);
             // If the player landed on a bad thing, move them into the level.
             if (hit.collider.tag == "Wall" || hit.collider.tag == "Railing" || hit.collider.tag == "Obstacle") {
-                Debug.Log("landed on something.");
                 Vector3 moveDirection = -hit.collider.transform.forward;
                 Services.playerTransform.position += moveDirection * Services.playerTransform.GetComponent<CapsuleCollider>().radius * 2f;
             }

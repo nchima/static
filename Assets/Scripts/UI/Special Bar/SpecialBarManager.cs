@@ -80,6 +80,8 @@ public class SpecialBarManager : MonoBehaviour {
             }
 
             else {
+                earnedPrompt.gameObject.SetActive(true);
+                earnedPrompt.Activate();
                 savedShotBoxes[1].SetActive(true);
             }
         }
