@@ -37,6 +37,7 @@ public class SteamLeaderboardManager : MonoBehaviour {
         if (!isLeaderboardInitialized) {
             Debug.LogWarning("Could not upload score to the Steam leaderboard because it was not initialized.");
         } else {
+            isScoreUploaded = false;
             Debug.Log("Uploading score (" + score + ") to leaderboard.");
             SteamAPICall_t handle = SteamUserStats.UploadLeaderboardScore(m_SteamLeaderboard, ELeaderboardUploadScoreMethod.k_ELeaderboardUploadScoreMethodKeepBest, score, null, 0);
             OnLeaderboardScoreUploadedCallResult.Set(handle, OnLeaderboardScoreUploaded);
@@ -47,6 +48,7 @@ public class SteamLeaderboardManager : MonoBehaviour {
     public void DownloadLeaderboardEntries(int rangeStart, int rangeEnd) {
         SteamAPICall_t handle = SteamUserStats.DownloadLeaderboardEntries(m_SteamLeaderboard, ELeaderboardDataRequest.k_ELeaderboardDataRequestGlobalAroundUser, rangeStart, rangeEnd);
         OnLeaderboardScoresDownloadedCallResult.Set(handle, OnLeaderboardScoresDownloaded);
+        isScoreEntriesDownloaded = false;
     }
 
 
