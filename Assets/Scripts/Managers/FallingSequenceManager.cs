@@ -9,7 +9,6 @@ public class FallingSequenceManager : StateController {
     [HideInInspector] public PlayerState playerState = PlayerState.Normal;
 
     [SerializeField] TriggerTransition fallingTrigger;
-    public Collider fallCatcher;
 
     public bool isPlayerFalling {
         get {
@@ -45,6 +44,42 @@ public class FallingSequenceManager : StateController {
 
     [HideInInspector] public Transform playerSpawnPoint;
     Transform player;
+
+    public bool PlayerIsWithinLevelBoundsOnXZAxes {
+        get {
+            bool returnValue = false;
+
+            // See if the player is over a floor tile.
+            RaycastHit hit1;
+            RaycastHit hit2;
+            RaycastHit hit3;
+            RaycastHit hit4;
+
+            float colliderRadius = Services.playerController.GetComponent<CapsuleCollider>().radius;
+            float distance = 200f;
+
+            // If we didn't find anything, return false.
+            if (!Physics.Raycast(Services.playerTransform.position + Services.playerTransform.forward * colliderRadius * 0.9f, Vector3.down, out hit1, distance, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(Services.playerTransform.position + Services.playerTransform.forward * -colliderRadius * 0.9f, Vector3.down, out hit2, distance, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(Services.playerTransform.position + Services.playerTransform.forward * colliderRadius * 0.9f, Vector3.up, out hit3, distance, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(Services.playerTransform.position + Services.playerTransform.forward * -colliderRadius * 0.9f, Vector3.up, out hit4, distance, (1 << 20 | 1 << 24))) { return false; }
+
+            // If both things hit something and it was the floor, we're all good baby!
+            if ((hit1.transform.name.ToLower().Contains("floor") && hit2.transform.name.ToLower().Contains("floor")) ||
+                (hit3.transform.name.ToLower().Contains("floor") && hit4.transform.name.ToLower().Contains("floor"))) {
+                returnValue = true;
+            }
+
+            // If it wasn't the floor, return false.
+            else {
+                return false;
+            }
+
+            return returnValue;
+
+        }
+    }
+
 
 
     private void Awake() {
