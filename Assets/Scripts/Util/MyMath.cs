@@ -21,4 +21,9 @@ public class MyMath {
             if (rand < 0.5f) { return -1f; } else { return 1f; }
         }
     }
+
+    public static int BoolToInt(bool input) {
+        if (input) { return 1; }
+        else { return 0; }
+    }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class OffsetPropertyBlockControl : PropertyBlockControl {
 
-    public Vector2 Offset = Vector2.zero;
+    [HideInInspector] public Vector2 Offset = Vector2.zero;
 
     void LateUpdate() {
         // Get the current value of the material properties in the renderer.

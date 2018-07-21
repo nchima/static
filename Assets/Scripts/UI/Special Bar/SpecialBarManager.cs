@@ -72,17 +72,20 @@ public class SpecialBarManager : MonoBehaviour {
         leftBar.Run(this);
         rightBar.Run(this);
 
-        if (bothBarsFull && !screenHidden && Services.playerController.state != PlayerController.State.Dead) {
-            if (ShotsSaved < maxSavedShots) {
-                ShotsSaved++;
-                leftBar.CurrentValue = 0f;
-                rightBar.CurrentValue = 0f;
-            }
+        if (!screenHidden && Services.playerController.state != PlayerController.State.Dead) {
 
-            else {
-                earnedPrompt.gameObject.SetActive(true);
-                earnedPrompt.Activate();
-                savedShotBoxes[1].SetActive(true);
+            if (bothBarsFull) {
+                if (ShotsSaved < maxSavedShots) {
+                    ShotsSaved++;
+                    leftBar.CurrentValue = 0f;
+                    rightBar.CurrentValue = 0f;
+                    leftBar.fullBar.SetActive(true);
+                    rightBar.fullBar.SetActive(true);
+                } else {
+                    earnedPrompt.gameObject.SetActive(true);
+                    earnedPrompt.Activate();
+                    savedShotBoxes[1].SetActive(true);
+                }
             }
         }
     }
@@ -123,9 +126,10 @@ public class SpecialBarManager : MonoBehaviour {
             leftBar.CurrentValue = 0f;
             rightBar.CurrentValue = 0f;
             savedShotBoxes[1].SetActive(false);
-
         } else {
             ShotsSaved--;
+            leftBar.fullBar.SetActive(false);
+            rightBar.fullBar.SetActive(false);
         }
     }
 
