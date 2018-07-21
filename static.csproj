@@ -377,6 +377,7 @@
     <Compile Include="Assets\Scripts\UI\Score Popups\ScorePopup.cs" />
     <Compile Include="Assets\Scripts\UI\Score Popups\ScorePopupManager.cs" />
     <Compile Include="Assets\Scripts\UI\SeizureWarningScreen.cs" />
+    <Compile Include="Assets\Scripts\UI\SkipSeizureWarning.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBar.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarManager.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarSizeController.cs" />
