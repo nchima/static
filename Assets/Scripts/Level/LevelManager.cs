@@ -39,7 +39,7 @@ public class LevelManager : MonoBehaviour {
     private void Awake() {
         if (startingLevelSet != null) {
             if (!levelSets.Contains(startingLevelSet)) {
-                levelSets.Insert(0, startingLevelSet);
+                levelSets.Add(startingLevelSet);
             }
         } else {
             startingLevelSet = GetLevelSet("GDC Level Set");
@@ -47,7 +47,7 @@ public class LevelManager : MonoBehaviour {
 
         currentLevelSet = startingLevelSet;
 
-        StartCoroutine(LoadLevelCoroutine(startingLevelSet.levelDataReferences[0].levelData));
+        LoadNextLevel();
 
         //levelScaler = GetComponent<LevelScaler>();
 
@@ -104,7 +104,7 @@ public class LevelManager : MonoBehaviour {
             }
         }
 
-        StartCoroutine(LoadLevelCoroutine(currentLevelSet.GetLevelData(0)));
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel));
     }
 
     
