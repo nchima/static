@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 using UnityStandardAssets.Characters.FirstPerson;
 using DG.Tweening;
 using UnityEngine.Audio;
-using UnityEngine.Analytics;
 
 public class GameManager : MonoBehaviour {
 
@@ -49,6 +48,7 @@ public class GameManager : MonoBehaviour {
         Services.scorePopupManager = GetComponentInChildren<ScorePopupManager>();
         Services.extraScreenManager = GetComponentInChildren<ExtraScreenManager>();
         Services.steamLeaderboardManager = GetComponentInChildren<SteamLeaderboardManager>();
+        Services.analyticsManager = GetComponentInChildren<AnalyticsManager>();
     }
 
     private void OnEnable() {
@@ -151,11 +151,6 @@ public class GameManager : MonoBehaviour {
 
     // Maybe move this functionality to various managers at some point.
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        Debug.Log("analytics event");
-        Analytics.CustomEvent("Level Complete", new Dictionary<string, object> { 
-            { "Level Number", Services.levelManager.LevelNumber }
-        });
-
         levelWinAudio.Play();
         DeleteThings();
     }

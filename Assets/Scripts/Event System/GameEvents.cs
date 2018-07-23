@@ -23,6 +23,10 @@ namespace GameEvents {
         public PlayerFiredGun() { }
     }
 
+    public class PlayerUsedSpecialMove : GameEvent {
+        public PlayerUsedSpecialMove() { }
+    }
+
     public class PlayerKilledEnemy : GameEvent {
         public int scoreValue;
         public float specialValue;
@@ -36,5 +40,9 @@ namespace GameEvents {
 
     public class PlayerWasHurt : GameEvent {
         public PlayerWasHurt() { }
+    }
+
+    public class PickupObtained : GameEvent {
+        public PickupObtained() { }
     }
 }

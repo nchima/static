@@ -236,6 +236,7 @@
     <Compile Include="Assets\Asset Packages\Standard Assets\Utility\TimedObjectDestructor.cs" />
     <Compile Include="Assets\Asset Packages\Standard Assets\Utility\WaypointCircuit.cs" />
     <Compile Include="Assets\Asset Packages\Standard Assets\Utility\WaypointProgressTracker.cs" />
+    <Compile Include="Assets\Scripts\Analytics\AnalyticsManager.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioLightFlasher.cs" />
     <Compile Include="Assets\Scripts\Audio\MoveAudioSourceCloseToPlayer.cs" />
     <Compile Include="Assets\Scripts\Audio\MusicManager.cs" />
@@ -322,10 +323,13 @@
     <Compile Include="Assets\Scripts\Level\EnemyPlacer.cs" />
     <Compile Include="Assets\Scripts\Level\FloorCreator.cs" />
     <Compile Include="Assets\Scripts\Level\FloorTile.cs" />
+    <Compile Include="Assets\Scripts\Level\LevelData.cs" />
+    <Compile Include="Assets\Scripts\Level\LevelDataListItem.cs" />
     <Compile Include="Assets\Scripts\Level\LevelGenerator.cs" />
     <Compile Include="Assets\Scripts\Level\LevelInfo.cs" />
     <Compile Include="Assets\Scripts\Level\LevelManager.cs" />
     <Compile Include="Assets\Scripts\Level\LevelScaler.cs" />
+    <Compile Include="Assets\Scripts\Level\LevelSet.cs" />
     <Compile Include="Assets\Scripts\Level\Obstacle.cs" />
     <Compile Include="Assets\Scripts\Managers\DebugManager.cs" />
     <Compile Include="Assets\Scripts\Managers\ExtraScreenManager.cs" />
@@ -378,6 +382,7 @@
     <Compile Include="Assets\Scripts\UI\Score Popups\ScorePopup.cs" />
     <Compile Include="Assets\Scripts\UI\Score Popups\ScorePopupManager.cs" />
     <Compile Include="Assets\Scripts\UI\SeizureWarningScreen.cs" />
+    <Compile Include="Assets\Scripts\UI\SkipSeizureWarning.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBar.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarManager.cs" />
     <Compile Include="Assets\Scripts\UI\Special Bar\SpecialBarSizeController.cs" />

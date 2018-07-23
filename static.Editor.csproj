@@ -186,7 +186,9 @@
     <Compile Include="Assets\Asset Packages\Reaktion\Editor\Utility\VariableMotionEditor.cs" />
     <Compile Include="Assets\Editor\Steamworks.NET\RedistCopy.cs" />
     <Compile Include="Assets\Editor\Steamworks.NET\RedistInstall.cs" />
+    <Compile Include="Assets\Scripts\Editor\LevelDataEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\LevelGeneratorEditor.cs" />
+    <Compile Include="Assets\Scripts\Editor\LevelSetEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\MeshSaverEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\ScoreManagerEditor.cs" />
     <Compile Include="Assets\Scripts\Editor\WadLoaderEditor.cs" />

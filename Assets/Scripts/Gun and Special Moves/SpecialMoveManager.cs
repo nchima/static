@@ -38,6 +38,8 @@ public class SpecialMoveManager : MonoBehaviour {
 
 
     void FireMissiles() {
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedSpecialMove());
+
         // Spawn shield explosion.
         Explosion specialMoveShield = Instantiate(specialMoveShieldPrefab, Services.playerTransform.position, Quaternion.identity, Services.playerTransform).GetComponent<Explosion>();
         specialMoveShield.explosionRadius = GunValueManager.MapToFloatRange(shieldExplosionRadiusRange);

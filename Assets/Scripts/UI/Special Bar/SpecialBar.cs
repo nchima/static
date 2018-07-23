@@ -5,6 +5,7 @@ using UnityEngine;
 public class SpecialBar : MonoBehaviour {
 
     [SerializeField] TextMesh percentageText;
+    public GameObject fullBar;
 
     float currentValue;
     public float CurrentValue {

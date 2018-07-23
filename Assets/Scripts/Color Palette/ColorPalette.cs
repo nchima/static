@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Color Palettes/Color Palette")]
+[CreateAssetMenu(menuName = "Custom/Color Palette")]
 public class ColorPalette : ScriptableObject {
     public Color wallColor;
     public Color floorColor;
