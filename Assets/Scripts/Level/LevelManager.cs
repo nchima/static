@@ -6,127 +6,128 @@ using UnityEngine.AI;
 
 public class LevelManager : MonoBehaviour {
 
-    [SerializeField] IntRange levelSceneIndices;
-    [SerializeField] float howOftenToLoadNewLevelWhenFalling = 1f;
+    [SerializeField] List<LevelSet> levelSets;
     [SerializeField] GameObject scoreBonusPrefab;
 
-    public enum LoadingState { LoadingRandomly, Idle }
-    [HideInInspector] public LoadingState loadingState = LoadingState.Idle;
+    [SerializeField] LevelSet startingLevelSet;
+    LevelSet currentLevelSet;
 
-    float loadRandomLevelTimer = 0f;
-
-    [HideInInspector] int currentlyLoadedLevel = 1;
-
+    [HideInInspector] LevelData currentlyLoadedLevel;
     [HideInInspector] public int levelsCompleted = 0;
-    public int LevelNumber { get { return levelsCompleted + 1; } }
-    bool isLevelLoaded {
-        get {
-            if (currentlyLoadedLevel == 0) { return false; }
-            return SceneManager.GetSceneByBuildIndex(currentlyLoadedLevel).isLoaded;
-        }
-    }
     [HideInInspector] public bool isLevelCompleted = false;
 
-    LevelScaler levelScaler;
-    EnemyPlacer enemyPlacer;
-    LevelInfo[] levelInfos;
+    public int CurrentLevelNumber { get { return levelsCompleted + 1; } }
+    public int TotalNumberOfLevels { get {
+            int levelNumbers = 0;
+            for (int i = 0; i < levelSets.Count; i++) { levelNumbers += levelSets.Count; }
+            return levelNumbers;
+        } }
+    bool IsLevelLoaded {
+        get {
+            if (currentlyLoadedLevel == null) { return false; }
+            return SceneManager.GetSceneByBuildIndex(currentlyLoadedLevel.buildIndex).isLoaded;
+        }
+    }
 
-    // Deprecated:
-    //GameObject[] levelChunks;
+    EnemyPlacer enemyPlacer { get { return GetComponent<EnemyPlacer>(); } }
+
+    // Deprecated things from when levels included more randomness.
+    //LevelScaler levelScaler;
+    //LevelInfo[] levelInfos;
 
 
     private void Awake() {
-        levelScaler = GetComponent<LevelScaler>();
-        enemyPlacer = GetComponent<EnemyPlacer>();
-
-        levelInfos = new LevelInfo[Resources.LoadAll<LevelInfo>("Level Info").Length];
-        for (int i = 0; i < levelInfos.Length; i++) {
-            string levelNumber = (i+1).ToString();
-            levelInfos[i] = Resources.Load<LevelInfo>("Level Info/Level Info " + levelNumber);
+        if (startingLevelSet != null) {
+            if (!levelSets.Contains(startingLevelSet)) {
+                levelSets.Insert(0, startingLevelSet);
+            }
+        } else {
+            startingLevelSet = GetLevelSet("GDC Level Set");
         }
 
-        loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
+        currentLevelSet = startingLevelSet;
+
+        StartCoroutine(LoadLevelCoroutine(startingLevelSet.levelDataReferences[0].levelData));
+
+        //levelScaler = GetComponent<LevelScaler>();
+
+        //levelInfos = new LevelInfo[Resources.LoadAll<LevelInfo>("Level Info").Length];
+        //for (int i = 0; i < levelInfos.Length; i++) {
+        //    string levelNumber = (i+1).ToString();
+        //    levelInfos[i] = Resources.Load<LevelInfo>("Level Info/Level Info " + levelNumber);
+        //}
+
+        //loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
     }
+
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
+
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
-    }
 
-
-    //private void Update() {
-    //    switch (loadingState) {
-    //        case LoadingState.Idle:
-    //            loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
-    //            break;
-    //        case LoadingState.LoadingRandomly:
-    //            LoadRandomly();
-    //            break;
-    //    }
-    //}
-
-
-    private void LoadRandomly() {
-        loadRandomLevelTimer += Time.deltaTime;
-        if (loadRandomLevelTimer >= howOftenToLoadNewLevelWhenFalling) {
-            LoadRandomLevel();
-            loadRandomLevelTimer = 0f;
+        for (int i = 0; i < levelSets.Count; i++) {
+            levelSets[i].levelsCompleted = 0;
         }
     }
-
-
-    public void LoadRandomLevel() {
-        if (levelsCompleted == 30) {
-            SceneManager.UnloadSceneAsync(levelsCompleted);
-            Services.uiManager.ShowEndOfDemoScreen();
-            return;
-        }
-
-        LoadLevel(levelSceneIndices.Random);
-    }
-
 
     public void LoadNextLevel() {
-        if ((levelsCompleted + 1 > SceneManager.sceneCountInBuildSettings-1)) {
+        // If the player has completed every level, show the end of demo screen.
+        if ((levelsCompleted >= TotalNumberOfLevels)) {
             SceneManager.UnloadSceneAsync(levelsCompleted);
             Services.uiManager.ShowEndOfDemoScreen();
             return;
         }
 
-        LoadLevel(levelsCompleted + 1);
-    }
+        // If the player has completed all the levels in a set, load the next set.
+        if (currentLevelSet.AllLevelsCompleted) {
+            LevelSet nextLevelSet = null;
+            for (int i = 0; i < levelSets.Count; i++) {
+                if (!levelSets[i].AllLevelsCompleted) {
+                    nextLevelSet = levelSets[i];
+                    break;
+                }
+            }
 
+            if (nextLevelSet == null) {
+                Debug.Log("ending demo here.");
+                SceneManager.UnloadSceneAsync(levelsCompleted);
+                Services.uiManager.ShowEndOfDemoScreen();
+                return;
+            } else {
+                currentLevelSet = nextLevelSet;
+            }
+        }
 
-    public void LoadLevel(int levelNumber) {
-        StartCoroutine(LoadLevelCoroutine(levelNumber));
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.GetLevelData(0)));
     }
 
     
-    private IEnumerator LoadLevelCoroutine(int levelNumber) {
-        if (isLevelLoaded) {
-            AsyncOperation unload = SceneManager.UnloadSceneAsync(currentlyLoadedLevel);
+    private IEnumerator LoadLevelCoroutine(LevelData levelData) {
+        if (IsLevelLoaded) {
+            AsyncOperation unload = SceneManager.UnloadSceneAsync(currentlyLoadedLevel.buildIndex);
             while (!unload.isDone) { yield return null; }
         }
 
-        AsyncOperation load = SceneManager.LoadSceneAsync(levelNumber, LoadSceneMode.Additive);
+        AsyncOperation load = SceneManager.LoadSceneAsync(levelData.buildIndex, LoadSceneMode.Additive);
         while (!load.isDone) { yield return null; }
 
         // Scale level according to, you know, whatever I guess
         //levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
 
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         //SetEnemiesActive(false);
 
         isLevelCompleted = false;
-        currentlyLoadedLevel = levelNumber;
+        currentlyLoadedLevel = levelData;
 
         yield return null;
     }
@@ -164,10 +165,6 @@ public class LevelManager : MonoBehaviour {
 
 
     public void LockInLevel() {
-        loadingState = LoadingState.Idle;
-
-        loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
-
         Services.levelManager.SetEnemiesActive(true);
 
         // Re-enable the floor's collision (since it is disabled when the player completes a level.)
@@ -178,8 +175,19 @@ public class LevelManager : MonoBehaviour {
     }
 
 
+    public LevelSet GetLevelSet(string name) {
+        for (int i = 0; i < levelSets.Count; i++) {
+            if (levelSets[i].name == name) { return levelSets[i]; }
+        }
+
+        Debug.LogError("Hey, sorry but I couldn't find a level set with that name. :-(");
+        return null;
+    }
+
+
     public void LevelCompletedHandler(GameEvent gameEvent) {
         isLevelCompleted = true;
+        currentLevelSet.levelsCompleted++;
         levelsCompleted++;
         SetFloorCollidersActive(false);
     }

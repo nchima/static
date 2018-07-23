@@ -26,4 +26,5 @@ public class Services {
     public static ScorePopupManager scorePopupManager;
     public static ExtraScreenManager extraScreenManager;
     public static SteamLeaderboardManager steamLeaderboardManager;
+    public static AnalyticsManager analyticsManager;
 }

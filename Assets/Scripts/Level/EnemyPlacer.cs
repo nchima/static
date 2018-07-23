@@ -11,7 +11,7 @@ public class EnemyPlacer : MonoBehaviour {
         public GameObject prefab;
         public int firstAppearance;
         public int baseDifficulty;
-        public bool isAvailable { get { return Services.levelManager.LevelNumber >= firstAppearance; } }
+        public bool isAvailable { get { return Services.levelManager.CurrentLevelNumber >= firstAppearance; } }
         [HideInInspector] public float tempChance;
     }
     //[SerializeField] EnemyInfo simpleEnemyInfo;

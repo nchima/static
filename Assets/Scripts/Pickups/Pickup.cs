@@ -69,6 +69,7 @@ public class Pickup : MonoBehaviour {
     public virtual void BeginMovingTowardsPlayer() {
         //GetComponent<Rigidbody>().AddForce(directionToPlayer * kickForce, ForceMode.Impulse);
         //foreach(Renderer renderer in flashingRenderers) { renderer.gameObject.layer = LayerMask.NameToLayer("Enemy Sheathe"); }
+        GameEventManager.instance.FireEvent(new GameEvents.PickupObtained());
         foreach(Transform trail in pickupTrails) {
             trail.gameObject.SetActive(true);
             if (trail.GetComponent<PickupTrail>() != null) { trail.GetComponent<PickupTrail>().BeginMovingTowardsPlayer(); }

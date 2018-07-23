@@ -43,7 +43,7 @@ public class GameOverScreen : MonoBehaviour
         transform.Find("Final Score Number").GetComponent<TextMesh>().text = scoreManager.score.ToString();
 
         // Update level complete number.
-        transform.Find("You Reached Level X Text").GetComponent<TextMesh>().text = "Y O U  R E A C H E D  L E V E L  " + Services.levelManager.LevelNumber.ToString();
+        transform.Find("You Reached Level X Text").GetComponent<TextMesh>().text = "Y O U  R E A C H E D  L E V E L  " + Services.levelManager.CurrentLevelNumber.ToString();
 
         // If this is a high score, show the name entry interface.
         if (scoreManager.leaderboardType == ScoreManager.LeaderboardType.Local && scoreManager.score > scoreManager.highScoreEntries[9].score) {
