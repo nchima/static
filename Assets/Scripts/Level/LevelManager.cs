@@ -18,9 +18,9 @@ public class LevelManager : MonoBehaviour {
 
     public int CurrentLevelNumber { get { return levelsCompleted + 1; } }
     public int TotalNumberOfLevels { get {
-            int levelNumbers = 0;
-            for (int i = 0; i < levelSets.Count; i++) { levelNumbers += levelSets.Count; }
-            return levelNumbers;
+            int numberOfLevels = 0;
+            for (int i = 0; i < levelSets.Count; i++) { numberOfLevels += levelSets[i].levelDataReferences.Count; }
+            return numberOfLevels;
         } }
     bool IsLevelLoaded {
         get {
@@ -79,7 +79,7 @@ public class LevelManager : MonoBehaviour {
     public void LoadNextLevel() {
         // If the player has completed every level, show the end of demo screen.
         if ((levelsCompleted >= TotalNumberOfLevels)) {
-            SceneManager.UnloadSceneAsync(levelsCompleted);
+            SceneManager.UnloadSceneAsync(currentlyLoadedLevel.buildIndex);
             Services.uiManager.ShowEndOfDemoScreen();
             return;
         }
