@@ -30,6 +30,17 @@ public class FallIntoLevelState : State {
         if (Services.playerTransform.position.y <= 600f) {
             Services.scoreManager.HideLevelCompleteScreen();
         }
+
+        // Move the player off of any obstacles they might land on.
+        RaycastHit hit;
+        if (Physics.SphereCast(Services.playerTransform.position, Services.playerTransform.GetComponent<CapsuleCollider>().radius, Vector3.down, out hit, 10f)) {
+            // If the player landed on a bad thing, move them into the level.
+            if (hit.collider.tag == "Wall" || hit.collider.tag == "Railing" || hit.collider.tag == "Obstacle") {
+                Vector3 moveDirection = -hit.collider.transform.forward;
+                Services.playerTransform.position += moveDirection * Services.playerTransform.GetComponent<CapsuleCollider>().radius * 2f;
+            }
+        }
+
     }
 
     public override void End(StateController stateController) {

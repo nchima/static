@@ -24,9 +24,6 @@ public class GameOverScreen : MonoBehaviour
         //GameManager.player.GetComponent<CapsuleCollider>().center = new Vector3(player.GetComponent<CapsuleCollider>().center.x, player.GetComponent<CapsuleCollider>().center.y - 0.5f, player.GetComponent<CapsuleCollider>().center.z);
         Services.playerController.isMovementEnabled = false;
 
-        // Disable fall catcher so that a new level is not loaded.
-        FindObjectOfType<FallCatcher>().enabled = false;
-
         // Disable gun object.
         foreach (Gun gun in FindObjectsOfType<Gun>()) {
             gun.enabled = false;

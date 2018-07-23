@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class SpecialBar : MonoBehaviour {
 
+    [SerializeField] TextMesh percentageText;
 
-    float _currentValue;
-    public float currentValue {
+    float currentValue;
+    public float CurrentValue {
         get {
-            return _currentValue;
+            return currentValue;
         }
 
         set {
+            value = Mathf.Clamp01(value);
             sizeController.percentageFilled = value;
-            _currentValue = value;
+            currentValue = value;
         }
     }
 
@@ -36,7 +38,7 @@ public class SpecialBar : MonoBehaviour {
 
 
     public void Initialize(SpecialBarManager manager) {
-        _currentValue = manager.startValue;
+        currentValue = manager.startValue;
     }
 
 
@@ -57,10 +59,13 @@ public class SpecialBar : MonoBehaviour {
             //if (barBorderObject.GetComponent<MeshRenderer>().material.color != Color.black) barBorderObject.GetComponent<MeshRenderer>().material.color = Color.black;
             //if (barObject.GetComponent<MeshRenderer>().material.color != Color.black) barObject.GetComponent<MeshRenderer>().material.color = Color.black;
 
-            // Apply decay
-            if (Services.gameManager.gameStarted && !freezeDecay) {
-                currentValue -= manager.decayRate * Time.deltaTime;
-            }
+            // Apply decay [Disabled to see if it's really necessary]
+            //if (Services.gameManager.gameStarted && !freezeDecay) {
+            //    currentValue -= manager.decayRate * Time.deltaTime;
+            //}
         }
+
+        string newPercentageText = Mathf.CeilToInt(CurrentValue * 100f).ToString() + "%";
+        percentageText.text = newPercentageText;
     }
 }

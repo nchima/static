@@ -24,7 +24,7 @@ public class PauseAfterLevelCompleteFallingState : State {
     public override void End(StateController stateController) {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
-        fallingSequenceManager.SetUpFallingVariables();
+        //fallingSequenceManager.SetUpFallingVariables();
         
         // Load next level.
         if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {

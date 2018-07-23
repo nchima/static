@@ -230,6 +230,7 @@ public class PlayerController : MonoBehaviour {
         else if (state == State.Falling || state == State.SpeedFalling) {
             if (desiredMove == Vector3.zero) { m_Rigidbody.velocity = new Vector3(0f, m_Rigidbody.velocity.y, 0f); }
             else { m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
+            m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, 1400f);
         }
         
         // Handle shotgun charge movement.

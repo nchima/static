@@ -1,11 +1,12 @@
 ﻿<Properties StartupItem="static.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Color Palette\ColorPaletteManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Falling Sequence States and Transitions\PlayerTouchedDownTransition.cs">
     <Files>
       <File FileName="Assets\Scripts\Audio\MusicManager.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Enemy Shot\HomingShot.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Pickups\PointPickup.cs" Line="13" Column="2" />
+      <File FileName="Assets\Scripts\Pickups\PointPickup.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Color Palette\ColorPaletteManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Falling Sequence States and Transitions\PlayerTouchedDownTransition.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
