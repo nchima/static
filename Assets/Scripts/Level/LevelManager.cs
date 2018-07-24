@@ -7,9 +7,10 @@ using UnityEngine.AI;
 public class LevelManager : MonoBehaviour {
 
     [SerializeField] List<LevelSet> levelSets;
+    [SerializeField] LevelSet startingLevelSetOverride;
+
     [SerializeField] GameObject scoreBonusPrefab;
 
-    [SerializeField] LevelSet startingLevelSetOverride;
     LevelSet currentLevelSet;
 
     [HideInInspector] public LevelData currentlyLoadedLevel;
@@ -44,7 +45,7 @@ public class LevelManager : MonoBehaviour {
             SetStartingLevelSet(GetLevelSet("GDC Level Set"));
         }
 
-        LoadNextLevel();
+        //LoadNextLevel();
 
         //levelScaler = GetComponent<LevelScaler>();
 
@@ -75,7 +76,7 @@ public class LevelManager : MonoBehaviour {
 
     public void LoadNextLevel() {
         // If the player has completed every level, show the end of demo screen.
-        if ((levelsCompleted >= TotalNumberOfLevels)) {
+        if (IsLevelLoaded && (levelsCompleted >= TotalNumberOfLevels)) {
             SceneManager.UnloadSceneAsync(currentlyLoadedLevel.buildIndex);
             Services.uiManager.ShowEndOfDemoScreen();
             return;

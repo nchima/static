@@ -4,11 +4,11 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "Custom/Level Set")]
 public class LevelSet : ScriptableObject {
-    [HideInInspector] public List<LevelDataListItem> levelDataReferences;    // Drawn in inspector via editor script
+    [SerializeField] [HideInInspector] public List<LevelDataListItem> levelDataReferences;    // Drawn in inspector via editor script
     [HideInInspector] public int levelsCompleted = 0;
 
     private void Awake() {
-        levelDataReferences = new List<LevelDataListItem>();
+        if (levelDataReferences == null) { levelDataReferences = new List<LevelDataListItem>(); }
     }
 
     public bool AllLevelsCompleted { get { return levelsCompleted >= levelDataReferences.Count && levelDataReferences.Count != 0; } }
