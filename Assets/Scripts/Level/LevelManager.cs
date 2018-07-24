@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] LevelSet startingLevelSet;
     LevelSet currentLevelSet;
 
-    [HideInInspector] LevelData currentlyLoadedLevel;
+    [HideInInspector] public LevelData currentlyLoadedLevel;
     [HideInInspector] public int levelsCompleted = 0;
     [HideInInspector] public bool isLevelCompleted = false;
 

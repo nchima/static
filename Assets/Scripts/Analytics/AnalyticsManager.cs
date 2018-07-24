@@ -52,8 +52,8 @@ public class AnalyticsManager : MonoBehaviour {
 
     void LevelCompletedHandler(GameEvent gameEvent) {
         Analytics.CustomEvent("Level Complete", new Dictionary<string, object> {
-            // [Level name]
-            { "Level Number", Services.levelManager.CurrentLevelNumber },
+            { "Level name", Services.levelManager.currentlyLoadedLevel.LevelName },
+            { "Level number", Services.levelManager.CurrentLevelNumber },
             { "Time spent in level", timeInLevel },
             { "Damage taken in level", damageTakenInLevel },
             { "Average tuning value in level", MyMath.Average(tuningValuesLevel) },
@@ -91,7 +91,7 @@ public class AnalyticsManager : MonoBehaviour {
 
     void GameOverHandler(GameEvent gameEvent) {
         Analytics.CustomEvent("Player Died", new Dictionary<string, object> {
-            // [Level name]
+            { "Level died on", Services.levelManager.currentlyLoadedLevel.name },
             { "Levels completed", Services.levelManager.levelsCompleted },
             { "Play time", timeAlive },
             { "Average tuning value", MyMath.Average(tuningValuesTotal) },
