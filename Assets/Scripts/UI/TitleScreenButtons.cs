@@ -9,7 +9,7 @@ public class TitleScreenButtons : MonoBehaviour {
     }
 
     public void StartGameButton() {
-        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
+        Services.uiManager.ShowEpisodeSelectScreen();
     }
 
     public void ViewControlsButtonPressed() {

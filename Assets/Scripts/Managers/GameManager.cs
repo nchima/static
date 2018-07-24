@@ -81,7 +81,6 @@ public class GameManager : MonoBehaviour {
         }
 
         //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-        Services.levelManager.LoadNextLevel();
 
         //yield return new WaitUntil(() => {
         //    if (SceneManager.GetSceneByBuildIndex(levelManager.levelsCompleted).isLoaded) { return true; } 

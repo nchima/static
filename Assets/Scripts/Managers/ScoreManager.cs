@@ -9,40 +9,39 @@ using Steamworks;
 
 public class ScoreManager : MonoBehaviour
 {
-    // STEAM V LOCAL LEADERBOARDS
+    // STEAM OR LOCAL LEADERBOARDS
     public enum LeaderboardType { Steam, Local }
     public LeaderboardType leaderboardType = LeaderboardType.Steam;
 
     // USED FOR DISPLAYING THE SCORE
-    private int _score = 0;
-    public int score
+    private int score = 0;
+    public int Score
     {
         get {
-            return _score;
+            return score;
         }
 
         set {
-            int inputValue = value - _score;
-            inputValue = Mathf.RoundToInt(inputValue * multiplier);
+            int inputValue = value - score;
+            inputValue = Mathf.RoundToInt(inputValue * Multiplier);
             Services.healthManager.ApplyPointsToBonus(inputValue);
-            _score += inputValue;
-            scoreDisplay.text = _score.ToString();
+            score += inputValue;
+            scoreDisplay.text = score.ToString();
         }
     }// The player's current score. 
     [SerializeField] private TextMesh scoreDisplay;   // A reference to the TextMesh which displays the score.
     [SerializeField] private TextMesh highScoreDisplay; // A reference to the TextMesh which displays the current high score at the top of the screen.
 
     [SerializeField] private TextMesh multNumber; // The TextMesh which displays the player's current multiplier.
-    float _multiplier = 1f;  // The multiplier that the player starts the game with.
-    public float multiplier
-    {
-        get { return _multiplier; }
+    float multiplier = 1f;  // The multiplier that the player starts the game with.
+    public float Multiplier {
+        get { return multiplier; }
         set
         {
             // Update the multiplier number display.
-            multNumber.text = multiplier.ToString() + "X";
+            multNumber.text = Multiplier.ToString() + "X";
 
-            _multiplier = value;
+            multiplier = value;
         }
     }
     [SerializeField] float multiplierIncreaseValue = 0.1f;
@@ -64,7 +63,7 @@ public class ScoreManager : MonoBehaviour
     int maxTimeBonus;
     float maxBonusTime;
     float bonusTimer = 0;
-    public int currentTimeBonus
+    public int CurrentTimeBonus
     {
         get {
             return Mathf.Clamp(Mathf.RoundToInt(MyMath.Map(bonusTimer, 0f, maxBonusTime, maxTimeBonus, 0f)), 0, maxTimeBonus);
@@ -90,15 +89,15 @@ public class ScoreManager : MonoBehaviour
         highScoreEntries = RetrieveHighScores();
 
         // Set up the score and multiplier number displays.
-        scoreDisplay.text = score.ToString();
-        multNumber.text = multiplier.ToString() + "X";
+        scoreDisplay.text = Score.ToString();
+        multNumber.text = Multiplier.ToString() + "X";
     }
 
 
     void Update() {
         comboTimer -= Time.deltaTime;
         if (comboTimer <= 0f) {
-            multiplier = 1f;
+            Multiplier = 1f;
         }
 
         if (bonusTimerIsRunning)
@@ -158,7 +157,7 @@ public class ScoreManager : MonoBehaviour
         GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
 
         // Round the score to an integer and update the score display.
-        score += playerKilledEnemyEvent.scoreValue;
+        Score += playerKilledEnemyEvent.scoreValue;
 
         Services.scorePopupManager.CreatePositionalPopup(playerKilledEnemyEvent.enemyKilled.transform.position, playerKilledEnemyEvent.scoreValue);
 
@@ -167,14 +166,14 @@ public class ScoreManager : MonoBehaviour
 
 
     public void IncreaseMultiplier() {
-        multiplier += multiplierIncreaseValue;
+        Multiplier += multiplierIncreaseValue;
         comboTimer = comboTime;
     }
 
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
         // Give the player a score boost for beating the level.
-        score += currentTimeBonus;
+        Score += CurrentTimeBonus;
         bonusTimerIsRunning = false;
 
         ShowLevelCompleteScreen();
@@ -184,7 +183,7 @@ public class ScoreManager : MonoBehaviour
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
-        multiplier = 1f;
+        Multiplier = 1f;
         comboTimer = 0f;
     }
 
@@ -193,7 +192,7 @@ public class ScoreManager : MonoBehaviour
         levelCompletedScreen.SetActive(true);
         levelCompletedDisplay.text = "LEVEL " + Services.levelManager.CurrentLevelNumber.ToString() + " COMPLETED";
         secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
-        bonusScoreDisplay.text = currentTimeBonus.ToString();
+        bonusScoreDisplay.text = CurrentTimeBonus.ToString();
         nextLevelDisplay.text = "NOW ENTERING LEVEL " + (Services.levelManager.CurrentLevelNumber + 1).ToString();
     }
 
@@ -208,7 +207,7 @@ public class ScoreManager : MonoBehaviour
     /// Should be called when a bullet hits an enemy.
     /// </summary>
     public void BulletHitEnemy() {
-        score += 1;
+        Score += 1;
     }
 
 
@@ -252,7 +251,7 @@ public class ScoreManager : MonoBehaviour
         });
 
         // Upload score
-        Services.steamLeaderboardManager.UploadScore(score);
+        Services.steamLeaderboardManager.UploadScore(Score);
 
         // Wait until score has been uploaded.
         yield return new WaitUntil(() => {
@@ -355,7 +354,7 @@ public class ScoreManager : MonoBehaviour
         highScoreEntries = RetrieveHighScores();
 
         // Add score to list
-        highScoreEntries.Add(new ScoreEntry(highScoreEntries.Count+1, initials, score, 1));
+        highScoreEntries.Add(new ScoreEntry(highScoreEntries.Count+1, initials, Score, 1));
 
         SortScores();
 

@@ -9,7 +9,7 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] List<LevelSet> levelSets;
     [SerializeField] GameObject scoreBonusPrefab;
 
-    [SerializeField] LevelSet startingLevelSet;
+    [SerializeField] LevelSet startingLevelSetOverride;
     LevelSet currentLevelSet;
 
     [HideInInspector] public LevelData currentlyLoadedLevel;
@@ -37,15 +37,12 @@ public class LevelManager : MonoBehaviour {
 
 
     private void Awake() {
-        if (startingLevelSet != null) {
-            if (!levelSets.Contains(startingLevelSet)) {
-                levelSets.Add(startingLevelSet);
-            }
-        } else {
-            startingLevelSet = GetLevelSet("GDC Level Set");
-        }
 
-        currentLevelSet = startingLevelSet;
+        if (startingLevelSetOverride != null) {
+            SetStartingLevelSet(startingLevelSetOverride);
+        } else {
+            SetStartingLevelSet(GetLevelSet("GDC Level Set"));
+        }
 
         LoadNextLevel();
 
@@ -133,6 +130,28 @@ public class LevelManager : MonoBehaviour {
     }
 
 
+    public void SetStartingLevelSet(LevelSet startingSet) {
+
+        Debug.Log("Setting starting level set to: " + startingSet.name);
+
+        if (startingLevelSetOverride != null) {
+            Debug.Log("Starting level overridden by user.");
+            return;
+        }
+ 
+        if (!levelSets.Contains(startingSet)) {
+            levelSets.Add(startingSet);
+        }
+
+        currentLevelSet = startingSet;
+    }
+
+
+    public void SetStartingLevelSet(string setName) {
+        SetStartingLevelSet(GetLevelSet(setName));
+    }
+
+
     public void SetEnemiesActive(bool value) {
         StartCoroutine(SetEnemiesActiveCoroutine(value));
     }
@@ -194,6 +213,7 @@ public class LevelManager : MonoBehaviour {
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        LoadNextLevel();
         SetEnemiesActive(true);
     }
 

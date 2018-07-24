@@ -19,7 +19,7 @@ public class PointPickup : Pickup {
     public override void BeginMovingTowardsPlayer() {
         Services.scoreManager.IncreaseMultiplier();
         Services.scorePopupManager.CreatePositionalPopup(transform.position, pointValue);
-        Services.scoreManager.score += pointValue;
+        Services.scoreManager.Score += pointValue;
         base.BeginMovingTowardsPlayer();
     }
 }

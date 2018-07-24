@@ -22,6 +22,7 @@ public class AnalyticsManager : MonoBehaviour {
     [HideInInspector] int timesSpecialMoveUsedTotal;
     int pickupsObtainedTotal;
     int scoreEarned;
+    [HideInInspector] string startingLevelSet;
 
 
     private void OnEnable() {
@@ -92,6 +93,7 @@ public class AnalyticsManager : MonoBehaviour {
     void GameOverHandler(GameEvent gameEvent) {
         Analytics.CustomEvent("Player Died", new Dictionary<string, object> {
             { "Level died on", Services.levelManager.currentlyLoadedLevel.name },
+            { "Starting level set", startingLevelSet },
             { "Levels completed", Services.levelManager.levelsCompleted },
             { "Play time", timeAlive },
             { "Average tuning value", MyMath.Average(tuningValuesTotal) },

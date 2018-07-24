@@ -8,6 +8,7 @@ public class UIManager : MonoBehaviour {
     // SCREENS
     public GameObject seizureWarningScreen;
     public GameObject titleScreen;
+    public GameObject episodeSelectScreen;
     public GameObject controlsScreen;
     public GameObject creditsScreen;
     public GameObject levelCompleteScreen;
@@ -46,7 +47,14 @@ public class UIManager : MonoBehaviour {
 
     public void ShowTitleScreen(bool value) {
         seizureWarningScreen.SetActive(false);
+        episodeSelectScreen.SetActive(false);
         titleScreen.SetActive(value);
+    }
+
+
+    public void ShowEpisodeSelectScreen() {
+        titleScreen.SetActive(false);
+        episodeSelectScreen.SetActive(true);
     }
 
 
