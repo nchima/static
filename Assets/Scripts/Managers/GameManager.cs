@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour {
         Services.levelManager = GetComponentInChildren<LevelManager>();
         Services.levelGenerator = GetComponentInChildren<LevelGenerator>();
         Services.fallingSequenceManager = GetComponentInChildren<FallingSequenceManager>();
+        Services.fieldOfViewController = FindObjectOfType<FieldOfViewController>();
         Services.sfxManager = GetComponentInChildren<SFXManager>();
         Services.uiManager = GetComponentInChildren<UIManager>();
         Services.musicManager = GetComponentInChildren<MusicManager>();

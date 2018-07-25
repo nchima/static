@@ -36,6 +36,12 @@ public class ColorPaletteManager : MonoBehaviour {
     private void Awake() {
         // Memorize original colors.
         ChangePaletteImmediate(defaultPalette);
+
+        levelPalettes = new ColorPalette[Resources.LoadAll<ColorPalette>("Level Color Palettes").Length];
+        for (int i = 1; i < levelPalettes.Length; i++) {
+            string levelNumber = (i + 1).ToString();
+            levelPalettes[i] = Resources.Load<ColorPalette>("Level Color Palettes/Color Palette Level " + levelNumber);
+        }
     }
 
     private void OnEnable() {
@@ -50,12 +56,6 @@ public class ColorPaletteManager : MonoBehaviour {
 
     private void Start() {
         SaveCurrentPalette(savedPalette);
-
-        levelPalettes = new ColorPalette[Resources.LoadAll<ColorPalette>("Level Color Palettes").Length];
-        for (int i = 1; i < levelPalettes.Length; i++) {
-            string levelNumber = (i + 1).ToString();
-            levelPalettes[i] = Resources.Load<ColorPalette>("Level Color Palettes/Color Palette Level " + levelNumber);
-        }
     }
 
     private void Update() {
@@ -161,7 +161,10 @@ public class ColorPaletteManager : MonoBehaviour {
         float duration = 0.78f;
         if (levelPaletteIndex == 0) { ChangePalette(defaultPalette, duration); } 
         else if (levelPaletteIndex > levelPalettes.Length-1) { ChangePalette(savedPalette, duration); }
-        else { ChangePalette(levelPalettes[levelPaletteIndex], duration); }
+        else {
+            if (levelPalettes[levelPaletteIndex] == null) { ChangePalette(defaultPalette, duration); } 
+            else { ChangePalette(levelPalettes[levelPaletteIndex], duration); }
+        }
     }
 
     void SaveCurrentPaletteAsNewAsset() {
@@ -177,6 +180,16 @@ public class ColorPaletteManager : MonoBehaviour {
 #endif
     }
 
+    public void LoadLevelPalette() {
+        if (useRandomPalettes || levelPaletteIndex >= levelPalettes.Length) {
+            Debug.Log("using random palette for next level.");
+            ChangeToRandomPalette(0.1f);
+        } else {
+            if (levelPalettes[levelPaletteIndex] == null) { ChangePalette(defaultPalette, 0.1f); }
+            else { ChangePalette(levelPalettes[levelPaletteIndex], 0.1f); }
+        }
+    }
+
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
@@ -185,11 +198,6 @@ public class ColorPaletteManager : MonoBehaviour {
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
         levelPaletteIndex++;
-
-        if (useRandomPalettes || levelPaletteIndex >= levelPalettes.Length) {
-            Debug.Log("using random palette for next level.");
-            ChangeToRandomPalette(0.1f);
-        }
-        else { ChangePalette(levelPalettes[levelPaletteIndex], 0.1f); }
+        //LoadLevelPalette();
     }
 }

@@ -12,6 +12,10 @@ public class ScorePopupManager : MonoBehaviour {
     [SerializeField] FloatRange scoreRange = new FloatRange(100, 1000);
 
     public void CreatePositionalPopup(Vector3 position, int score) {
+
+        // >:-)
+        return;
+
         GameObject newPopup = Instantiate(scorePopupPrefab, popupContainer);
 
         Vector3 newPosition = playerCamera.WorldToViewportPoint(position);

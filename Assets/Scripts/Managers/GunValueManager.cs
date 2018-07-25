@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GunValueManager : MonoBehaviour {
-
+    private static float internalVlaue = 0f;
     [HideInInspector] public static float currentValue = 0f;
     float previousGunValue = 0f;
     [SerializeField] GameObject wiper;
-
-
+    public AnimationCurve tuningCurve;
+    bool inNotch;
+    public float unNotchThresh;
+    public float notchInThresh;
+    float notchedValue;
+    public float notchDistThresh;
+    public float notchInSpeed;
     void Update() {
 
         // Change current gun value based on mouse Y movement.
@@ -16,13 +21,32 @@ public class GunValueManager : MonoBehaviour {
         if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -2.9f; }
         if (Time.timeScale == 0) { inputMod = 0; }
         else { inputMod *= (1 / Time.timeScale); }
-        currentValue += InputManager.gunTuningValue * inputMod * (Time.deltaTime);
-        currentValue = Mathf.Clamp(currentValue, -1f, 1f);
+        if (inNotch && Mathf.Abs(InputManager.gunTuningValue) > unNotchThresh) {
+            inNotch = false;
+        } else if (!inNotch && Mathf.Abs(InputManager.gunTuningValue) < notchInThresh) {
+            CheckNotch(-1f);
+            CheckNotch(0f);
+            CheckNotch(1f);
+        }
+        if (!inNotch)
+            internalVlaue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
+        else
+            internalVlaue += Mathf.Clamp((notchedValue - internalVlaue), -notchInSpeed * Time.deltaTime, notchInSpeed * Time.deltaTime);
+
+       // internalVlaue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
+        internalVlaue = Mathf.Clamp(internalVlaue, -1f, 1f);
+
+        currentValue = internalVlaue;//tuningCurve.Evaluate(internalVlaue);
+
+
+
+
+
 
         // Handle wiper
-        if (Mathf.Abs(previousGunValue - currentValue) >= 0.01f) {
+        if (Mathf.Abs(previousGunValue - internalVlaue) >= 0.01f) {
             wiper.transform.localScale = new Vector3(
-                MyMath.Map(Mathf.Abs(previousGunValue - currentValue), 0f, 0.5f, 0f, 10f),
+                MyMath.Map(Mathf.Abs(previousGunValue - internalVlaue), 0f, 0.5f, 0f, 10f),
                 wiper.transform.localScale.y,
                 wiper.transform.localScale.z
             );
@@ -38,23 +62,28 @@ public class GunValueManager : MonoBehaviour {
 
         wiper.transform.localPosition = new Vector3(
             wiper.transform.localPosition.x,
-            MyMath.Map(currentValue, -1f, 1f, -25f, 11f),
+            MyMath.Map(internalVlaue, -1f, 1f, -25f, 11f),
             wiper.transform.localPosition.z
             );
 
-        previousGunValue = currentValue;
+        previousGunValue = internalVlaue;
     }
-
+    void CheckNotch(float notch) {
+        if (Mathf.Abs(notch - internalVlaue) < notchDistThresh) {
+            inNotch = true;
+            notchedValue = notch;
+        }
+    }
     
     public static float MapToFloatRange(FloatRange floatRange) {
-        return MyMath.Map(currentValue, -1f, 1f, floatRange.min, floatRange.max);
+        return MyMath.Map(internalVlaue, -1f, 1f, floatRange.min, floatRange.max);
     }
 
     public static float MapToFloatRangeInverted(FloatRange floatRange) {
-        return MyMath.Map(currentValue, -1f, 1f, floatRange.max, floatRange.min);
+        return MyMath.Map(internalVlaue, -1f, 1f, floatRange.max, floatRange.min);
     }
 
     public static float MapTo(float min, float max) {
-        return MyMath.Map(currentValue, -1f, 1f, min, max);
+        return MyMath.Map(internalVlaue, -1f, 1f, min, max);
     }
 }

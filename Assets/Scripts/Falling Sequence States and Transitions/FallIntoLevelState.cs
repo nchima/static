@@ -15,6 +15,8 @@ public class FallIntoLevelState : State {
         Services.playerTransform.position = fallingSequenceManager.playerSpawnPoint.position;
         Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Vector3.down * 100f, ForceMode.VelocityChange);
         Services.levelManager.SetFloorCollidersActive(true);
+        Services.fieldOfViewController.SetClearVeilActive(true);
+        Services.colorPaletteManager.LoadFallingSequencePalette();
         fallingSequenceManager.SetUpFallingVariables();
     }
 
@@ -47,6 +49,8 @@ public class FallIntoLevelState : State {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
         Services.levelManager.LockInLevel();
+        Services.fieldOfViewController.SetClearVeilActive(false);
+        Services.colorPaletteManager.LoadLevelPalette();
     }
 
     private void BeginSpeedFall(StateController stateController) {

@@ -72,13 +72,13 @@ public class ScoreManager : MonoBehaviour
 
 
     private void OnEnable() {
-        GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        //GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void OnDisable() {
-        GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
+        //GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
@@ -153,16 +153,16 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
-        GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
+    //public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
+    //    GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
 
-        // Round the score to an integer and update the score display.
-        Score += playerKilledEnemyEvent.scoreValue;
+    //    // Round the score to an integer and update the score display.
+    //    Score += playerKilledEnemyEvent.scoreValue;
 
-        Services.scorePopupManager.CreatePositionalPopup(playerKilledEnemyEvent.enemyKilled.transform.position, playerKilledEnemyEvent.scoreValue);
+    //    Services.scorePopupManager.CreatePositionalPopup(playerKilledEnemyEvent.enemyKilled.transform.position, playerKilledEnemyEvent.scoreValue);
 
-        IncreaseMultiplier();
-    }
+    //    IncreaseMultiplier();
+    //}
 
 
     public void IncreaseMultiplier() {
@@ -410,15 +410,13 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    public class ScoreEntry
-    {
+    public class ScoreEntry {
         public string name;
         public int rank;
         public int score;
         public int newest; // Int as bool... 0 = false, 1 = true
 
-        public ScoreEntry(int rank, string name, int score, int newest)
-        {
+        public ScoreEntry(int rank, string name, int score, int newest) {
             this.rank = rank;
             this.name = name;
             this.score = score;

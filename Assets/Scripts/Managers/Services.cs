@@ -12,6 +12,7 @@ public class Services {
     public static SpecialBarManager specialBarManager;
     public static HealthManager healthManager;
     public static FallingSequenceManager fallingSequenceManager;
+    public static FieldOfViewController fieldOfViewController;
     public static MusicManager musicManager;
     public static SFXManager sfxManager;
     public static UIManager uiManager;
