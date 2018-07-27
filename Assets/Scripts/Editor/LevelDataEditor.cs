@@ -13,11 +13,11 @@ public class LevelDataEditor : Editor {
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
         EditorStyles.label.wordWrap = true;
-        EditorGUILayout.LabelField(levelData.path);
+        EditorGUILayout.LabelField(levelData.LevelName);
         this.Repaint();
 
         if (GUILayout.Button("Load Scene")) {
-            EditorSceneManager.OpenScene(levelData.path, OpenSceneMode.Additive);
+            EditorSceneManager.OpenScene(levelData.Path, OpenSceneMode.Additive);
         }
     }
 }

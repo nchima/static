@@ -23,7 +23,7 @@ public class ScorePopupManager : MonoBehaviour {
         newPosition.z = 10f;
         newPopup.transform.localPosition = newPosition;
 
-        int multipliedScore = Mathf.RoundToInt(score * Services.scoreManager.multiplier);
+        int multipliedScore = Mathf.RoundToInt(score * Services.scoreManager.Multiplier);
         newPopup.GetComponent<TextMesh>().text = multipliedScore.ToString();
         newPopup.GetComponent<TextMesh>().characterSize = 
             Mathf.Clamp(MyMath.Map((float)multipliedScore, scoreRange.min, scoreRange.max, sizeRange.min, sizeRange.max), sizeRange.min, sizeRange.max);

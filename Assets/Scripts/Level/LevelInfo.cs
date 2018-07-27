@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Level Info", menuName = "Custom/Level Info", order = 1)]
+//[CreateAssetMenu(fileName = "Level Info", menuName = "Custom/Level Info", order = 1)]
 public class LevelInfo : ScriptableObject {
 
     public float levelSize;

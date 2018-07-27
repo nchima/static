@@ -7,20 +7,21 @@ using UnityEngine.AI;
 public class LevelManager : MonoBehaviour {
 
     [SerializeField] List<LevelSet> levelSets;
+    [SerializeField] LevelSet startingLevelSetOverride;
+
     [SerializeField] GameObject scoreBonusPrefab;
 
-    [SerializeField] LevelSet startingLevelSet;
     LevelSet currentLevelSet;
 
-    [HideInInspector] LevelData currentlyLoadedLevel;
+    [HideInInspector] public LevelData currentlyLoadedLevel;
     [HideInInspector] public int levelsCompleted = 0;
     [HideInInspector] public bool isLevelCompleted = false;
 
     public int CurrentLevelNumber { get { return levelsCompleted + 1; } }
     public int TotalNumberOfLevels { get {
-            int levelNumbers = 0;
-            for (int i = 0; i < levelSets.Count; i++) { levelNumbers += levelSets.Count; }
-            return levelNumbers;
+            int numberOfLevels = 0;
+            for (int i = 0; i < levelSets.Count; i++) { numberOfLevels += levelSets[i].levelDataReferences.Count; }
+            return numberOfLevels;
         } }
     bool IsLevelLoaded {
         get {
@@ -37,17 +38,14 @@ public class LevelManager : MonoBehaviour {
 
 
     private void Awake() {
-        if (startingLevelSet != null) {
-            if (!levelSets.Contains(startingLevelSet)) {
-                levelSets.Insert(0, startingLevelSet);
-            }
+
+        if (startingLevelSetOverride != null) {
+            SetStartingLevelSet(startingLevelSetOverride);
         } else {
-            startingLevelSet = GetLevelSet("GDC Level Set");
+            SetStartingLevelSet(GetLevelSet("GDC Level Set"));
         }
 
-        currentLevelSet = startingLevelSet;
-
-        StartCoroutine(LoadLevelCoroutine(startingLevelSet.levelDataReferences[0].levelData));
+        //LoadNextLevel();
 
         //levelScaler = GetComponent<LevelScaler>();
 
@@ -78,8 +76,8 @@ public class LevelManager : MonoBehaviour {
 
     public void LoadNextLevel() {
         // If the player has completed every level, show the end of demo screen.
-        if ((levelsCompleted >= TotalNumberOfLevels)) {
-            SceneManager.UnloadSceneAsync(levelsCompleted);
+        if (IsLevelLoaded && (levelsCompleted >= TotalNumberOfLevels)) {
+            SceneManager.UnloadSceneAsync(currentlyLoadedLevel.buildIndex);
             Services.uiManager.ShowEndOfDemoScreen();
             return;
         }
@@ -104,7 +102,7 @@ public class LevelManager : MonoBehaviour {
             }
         }
 
-        StartCoroutine(LoadLevelCoroutine(currentLevelSet.GetLevelData(0)));
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel));
     }
 
     
@@ -130,6 +128,28 @@ public class LevelManager : MonoBehaviour {
         currentlyLoadedLevel = levelData;
 
         yield return null;
+    }
+
+
+    public void SetStartingLevelSet(LevelSet startingSet) {
+
+        Debug.Log("Setting starting level set to: " + startingSet.name);
+
+        if (startingLevelSetOverride != null) {
+            Debug.Log("Starting level overridden by user.");
+            return;
+        }
+ 
+        if (!levelSets.Contains(startingSet)) {
+            levelSets.Add(startingSet);
+        }
+
+        currentLevelSet = startingSet;
+    }
+
+
+    public void SetStartingLevelSet(string setName) {
+        SetStartingLevelSet(GetLevelSet(setName));
     }
 
 
@@ -194,6 +214,7 @@ public class LevelManager : MonoBehaviour {
 
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        LoadNextLevel();
         SetEnemiesActive(true);
     }
 
