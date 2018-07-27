@@ -6,6 +6,10 @@ using DG.Tweening;
 public class FieldOfViewController : MonoBehaviour {
 
     [SerializeField] Transform pullbackPoint;
+    [SerializeField] GameObject backgroundClearVeil1;
+    [SerializeField] GameObject backgroundClearVeil2;
+    [SerializeField] GameObject foregroundClearVeil1;
+    [SerializeField] GameObject foregroundClearVeil2;
 
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
     FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
@@ -35,7 +39,7 @@ public class FieldOfViewController : MonoBehaviour {
     }
 
     float _currentOrthoSize;
-    float currentOrthoSize {
+    float CurrentOrthoSize {
         get {
             return _currentOrthoSize;
         }
@@ -58,15 +62,18 @@ public class FieldOfViewController : MonoBehaviour {
         }
     }
 
+
     private void Update() {
         SetFieldOfView(GunValueManager.currentValue);
     }
 
+
     void SetFieldOfView(float sineValue) {
         if (freezeUpdate) { return; }
         currentFOV = MyMath.Map(sineValue, 1f, -1f, fieldOfViewRange.min, fieldOfViewRange.max);
-        currentOrthoSize = MyMath.Map(sineValue, 1f, -1f, orthographicSizeRange.min, orthographicSizeRange.max);
+        CurrentOrthoSize = MyMath.Map(sineValue, 1f, -1f, orthographicSizeRange.min, orthographicSizeRange.max);
     }
+
 
     Tween moveCameraTween;
     Tween rotateCameraTween;
@@ -82,6 +89,7 @@ public class FieldOfViewController : MonoBehaviour {
         freezeUpdate = true;
     }
 
+
     public void TweenToNormalFOV() {
         TweenFieldOfView(shotgunChargeFOVRange.min, shotgunChargeOrthoSizeRange.min, 0.14f);
 
@@ -93,8 +101,16 @@ public class FieldOfViewController : MonoBehaviour {
         freezeUpdate = false;
     }
 
+
+    public void SetClearVeilActive(bool value) {
+        backgroundClearVeil1.SetActive(value);
+        foregroundClearVeil1.SetActive(!value);
+        foregroundClearVeil2.SetActive(value);
+    }
+
+
     void TweenFieldOfView(float targetFOV, float targetOrthoSize, float duration) {
         DOTween.To(() => currentFOV, x => currentFOV = x, targetFOV, duration);
-        DOTween.To(() => currentOrthoSize, x => currentOrthoSize = x, targetOrthoSize, duration);
+        DOTween.To(() => CurrentOrthoSize, x => CurrentOrthoSize = x, targetOrthoSize, duration);
     }
 }

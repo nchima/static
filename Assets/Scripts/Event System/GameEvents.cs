@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace GameEvents {
-    public class EnemyDied : GameEvent {
-        public EnemyDied() { }
-    }
-
     public class GameStarted : GameEvent {
         public GameStarted() { }
     }
@@ -44,5 +40,9 @@ namespace GameEvents {
 
     public class PickupObtained : GameEvent {
         public PickupObtained() { }
+    }
+
+    public class Bullseye : GameEvent {
+        public Bullseye() { }
     }
 }
