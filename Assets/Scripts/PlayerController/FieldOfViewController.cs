@@ -103,7 +103,6 @@ public class FieldOfViewController : MonoBehaviour {
 
 
     public void SetClearVeilActive(bool value) {
-        Debug.Log("Setting clear veil active: " + value);
         backgroundClearVeil1.SetActive(value);
         foregroundClearVeil1.SetActive(!value);
         foregroundClearVeil2.SetActive(value);

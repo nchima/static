@@ -21,6 +21,7 @@ public class ComboManager : MonoBehaviour {
     const float KILL_BONUS_TIME = 1f;
     const float LEVEL_COMPLETED_BONUS_TIME = 1f;
     const float PICKUP_OBTAINED_BONUS_TIME = 2f;
+    const float MISC_BONUS_TIME = 1f;
 
     // Enemy kill values.
     const int SIMPLE_ENEMY_SCORE_VALUE = 100;
@@ -33,6 +34,8 @@ public class ComboManager : MonoBehaviour {
 
     // Other values
     const int PICKUP_SCORE_VALUE = 100;
+    const int BULLSEYE_VALUE = 200;
+    const int SPECIAL_MOVE_VALUE = 100;
 
     // Current combo data.
     int simpleEnemiesKilled = 0;
@@ -43,12 +46,16 @@ public class ComboManager : MonoBehaviour {
     int bossEnemiesKilled = 0;
     int pickupsObtained = 0;
     int levelsCompleted = 0;
+    int bullseyes = 0;
+    int timesSpecialMoveUsed = 0;
 
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PickupObtained>(PickupObtainedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
+        GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
     }
 
@@ -57,6 +64,8 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PickupObtained>(PickupObtainedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
     }
 
@@ -76,6 +85,32 @@ public class ComboManager : MonoBehaviour {
             comboTextDisplay.text = GenerateComboTextString();
             comboScoreDisplay.text = GetComboTotalAsString();
         }
+
+        //StartCoroutine(FuckOff());
+    }
+
+
+    IEnumerator FuckOff() {
+
+        TextGenerationSettings settings = new TextGenerationSettings();
+        settings.resizeTextForBestFit = true;
+        settings.textAnchor = TextAnchor.MiddleCenter;
+        settings.color = comboTextDisplay.color;
+        settings.generationExtents = new Vector2(1000f, 1000f);
+        settings.pivot = Vector2.zero;
+        settings.richText = true;
+        settings.font = comboTextDisplay.font;
+        //settings.fontSize = comboTextDisplay.fontSize;
+        settings.fontStyle = comboTextDisplay.fontStyle;
+        settings.verticalOverflow = VerticalWrapMode.Overflow;
+        TextGenerator generator = new TextGenerator();
+        generator.Populate(comboTextDisplay.text, settings);
+
+        yield return new WaitForEndOfFrame();
+
+        comboTextDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / comboTextDisplay.canvas.scaleFactor);
+
+        yield return null;
     }
 
 
@@ -98,6 +133,8 @@ public class ComboManager : MonoBehaviour {
         bossEnemiesKilled = 0;
         levelsCompleted = 0;
         pickupsObtained = 0;
+        bullseyes = 0;
+        timesSpecialMoveUsed = 0;
 
         comboTextDisplay.text = "";
         comboScoreDisplay.text = "";
@@ -111,43 +148,53 @@ public class ComboManager : MonoBehaviour {
     string GenerateComboTextString() {
         string comboString = "";
 
+        if (bullseyes > 0) {
+            if (comboString != "") { comboString += " + "; }
+            comboString += "Bullseye! x" + bullseyes.ToString();
+        }
+
         if (simpleEnemiesKilled > 0) {
-            comboString += "Basic Enemy Killed X " + simpleEnemiesKilled.ToString();
+            comboString += "Basic Enemy Killed x" + simpleEnemiesKilled.ToString();
         }
 
         if (meleeEnemiesKilled > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Melee Enemy Killed X " + meleeEnemiesKilled.ToString();
+            comboString += "Melee Enemy Killed x" + meleeEnemiesKilled.ToString();
         }
 
         if (laserEnemiesKilled > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Laser Enemy Killed X " + laserEnemiesKilled.ToString();
+            comboString += "Laser Enemy Killed x" + laserEnemiesKilled.ToString();
         }
 
         if (tankEnemiesKilled > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Tank Enemy Killed X " + tankEnemiesKilled.ToString();
+            comboString += "Tank Enemy Killed x" + tankEnemiesKilled.ToString();
         }
 
         if (hoverEnemiesKilled > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Hovering Enemy Killed X " + hoverEnemiesKilled.ToString();
+            comboString += "Hovering Enemy Killed x" + hoverEnemiesKilled.ToString();
         }
 
         if (bossEnemiesKilled > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Boss Enemy Killed X " + bossEnemiesKilled.ToString();
+            comboString += "Boss Enemy Killed x" + bossEnemiesKilled.ToString();
         }
 
         if (levelsCompleted > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Level Completed X " + levelsCompleted.ToString();
+            comboString += "Level Completed x" + levelsCompleted.ToString();
         }
 
         if (pickupsObtained > 0) {
             if (comboString != "") { comboString += " + "; }
-            comboString += "Pickup Obtained X " + pickupsObtained.ToString();
+            comboString += "Multiplier Pickup x" + pickupsObtained.ToString();
+        }
+
+        if (timesSpecialMoveUsed > 0) {
+            if (comboString != "") { comboString += " + "; }
+            comboString += "Special Move Used x" + timesSpecialMoveUsed.ToString();
         }
 
         return comboString;
@@ -164,6 +211,8 @@ public class ComboManager : MonoBehaviour {
         totalScore += bossEnemiesKilled * BOSS_ENEMY_KILL_VALUE;
         totalScore += levelsCompleted * LEVEL_COMPLETE_VALUE;
         totalScore += pickupsObtained * PICKUP_SCORE_VALUE;
+        totalScore += timesSpecialMoveUsed * SPECIAL_MOVE_VALUE;
+        totalScore += bullseyes * BULLSEYE_VALUE;
         return totalScore;
     }
 
@@ -203,6 +252,22 @@ public class ComboManager : MonoBehaviour {
         else { comboTimer = Mathf.Clamp(comboTimer + PICKUP_OBTAINED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
         pickupsObtained++;
+    }
+
+
+    public void PlayerUsedSpecialMoveHandler(GameEvent gameEvent) {
+        if (state == State.ComboIdle) { StartCombo(); }
+        else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+
+        timesSpecialMoveUsed++;
+    }
+
+
+    public void BullseyeHandler(GameEvent gameEvent) {
+        if (state == State.ComboIdle) { StartCombo(); }
+        else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+
+        bullseyes++;
     }
 
 

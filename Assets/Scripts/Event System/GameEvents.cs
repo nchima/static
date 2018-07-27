@@ -41,4 +41,8 @@ namespace GameEvents {
     public class PickupObtained : GameEvent {
         public PickupObtained() { }
     }
+
+    public class Bullseye : GameEvent {
+        public Bullseye() { }
+    }
 }

@@ -26,6 +26,7 @@ public class SpecialMoveManager : MonoBehaviour {
         // See if the player has fired a special move & if so, initialize proper variables.
         if (InputManager.specialMoveButtonDown && Services.gun.canShoot && !firingMissiles && HasAmmo) {
             Services.specialBarManager.PlayerUsedSpecialMove();
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedSpecialMove());
             missilesFired = 0;
             missileTimer = 0f;
             firingMissiles = true;
@@ -38,7 +39,6 @@ public class SpecialMoveManager : MonoBehaviour {
 
 
     void FireMissiles() {
-        GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedSpecialMove());
 
         // Spawn shield explosion.
         Explosion specialMoveShield = Instantiate(specialMoveShieldPrefab, Services.playerTransform.position, Quaternion.identity, Services.playerTransform).GetComponent<Explosion>();
