@@ -121,7 +121,7 @@ public class LevelManager : MonoBehaviour {
         yield return new WaitForSeconds(0.2f);
 
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
-        for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
+        //for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         //SetEnemiesActive(false);
 
         isLevelCompleted = false;
@@ -137,6 +137,7 @@ public class LevelManager : MonoBehaviour {
 
         if (startingLevelSetOverride != null) {
             Debug.Log("Starting level overridden by user.");
+            currentLevelSet = startingLevelSetOverride;
             return;
         }
  
