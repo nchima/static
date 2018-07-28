@@ -38,7 +38,6 @@ public class LevelSetEditor : Editor {
         LevelDataListItem item = levelSet.levelDataReferences[index];
         EditorGUI.BeginChangeCheck();
         item.levelData = (LevelData)EditorGUI.ObjectField(new Rect(rect.x, rect.y, rect.width, rect.height), "Level " + (index + 1).ToString(), item.levelData, typeof(LevelData), false);
-        //item.levelData = (LevelData)EditorGUILayout.ObjectField("Level " + (index + 1).ToString(), item.levelData, typeof(LevelData), false);
         if (EditorGUI.EndChangeCheck()) { EditorUtility.SetDirty(target); }
     }
 
@@ -54,12 +53,6 @@ public class LevelSetEditor : Editor {
 
     public override void OnInspectorGUI() {
         base.OnInspectorGUI();
-        //levelDataList = new ReorderableList(levelSet.levelDataList, typeof(LevelData), true, true, true, true);
-
-        //levelDataList.drawHeaderCallback += DrawHeader;
-        //levelDataList.drawElementCallback += DrawElement;
-        //levelDataList.onAddCallback += AddItem;
-        //levelDataList.onRemoveCallback += RemoveItem;
 
         if (levelDataList != null) {
             levelDataList.DoLayoutList();
