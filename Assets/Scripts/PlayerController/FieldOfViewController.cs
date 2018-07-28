@@ -14,7 +14,7 @@ public class FieldOfViewController : MonoBehaviour {
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
     FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
 
-    List<Camera> perspectiveCams;
+    [SerializeField] Camera perspectiveCam;
     [HideInInspector] public List<Camera> orthographicCams;
 
     FloatRange shotgunChargeFOVRange = new FloatRange(85f, 100f);
@@ -33,7 +33,7 @@ public class FieldOfViewController : MonoBehaviour {
         }
 
         set {
-            for (int i = 0; i < perspectiveCams.Count; i++) { perspectiveCams[i].fieldOfView = value; }
+            perspectiveCam.fieldOfView = value;
             _currentFOV = value;
         }
     }
@@ -53,12 +53,10 @@ public class FieldOfViewController : MonoBehaviour {
 
     private void Awake() {
         // Go through all cameras in my children and add them to the right array.
-        perspectiveCams = new List<Camera>();
         orthographicCams = new List<Camera>();
         Camera[] camerasInChildren = GetComponentsInChildren<Camera>();
         for (int i = 0; i < camerasInChildren.Length; i++) {
             if (camerasInChildren[i].orthographic) { camerasInChildren[i].enabled = false;  orthographicCams.Add(camerasInChildren[i]); }
-            else { perspectiveCams.Add(camerasInChildren[i]); }
         }
     }
 
@@ -112,5 +110,14 @@ public class FieldOfViewController : MonoBehaviour {
     void TweenFieldOfView(float targetFOV, float targetOrthoSize, float duration) {
         DOTween.To(() => currentFOV, x => currentFOV = x, targetFOV, duration);
         DOTween.To(() => CurrentOrthoSize, x => CurrentOrthoSize = x, targetOrthoSize, duration);
+    }
+
+
+    public void ActivateCameraClearing(bool value) {
+        if (value == true) {
+            perspectiveCam.clearFlags = CameraClearFlags.SolidColor;
+        } else {
+            perspectiveCam.clearFlags = CameraClearFlags.Depth;
+        }
     }
 }

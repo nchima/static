@@ -14,6 +14,11 @@ public class EpisodeSelectScreen : MonoBehaviour {
         GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
     }
 
+    public void AnatomiaButton() {
+        Services.levelManager.SetStartingLevelSet("Anatomia Level Set");
+        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
+    }
+
     public void BackButton() {
         Services.uiManager.ShowTitleScreen(true);
     }

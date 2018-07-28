@@ -35,7 +35,7 @@ public class ComboManager : MonoBehaviour {
     // Other values
     const int PICKUP_SCORE_VALUE = 100;
     const int BULLSEYE_VALUE = 200;
-    const int SPECIAL_MOVE_VALUE = 100;
+    const int SPECIAL_MOVE_VALUE = 50;
 
     // Current combo data.
     int simpleEnemiesKilled = 0;
@@ -48,6 +48,8 @@ public class ComboManager : MonoBehaviour {
     int levelsCompleted = 0;
     int bullseyes = 0;
     int timesSpecialMoveUsed = 0;
+
+    int CurrentMultiplier { get { return pickupsObtained + timesSpecialMoveUsed + 1; } }
 
 
     private void OnEnable() {
@@ -122,8 +124,7 @@ public class ComboManager : MonoBehaviour {
 
 
     private void EndCombo() {
-        int multiplier = pickupsObtained + 1;
-        Services.scoreManager.Score += GetUnmultipliedTotal() * multiplier;
+        Services.scoreManager.Score += GetUnmultipliedTotal() * CurrentMultiplier;
 
         simpleEnemiesKilled = 0;
         meleeEnemiesKilled = 0;
@@ -219,7 +220,7 @@ public class ComboManager : MonoBehaviour {
 
     string GetComboTotalAsString() {
         string total = GetUnmultipliedTotal().ToString();
-        if (pickupsObtained > 0) { total += " X " + (pickupsObtained + 1).ToString(); }
+        if (CurrentMultiplier > 1) { total += " X " + CurrentMultiplier.ToString(); }
         return total;
     }
 

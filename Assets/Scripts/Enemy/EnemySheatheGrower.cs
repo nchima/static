@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySheatheGrower : MonoBehaviour {
 
-    float maxScaleMultiplier = 10f;
+    const float MAX_SCALE_MULTIPLIER = 5f;
     float playerSpawnHeight = 2000f;
     Vector3 originalScale;
 
@@ -16,7 +16,7 @@ public class EnemySheatheGrower : MonoBehaviour {
 
     private void Update() {
         if (Services.fallingSequenceManager.isPlayerFalling) {
-            transform.localScale = originalScale * MyMath.Map(Services.playerTransform.position.y, 0f, playerSpawnHeight, 1f, 10f);
+            transform.localScale = originalScale * Mathf.Clamp(MyMath.Map(Services.playerTransform.position.y, 0f, playerSpawnHeight, 1f, MAX_SCALE_MULTIPLIER), 1f, MAX_SCALE_MULTIPLIER);
         } else {
             transform.localScale = originalScale;
         }
