@@ -6,11 +6,15 @@ using System.Collections.Generic;
 public class Gun : MonoBehaviour {
 
     /* INSPECTOR */
-    [SerializeField] IntRange bulletsPerBurstRange = new IntRange(2, 50);   // How many bullets are fired per shot.
+    public IntRange bulletsPerBurstRange = new IntRange(2, 50);   // How many bullets are fired per shot.
+    [SerializeField] AnimationCurve bulletsPerBurstCurve;
     [SerializeField] FloatRange burstsPerSecondRange = new FloatRange(2f, 9f);  // How many shots can be fired per second.
+    [SerializeField] AnimationCurve burstsPerSecondCurve;
     [SerializeField] FloatRange bulletSpreadRange = new FloatRange(1f, 10f);
+    [SerializeField] AnimationCurve bulletSpreadCurve;
     [SerializeField] FloatRange bulletSpeedRange = new FloatRange(300f, 600f);
     [SerializeField] FloatRange bulletThicknessRange = new FloatRange(0.1f, 0.3f);
+    [SerializeField] AnimationCurve bulletThicknessCurve;
     [SerializeField] int bulletDamage = 1;
     [SerializeField] float bulletRecoil = 0.2f;
     [SerializeField] Color bulletColor1;
@@ -20,7 +24,8 @@ public class Gun : MonoBehaviour {
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
 
     // USED DURING SHOOTING
-    public int bulletsPerBurst { get { return Mathf.RoundToInt(MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletsPerBurstRange.max, bulletsPerBurstRange.min)); } }
+    public int bulletsPerBurst {
+        get { return Mathf.RoundToInt(MyMath.Map(bulletsPerBurstCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletsPerBurstRange.min, bulletsPerBurstRange.max)); } }
     int bulletsHitThisBurst = 0;
     [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
 
@@ -84,11 +89,13 @@ public class Gun : MonoBehaviour {
 
 
     public void FireBurst() {
-        if (!Services.gameManager.gameStarted) { return; }
+        if (!Services.gameManager.isGameStarted) { return; }
 
         // Get new firing variables based on current oscillation.
-        float burstsPerSecond = MyMath.Map(GunValueManager.currentValue, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
-        float inaccuracy = MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
+        //float burstsPerSecond = MyMath.Map(GunValueManager.currentValue, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
+        float burstsPerSecond = MyMath.Map(burstsPerSecondCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
+        float accuracy = MyMath.Map(bulletSpreadCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletSpreadRange.min, bulletSpreadRange.max);
+        //float accuracy = MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
 
         // Make sure enough time has passed since the last shot.
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
@@ -130,16 +137,16 @@ public class Gun : MonoBehaviour {
 
         // Auto aim for weak points.
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
-        autoAimPoint = AutoAim("Weak Point", 0.225f);
+        autoAimPoint = AutoAim("Weak Point", 0.15f);
 
         // If we couldn't hit a weak point, auto aim for enemies instead.
         if (!Physics.Raycast(tip.position, autoAimPoint - tip.position, 1000f, 1 << 28)) {
-            autoAimPoint = AutoAim("Enemy", 0.125f);
+            autoAimPoint = AutoAim("Enemy", 0.1f);
         }
 
         // Fire the specified number of bullets.
         for (int i = 0; i < bulletsPerBurst; i++) {
-            FireBullet(autoAimPoint, inaccuracy);
+            FireBullet(autoAimPoint, accuracy);
         }
 
         // Add recoil to player controller.
@@ -154,8 +161,15 @@ public class Gun : MonoBehaviour {
         // Rotate bullet spawner to get the direction of the next bullet.
         bulletSpawnTransform.LookAt(target);
         bulletSpawnTransform.localRotation = Quaternion.Euler(
-            new Vector3(bulletSpawnTransform.localRotation.eulerAngles.x + Random.insideUnitCircle.y * inaccuracy, Random.insideUnitCircle.x * inaccuracy, 0)
+            new Vector3(
+                bulletSpawnTransform.localRotation.eulerAngles.x + Random.insideUnitCircle.y * inaccuracy, 
+                bulletSpawnTransform.localRotation.eulerAngles.y + Random.insideUnitCircle.x * inaccuracy,
+                0)
             );
+
+        Debug.DrawRay(bulletSpawnTransform.position, bulletSpawnTransform.forward * 1000f, Color.yellow);
+
+        //Debug.Break();
 
         ObjectPooler bulletPooler = GameObject.Find("Pooled Bullets").GetComponent<ObjectPooler>();
         GameObject newBullet = bulletPooler.GrabObject();
@@ -164,7 +178,8 @@ public class Gun : MonoBehaviour {
         newBullet.GetComponent<PlayerBullet>().GetFired(
             bulletSpawnTransform.position,
             bulletSpawnTransform.forward,
-            MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
+            MyMath.Map(bulletThicknessCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
+            //MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
             Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f))
         );
@@ -173,6 +188,7 @@ public class Gun : MonoBehaviour {
 
     Vector3 AutoAim(string tag, float bandSize) {
         
+        // Set autoaim to be straight ahead of the player.
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.transform.forward * 1000f;
 
         // Check all gameobjects with the given tag:
@@ -180,9 +196,12 @@ public class Gun : MonoBehaviour {
             
             // See if this object is near the middle of the screen.
             Vector3 viewportPosition = Camera.main.WorldToViewportPoint(thisObject.transform.position);
-            bool inXRange = viewportPosition.x >= 0.5f - bandSize && viewportPosition.x <= 0.5f + bandSize;
+            bool inXRange = viewportPosition.x >= 0.5f - bandSize * 0.5f && viewportPosition.x <= 0.5f + bandSize * 0.5f;
             bool inYRange = viewportPosition.y >= 0f && viewportPosition.y <= 1f;
             bool inZRange = viewportPosition.z >= 0f;
+
+            //Debug.Log("x: " + inXRange + ", y: " + inYRange + ", z: " + inZRange);
+
             if (inXRange && inYRange && inZRange) {
                 // For the enemy's position, use the center of its renderer.
                 Vector3 thisPosition = thisObject.GetComponent<Collider>().bounds.center;

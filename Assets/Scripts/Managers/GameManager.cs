@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
 
     // RANDOM USEFUL STUFF
-    public bool gameStarted = false;
+    public bool isGameStarted = false;
     Vector3 initialGravity;
 
 
@@ -99,7 +99,7 @@ public class GameManager : MonoBehaviour {
 
 
     private void Update() {
-        if (InputManager.pauseButtonDown && gameStarted && !Services.healthManager.PlayerIsDead) {
+        if (InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead) {
             if (!gamePaused) { PauseGame(true); } 
             else { PauseGame(false); }
         }
@@ -122,7 +122,7 @@ public class GameManager : MonoBehaviour {
         else {
             Services.uiManager.HidePauseScreen();
             Time.timeScale = memorizedTimeScale;
-            if (!gameStarted) { Services.uiManager.titleScreen.SetActive(true); }
+            if (!isGameStarted) { Services.uiManager.titleScreen.SetActive(true); }
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             gamePaused = false;
@@ -178,7 +178,7 @@ public class GameManager : MonoBehaviour {
         Services.scoreManager.UpdateHighScoreDisplay();
         Physics.gravity = initialGravity;   // Move to gravity manager
         FindObjectOfType<FallIntoLevelState>().speedFallTrigger = true;
-        gameStarted = true;
+        isGameStarted = true;
     }
 
 

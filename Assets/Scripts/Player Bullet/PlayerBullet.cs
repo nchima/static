@@ -123,7 +123,7 @@ public class PlayerBullet : MonoBehaviour {
         m_playerBulletTrail.thickness = thickness;
         m_playerBulletTrail.m_Color = m_Color;
 
-        
+        FixedUpdateMove();
     }
 
 

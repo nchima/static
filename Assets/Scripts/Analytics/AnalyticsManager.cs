@@ -4,7 +4,10 @@ using UnityEngine;
 using UnityEngine.Analytics;
 
 public class AnalyticsManager : MonoBehaviour {
-    
+
+    float averageTimer = 0f;
+    float AVERAGE_SAMPLE_INTERVAL = 1f;   // How often we sample tuning value for the average.
+
     // Per level stats
     float timeInLevel; //
     int damageTakenInLevel; //
@@ -28,7 +31,6 @@ public class AnalyticsManager : MonoBehaviour {
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
-        GameEventManager.instance.Subscribe<GameEvents.PlayerFiredGun>(PlayerFiredGunHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Subscribe<GameEvents.PickupObtained>(PickupObtainedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
@@ -38,7 +40,6 @@ public class AnalyticsManager : MonoBehaviour {
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
-        GameEventManager.instance.Unsubscribe<GameEvents.PlayerFiredGun>(PlayerFiredGunHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PickupObtained>(PickupObtainedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
@@ -48,6 +49,16 @@ public class AnalyticsManager : MonoBehaviour {
     private void Update() {
         timeAlive += Time.deltaTime;
         timeInLevel += Time.deltaTime;
+
+        if (Services.gameManager.isGameStarted) {
+            averageTimer += Time.deltaTime;
+            if (averageTimer >= AVERAGE_SAMPLE_INTERVAL) {
+                timesFiredGunTotal++;
+                tuningValuesLevel.Add(GunValueManager.currentValue);
+                tuningValuesTotal.Add(GunValueManager.currentValue);
+                averageTimer = 0f;
+            }
+        }
     }
 
 
@@ -72,12 +83,6 @@ public class AnalyticsManager : MonoBehaviour {
 
     void PlayerWasHurtHandler(GameEvent gameEvent) {
         damageTakenInLevel++;
-    }
-
-    void PlayerFiredGunHandler(GameEvent gameEvent) {
-        timesFiredGunTotal++;
-        tuningValuesLevel.Add(GunValueManager.currentValue);
-        tuningValuesTotal.Add(GunValueManager.currentValue);
     }
 
     void PlayerUsedSpecialMoveHandler(GameEvent gameEvent) {

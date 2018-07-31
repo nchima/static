@@ -13,7 +13,7 @@ public class HighScoreScreen : MonoBehaviour {
 
     private void Update()
     {
-        if (!Services.gameManager.gameStarted) {
+        if (!Services.gameManager.isGameStarted) {
             if (InputManager.pauseButtonDown || InputManager.submitButtonDown) {
                 Services.uiManager.highScoreScreen.SetActive(false);
                 Services.uiManager.titleScreen.SetActive(true);

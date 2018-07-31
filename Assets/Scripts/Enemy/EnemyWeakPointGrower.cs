@@ -11,6 +11,7 @@ public class EnemyWeakPointGrower : MonoBehaviour {
     [HideInInspector] public Enemy myDad;
     Vector3 fullSizeScale;
 
+    const int BULLETS_FOR_INSTANT_DEATH = 15;
     int hitsLastFrame;
 
 
@@ -31,7 +32,7 @@ public class EnemyWeakPointGrower : MonoBehaviour {
         }
 
         // See if I was struck by almost all of the player's bullets at once
-        if (hitsLastFrame >= Services.gun.bulletsPerBurst - 5) {
+        if (hitsLastFrame >= BULLETS_FOR_INSTANT_DEATH) {
             GameEventManager.instance.FireEvent(new GameEvents.Bullseye());
             myDad.currentHealth = 0;
         } else {

@@ -72,7 +72,7 @@ public class CrossHair : MonoBehaviour {
 
 
     void AdjustShakeValueForShotFired() {
-        shakeValue = MyMath.Map(GunValueManager.currentValue, 1f, -1f, shakeRange.max * 1.1f, shakeRange.min);
+        shakeValue = MyMath.Map(Services.gun.bulletsPerBurst, Services.gun.bulletsPerBurstRange.min, Services.gun.bulletsPerBurstRange.max, shakeRange.min, shakeRange.max * 1.1f);
     }
 
 

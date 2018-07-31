@@ -33,13 +33,13 @@ public class LaserEnemyStateDash : State {
 
         // Turn towards new position.
         controller.animationController.StartDashWindupAnimation(turnDuration);
-        controller.transform.DOLookAt(nextPosition, turnDuration).SetEase(Ease.InExpo);
+        controller.transform.DOLookAt(nextPosition, turnDuration).SetEase(Ease.InOutExpo);
         yield return new WaitForSeconds(turnDuration + 0.3f);
 
         // Dash to new position.
         float dashAnimDuration = dashDuration * 0.8f;
         controller.animationController.StartDashReleaseAnimation(dashAnimDuration);
-        controller.transform.DOMove(nextPosition, dashDuration).SetEase(Ease.InExpo);
+        controller.transform.DOMove(nextPosition, dashDuration).SetEase(Ease.InOutExpo);
         yield return new WaitForSeconds(dashDuration);
 
         controller.animationController.EndDashReleaseAnimation(0.3f);
