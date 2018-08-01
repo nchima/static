@@ -141,6 +141,7 @@ public class PlayerController : MonoBehaviour {
             dashCooldownTimer += Time.deltaTime;
             if (dashCooldownTimer >= dashCooldown && dashRechargeTimer >= DASH_RECHARGE_TIME) {
                 if (InputManager.dashButtonDown && !isSuperDashCharging) {
+                    Debug.Log("begin dash");
                     BeginDash(false);
                 }
 
@@ -314,7 +315,7 @@ public class PlayerController : MonoBehaviour {
             }
 
             yield return new WaitUntil(() => {
-                if ((Vector3.Distance(startingPosition, transform.position) >= dashDistance) && !InputManager.dashButton) {
+                if ((Vector3.Distance(startingPosition, transform.position) >= dashDistance)) {
                     return true;
                 } else { return false; }
             });

@@ -18,6 +18,7 @@ public class PlayerMissile : MonoBehaviour {
     [SerializeField] private FloatRange colliderWidthRange = new FloatRange(2f, 4f);
     [SerializeField] private FloatRange upwardTiltRange = new FloatRange(4f, 9.5f);
     [SerializeField] private FloatRange spreadXRange = new FloatRange(20f, 35f);
+    [SerializeField] private FloatRange spreadYRange = new FloatRange(0f, 7.5f);
 
     // References
     [SerializeField] private GameObject explosionPrefab;
@@ -34,6 +35,7 @@ public class PlayerMissile : MonoBehaviour {
     // Firing
     private float upwardTilt;
     private float spreadX;
+    private float spreadY;
 
     // Movement
     private float initialSpeed;
@@ -64,6 +66,8 @@ public class PlayerMissile : MonoBehaviour {
     // Timer
     private float lifetimeDuration;
     private float lifetimeTimer;
+    const float LOCKON_DELAY = 0.25f;
+    float lockonDelayTimer = 0f;
 
     // References
     SkinnedMeshRenderer m_SkinnedMeshRenderer;
@@ -87,6 +91,7 @@ public class PlayerMissile : MonoBehaviour {
         lifetimeDuration = GunValueManager.MapToFloatRange(lifetimeDurationRange);
         upwardTilt = GunValueManager.MapToFloatRange(upwardTiltRange);
         spreadX = GunValueManager.MapToFloatRange(spreadXRange);
+        spreadY = GunValueManager.MapToFloatRange(spreadYRange);
         decelerationOverLifetimeMultiplier = GunValueManager.MapToFloatRange(decelerationOverLifetimeMultiplierRange);
 
         // Get random rotation
@@ -94,8 +99,8 @@ public class PlayerMissile : MonoBehaviour {
 
         // Adjust size of visuals
         Vector3 newVisualScale = sphereVisuals.transform.localScale;
-        newVisualScale.x = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
-        newVisualScale.y = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
+        newVisualScale *= GunValueManager.MapToFloatRange(visualWidthRange);
+        //newVisualScale.y = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
         sphereVisuals.transform.localScale = newVisualScale;
         m_SkinnedMeshRenderer.SetBlendShapeWeight(0, GunValueManager.MapTo(100f, 0f));
 
@@ -114,7 +119,8 @@ public class PlayerMissile : MonoBehaviour {
 
         // Get initial direction
         transform.rotation = Services.playerTransform.rotation;
-        transform.Rotate(new Vector3(-upwardTilt - Random.Range(-7.5f, 7.5f), Random.Range(-spreadX, spreadX), 0f));
+
+        transform.Rotate(new Vector3(-upwardTilt + Random.Range(-spreadY, spreadY), Random.Range(-spreadX, spreadX), 0f));
         initialDirection = transform.forward;
         velocity = initialDirection * initialSpeed;
     }
@@ -124,6 +130,8 @@ public class PlayerMissile : MonoBehaviour {
         // Get destroyed if lifetime is expired.
         lifetimeTimer += Time.deltaTime;
         if (lifetimeTimer >= lifetimeDuration) { GetDestroyed(); }
+
+        lockonDelayTimer += Time.deltaTime;
 
         // Update position of lock-on trigger (always keep it at ground level and in front of missile)
         float lockOnTriggerRadius = lockOnTrigger.GetComponent<SphereCollider>().radius;
@@ -226,6 +234,7 @@ public class PlayerMissile : MonoBehaviour {
     void OnTriggerEnterChild(Collider collider) {
         // If an enters the lock-on trigger, lock on.
         if (collider.tag == "Enemy") {
+            if (lockonDelayTimer < LOCKON_DELAY) { return; }
             if (currentState == State.NotLockedOn) {
                 lockedOnEnemy = collider.gameObject;
                 currentState = State.LockedOn;

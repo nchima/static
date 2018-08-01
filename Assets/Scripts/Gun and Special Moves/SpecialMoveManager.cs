@@ -45,7 +45,6 @@ public class SpecialMoveManager : MonoBehaviour {
 
         // Fire a missile every x seconds.
         if (missileTimer >= GunValueManager.MapToFloatRange(missileFireIntervalRange)) {
-            Debug.Log(Mathf.CeilToInt(Time.deltaTime / GunValueManager.MapToFloatRange(missileFireIntervalRange)));
             int missilesToFireThisFrame = 1 + Mathf.CeilToInt(Time.deltaTime / GunValueManager.MapToFloatRange(missileFireIntervalRange));
             for (int i = 0; i < missilesToFireThisFrame; i++) {
                 FireMissile();
@@ -69,7 +68,9 @@ public class SpecialMoveManager : MonoBehaviour {
     void FireMissile() {
         missilesFired++;
         missileTimer = 0;
-        PlayerMissile newMissile = Instantiate(missilePrefab, Services.gun.tip.position, Services.playerTransform.rotation).GetComponent<PlayerMissile>();
+        Vector3 newPosition = Services.gun.tip.position + Random.insideUnitSphere * 2f;
+        newPosition.y -= 2f;
+        PlayerMissile newMissile = Instantiate(missilePrefab, newPosition, Services.playerTransform.rotation).GetComponent<PlayerMissile>();
         newMissile.GetFired();
     }
 }
