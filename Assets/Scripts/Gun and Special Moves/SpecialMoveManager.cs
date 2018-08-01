@@ -39,14 +39,17 @@ public class SpecialMoveManager : MonoBehaviour {
 
 
     void FireMissiles() {
-
         // Spawn shield explosion.
         Explosion specialMoveShield = Instantiate(specialMoveShieldPrefab, Services.playerTransform.position, Quaternion.identity, Services.playerTransform).GetComponent<Explosion>();
         specialMoveShield.explosionRadius = GunValueManager.MapToFloatRange(shieldExplosionRadiusRange);
 
         // Fire a missile every x seconds.
         if (missileTimer >= GunValueManager.MapToFloatRange(missileFireIntervalRange)) {
-            FireMissile();
+            Debug.Log(Mathf.CeilToInt(Time.deltaTime / GunValueManager.MapToFloatRange(missileFireIntervalRange)));
+            int missilesToFireThisFrame = 1 + Mathf.CeilToInt(Time.deltaTime / GunValueManager.MapToFloatRange(missileFireIntervalRange));
+            for (int i = 0; i < missilesToFireThisFrame; i++) {
+                FireMissile();
+            }
         } else {
             missileTimer += Time.deltaTime;
         }

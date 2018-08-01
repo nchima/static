@@ -12,6 +12,7 @@ public class MeleeEnemy : Enemy {
     public AudioSource humAudioSource;
     public AudioSource attackAudioSource;
     public MeleeEnemyAnimationController m_AnimationController;
+    [SerializeField] EnemyWeakPointGrower weakpoint;
 
     [HideInInspector] public float rotationSpeedMax = 2000f; // How quickly we rotate just when we're about to charge.
     float rotationSpeedCurrent; // The current rotation speed.
@@ -31,6 +32,7 @@ public class MeleeEnemy : Enemy {
         originalColor = sheatheMeshRenderer.material.GetColor("_Color");
         originalHumVolume = humAudioSource.volume;
         originalHumPitch = humAudioSource.pitch;
+        weakpoint.myDad = this;
     }
     
 
