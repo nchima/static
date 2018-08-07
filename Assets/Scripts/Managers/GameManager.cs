@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour {
     // RANDOM USEFUL STUFF
     public bool isGameStarted = false;
     Vector3 initialGravity;
+    const float PAUSE_INPUT_COOLDOWN = 0.2f;
+    float pauseInputCooldownTimer = 0.2f;
 
 
     void Awake() {
@@ -99,9 +101,9 @@ public class GameManager : MonoBehaviour {
 
 
     private void Update() {
-        if (InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead) {
-            if (!gamePaused) { PauseGame(true); } 
-            else { PauseGame(false); }
+        pauseInputCooldownTimer += Time.deltaTime;
+        if (!gamePaused && InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead && pauseInputCooldownTimer >= PAUSE_INPUT_COOLDOWN) {
+            PauseGame(true);
         }
     }
 
@@ -109,13 +111,14 @@ public class GameManager : MonoBehaviour {
     float memorizedTimeScale;
     public static bool gamePaused;
     public void PauseGame(bool value) {
-        Debug.Log("pausing game: " + value);
+        pauseInputCooldownTimer = 0f;
         if (value == true) {
             Services.uiManager.ShowPauseScreen();
             memorizedTimeScale = Time.timeScale;
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
+            Services.gun.canShoot = false;
             gamePaused = true;
         }
 
@@ -125,6 +128,7 @@ public class GameManager : MonoBehaviour {
             if (!isGameStarted) { Services.uiManager.titleScreen.SetActive(true); }
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+            Services.gun.canShoot = true;
             gamePaused = false;
         }
     }

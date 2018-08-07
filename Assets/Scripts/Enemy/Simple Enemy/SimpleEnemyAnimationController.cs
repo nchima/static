@@ -113,7 +113,7 @@ public class SimpleEnemyAnimationController : EnemyAnimationController {
 
             else {
                 transform.Rotate(Random.Range(-0.1f, 0.1f), rotationSpeed, Random.Range(-0.1f, 0.1f));
-                rotationSpeed *= 1.3f;
+                if (Time.deltaTime != 0) rotationSpeed *= 1.3f;
                 return false;
             }
         });

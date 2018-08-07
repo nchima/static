@@ -20,6 +20,10 @@ public class TitleScreenButtons : MonoBehaviour {
         Services.uiManager.ShowHighScoreScreen();
     }
 
+    public void OptionsButtonPressed() {
+        Services.uiManager.ShowOptionsScreen(true);
+    }
+
     public void CreditsButtonPressed() {
         Services.uiManager.ShowCreditsScreen(true);
     }

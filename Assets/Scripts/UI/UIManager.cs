@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour {
     public GameObject titleScreen;
     public GameObject episodeSelectScreen;
     public GameObject controlsScreen;
+    public GameObject optionsScreen;
     public GameObject creditsScreen;
     public GameObject levelCompleteScreen;
     public GameObject pauseScreen;
@@ -55,6 +56,13 @@ public class UIManager : MonoBehaviour {
     public void ShowEpisodeSelectScreen() {
         titleScreen.SetActive(false);
         episodeSelectScreen.SetActive(true);
+    }
+
+    
+    public void ShowOptionsScreen(bool value) {
+        if (Services.gameManager.isGameStarted) { pauseScreen.SetActive(!value); } 
+        else { titleScreen.SetActive(!value); }
+        optionsScreen.SetActive(value);
     }
 
 

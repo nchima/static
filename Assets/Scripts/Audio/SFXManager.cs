@@ -1,8 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class SFXManager : MonoBehaviour {
+
+    [SerializeField] AudioMixer sfxMasterMixer;
+    [SerializeField] FloatRange sfxMasterVolumeRange;
 
     [SerializeField] AudioSource bulletHitEnemyAudioSource;
     [SerializeField] AudioSource bulletHitWeakPointAudioSource;
@@ -46,5 +50,10 @@ public class SFXManager : MonoBehaviour {
         if (Services.healthManager.isInvincible) { return; }
 
         playerWasHurtAudioSource.Play();
+    }
+
+    public void SetVolume(float value) {
+        value = Mathf.Clamp01(value);
+        sfxMasterMixer.SetFloat("Master Volume", sfxMasterVolumeRange.MapTo(value, 0f, 1f));
     }
 }

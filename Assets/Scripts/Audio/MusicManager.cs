@@ -17,6 +17,9 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] FloatRange rhythmVolumeRange = new FloatRange(-5f, 5f);
     [SerializeField] FloatRange ABVolumeRange = new FloatRange(-5f, 5f);
 
+    [SerializeField] FloatRange masterVolumeRange;
+    [SerializeField] FloatRange musicMasterVolumeRange;
+
     enum State { Normal, SpeedFall, FallingSequence, DashCharging, Dashing }
     State state = State.Normal;
 
@@ -209,6 +212,18 @@ public class MusicManager : MonoBehaviour {
         musicMasterMixer.SetFloat("Layer B Volume", -80f);
         musicMasterMixer.SetFloat("Rhythm Volume", -80f);
         musicAudioSource.Play();
+    }
+
+
+    public void SetMasterVolume(float value) {
+        value = Mathf.Clamp01(value);
+        masterMixer.SetFloat("Master Volume", masterVolumeRange.MapTo(value, 0f, 1f));
+    }
+
+
+    public void SetMusicVolume(float value) {
+        value = Mathf.Clamp01(value);
+        musicMasterMixer.SetFloat("Master Volume", musicMasterVolumeRange.MapTo(value, 0f, 1f));
     }
 
 

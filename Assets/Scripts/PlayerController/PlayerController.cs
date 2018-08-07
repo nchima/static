@@ -23,9 +23,10 @@ public class PlayerController : MonoBehaviour {
     float movementKickTimer = 0f;
     float movementKickCooldown = 0.3f;
 
+    float knockbackModifier = 1f;
+
     // SHOTGUN CHARGE STUFF
     float shotGunChargeSpeed = 1000f;
-    float shotGunChargeMouseSensitivity = 0.76f;
 
     // DASHING STUFF
     [SerializeField] float dashDistance = 20f;
@@ -44,8 +45,6 @@ public class PlayerController : MonoBehaviour {
     float normalBounciness;
 
     // TURNING
-    [SerializeField] float mouseSensitivity;
-    [SerializeField] float controllerSensitivity;
     private Quaternion targetRotation;
 
     // STATE    
@@ -128,11 +127,10 @@ public class PlayerController : MonoBehaviour {
         }
 
         /* HANDLE VIEW ROTATION */
-        float _mouseSensitivity = mouseSensitivity;
-        if (InputManager.inputMode == InputManager.InputMode.Controller) { _mouseSensitivity = controllerSensitivity; }
-        if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
-        mouseInput = (InputManager.turningValue * (1 / Time.timeScale)) * _mouseSensitivity * Time.deltaTime;
-        float rotation = mouseInput;
+        //if (InputManager.inputMode == InputManager.InputMode.Controller) { _mouseSensitivity = controllerSensitivity; }
+        //if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
+        mouseInput = InputManager.turningValue * (1 / Time.timeScale) * Time.deltaTime;
+        float rotation = mouseInput * 50f;
         targetRotation *= Quaternion.Euler(0f, rotation, 0f);
         transform.localRotation = targetRotation;
 
@@ -141,7 +139,6 @@ public class PlayerController : MonoBehaviour {
             dashCooldownTimer += Time.deltaTime;
             if (dashCooldownTimer >= dashCooldown && dashRechargeTimer >= DASH_RECHARGE_TIME) {
                 if (InputManager.dashButtonDown && !isSuperDashCharging) {
-                    Debug.Log("begin dash");
                     BeginDash(false);
                 }
 
@@ -222,10 +219,22 @@ public class PlayerController : MonoBehaviour {
             // Keep player at floor level.
             if (isAboveFloor) { m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, 0f, m_Rigidbody.velocity.z); }
 
+            // Add charging movement.
             float tempSpeed = maxGroundSpeed;
             if (isSuperDashCharging) { tempSpeed *= DASH_CHARGING_MOVEMENT_MOD; }
+
+            // Add knockback & decrease modifier over time.
+            tempSpeed *= knockbackModifier;
+            if (Mathf.Abs(knockbackModifier - 1f) < 0.1f) {
+                knockbackModifier = 1f;
+            } else {
+                knockbackModifier = Mathf.Lerp(knockbackModifier, 1f, 0.99f * Time.deltaTime);
+                Debug.Log("knockback: " + knockbackModifier);
+            }
+
             m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, tempSpeed);
         }
+
         
         // Handle air movement.
         else if (state == State.Falling || state == State.SpeedFalling) {
@@ -251,6 +260,7 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+
     void CheckMovementKick() {
         // Check whether we should add movement kick.
         movementKickTimer += Time.fixedDeltaTime;
@@ -260,8 +270,8 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    void HandleCursorLocking()
-    {
+
+    void HandleCursorLocking() {
         if (!Services.gameManager.isGameStarted) { return; }
 
         if (InputManager.pauseButtonDown) {
@@ -273,15 +283,18 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+
     public void LockCursor() {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
+
     public void UnlockCursor() {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
+
 
     public void AddRecoil(float forceAmt) {
         //transform.Find("FirstPersonCharacter").transform.DOBlendableLocalRotateBy(new Vector3(-0.1f, 0f, 0f), 0.1f, RotateMode.Fast).SetLoops(1, LoopType.Yoyo);
@@ -364,6 +377,7 @@ public class PlayerController : MonoBehaviour {
         if (Services.healthManager.isInvincible) { return; }
 
         EndDashEarly();
+        knockbackModifier = 0.1f;
         movementKickReady = true;
     }
 

@@ -20,7 +20,7 @@ public class GunValueManager : MonoBehaviour {
     void Update() {
 
         // Change current gun value based on mouse Y movement.
-        float inputMod = 10f;
+        float inputMod = 1f;
         if (InputManager.inputMode == InputManager.InputMode.Controller) { inputMod = -2.9f; }
         if (Time.timeScale == 0) { inputMod = 0; }
         else { inputMod *= (1 / Time.timeScale); }

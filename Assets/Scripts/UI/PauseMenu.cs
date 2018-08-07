@@ -4,8 +4,13 @@ using System.Collections;
 
 public class PauseMenu : MonoBehaviour {
 
-    public void ResetButton()
-    {
+    private void Update() {
+        if (InputManager.cancelButtonDown || InputManager.pauseButtonDown) {
+            Services.gameManager.PauseGame(false);
+        }
+    }
+
+    public void ResetButton() {
         Services.gameManager.PauseGame(false);
 
         // Reload the scene.
@@ -15,6 +20,11 @@ public class PauseMenu : MonoBehaviour {
         // Unlock and show cursor.
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+    }
+
+
+    public void OptionsButtonPressed() {
+        Services.uiManager.ShowOptionsScreen(true);
     }
 
 

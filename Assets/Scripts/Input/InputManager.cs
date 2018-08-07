@@ -12,6 +12,10 @@ public class InputManager : MonoBehaviour {
     [HideInInspector] public static Vector2 movementAxis;
     [HideInInspector] public static float turningValue;
 
+    [HideInInspector] public static float mouseSensitivityOverall = 1.5f;
+    [HideInInspector] public static float mouseSensitivityXMod = 1.5f;
+    [HideInInspector] public static float mouseSensitivityYMod = 1.5f;
+
     [HideInInspector] public static float gunTuningValue;
 
     [HideInInspector] public static bool fireButton;
@@ -68,6 +72,7 @@ public class InputManager : MonoBehaviour {
 
 
     void Awake() {
+        RetrieveSavedSettings();
         inputMode = InputMode.MouseAndKeyboard;
     }
 
@@ -140,9 +145,9 @@ public class InputManager : MonoBehaviour {
         movementAxis.x = Input.GetAxisRaw("Horizontal Keyboard");
         movementAxis.y = Input.GetAxisRaw("Vertical Keyboard");
 
-        turningValue = Input.GetAxis("Mouse X");
+        turningValue = Input.GetAxis("Mouse X") * mouseSensitivityOverall * mouseSensitivityXMod;
 
-        gunTuningValue = Input.GetAxis("Mouse Y");
+        gunTuningValue = Input.GetAxis("Mouse Y") * mouseSensitivityOverall * mouseSensitivityYMod;
 
         fireButton = Input.GetButton("Fire Mouse and Keyboard");
         fireButtonDown = Input.GetButtonDown("Fire Mouse and Keyboard");
@@ -196,5 +201,27 @@ public class InputManager : MonoBehaviour {
 
         cancelButton = Input.GetButton("Cancel");
         cancelButtonDown = Input.GetButtonDown("Cancel");
+    }
+
+
+    public static void SaveSettings() {
+        PlayerPrefs.SetFloat("Overall Mouse Sensitivity", mouseSensitivityOverall);
+        PlayerPrefs.SetFloat("Mouse Sensitivity X Modifier", mouseSensitivityXMod);
+        PlayerPrefs.SetFloat("Mouse Sensitivity Y Modifier", mouseSensitivityYMod);
+    }
+
+
+    private void RetrieveSavedSettings() {
+        if (PlayerPrefs.GetFloat("Overall Mouse Sensitivity") != 0) {
+            mouseSensitivityOverall = PlayerPrefs.GetFloat("Overall Mouse Sensitivity");
+            mouseSensitivityXMod = PlayerPrefs.GetFloat("Mouse Sensitivity X Modifier");
+            mouseSensitivityYMod = PlayerPrefs.GetFloat("Mouse Sensitivity Y Modifier");
+        }
+
+        // If player prefs do not already exist for these settings, create them.
+        else {
+            Debug.Log("Creating player prefs.");
+            SaveSettings();
+        }
     }
 }
