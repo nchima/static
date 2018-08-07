@@ -44,6 +44,7 @@ public class LevelManager : MonoBehaviour {
             SetStartingLevelSet(startingLevelSetOverride);
 #endif
         } else {
+            Debug.Log("For some reason, I'm doing this.");
             SetStartingLevelSet(GetLevelSet("GDC Level Set"));
         }
 
@@ -135,13 +136,10 @@ public class LevelManager : MonoBehaviour {
 
     public void SetStartingLevelSet(LevelSet startingSet) {
 
-        Debug.Log("Setting starting level set to: " + startingSet.name);
-
 #if UNITY_EDITOR
         if (startingLevelSetOverride != null) {
             Debug.Log("Starting level overridden by user.");
-            currentLevelSet = startingLevelSetOverride;
-            return;
+            startingSet = startingLevelSetOverride;
         }
 #endif
 
@@ -150,6 +148,8 @@ public class LevelManager : MonoBehaviour {
         }
 
         currentLevelSet = startingSet;
+
+        Debug.Log("Setting starting level set to: " + currentLevelSet.name);
     }
 
 

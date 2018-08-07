@@ -346,6 +346,7 @@
     <Compile Include="Assets\Scripts\Pickups\PickupTrail.cs" />
     <Compile Include="Assets\Scripts\Pickups\PointPickup.cs" />
     <Compile Include="Assets\Scripts\Pickups\SpecialMoveAmmo.cs" />
+    <Compile Include="Assets\Scripts\Pickups\SpecialMoveRefillZone.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBullet.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletExperimental.cs" />
     <Compile Include="Assets\Scripts\Player Bullet\PlayerBulletMesh.cs" />
