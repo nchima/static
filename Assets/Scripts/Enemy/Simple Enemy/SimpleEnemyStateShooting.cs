@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
 
 public class SimpleEnemyStateShooting : State {
 
@@ -33,7 +32,6 @@ public class SimpleEnemyStateShooting : State {
         if (controller.navMeshAgent != null) controller.navMeshAgent.enabled = false;
 
         // Begin the charging up animation.
-        //if (controller.GetComponent<Animator>() != null) controller.GetComponent<Animator>().SetTrigger("ChargeUp");
         controller.animationController.StartAttackAnimation(preShotDelay, postShotDelay);
 
         foreach (ParticleSystem particleSystem in controller.chargeParticles.GetComponentsInChildren<ParticleSystem>()) {
@@ -41,17 +39,10 @@ public class SimpleEnemyStateShooting : State {
             particleSystem.Play();
         }
 
-        // I plan to redo this color system to let's not worry about it for now.
-        //attackingColorCurrent = Color.Lerp(attackingColorCurrent, attackingColorMax, 0.8f * Time.deltaTime);
-        //DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, attackingColorMax, preShotDelay * 0.8f).SetEase(Ease.InCubic).SetUpdate(true);
-
         yield return new WaitForSeconds(preShotDelay);
 
         // Fire a shot.
         FireShot(controller);
-
-        // Again, I'll worry about color later.
-        //DOTween.To(() => attackingColorCurrent, x => attackingColorCurrent = x, originalColor, postShotDelay * 0.1f).SetEase(Ease.Linear).SetUpdate(true);
 
         // Set the shot timer for the post shot delay.
         yield return new WaitForSeconds(postShotDelay);

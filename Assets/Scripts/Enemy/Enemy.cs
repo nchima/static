@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using DG.Tweening;
 
 public class Enemy : StateController {
 
@@ -20,7 +21,7 @@ public class Enemy : StateController {
             } else {
                 //hurtAudio.Play();
                 GetHurt();
-                TestPainChance();
+                //TestPainChance();
                 _currentHealth = value;
             }
         }
@@ -32,13 +33,15 @@ public class Enemy : StateController {
     [SerializeField] protected float painChance = 0.5f;
     static float painTime = 0.4f;
 
+    [HideInInspector] public bool isBeingKnockedBack = false;
+
     // SCORING
     public int scoreKillValue;  // How many points the player gets for killing this enemy.
     [SerializeField] float specialKillValue = 0.3f;
     public float bonusTimeAdded;    // How much time this enemy adds to the bonus timer at level generation.
 
     // MISC UTILITY
-    public bool canSeePlayer {
+    public bool CanSeePlayer {
         get {
             RaycastHit hit;
             if (Physics.Raycast(transform.position, Services.playerTransform.position - transform.position, out hit, 200f, 1 << 8 | 1 << 16)) {
@@ -48,7 +51,7 @@ public class Enemy : StateController {
             return false;
         }
     }
-    protected bool isGrounded {
+    protected bool IsGrounded {
         get {
             RaycastHit hit;
             if (Physics.Raycast(transform.position, Vector3.down, out hit, 10f) && hit.collider.name == "Floor") {
@@ -60,9 +63,11 @@ public class Enemy : StateController {
     }
     [HideInInspector] public bool isAIPaused;
     Coroutine painCoroutine;
+    List<Tween> activeTweens = new List<Tween>();
 
     // REFERENCES
     public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
+    private Rigidbody m_Rigidbody { get { return GetComponent<Rigidbody>(); } }
     [SerializeField] protected GameObject myGeometry;
 
 
@@ -97,6 +102,7 @@ public class Enemy : StateController {
         // Check to see if there is a path on the navmesh to the new position.
         NavMeshHit currentPositionNavMeshHit;
         NavMesh.SamplePosition(transform.position, out currentPositionNavMeshHit, 5f, NavMesh.AllAreas);
+
         if (!NavMesh.Raycast(currentPositionNavMeshHit.position, destinationNavMeshHit.position, out currentPositionNavMeshHit, NavMesh.AllAreas)) {
             return false;
         }
@@ -135,6 +141,29 @@ public class Enemy : StateController {
         ReturnToInitialState();
         isAIPaused = !value;
     }
+
+    public void StopAllActiveTweens() {
+        for  (int i = activeTweens.Count - 1; i >= 0; i--) {
+            activeTweens[i].Complete();
+        }
+        activeTweens.Clear();
+    }
+
+
+    //void KnockBack() {
+    //    BecomePhysicsObject(true);
+    //    m_Rigidbody.AddExplosionForce(25f, transform.position, 25f, 25f, ForceMode.Impulse);
+    //}
+
+
+    // This is not going to work :-(
+    //void BecomePhysicsObject(bool value) {
+    //    m_NavMeshAgent.isStopped = value;
+    //    m_Rigidbody.isKinematic = !value;
+    //    if (value == true) { m_Rigidbody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ; }
+    //    else { m_Rigidbody.constraints = RigidbodyConstraints.None; }
+    //    m_Rigidbody.useGravity = value;
+    //}
 
 
     private void OnTriggerEnter(Collider other) {

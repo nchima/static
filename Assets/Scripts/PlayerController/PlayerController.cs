@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour {
     float movementKickCooldown = 0.3f;
 
     float knockbackModifier = 1f;
+    float knockbackTimer = 0f;
 
     // SHOTGUN CHARGE STUFF
     float shotGunChargeSpeed = 1000f;
@@ -208,12 +209,7 @@ public class PlayerController : MonoBehaviour {
             // Apply movement kick.
             CheckMovementKick();
             if (directionalInput != Vector2.zero && movementKickReady) {
-                lastKickDirection = directionalInput;
-                movementKickTimer = 0f;
-                movementKickReady = false;
-                Vector3 kickForce = desiredMove.normalized * movementKickForce;
-                kickForce.y = 0f;
-                m_Rigidbody.AddForce(kickForce, ForceMode.VelocityChange);
+                AddMovementKick(desiredMove);
             }
 
             // Keep player at floor level.
@@ -225,11 +221,11 @@ public class PlayerController : MonoBehaviour {
 
             // Add knockback & decrease modifier over time.
             tempSpeed *= knockbackModifier;
-            if (Mathf.Abs(knockbackModifier - 1f) < 0.1f) {
+            if (knockbackModifier != 1 && knockbackTimer >= 0.65f) {
                 knockbackModifier = 1f;
+                AddMovementKick(desiredMove);
             } else {
-                knockbackModifier = Mathf.Lerp(knockbackModifier, 1f, 0.99f * Time.deltaTime);
-                Debug.Log("knockback: " + knockbackModifier);
+                knockbackTimer += Time.deltaTime;
             }
 
             m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, tempSpeed);
@@ -271,6 +267,16 @@ public class PlayerController : MonoBehaviour {
     }
 
 
+    void AddMovementKick(Vector3 desiredMove) {
+        lastKickDirection = directionalInput;
+        movementKickTimer = 0f;
+        movementKickReady = false;
+        Vector3 kickForce = desiredMove.normalized * movementKickForce;
+        kickForce.y = 0f;
+        m_Rigidbody.AddForce(kickForce, ForceMode.VelocityChange);
+    }
+
+
     void HandleCursorLocking() {
         if (!Services.gameManager.isGameStarted) { return; }
 
@@ -306,10 +312,12 @@ public class PlayerController : MonoBehaviour {
         GetComponent<Rigidbody>().AddForce(forceVector, ForceMode.Impulse);
     }
 
+
     void BeginDash(bool buttonHeld) {
         state = State.Dashing;
         dashCoroutine = StartCoroutine(DashCoroutine(buttonHeld));
     }
+
 
     IEnumerator DashCoroutine(bool buttonHeld) {
         Vector3 dashDirection = transform.forward * directionalInput.y + transform.right * directionalInput.x;
@@ -343,6 +351,7 @@ public class PlayerController : MonoBehaviour {
         yield return null;
     }
 
+
     void EndDashEarly() {
         if (state == State.Falling || state == State.SpeedFalling) { return; }
         if (dashCoroutine != null) { StopCoroutine(dashCoroutine); }
@@ -353,11 +362,13 @@ public class PlayerController : MonoBehaviour {
         state = State.Normal;
     }
 
+
     void IgnoreCollisionsWithRailings(bool ignore) {
         foreach(GameObject railing in GameObject.FindGameObjectsWithTag("Railing")) {
             Physics.IgnoreCollision(GetComponent<Collider>(), railing.GetComponent<Collider>(), ignore);
         }
     }
+
 
     private void OnCollisionEnter(Collision collision) {
         // If the player collides with a wall while shotgun charging, end the shotgun charge.
@@ -373,19 +384,23 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
+
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
         EndDashEarly();
-        knockbackModifier = 0.1f;
+        knockbackModifier = 0.3f;
+        knockbackTimer = 0f;
         movementKickReady = true;
     }
+
 
     public void GameOverHandler(GameEvent gameEvent) {
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         state = State.Dead;
         this.enabled = false;
     }
+
 
     public void GameStartedHandler(GameEvent gameEvent) {
         isMovementEnabled = true;
