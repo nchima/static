@@ -21,6 +21,11 @@ public class EnemyWeakPointGrower : MonoBehaviour {
     }
 
     private void Update() {
+
+        if (myDad.isBeingKnockedBack) {
+            SetColliderActive(false);
+        }
+
         if (keepInFrontOffset != 0 && transform.localScale.magnitude > 0f) {
             // Billboard
             transform.LookAt(Services.playerTransform);
@@ -40,23 +45,28 @@ public class EnemyWeakPointGrower : MonoBehaviour {
         }
     }
 
+    private void SetColliderActive(bool value) {
+        if (myDad.isBeingKnockedBack) { value = false; }
+        GetComponent<Collider>().enabled = value;
+    }
+
     public void SetScale(float scale) {
         transform.localScale = Vector3.Lerp(minSizeScale, fullSizeScale, scale);
     }
 
     public void Grow(float duration) {
-        GetComponent<Collider>().enabled = true;
+        SetColliderActive(true);
         transform.DOScale(fullSizeScale, duration);
-    }
-
-    public void Shrink(float duration) {
-        StartCoroutine(ShrinkCoroutine(duration));
     }
 
     public void YouHurtMyDad(int howMuchYouHurtMyDad) {
         if (myDad == null) { Debug.Log("My Dad Equals Null"); return; }
         hitsLastFrame++;
         myDad.currentHealth -= howMuchYouHurtMyDad;
+    }
+
+    public void Shrink(float duration) {
+        StartCoroutine(ShrinkCoroutine(duration));
     }
 
     IEnumerator ShrinkCoroutine(float duration) {

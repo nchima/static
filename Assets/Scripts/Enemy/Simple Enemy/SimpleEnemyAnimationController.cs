@@ -74,9 +74,9 @@ public class SimpleEnemyAnimationController : EnemyAnimationController {
         float duration = Random.Range(0.8f, 1f);
         Vector3 newRotation = Random.rotation.eulerAngles;
         transform.DOLocalRotate(newRotation, duration).SetEase(Ease.Linear);
-        DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), duration).SetEase(Ease.Linear);
-        DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), duration).SetEase(Ease.Linear);
-        DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), duration).SetEase(Ease.Linear);
+        activeTweens.Add(DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), duration).SetEase(Ease.Linear));
+        activeTweens.Add(DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), duration).SetEase(Ease.Linear));
+        activeTweens.Add(DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), duration).SetEase(Ease.Linear));
         yield return new WaitForSeconds(duration);
         baseBlendWeight0 = currentBlendWeight0;
         baseBlendWeight1 = currentBlendWeight1;
@@ -89,15 +89,15 @@ public class SimpleEnemyAnimationController : EnemyAnimationController {
     public void StartAttackAnimation(float preShotDelay, float postShotDelay) {
         animationState = AnimationState.WaitForCoroutine;
         if (tweenBlendWeightsCoroutine != null) { StopCoroutine(tweenBlendWeightsCoroutine); }
-        StartCoroutine(AttackCoroutine(preShotDelay, postShotDelay));
+        activeCoroutines.Add(StartCoroutine(AttackCoroutine(preShotDelay, postShotDelay)));
     }
 
 
     IEnumerator AttackCoroutine(float preShotDelay, float postShotDelay) {
         // Tween blend values to zero
-        DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, 0f, preShotDelay * 0.8f);
-        DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, 0f, preShotDelay * 0.8f);
-        DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, 0f, preShotDelay * 0.8f);
+        activeTweens.Add(DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, 0f, preShotDelay * 0.8f));
+        activeTweens.Add(DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, 0f, preShotDelay * 0.8f));
+        activeTweens.Add(DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, 0f, preShotDelay * 0.8f));
 
         // Expand
         transform.DOScale(1.3f, preShotDelay);
@@ -123,9 +123,9 @@ public class SimpleEnemyAnimationController : EnemyAnimationController {
         // Shrink
         transform.DOScale(1f, postShotDelay);
 
-        DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear);
-        DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear);
-        DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear);
+        activeTweens.Add(DOTween.To(() => currentBlendWeight0, x => currentBlendWeight0 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear));
+        activeTweens.Add(DOTween.To(() => currentBlendWeight1, x => currentBlendWeight1 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear));
+        activeTweens.Add(DOTween.To(() => currentBlendWeight2, x => currentBlendWeight2 = x, Random.Range(vibrationIntensityRange, 100f - vibrationIntensityRange), postShotDelay).SetEase(Ease.Linear));
 
         // Rotate slower and slower until timer expires.
         timer = 0f;

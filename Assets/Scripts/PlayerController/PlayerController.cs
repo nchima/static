@@ -226,7 +226,6 @@ public class PlayerController : MonoBehaviour {
                 AddMovementKick(desiredMove);
             } else {
                 knockbackTimer += Time.deltaTime;
-                Debug.Log("knockback: " + knockbackModifier);
             }
 
             m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, tempSpeed);

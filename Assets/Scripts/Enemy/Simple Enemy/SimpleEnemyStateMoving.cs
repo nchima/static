@@ -16,10 +16,7 @@ public class SimpleEnemyStateMoving : State {
 
     public override void Initialize(StateController stateController) {
         base.Initialize(stateController);
-
-        SimpleEnemy controller = stateController as SimpleEnemy;
-
-        ChooseNewDestination(controller);
+        ChooseNewDestination(stateController);
     }
 
 

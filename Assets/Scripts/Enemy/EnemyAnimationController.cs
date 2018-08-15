@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class EnemyAnimationController : MonoBehaviour {
 
@@ -11,8 +12,9 @@ public class EnemyAnimationController : MonoBehaviour {
 
     // We need to use this because of the simple enemies; right now they don't use blend shapes.
     protected Renderer[] renderers;
-
     protected Coroutine[] getHurtCoroutines;
+    protected List<Coroutine> activeCoroutines;
+    protected List<Tween> activeTweens = new List<Tween>();
 
 
     protected virtual void Start() {
@@ -47,5 +49,21 @@ public class EnemyAnimationController : MonoBehaviour {
             objectToFlash.layer = LayerMask.NameToLayer("Enemies");
         }
         yield return null;
+    }
+
+
+    public void StopAllAnimations() {
+        // Stop all active tweens.
+        for (int i = activeTweens.Count - 1; i >= 0; i--) {
+            activeTweens[i].Complete();
+            activeTweens.RemoveAt(i);
+        }
+
+        // Reset all blendshape values to 0.
+        for (int i = 0; i < 20; i++) {
+            foreach (SkinnedMeshRenderer renderer in blendRenderers) {
+                renderer.SetBlendShapeWeight(i, 0f);
+            }
+        }
     }
 }
