@@ -15,23 +15,25 @@ public class SpecialMoveEarnedPrompt : MonoBehaviour {
     bool memorized = false;
 
     RectTransform m_RectTransform { get{ return GetComponent<RectTransform>(); } }
+    Text m_Text { get { return GetComponent<Text>(); } }
 
 
     private void Start() {
         if (!memorized) {
-            startingPosition = transform.parent.parent.localPosition;
+            startingPosition = transform.parent.localPosition;
             startingSize = m_RectTransform.sizeDelta;
             memorized = true;
+            m_Text.enabled = false;
         }
     }
 
 
     public void Activate() {
         if (moveCoroutine != null) {
-            transform.parent.parent.localPosition = startingPosition;
-            m_RectTransform.sizeDelta = startingSize;
-            gameObject.SetActive(false);
             StopCoroutine(moveCoroutine);
+            transform.parent.localPosition = startingPosition;
+            m_RectTransform.sizeDelta = startingSize;
+            m_Text.enabled = false;
         }
         StartCoroutine(MoveCoroutine());
     }
@@ -39,20 +41,22 @@ public class SpecialMoveEarnedPrompt : MonoBehaviour {
 
     Coroutine moveCoroutine;
     IEnumerator MoveCoroutine() {
+        m_Text.enabled = true;
+
         // Hang in place for a sec
         float duration = 2.5f;
         yield return new WaitForSeconds(duration);
 
         // Move and shrink
         duration = 0.5f;
-        transform.parent.parent.DOLocalMove(endingPosition, duration);
+        transform.parent.DOLocalMove(endingPosition, duration);
         m_RectTransform.DOSizeDelta(endingSize, duration);
         yield return new WaitForSeconds(duration + 0.1f);
 
         // Move back to original position/size and disable
-        transform.parent.parent.localPosition = startingPosition;
+        transform.parent.localPosition = startingPosition;
         m_RectTransform.sizeDelta = startingSize;
-        gameObject.SetActive(false);
+        m_Text.enabled = false;
 
         yield return null;
     }

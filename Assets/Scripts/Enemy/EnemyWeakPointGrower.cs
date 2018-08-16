@@ -22,7 +22,7 @@ public class EnemyWeakPointGrower : MonoBehaviour {
 
     private void Update() {
 
-        if (myDad.isBeingKnockedBack) {
+        if (myDad != null && myDad.isBeingKnockedBack) {
             SetColliderActive(false);
         }
 

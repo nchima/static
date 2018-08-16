@@ -27,12 +27,20 @@ public class SpecialBarManager : MonoBehaviour {
 
     [HideInInspector] public bool screenHidden = false;
 
-    public bool bothBarsFull {
+    public bool BothFirstBarsFull {
         get {
             if (debug_AlwaysMax) { return true; }
             return leftBar.CurrentValue >= 0.99f && rightBar.CurrentValue >= 0.99f;
         }
     }
+
+    public bool BothSecondBarsFull {
+        get {
+            if (debug_AlwaysMax) { return true; }
+            return leftBar.CurrentValue >= 1.99f && rightBar.CurrentValue >= 1.99f;
+        }
+    }
+
 
     [SerializeField] int maxSavedShots = 2;
     private int shotsSaved;
@@ -42,13 +50,13 @@ public class SpecialBarManager : MonoBehaviour {
         }
 
         set {
-            shotsSaved = Mathf.Clamp(value, 0, maxSavedShots);
-            if (shotsSaved == 1) {
-                savedShotBoxes[0].SetActive(true);
-                earnedPrompt.gameObject.SetActive(true);
-                earnedPrompt.Activate();
-            }
-            else { savedShotBoxes[0].SetActive(false); }
+            shotsSaved = Mathf.Clamp(value, 0, maxSavedShots+1);
+            //if (shotsSaved == 1) {
+            //    savedShotBoxes[0].SetActive(true);
+            //    earnedPrompt.gameObject.SetActive(true);
+            //    earnedPrompt.Activate();
+            //}
+            //else { savedShotBoxes[0].SetActive(false); }
         }
     }
 
@@ -73,21 +81,55 @@ public class SpecialBarManager : MonoBehaviour {
         rightBar.Run(this);
 
         if (!screenHidden && Services.playerController.state != PlayerController.State.Dead) {
-
-            if (bothBarsFull) {
-                if (ShotsSaved < maxSavedShots) {
-                    ShotsSaved++;
-                    leftBar.CurrentValue = 0f;
-                    rightBar.CurrentValue = 0f;
-                    leftBar.fullBar.SetActive(true);
-                    rightBar.fullBar.SetActive(true);
-                } else {
-                    earnedPrompt.gameObject.SetActive(true);
-                    earnedPrompt.Activate();
-                    savedShotBoxes[1].SetActive(true);
-                }
+            if (BothFirstBarsFull && ShotsSaved < 1) {
+                AddAmmoCharge();
             }
+
+            if (BothSecondBarsFull && ShotsSaved < 2) {
+                AddAmmoCharge();
+            }
+
+            if (!BothSecondBarsFull && ShotsSaved > 1) {
+                RemoveAmmoCharge();
+            }
+
+            if (!BothFirstBarsFull && ShotsSaved > 0) {
+                RemoveAmmoCharge();
+            }
+
+            //if (BothFirstBarsFull) {
+            //    if (ShotsSaved < maxSavedShots) {
+            //        ShotsSaved++;
+            //        leftBar.CurrentValue = 0f;
+            //        rightBar.CurrentValue = 0f;
+            //    } else {
+            //        earnedPrompt.gameObject.SetActive(true);
+            //        earnedPrompt.Activate();
+            //        savedShotBoxes[1].SetActive(true);
+            //    }
+            //}
         }
+    }
+
+
+    void AddAmmoCharge() {
+        Debug.Log("adding ammo");
+        ShotsSaved++;
+        earnedPrompt.gameObject.SetActive(true);
+        earnedPrompt.Activate();
+        savedShotBoxes[ShotsSaved - 1].SetActive(true);
+    }
+
+
+    void RemoveAmmoCharge() {
+        Debug.Log("removing ammo");
+        ShotsSaved--;
+        savedShotBoxes[ShotsSaved].SetActive(false);
+        //if (ShotsSaved == maxSavedShots && bothFirstBarsFull) {
+        //    savedShotBoxes[1].SetActive(false);
+        //} else {
+        //    ShotsSaved--;
+        //}
     }
 
 
@@ -116,21 +158,14 @@ public class SpecialBarManager : MonoBehaviour {
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
-        leftBar.CurrentValue -= getHurtPenalty;
-        rightBar.CurrentValue -= getHurtPenalty;
+        //leftBar.CurrentValue -= getHurtPenalty;
+        //rightBar.CurrentValue -= getHurtPenalty;
     }
 
 
     public void PlayerUsedSpecialMove() {
-        if (ShotsSaved == maxSavedShots && bothBarsFull) {
-            leftBar.CurrentValue = 0f;
-            rightBar.CurrentValue = 0f;
-            savedShotBoxes[1].SetActive(false);
-        } else {
-            ShotsSaved--;
-            leftBar.fullBar.SetActive(false);
-            rightBar.fullBar.SetActive(false);
-        }
+        leftBar.CurrentValue -= 1f;
+        rightBar.CurrentValue -= 1f;
     }
 
 

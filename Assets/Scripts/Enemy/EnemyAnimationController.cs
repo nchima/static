@@ -14,7 +14,6 @@ public class EnemyAnimationController : MonoBehaviour {
     protected Renderer[] renderers;
     protected Coroutine[] getHurtCoroutines;
     protected List<Coroutine> activeCoroutines;
-    protected List<Tween> activeTweens = new List<Tween>();
 
 
     protected virtual void Start() {
@@ -54,10 +53,10 @@ public class EnemyAnimationController : MonoBehaviour {
 
     public void StopAllAnimations() {
         // Stop all active tweens.
-        for (int i = activeTweens.Count - 1; i >= 0; i--) {
-            activeTweens[i].Complete();
-            activeTweens.RemoveAt(i);
-        }
+        //for (int i = activeTweens.Count - 1; i >= 0; i--) {
+        //    activeTweens[i].Complete();
+        //    activeTweens.RemoveAt(i);
+        //}
 
         // Reset all blendshape values to 0.
         for (int i = 0; i < 20; i++) {

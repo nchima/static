@@ -44,7 +44,6 @@ public class LevelManager : MonoBehaviour {
             SetStartingLevelSet(startingLevelSetOverride);
 #endif
         } else {
-            Debug.Log("For some reason, I'm doing this.");
             SetStartingLevelSet(GetLevelSet("GDC Level Set"));
         }
 

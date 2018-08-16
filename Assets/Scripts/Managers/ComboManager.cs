@@ -9,7 +9,8 @@ public class ComboManager : MonoBehaviour {
     [SerializeField] Text comboTextDisplay;
     [SerializeField] Text comboScoreDisplay;
     [SerializeField] GameObject timerBar;
-    [SerializeField] FloatRange timerBarLengthRange = new FloatRange(0f, 5f);
+    [SerializeField] Transform timerBarReference;
+    //[SerializeField] FloatRange timerBarLengthRange = new FloatRange(0f, 5f);
 
     enum State { ComboActive, ComboIdle }
     State state;
@@ -81,8 +82,12 @@ public class ComboManager : MonoBehaviour {
             }
 
             Vector3 newTimerBarScale = timerBar.transform.localScale;
-            newTimerBarScale.x = timerBarLengthRange.MapTo(comboTimer, 0f, MAX_COMBO_TIME);
+            newTimerBarScale.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, 0.001f, timerBarReference.localScale.x);
             timerBar.transform.localScale = newTimerBarScale;
+
+            Vector3 newTimerBarPosition = timerBar.transform.localPosition;
+            newTimerBarPosition.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, timerBarReference.localPosition.x - timerBarReference.localScale.x * 0.5f, timerBarReference.localPosition.x);
+            timerBar.transform.localPosition = newTimerBarPosition;
 
             comboTextDisplay.text = GenerateComboTextString();
             comboScoreDisplay.text = GetComboTotalAsString();

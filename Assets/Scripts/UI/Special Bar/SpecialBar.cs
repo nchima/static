@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpecialBar : MonoBehaviour {
 
-    [SerializeField] TextMesh percentageText;
-    public GameObject fullBar;
+    [SerializeField] Text percentageText;
+    [SerializeField] SpecialBarSizeController bar1SizeController;
+    [SerializeField] SpecialBarSizeController bar2SizeController;
 
     float currentValue;
     public float CurrentValue {
@@ -14,37 +16,24 @@ public class SpecialBar : MonoBehaviour {
         }
 
         set {
-            value = Mathf.Clamp01(value);
-            sizeController.percentageFilled = value;
+            if (value >= 1f && !Services.specialBarManager.BothFirstBarsFull) { value = Mathf.Clamp01(value); }
+            else { value = Mathf.Clamp(value, 0f, 2f); }
+            bar1SizeController.percentageFilled = Mathf.Clamp01(value);
+            bar2SizeController.percentageFilled = Mathf.Clamp01(value - 1);
             currentValue = value;
         }
     }
 
-    [HideInInspector] public bool barIsFull;
+    bool barIsFull;
     float stickToFullTimer = 0f;    // Used to make the bar stay at full for a certain amount of time.
-
-    [HideInInspector] public bool freezeDecay = false;
-
-    // Colors
-    Color fullColor = Color.white;
-    Color readyColor1 = new Color(1f, 1f, 0f);
-    Color readyColor2 = new Color(1f, 0f, 0f);
-
-    [HideInInspector] public SpecialBarSizeController sizeController;
-
-
-    private void Awake() {
-        sizeController = GetComponentInChildren<SpecialBarSizeController>();
-    }
 
 
     public void Initialize(SpecialBarManager manager) {
-        currentValue = manager.startValue;
+        CurrentValue = manager.startValue;
     }
 
 
     public void Run(SpecialBarManager manager) {
-
         // If bar is at max, keep it there for a moment to make things easier for the player.
         if (barIsFull) {
             //barBorderObject.GetComponent<MeshRenderer>().material.color = Color.Lerp(readyColor1, readyColor2, Random.value);

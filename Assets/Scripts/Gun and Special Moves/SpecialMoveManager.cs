@@ -20,7 +20,7 @@ public class SpecialMoveManager : MonoBehaviour {
     [SerializeField] GameObject specialMoveShieldPrefab;
 
     /* OTHER STUF */
-    public bool HasAmmo { get { return Services.specialBarManager.bothBarsFull || Services.specialBarManager.ShotsSaved > 0; } }
+    public bool HasAmmo { get { return Services.specialBarManager.BothFirstBarsFull || Services.specialBarManager.ShotsSaved > 0; } }
 
     int missilesFired = 0;
     float missileTimer;
@@ -36,8 +36,6 @@ public class SpecialMoveManager : MonoBehaviour {
     private void Start() {
         originalCameraPosition = Services.fieldOfViewController.transform.localPosition;
         originalCameraRotation = Quaternion.Euler(Vector3.zero);
-
-        Debug.Log("orig pos: " + originalCameraPosition);
     }
 
 

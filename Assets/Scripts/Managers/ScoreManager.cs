@@ -29,8 +29,8 @@ public class ScoreManager : MonoBehaviour
             scoreDisplay.text = score.ToString();
         }
     }// The player's current score. 
-    [SerializeField] private TextMesh scoreDisplay;   // A reference to the TextMesh which displays the score.
-    [SerializeField] private TextMesh highScoreDisplay; // A reference to the TextMesh which displays the current high score at the top of the screen.
+    [SerializeField] private Text scoreDisplay;   // A reference to the TextMesh which displays the score.
+    [SerializeField] private Text highScoreDisplay; // A reference to the TextMesh which displays the current high score at the top of the screen.
 
     [SerializeField] private TextMesh multNumber; // The TextMesh which displays the player's current multiplier.
     float multiplier = 1f;  // The multiplier that the player starts the game with.
