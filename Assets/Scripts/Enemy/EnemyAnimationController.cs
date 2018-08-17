@@ -40,11 +40,12 @@ public class EnemyAnimationController : MonoBehaviour {
     float getHurtTime = 0.1f;
     Coroutine getHurtCoroutine;
     private IEnumerator GetHurtCoroutine(GameObject objectToFlash) {
+        if (objectToFlash.name.ToLower().Contains("mask")) { yield break; }
         objectToFlash.layer = LayerMask.NameToLayer("Enemy Hit");
         yield return new WaitForSeconds(getHurtTime);
         if (objectToFlash.name.ToLower().Contains("sheathe")) {
             objectToFlash.layer = LayerMask.NameToLayer("Enemy Sheathe");
-        } else {
+        } else if (!objectToFlash.name.ToLower().Contains("mask")) {
             objectToFlash.layer = LayerMask.NameToLayer("Enemies");
         }
         yield return null;

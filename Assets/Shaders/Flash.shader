@@ -63,7 +63,7 @@
 				// sample the texture
 				fixed4 col = tex2D(_MainTex, i.uv);
 			
-				clip(col.a - 1);
+				clip(col.a - 0.1);
 
 			    float3 COLOR_MASKS[4];
 				COLOR_MASKS[0] = _FlashColor1;

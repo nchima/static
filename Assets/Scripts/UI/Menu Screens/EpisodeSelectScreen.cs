@@ -19,6 +19,11 @@ public class EpisodeSelectScreen : MonoBehaviour {
         GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
     }
 
+    public void IslandsButton() {
+        Services.levelManager.SetStartingLevelSet("Islands Level Set");
+        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
+    }
+
     public void BackButton() {
         Services.uiManager.ShowTitleScreen(true);
     }
