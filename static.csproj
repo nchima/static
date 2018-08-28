@@ -408,6 +408,7 @@
     <Compile Include="Assets\Scripts\Util\PerlinNoise.cs" />
     <Compile Include="Assets\Scripts\Util\PooledObject.cs" />
     <Compile Include="Assets\Scripts\Util\ReportTriggerToParent.cs" />
+    <Compile Include="Assets\Scripts\Util\TextUtil.cs" />
     <Compile Include="Assets\Scripts\Util\Timer.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\AlphaCutoffJitter.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\BatchBillboard.cs" />

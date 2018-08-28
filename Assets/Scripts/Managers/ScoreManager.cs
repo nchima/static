@@ -26,7 +26,7 @@ public class ScoreManager : MonoBehaviour
             inputValue = Mathf.RoundToInt(inputValue * Multiplier);
             Services.healthManager.ApplyPointsToBonus(inputValue);
             score += inputValue;
-            scoreDisplay.text = score.ToString();
+            scoreDisplay.text = TextUtil.AddZerosToBeginningOfNumber(Score, 9);
         }
     }// The player's current score. 
     [SerializeField] private Text scoreDisplay;   // A reference to the TextMesh which displays the score.
@@ -89,7 +89,7 @@ public class ScoreManager : MonoBehaviour
         highScoreEntries = RetrieveHighScores();
 
         // Set up the score and multiplier number displays.
-        scoreDisplay.text = Score.ToString();
+        Score = 0;
         multNumber.text = Multiplier.ToString() + "X";
     }
 
@@ -115,7 +115,7 @@ public class ScoreManager : MonoBehaviour
 
     public void UpdateHighScoreDisplay() {
         if (leaderboardType == LeaderboardType.Local) {
-            highScoreDisplay.text = GetHighestScore().name + ": " + GetHighestScore().score.ToString();
+            highScoreDisplay.text = GetHighestScore().name + ": " + TextUtil.AddZerosToBeginningOfNumber(GetHighestScore().score, 9);
         } else if (leaderboardType == LeaderboardType.Steam) {
             StartCoroutine(UpdateHighScoreDisplayCoroutine());
         }
@@ -130,7 +130,7 @@ public class ScoreManager : MonoBehaviour
             if (Services.steamLeaderboardManager.isScoreEntriesDownloaded) { return true; } else { return false; }
         });
 
-        highScoreDisplay.text = Services.steamLeaderboardManager.GetDownloadedLeaderboardEntry(0).m_nScore.ToString();
+        highScoreDisplay.text = TextUtil.AddZerosToBeginningOfNumber(Services.steamLeaderboardManager.GetDownloadedLeaderboardEntry(0).m_nScore, 9);
 
         yield return null;
     }

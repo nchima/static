@@ -7,8 +7,9 @@ using DG.Tweening;
 public class ComboManager : MonoBehaviour {
 
     // References
-    [SerializeField] Text comboTextDisplay;
-    [SerializeField] Text comboScoreDisplay;
+    [SerializeField] Text textDisplay;
+    [SerializeField] Text scoreDisplay;
+    [SerializeField] Text multiplierDisplay;
     [SerializeField] GameObject timerBar;
     [SerializeField] Transform timerBarReference;
     [SerializeField] float fontSizeIncreaseFactor = 2f;
@@ -54,9 +55,11 @@ public class ComboManager : MonoBehaviour {
     int bullseyes = 0;
     int timesSpecialMoveUsed = 0;
 
-    int initialFontSize;
+    int initialMultiplierFontSize;
     float modifiedFontSize;
-    int CurrentFontSize { get { return Mathf.FloorToInt(MyMath.Map(GetMultipliedTotal(), 0, 100000, initialFontSize, 800)); } }
+    int CurrentMultiplierFontSize { get { return Mathf.FloorToInt(MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierFontSize, 2000)); } }
+    float initialMultiplierScale;
+    float CurrentMultiplierScale { get { return MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierScale, 0.027f); } }
 
     int CurrentMultiplier { get { return simpleEnemiesKilled + meleeEnemiesKilled + laserEnemiesKilled + tankEnemiesKilled + hoverEnemiesKilled + bossEnemiesKilled + bullseyes + pickupsObtained + timesSpecialMoveUsed + levelsCompleted + 1; } }
 
@@ -81,11 +84,13 @@ public class ComboManager : MonoBehaviour {
     }
 
     private void Awake() {
-        initialFontSize = comboScoreDisplay.fontSize;
-        modifiedFontSize = initialFontSize;
+        initialMultiplierFontSize = multiplierDisplay.fontSize;
+        modifiedFontSize = initialMultiplierFontSize;
+        initialMultiplierScale = multiplierDisplay.rectTransform.localScale.x;
 
-        comboTextDisplay.text = "";
-        comboScoreDisplay.text = "";
+        textDisplay.text = "";
+        multiplierDisplay.text = "";
+        scoreDisplay.text = "";
         timerBar.SetActive(false);
     }
 
@@ -105,11 +110,19 @@ public class ComboManager : MonoBehaviour {
             newTimerBarPosition.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, timerBarReference.localPosition.x - timerBarReference.localScale.x * 0.5f, timerBarReference.localPosition.x);
             timerBar.transform.localPosition = newTimerBarPosition;
 
-            comboTextDisplay.text = GenerateComboTextString();
-            comboScoreDisplay.text = GetComboTotalAsString();
+            textDisplay.text = GenerateComboTextString();
+            scoreDisplay.text = GetUnmultipliedTotal().ToString();
+            multiplierDisplay.text = "X" + CurrentMultiplier.ToString();
         }
         
-        comboScoreDisplay.fontSize = Mathf.FloorToInt(modifiedFontSize);
+        // Update size of multiplier display
+        multiplierDisplay.fontSize = Mathf.FloorToInt(modifiedFontSize);
+
+        // Move the multiplier display the correct distance from the score display
+        Vector3 newPosition = scoreDisplay.transform.localPosition;
+        newPosition.y = multiplierDisplay.rectTransform.localPosition.y;
+        newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x + 0.3f;
+        multiplierDisplay.rectTransform.localPosition = newPosition;
     }
 
     private void StartCombo() {
@@ -120,9 +133,9 @@ public class ComboManager : MonoBehaviour {
 
     private void EndCombo() {
         Debug.Log("ending combo");
-        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, comboScoreDisplay.transform.parent).GetComponent<ComboFinisher>();
-        comboFinisher.transform.position = comboScoreDisplay.transform.position;
-        comboFinisher.Initialize(GetMultipliedTotal(), CurrentFontSize);
+        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, scoreDisplay.transform.parent).GetComponent<ComboFinisher>();
+        comboFinisher.transform.position = scoreDisplay.transform.position;
+        comboFinisher.Initialize(GetMultipliedTotal(), CurrentMultiplierFontSize);
 
         simpleEnemiesKilled = 0;
         meleeEnemiesKilled = 0;
@@ -135,8 +148,9 @@ public class ComboManager : MonoBehaviour {
         bullseyes = 0;
         timesSpecialMoveUsed = 0;
 
-        comboTextDisplay.text = "";
-        comboScoreDisplay.text = "";
+        textDisplay.text = "";
+        scoreDisplay.text = "";
+        multiplierDisplay.text = "";
 
         timerBar.SetActive(false);
 
@@ -287,33 +301,35 @@ public class ComboManager : MonoBehaviour {
         TextGenerationSettings settings = new TextGenerationSettings();
         settings.resizeTextForBestFit = true;
         settings.textAnchor = TextAnchor.MiddleCenter;
-        settings.color = comboTextDisplay.color;
+        settings.color = textDisplay.color;
         settings.generationExtents = new Vector2(1000f, 1000f);
         settings.pivot = Vector2.zero;
         settings.richText = true;
-        settings.font = comboTextDisplay.font;
+        settings.font = textDisplay.font;
         //settings.fontSize = comboTextDisplay.fontSize;
-        settings.fontStyle = comboTextDisplay.fontStyle;
+        settings.fontStyle = textDisplay.fontStyle;
         settings.verticalOverflow = VerticalWrapMode.Overflow;
         TextGenerator generator = new TextGenerator();
-        generator.Populate(comboTextDisplay.text, settings);
+        generator.Populate(textDisplay.text, settings);
 
         yield return new WaitForEndOfFrame();
 
-        comboTextDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / comboTextDisplay.canvas.scaleFactor);
+        textDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / textDisplay.canvas.scaleFactor);
 
         yield return null;
     }
 
     IEnumerator IncreaseComboValueCoroutine() {
-        modifiedFontSize = Mathf.FloorToInt(CurrentFontSize * fontSizeIncreaseFactor);
-        yield return new WaitForSeconds(0.1f);
+        modifiedFontSize = Mathf.FloorToInt(CurrentMultiplierFontSize * fontSizeIncreaseFactor);
+        multiplierDisplay.rectTransform.localScale = CurrentMultiplierScale * Vector2.one;
+        yield return new WaitForSeconds(0.5f);
 
         float duration = 0.2f;
-        DOTween.To(() => modifiedFontSize, x => modifiedFontSize = x, CurrentFontSize, duration);
+        DOTween.To(() => modifiedFontSize, x => modifiedFontSize = x, initialMultiplierFontSize, duration);
+        multiplierDisplay.rectTransform.DOScale(initialMultiplierScale, duration);
         yield return new WaitForSeconds(duration);
              
-        comboScoreDisplay.fontSize = initialFontSize;
+        multiplierDisplay.fontSize = initialMultiplierFontSize;
         yield return null;
     }
 }
