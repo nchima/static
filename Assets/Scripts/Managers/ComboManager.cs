@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class ComboManager : MonoBehaviour {
 
@@ -10,10 +11,13 @@ public class ComboManager : MonoBehaviour {
     [SerializeField] Text comboScoreDisplay;
     [SerializeField] GameObject timerBar;
     [SerializeField] Transform timerBarReference;
+    [SerializeField] float fontSizeIncreaseFactor = 2f;
+    [SerializeField] GameObject comboFinisherPrefab;
+    
     //[SerializeField] FloatRange timerBarLengthRange = new FloatRange(0f, 5f);
 
     enum State { ComboActive, ComboIdle }
-    State state;
+    State state = State.ComboIdle;
 
     // Timer
     const float MAX_COMBO_TIME = 5f;
@@ -50,8 +54,13 @@ public class ComboManager : MonoBehaviour {
     int bullseyes = 0;
     int timesSpecialMoveUsed = 0;
 
-    int CurrentMultiplier { get { return pickupsObtained + timesSpecialMoveUsed + 1; } }
+    int initialFontSize;
+    float modifiedFontSize;
+    int CurrentFontSize { get { return Mathf.FloorToInt(MyMath.Map(GetMultipliedTotal(), 0, 100000, initialFontSize, 800)); } }
 
+    int CurrentMultiplier { get { return simpleEnemiesKilled + meleeEnemiesKilled + laserEnemiesKilled + tankEnemiesKilled + hoverEnemiesKilled + bossEnemiesKilled + bullseyes + pickupsObtained + timesSpecialMoveUsed + levelsCompleted + 1; } }
+
+    Coroutine increaseComboValueCoroutine;
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
@@ -62,7 +71,6 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
     }
 
-
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
@@ -72,6 +80,14 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
     }
 
+    private void Awake() {
+        initialFontSize = comboScoreDisplay.fontSize;
+        modifiedFontSize = initialFontSize;
+
+        comboTextDisplay.text = "";
+        comboScoreDisplay.text = "";
+        timerBar.SetActive(false);
+    }
 
     private void Update() {
         if (state == State.ComboActive) {
@@ -92,34 +108,9 @@ public class ComboManager : MonoBehaviour {
             comboTextDisplay.text = GenerateComboTextString();
             comboScoreDisplay.text = GetComboTotalAsString();
         }
-
-        //StartCoroutine(FuckOff());
+        
+        comboScoreDisplay.fontSize = Mathf.FloorToInt(modifiedFontSize);
     }
-
-
-    IEnumerator FuckOff() {
-
-        TextGenerationSettings settings = new TextGenerationSettings();
-        settings.resizeTextForBestFit = true;
-        settings.textAnchor = TextAnchor.MiddleCenter;
-        settings.color = comboTextDisplay.color;
-        settings.generationExtents = new Vector2(1000f, 1000f);
-        settings.pivot = Vector2.zero;
-        settings.richText = true;
-        settings.font = comboTextDisplay.font;
-        //settings.fontSize = comboTextDisplay.fontSize;
-        settings.fontStyle = comboTextDisplay.fontStyle;
-        settings.verticalOverflow = VerticalWrapMode.Overflow;
-        TextGenerator generator = new TextGenerator();
-        generator.Populate(comboTextDisplay.text, settings);
-
-        yield return new WaitForEndOfFrame();
-
-        comboTextDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / comboTextDisplay.canvas.scaleFactor);
-
-        yield return null;
-    }
-
 
     private void StartCombo() {
         comboTimer = MAX_COMBO_TIME;
@@ -127,9 +118,11 @@ public class ComboManager : MonoBehaviour {
         state = State.ComboActive;
     }
 
-
     private void EndCombo() {
-        Services.scoreManager.Score += GetUnmultipliedTotal() * CurrentMultiplier;
+        Debug.Log("ending combo");
+        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, comboScoreDisplay.transform.parent).GetComponent<ComboFinisher>();
+        comboFinisher.transform.position = comboScoreDisplay.transform.position;
+        comboFinisher.Initialize(GetMultipliedTotal(), CurrentFontSize);
 
         simpleEnemiesKilled = 0;
         meleeEnemiesKilled = 0;
@@ -150,8 +143,31 @@ public class ComboManager : MonoBehaviour {
         state = State.ComboIdle;
     }
 
+    private void StartIncreaseComboValueCoroutine() {
+        if (increaseComboValueCoroutine != null) { StopCoroutine(increaseComboValueCoroutine); }
+        increaseComboValueCoroutine = StartCoroutine(IncreaseComboValueCoroutine());
+    }
 
-    string GenerateComboTextString() {
+    private int GetUnmultipliedTotal() {
+        int totalScore = 0;
+        totalScore += simpleEnemiesKilled * SIMPLE_ENEMY_SCORE_VALUE;
+        totalScore += meleeEnemiesKilled * MELEE_ENEMY_SCORE_VALUE;
+        totalScore += laserEnemiesKilled * LASER_ENEMY_SCORE_VALUE;
+        totalScore += tankEnemiesKilled * TANK_ENEMY_KILL_VALUE;
+        totalScore += hoverEnemiesKilled * HOVER_ENEMY_KILL_VALUE;
+        totalScore += bossEnemiesKilled * BOSS_ENEMY_KILL_VALUE;
+        totalScore += levelsCompleted * LEVEL_COMPLETE_VALUE;
+        totalScore += pickupsObtained * PICKUP_SCORE_VALUE;
+        totalScore += timesSpecialMoveUsed * SPECIAL_MOVE_VALUE;
+        totalScore += bullseyes * BULLSEYE_VALUE;
+        return totalScore;
+    }
+
+    private int GetMultipliedTotal() {
+        return GetUnmultipliedTotal() * CurrentMultiplier;
+    }
+
+    private string GenerateComboTextString() {
         string comboString = "";
 
         if (bullseyes > 0) {
@@ -206,29 +222,11 @@ public class ComboManager : MonoBehaviour {
         return comboString;
     }
 
-
-    int GetUnmultipliedTotal() {
-        int totalScore = 0;
-        totalScore += simpleEnemiesKilled * SIMPLE_ENEMY_SCORE_VALUE;
-        totalScore += meleeEnemiesKilled * MELEE_ENEMY_SCORE_VALUE;
-        totalScore += laserEnemiesKilled * LASER_ENEMY_SCORE_VALUE;
-        totalScore += tankEnemiesKilled * TANK_ENEMY_KILL_VALUE;
-        totalScore += hoverEnemiesKilled * HOVER_ENEMY_KILL_VALUE;
-        totalScore += bossEnemiesKilled * BOSS_ENEMY_KILL_VALUE;
-        totalScore += levelsCompleted * LEVEL_COMPLETE_VALUE;
-        totalScore += pickupsObtained * PICKUP_SCORE_VALUE;
-        totalScore += timesSpecialMoveUsed * SPECIAL_MOVE_VALUE;
-        totalScore += bullseyes * BULLSEYE_VALUE;
-        return totalScore;
-    }
-
-
-    string GetComboTotalAsString() {
+    private string GetComboTotalAsString() {
         string total = GetUnmultipliedTotal().ToString();
         if (CurrentMultiplier > 1) { total += " X " + CurrentMultiplier.ToString(); }
         return total;
     }
-
 
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
@@ -236,48 +234,86 @@ public class ComboManager : MonoBehaviour {
         if (state == State.ComboIdle) { StartCombo(); }
         else { comboTimer = Mathf.Clamp(comboTimer + KILL_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
-        if (playerKilledEnemyEvent.enemyKilled is SimpleEnemy) { simpleEnemiesKilled++; }
+        if (playerKilledEnemyEvent.enemyKilled is SimpleEnemy) { simpleEnemiesKilled++; } 
         else if (playerKilledEnemyEvent.enemyKilled is MeleeEnemy) { meleeEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is LaserEnemy) { laserEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is TankEnemy) { tankEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is HoveringEnemy) { hoverEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is SnailEnemy) { bossEnemiesKilled++; }
-    }
 
+        StartIncreaseComboValueCoroutine();
+    }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); }
-        else { comboTimer = Mathf.Clamp(comboTimer + LEVEL_COMPLETED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + LEVEL_COMPLETED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
         levelsCompleted++;
-    }
 
+        StartIncreaseComboValueCoroutine();
+    }
 
     public void PickupObtainedHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); } 
-        else { comboTimer = Mathf.Clamp(comboTimer + PICKUP_OBTAINED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + PICKUP_OBTAINED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
         pickupsObtained++;
-    }
 
+        StartIncreaseComboValueCoroutine();
+    }
 
     public void PlayerUsedSpecialMoveHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); }
-        else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
         timesSpecialMoveUsed++;
-    }
 
+        StartIncreaseComboValueCoroutine();
+    }
 
     public void BullseyeHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); }
-        else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
         bullseyes++;
-    }
 
+        StartIncreaseComboValueCoroutine();
+    }
 
     public void GameOverHandler(GameEvent gameEvent) {
         EndCombo();
+
+        StartIncreaseComboValueCoroutine();
+    }
+
+    IEnumerator FuckOff() {
+
+        TextGenerationSettings settings = new TextGenerationSettings();
+        settings.resizeTextForBestFit = true;
+        settings.textAnchor = TextAnchor.MiddleCenter;
+        settings.color = comboTextDisplay.color;
+        settings.generationExtents = new Vector2(1000f, 1000f);
+        settings.pivot = Vector2.zero;
+        settings.richText = true;
+        settings.font = comboTextDisplay.font;
+        //settings.fontSize = comboTextDisplay.fontSize;
+        settings.fontStyle = comboTextDisplay.fontStyle;
+        settings.verticalOverflow = VerticalWrapMode.Overflow;
+        TextGenerator generator = new TextGenerator();
+        generator.Populate(comboTextDisplay.text, settings);
+
+        yield return new WaitForEndOfFrame();
+
+        comboTextDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / comboTextDisplay.canvas.scaleFactor);
+
+        yield return null;
+    }
+
+    IEnumerator IncreaseComboValueCoroutine() {
+        modifiedFontSize = Mathf.FloorToInt(CurrentFontSize * fontSizeIncreaseFactor);
+        yield return new WaitForSeconds(0.1f);
+
+        float duration = 0.2f;
+        DOTween.To(() => modifiedFontSize, x => modifiedFontSize = x, CurrentFontSize, duration);
+        yield return new WaitForSeconds(duration);
+             
+        comboScoreDisplay.fontSize = initialFontSize;
+        yield return null;
     }
 }
