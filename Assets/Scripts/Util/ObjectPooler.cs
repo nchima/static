@@ -63,6 +63,7 @@ public class ObjectPooler : MonoBehaviour {
 
 
     public virtual void ReturnObject(GameObject returnedObject) {
+        returnedObject.transform.parent = transform;
         DeactivateObject(returnedObject);
     }
 }

@@ -171,7 +171,6 @@ public class SpecialBarManager : MonoBehaviour {
 
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
-
         AddValue(playerKilledEnemyEvent.specialValue);
     }
 }
