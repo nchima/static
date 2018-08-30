@@ -57,9 +57,9 @@ public class ComboManager : MonoBehaviour {
 
     int initialMultiplierFontSize;
     float modifiedFontSize;
-    int CurrentMultiplierFontSize { get { return Mathf.FloorToInt(MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierFontSize * 1.2f, 2000)); } }
+    int CurrentMultiplierFontSize { get { return Mathf.FloorToInt(MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierFontSize * 1.3f, 2000)); } }
     float initialMultiplierScale;
-    float CurrentMultiplierScale { get { return MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierScale * 1.2f, 0.027f); } }
+    float CurrentMultiplierScale { get { return MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierScale * 1.3f, 0.027f); } }
 
     int CurrentMultiplier { get { return simpleEnemiesKilled + meleeEnemiesKilled + laserEnemiesKilled + tankEnemiesKilled + hoverEnemiesKilled + bossEnemiesKilled + bullseyes + pickupsObtained + timesSpecialMoveUsed + levelsCompleted + 1; } }
 
@@ -121,7 +121,8 @@ public class ComboManager : MonoBehaviour {
         // Move the multiplier display the correct distance from the score display
         Vector3 newPosition = scoreDisplay.transform.localPosition;
         newPosition.y = multiplierDisplay.rectTransform.localPosition.y;
-        newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x + 0.05f;
+        newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x  + 0.3f;
+        Debug.Log("New position x: " + newPosition.x);
         multiplierDisplay.rectTransform.localPosition = newPosition;
     }
 
@@ -131,7 +132,7 @@ public class ComboManager : MonoBehaviour {
         state = State.ComboActive;
     }
 
-    private void EndCombo() {
+    public void EndCombo() {
         Debug.Log("ending combo");
         ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, scoreDisplay.transform.parent).GetComponent<ComboFinisher>();
         comboFinisher.transform.position = scoreDisplay.transform.position;

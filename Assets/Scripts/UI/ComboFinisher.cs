@@ -21,7 +21,7 @@ public class ComboFinisher : MonoBehaviour {
         float countUpAmount = 0;
         DOTween.To(() => countUpAmount, x => countUpAmount = x, comboAmount, duration);
         Vector3 nextPosition = m_RectTransform.anchoredPosition;
-        nextPosition.x = 47.33f;
+        nextPosition.x = 1.12f;
         //nextPosition.x = 20f;
         m_RectTransform.DOAnchorPos(nextPosition, duration * 0.7f);
         yield return new WaitUntil(() => {
@@ -43,7 +43,7 @@ public class ComboFinisher : MonoBehaviour {
         // Move up to the score area.
         duration = 0.4f;
         nextPosition = m_RectTransform.anchoredPosition;
-        nextPosition.y = 57.59f;
+        nextPosition.y = 55.91f;
         m_RectTransform.DOAnchorPos(nextPosition, duration);
         yield return new WaitForSeconds(duration);
 
