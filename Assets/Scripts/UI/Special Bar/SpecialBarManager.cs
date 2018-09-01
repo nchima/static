@@ -29,13 +29,17 @@ public class SpecialBarManager : MonoBehaviour {
 
     public bool BothFirstBarsFull {
         get {
+#if UNITY_EDITOR
             if (debug_AlwaysMax) { return true; }
+#endif
             return leftBar.CurrentValue >= 0.99f && rightBar.CurrentValue >= 0.99f;
         }
     }
     public bool BothSecondBarsFull {
         get {
+#if UNITY_EDITOR
             if (debug_AlwaysMax) { return true; }
+#endif
             return leftBar.CurrentValue >= 1.99f && rightBar.CurrentValue >= 1.99f;
         }
     }

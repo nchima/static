@@ -122,7 +122,6 @@ public class ComboManager : MonoBehaviour {
         Vector3 newPosition = scoreDisplay.transform.localPosition;
         newPosition.y = multiplierDisplay.rectTransform.localPosition.y;
         newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x  + 0.3f;
-        Debug.Log("New position x: " + newPosition.x);
         multiplierDisplay.rectTransform.localPosition = newPosition;
     }
 
