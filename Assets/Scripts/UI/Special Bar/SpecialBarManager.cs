@@ -29,20 +29,18 @@ public class SpecialBarManager : MonoBehaviour {
 
     public bool BothFirstBarsFull {
         get {
-#if UNITY_EDITOR
             if (debug_AlwaysMax) { return true; }
-#endif
             return leftBar.CurrentValue >= 0.99f && rightBar.CurrentValue >= 0.99f;
         }
     }
+
     public bool BothSecondBarsFull {
         get {
-#if UNITY_EDITOR
             if (debug_AlwaysMax) { return true; }
-#endif
             return leftBar.CurrentValue >= 1.99f && rightBar.CurrentValue >= 1.99f;
         }
     }
+
 
     [SerializeField] int maxSavedShots = 2;
     private int shotsSaved;
@@ -62,6 +60,7 @@ public class SpecialBarManager : MonoBehaviour {
         }
     }
 
+
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
@@ -70,10 +69,12 @@ public class SpecialBarManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
+
     private void Start() {
         leftBar.Initialize(this);
         rightBar.Initialize(this);
     }
+
 
     private void Update() {
         leftBar.Run(this);
@@ -110,12 +111,15 @@ public class SpecialBarManager : MonoBehaviour {
         }
     }
 
+
     void AddAmmoCharge() {
+        Debug.Log("adding ammo");
         ShotsSaved++;
         earnedPrompt.gameObject.SetActive(true);
         earnedPrompt.Activate();
         savedShotBoxes[ShotsSaved - 1].SetActive(true);
     }
+
 
     void RemoveAmmoCharge() {
         Debug.Log("removing ammo");
@@ -128,14 +132,17 @@ public class SpecialBarManager : MonoBehaviour {
         //}
     }
 
+
     public void PlayerAbsorbedAmmo(float value) {
         leftBar.CurrentValue += value;
         rightBar.CurrentValue += value;
     }
 
+
     public void FlashBar() {
         //barObject.GetComponent<MeshRenderer>().material.color = Color.Lerp(readyColor1, readyColor2, Random.Range(0f, 1f));
     }
+
 
     public void AddValue(float value) {
         // Split value based on current gun value.
@@ -147,6 +154,7 @@ public class SpecialBarManager : MonoBehaviour {
         rightBar.CurrentValue += rightValue;
     }
 
+
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
@@ -154,13 +162,16 @@ public class SpecialBarManager : MonoBehaviour {
         //rightBar.CurrentValue -= getHurtPenalty;
     }
 
+
     public void PlayerUsedSpecialMove() {
         leftBar.CurrentValue -= 1f;
         rightBar.CurrentValue -= 1f;
     }
 
+
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
+
         AddValue(playerKilledEnemyEvent.specialValue);
     }
 }

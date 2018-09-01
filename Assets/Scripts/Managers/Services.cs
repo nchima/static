@@ -28,5 +28,4 @@ public class Services {
     public static ExtraScreenManager extraScreenManager;
     public static SteamLeaderboardManager steamLeaderboardManager;
     public static AnalyticsManager analyticsManager;
-    public static ComboManager comboManager;
 }

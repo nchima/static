@@ -43,6 +43,7 @@ public class PlayerMissile : MonoBehaviour {
     private float lockedOnTurnSpeedMultiplier;
     private float maxSpeed;
     private float decelerationOverLifetimeMultiplier;
+    private Vector3 acceleration;
     private Vector3 velocity;
     private Vector3 desiredVelocity;
     private Vector3 initialDirection;
@@ -117,11 +118,10 @@ public class PlayerMissile : MonoBehaviour {
         noiseOffsetY = Random.Range(-100f, 100f);
 
         // Get initial direction
-        //transform.rotation = Services.playerTransform.rotation;
-
-        initialDirection = transform.forward;
+        transform.rotation = Services.playerTransform.rotation;
 
         transform.Rotate(new Vector3(-upwardTilt + Random.Range(-spreadY, spreadY), Random.Range(-spreadX, spreadX), 0f));
+        initialDirection = transform.forward;
         velocity = initialDirection * initialSpeed;
     }
 
@@ -150,16 +150,12 @@ public class PlayerMissile : MonoBehaviour {
 
         // Steer towards desired velocity.
         desiredVelocity = desiredVelocity.normalized * maxSpeed;
-
         Vector3 steerForce = desiredVelocity - velocity;
-        Debug.DrawRay(transform.position, steerForce, Color.green);
-        if (currentState == State.NotLockedOn) { steerForce = steerForce.normalized * turnSpeed; }
-        else { steerForce = steerForce.normalized * turnSpeed * lockedOnTurnSpeedMultiplier; }
+        if (currentState == State.NotLockedOn) { steerForce = Vector3.ClampMagnitude(steerForce, turnSpeed); } 
+        else { steerForce = Vector3.ClampMagnitude(steerForce, turnSpeed * lockedOnTurnSpeedMultiplier); }
 
         // Accelerate
-        Vector3 acceleration = Vector3.zero;
         acceleration += steerForce;
-
         velocity += acceleration;
         velocity *= decelerationOverLifetimeMultiplier;
 
@@ -176,12 +172,8 @@ public class PlayerMissile : MonoBehaviour {
     void MoveWithoutTarget() {
         // Steer towards a random direction using perlin noise.
         Vector3 tempTarget = transform.position + initialDirection;
-
-        if (meanderNoise > 0) {
-            tempTarget.y += MyMath.Map(Mathf.PerlinNoise(noiseTimeX + noiseOffsetX, 0f), 0f, 1f, -meanderNoise, meanderNoise);
-            tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -meanderNoise, meanderNoise);
-        }
-
+        tempTarget.y += MyMath.Map(Mathf.PerlinNoise(noiseTimeX + noiseOffsetX, 0f), 0f, 1f, -meanderNoise, meanderNoise);
+        tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -meanderNoise, meanderNoise);
         desiredVelocity = tempTarget - transform.position;
 
         sphereVisuals.transform.LookAt(transform.position + desiredVelocity);
@@ -213,13 +205,10 @@ public class PlayerMissile : MonoBehaviour {
 
     // Deletes game object.
     public void GetDestroyed() {
-        if (GetComponentInChildren<TrailRenderer>() != null) {
-            GameObject trail = Instantiate(GetComponentInChildren<TrailRenderer>().gameObject);
-            trail.GetComponent<TrailRenderer>().autodestruct = true;
-            trail.GetComponent<TrailRenderer>().transform.SetParent(null);
-        }
-
-        GetComponent<PooledObject>().ReturnToPool();
+        Destroy(gameObject);
+        if (GetComponentInChildren<TrailRenderer>() == null) return;
+        GetComponentInChildren<TrailRenderer>().autodestruct = true;
+        GetComponentInChildren<TrailRenderer>().transform.SetParent(null);
     }
 
 
@@ -231,7 +220,7 @@ public class PlayerMissile : MonoBehaviour {
 
 
     void OnTriggerEnter(Collider collider) {
-        if (collider.tag == "Obstacle" || LayerMask.LayerToName(collider.gameObject.layer).Contains("Floor")) /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/ {
+        if (collider.tag == "Obstacle") /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/ {
             Detonate();
             GetDestroyed();
         }

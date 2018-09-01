@@ -15,15 +15,14 @@ public class ComboFinisher : MonoBehaviour {
 
     private IEnumerator Sequence(int comboAmount, int fontSize) {
         m_Text.fontSize = fontSize;
-
+        
         // Count up to full amount and move right.
         float duration = 1f;
         float countUpAmount = 0;
         DOTween.To(() => countUpAmount, x => countUpAmount = x, comboAmount, duration);
-        Vector3 nextPosition = m_RectTransform.anchoredPosition;
-        nextPosition.x = 1.12f;
-        //nextPosition.x = 20f;
-        m_RectTransform.DOAnchorPos(nextPosition, duration * 0.7f);
+        Vector3 nextPosition = m_RectTransform.localPosition;
+        nextPosition.x = 19.01f;
+        m_RectTransform.DOLocalMove(nextPosition, duration * 0.7f);
         yield return new WaitUntil(() => {
             if (countUpAmount >= comboAmount) {
                 m_Text.text = Mathf.CeilToInt(comboAmount).ToString();
@@ -35,16 +34,14 @@ public class ComboFinisher : MonoBehaviour {
             }
         });
 
-        m_RectTransform.anchoredPosition = nextPosition;
-
         // Wait a seccy.
         yield return new WaitForSeconds(0.5f);
 
         // Move up to the score area.
         duration = 0.4f;
-        nextPosition = m_RectTransform.anchoredPosition;
-        nextPosition.y = 55.91f;
-        m_RectTransform.DOAnchorPos(nextPosition, duration);
+        nextPosition = m_RectTransform.localPosition;
+        nextPosition.y = 11.72f;
+        m_RectTransform.DOLocalMove(nextPosition, duration);
         yield return new WaitForSeconds(duration);
 
         Services.scoreManager.Score += comboAmount;

@@ -83,7 +83,6 @@ public class Gun : MonoBehaviour {
 
     void Update() {
         timeSinceLastShot += Time.deltaTime;
-        Debug.Log("gun can shoot: " + canShoot);
 
         if (InputManager.fireButton) { FireBurst(); }
     }

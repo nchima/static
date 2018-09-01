@@ -163,6 +163,6 @@ public class PlayerBullet : MonoBehaviour {
 
 
     private void EndBulletsExistence() {
-        GetComponent<PooledObject>().ReturnToPool();
+        GetComponent<PooledObject>().GetReturned();
     }
 }
