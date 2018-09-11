@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour {
         // Load next level.
         if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
             //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-            Services.levelManager.LoadNextLevel();
+            //Services.levelManager.LoadNextLevel();
         }
 
         //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
@@ -189,5 +189,11 @@ public class GameManager : MonoBehaviour {
 
     public void RestartGame() {
         SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
+
+    public void PlayerCompletedGame() {
+        // This is broken right now... the game will just freeze.
+        SceneManager.UnloadSceneAsync(Services.levelManager.currentlyLoadedLevelData.buildIndex);
+        Services.uiManager.ShowEndOfDemoScreen();
     }
 }

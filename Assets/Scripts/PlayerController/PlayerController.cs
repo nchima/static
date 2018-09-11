@@ -159,8 +159,8 @@ public class PlayerController : MonoBehaviour {
             //    }
             //}
 
-            if (InputManager.dashButtonDown /*&& Services.specialBarManager.ShotsSaved > 0*/) {
-                Services.comboManager.EndCombo();
+            if (InputManager.dashButtonDown && Services.specialBarManager.ShotsSaved > 0) {
+                //Services.comboManager.EndCombo();
                 Services.specialBarManager.PlayerUsedSpecialMove();
                 Services.levelManager.SetFloorCollidersActive(false);
             }

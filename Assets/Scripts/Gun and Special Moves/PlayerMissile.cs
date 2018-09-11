@@ -97,6 +97,7 @@ public class PlayerMissile : MonoBehaviour {
         RotateMesh();
 
         // Adjust size of visuals
+        sphereVisuals.transform.localScale = Vector3.one;
         Vector3 newVisualScale = sphereVisuals.transform.localScale;
         newVisualScale *= GunValueManager.MapToFloatRange(visualWidthRange);
         //newVisualScale.y = GunValueManager.MapToFloatRangeInverted(visualWidthRange);
@@ -117,9 +118,16 @@ public class PlayerMissile : MonoBehaviour {
         noiseOffsetY = Random.Range(-100f, 100f);
 
         // Get initial direction
-        //transform.rotation = Services.playerTransform.rotation;
-
-        initialDirection = transform.forward;
+        RaycastHit hit;
+        int layerMask = (1 << 8) | (1 << 14) | (1 << 20) | (1 << 23);
+        if (Physics.Raycast(Services.gun.tip.position, Services.gun.tip.forward, out hit, 500f, layerMask)) {
+            Debug.Log("setting it so this bulsfilea");  
+            initialDirection = Vector3.Normalize(hit.point - Services.gun.tip.position);
+            transform.forward = initialDirection;
+            Debug.DrawLine(transform.position, hit.point, Color.red, 1f);
+        } else {
+            initialDirection = transform.forward;
+        }
 
         transform.Rotate(new Vector3(-upwardTilt + Random.Range(-spreadY, spreadY), Random.Range(-spreadX, spreadX), 0f));
         velocity = initialDirection * initialSpeed;
@@ -231,7 +239,7 @@ public class PlayerMissile : MonoBehaviour {
 
 
     void OnTriggerEnter(Collider collider) {
-        if (collider.tag == "Obstacle" || LayerMask.LayerToName(collider.gameObject.layer).Contains("Floor")) /*|| collider.tag == "Wall" || (collider.name == "Floor" && collideWithFloor))*/ {
+        if (collider.tag == "Obstacle" || LayerMask.LayerToName(collider.gameObject.layer).Contains("Floor") || collider.tag == "Wall") /* || (collider.name == "Floor" && collideWithFloor))*/ {
             Detonate();
             GetDestroyed();
         }

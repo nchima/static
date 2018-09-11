@@ -7,13 +7,13 @@ using UnityEngine.AI;
 public class LevelManager : MonoBehaviour {
 
     [SerializeField] List<LevelSet> levelSets;
-    [SerializeField] LevelSet startingLevelSetOverride;
-
-    [SerializeField] GameObject scoreBonusPrefab;
+    [SerializeField] LevelSet overrideLevelSet;
+    [SerializeField] LevelBranchNode firstBranchNode;
 
     LevelSet currentLevelSet;
+    LevelBranchNode currentBranchNode;
 
-    [HideInInspector] public LevelData currentlyLoadedLevel;
+    [HideInInspector] public LevelData currentlyLoadedLevelData;
     [HideInInspector] public int levelsCompleted = 0;
     [HideInInspector] public bool isLevelCompleted = false;
 
@@ -25,47 +25,29 @@ public class LevelManager : MonoBehaviour {
         } }
     bool IsLevelLoaded {
         get {
-            if (currentlyLoadedLevel == null) { return false; }
-            return SceneManager.GetSceneByBuildIndex(currentlyLoadedLevel.buildIndex).isLoaded;
+            if (currentlyLoadedLevelData == null) { return false; }
+            return SceneManager.GetSceneByBuildIndex(currentlyLoadedLevelData.buildIndex).isLoaded;
         }
     }
-
-    EnemyPlacer enemyPlacer { get { return GetComponent<EnemyPlacer>(); } }
-
-    // Deprecated things from when levels included more randomness.
-    //LevelScaler levelScaler;
-    //LevelInfo[] levelInfos;
-
 
     private void Awake() {
-        
-        if (startingLevelSetOverride != null) {
+
+        // Load the first level set.
+        if (overrideLevelSet != null) {
 #if UNITY_EDITOR
-            SetStartingLevelSet(startingLevelSetOverride);
+            SetStartingLevelSet(overrideLevelSet);
 #endif
         } else {
-            SetStartingLevelSet(GetLevelSet("GDC Level Set"));
+            currentBranchNode = firstBranchNode;
+            currentBranchNode.levelSet.levelsCompleted = 0;
+            SetStartingLevelSet(currentBranchNode.levelSet);
         }
-
-        //LoadNextLevel();
-
-        //levelScaler = GetComponent<LevelScaler>();
-
-        //levelInfos = new LevelInfo[Resources.LoadAll<LevelInfo>("Level Info").Length];
-        //for (int i = 0; i < levelInfos.Length; i++) {
-        //    string levelNumber = (i+1).ToString();
-        //    levelInfos[i] = Resources.Load<LevelInfo>("Level Info/Level Info " + levelNumber);
-        //}
-
-        //loadRandomLevelTimer = howOftenToLoadNewLevelWhenFalling;
     }
-
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
-
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
@@ -76,41 +58,49 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
+    public void GameStartedHandler(GameEvent gameEvent) {
+        LoadNextLevel();
+        SetEnemiesAIActive(true);
+    }
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        isLevelCompleted = true;
+        Debug.Log("increasing levels completed of: " + currentLevelSet.name);
+        currentLevelSet.levelsCompleted++;
+        levelsCompleted++;
+        SetFloorCollidersActive(false);
+    }
+
     public void LoadNextLevel() {
         // If the player has completed every level, show the end of demo screen.
-        if (IsLevelLoaded && (levelsCompleted >= TotalNumberOfLevels)) {
-            SceneManager.UnloadSceneAsync(currentlyLoadedLevel.buildIndex);
-            Services.uiManager.ShowEndOfDemoScreen();
-            return;
-        }
+        //if (IsLevelLoaded && (levelsCompleted >= TotalNumberOfLevels)) {
+        //    SceneManager.UnloadSceneAsync(currentlyLoadedLevelData.buildIndex);
+        //    Services.uiManager.ShowEndOfDemoScreen();
+        //    return;
+        //}
 
         // If the player has completed all the levels in a set, load the next set.
         if (currentLevelSet.AllLevelsCompleted) {
-            LevelSet nextLevelSet = null;
-            for (int i = 0; i < levelSets.Count; i++) {
-                if (!levelSets[i].AllLevelsCompleted) {
-                    nextLevelSet = levelSets[i];
-                    break;
-                }
+            Debug.Log("all levels complete");
+
+            // See if the player has completed the final level.
+            if (currentBranchNode.DetermineNext() == null) {
+                Services.gameManager.PlayerCompletedGame();
+                return;
             }
 
-            if (nextLevelSet == null) {
-                Debug.Log("ending demo here.");
-                SceneManager.UnloadSceneAsync(levelsCompleted);
-                Services.uiManager.ShowEndOfDemoScreen();
-                return;
-            } else {
-                currentLevelSet = nextLevelSet;
-            }
+            // Determine the next level set and load it.
+            currentBranchNode = currentBranchNode.DetermineNext();
+            currentLevelSet = currentBranchNode.levelSet;
+            currentLevelSet.levelsCompleted = 0;
         }
 
         StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel));
     }
 
-    
     private IEnumerator LoadLevelCoroutine(LevelData levelData) {
         if (IsLevelLoaded) {
-            AsyncOperation unload = SceneManager.UnloadSceneAsync(currentlyLoadedLevel.buildIndex);
+            AsyncOperation unload = SceneManager.UnloadSceneAsync(currentlyLoadedLevelData.buildIndex);
             while (!unload.isDone) { yield return null; }
         }
 
@@ -127,18 +117,21 @@ public class LevelManager : MonoBehaviour {
         //SetEnemiesActive(false);
 
         isLevelCompleted = false;
-        currentlyLoadedLevel = levelData;
+        currentlyLoadedLevelData = levelData;
 
         yield return null;
     }
 
+    void LoadBranchNode(LevelBranchNode branchNode) {
+        currentLevelSet = branchNode.levelSet;
+    }
 
     public void SetStartingLevelSet(LevelSet startingSet) {
 
 #if UNITY_EDITOR
-        if (startingLevelSetOverride != null) {
+        if (overrideLevelSet != null) {
             Debug.Log("Starting level overridden by user.");
-            startingSet = startingLevelSetOverride;
+            startingSet = overrideLevelSet;
         }
 #endif
 
@@ -151,16 +144,13 @@ public class LevelManager : MonoBehaviour {
         Debug.Log("Setting starting level set to: " + currentLevelSet.name);
     }
 
-
     public void SetStartingLevelSet(string setName) {
         SetStartingLevelSet(GetLevelSet(setName));
     }
 
-
-    public void SetEnemiesActive(bool value) {
+    public void SetEnemiesAIActive(bool value) {
         StartCoroutine(SetEnemiesActiveCoroutine(value));
     }
-
 
     IEnumerator SetEnemiesActiveCoroutine(bool value) {
         yield return new WaitForSeconds(0.1f);
@@ -180,16 +170,14 @@ public class LevelManager : MonoBehaviour {
         yield return null;
     }
 
-
     public void SetFloorCollidersActive(bool value) {
         if (!GameObject.Find("Floor Planes")) { return; }
         Collider[] floorColliders = GameObject.Find("Floor Planes").GetComponentsInChildren<Collider>();
         foreach (Collider collider in floorColliders) collider.enabled = value;
     }
 
-
     public void LockInLevel() {
-        Services.levelManager.SetEnemiesActive(true);
+        Services.levelManager.SetEnemiesAIActive(true);
 
         // Re-enable the floor's collision (since it is disabled when the player completes a level.)
         Services.levelManager.SetFloorCollidersActive(true);
@@ -197,7 +185,6 @@ public class LevelManager : MonoBehaviour {
         // Update billboards.
         Services.gameManager.GetComponent<BatchBillboard>().FindAllBillboards();
     }
-
 
     public LevelSet GetLevelSet(string name) {
         for (int i = 0; i < levelSets.Count; i++) {
@@ -208,21 +195,7 @@ public class LevelManager : MonoBehaviour {
         return null;
     }
 
-
-    public void LevelCompletedHandler(GameEvent gameEvent) {
-        isLevelCompleted = true;
-        currentLevelSet.levelsCompleted++;
-        levelsCompleted++;
-        SetFloorCollidersActive(false);
-    }
-
-
-    public void GameStartedHandler(GameEvent gameEvent) {
-        LoadNextLevel();
-        SetEnemiesActive(true);
-    }
-
-
+    // Deprecated code:
     /*
     // Deprecated:
     public void ChooseLevelChunks() {

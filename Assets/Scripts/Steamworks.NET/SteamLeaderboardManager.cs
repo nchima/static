@@ -77,7 +77,6 @@ public class SteamLeaderboardManager : MonoBehaviour {
         } 
         
         else {
-            Debug.Log("Downloaded scores");
             m_SteamLeaderboardEntries = pCallback.m_hSteamLeaderboardEntries;
             isScoreEntriesDownloaded = true;
         }

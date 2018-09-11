@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PointPickup : Pickup {
 
-    [SerializeField] int pointValue;
+    public int scoreValue;
     [SerializeField] LineRenderer circleRenderer;
 
     private void Start() {
@@ -18,8 +18,8 @@ public class PointPickup : Pickup {
 
     public override void BeginMovingTowardsPlayer() {
         Services.scoreManager.IncreaseMultiplier();
-        Services.scorePopupManager.CreatePositionalPopup(transform.position, pointValue);
-        Services.scoreManager.Score += pointValue;
+        Services.scorePopupManager.CreatePositionalPopup(transform.position, scoreValue);
+        Services.scoreManager.Score += scoreValue;
         base.BeginMovingTowardsPlayer();
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class EpisodeSelectScreen : MonoBehaviour {
 
 	public void BeginningButton() {
-        Services.levelManager.SetStartingLevelSet("GDC Level Set");
+        //Services.levelManager.SetStartingLevelSet("GDC Level Set");
         GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
     }
 

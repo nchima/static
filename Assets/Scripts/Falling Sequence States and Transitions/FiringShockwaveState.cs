@@ -56,7 +56,7 @@ public class FiringShockwaveState : State {
         Services.gun.canShoot = true;
 
         // Allow enemies to start attacking.
-        Services.levelManager.SetEnemiesActive(true);
+        Services.levelManager.SetEnemiesAIActive(true);
 
         // Destroy any obstacles that the player is touching.
         Collider[] overlappingSolids = Physics.OverlapCapsule(

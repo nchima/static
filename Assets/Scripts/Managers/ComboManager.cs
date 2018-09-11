@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +15,7 @@ public class ComboManager : MonoBehaviour {
     [SerializeField] Transform timerBarReference;
     [SerializeField] float fontSizeIncreaseFactor = 2f;
     [SerializeField] GameObject comboFinisherPrefab;
-    
+
     //[SerializeField] FloatRange timerBarLengthRange = new FloatRange(0f, 5f);
 
     enum State { ComboActive, ComboIdle }
@@ -29,19 +30,11 @@ public class ComboManager : MonoBehaviour {
     const float PICKUP_OBTAINED_BONUS_TIME = 2f;
     const float MISC_BONUS_TIME = 1f;
 
-    // Enemy kill values.
-    const int SIMPLE_ENEMY_SCORE_VALUE = 100;
-    const int MELEE_ENEMY_SCORE_VALUE = 150;
-    const int LASER_ENEMY_SCORE_VALUE = 200;
-    const int TANK_ENEMY_KILL_VALUE = 200;
-    const int HOVER_ENEMY_KILL_VALUE = 175;
-    const int BOSS_ENEMY_KILL_VALUE = 500;
-    const int LEVEL_COMPLETE_VALUE = 500;
-
     // Other values
-    const int PICKUP_SCORE_VALUE = 100;
+    public const int PICKUP_SCORE_VALUE = 100;
     const int BULLSEYE_VALUE = 200;
     const int SPECIAL_MOVE_VALUE = 50;
+    public int levelCompleteValue = 500;
 
     // Current combo data.
     int simpleEnemiesKilled = 0;
@@ -54,6 +47,8 @@ public class ComboManager : MonoBehaviour {
     int levelsCompleted = 0;
     int bullseyes = 0;
     int timesSpecialMoveUsed = 0;
+
+    int currentEnemiesKilledScoreTotal = 0;
 
     int initialMultiplierFontSize;
     float modifiedFontSize;
@@ -72,6 +67,7 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void OnDisable() {
@@ -81,6 +77,7 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void Awake() {
@@ -114,14 +111,14 @@ public class ComboManager : MonoBehaviour {
             scoreDisplay.text = GetUnmultipliedTotal().ToString();
             multiplierDisplay.text = "X" + CurrentMultiplier.ToString();
         }
-        
+
         // Update size of multiplier display
         multiplierDisplay.fontSize = Mathf.FloorToInt(modifiedFontSize);
 
         // Move the multiplier display the correct distance from the score display
         Vector3 newPosition = scoreDisplay.transform.localPosition;
         newPosition.y = multiplierDisplay.rectTransform.localPosition.y;
-        newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x  + 0.3f;
+        newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x + 0.3f;
         multiplierDisplay.rectTransform.localPosition = newPosition;
     }
 
@@ -132,7 +129,6 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void EndCombo() {
-        Debug.Log("ending combo");
         ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, scoreDisplay.transform.parent).GetComponent<ComboFinisher>();
         comboFinisher.transform.position = scoreDisplay.transform.position;
         comboFinisher.Initialize(GetMultipliedTotal(), CurrentMultiplierFontSize);
@@ -147,6 +143,7 @@ public class ComboManager : MonoBehaviour {
         pickupsObtained = 0;
         bullseyes = 0;
         timesSpecialMoveUsed = 0;
+        currentEnemiesKilledScoreTotal = 0;
 
         textDisplay.text = "";
         scoreDisplay.text = "";
@@ -164,20 +161,15 @@ public class ComboManager : MonoBehaviour {
 
     private int GetUnmultipliedTotal() {
         int totalScore = 0;
-        totalScore += simpleEnemiesKilled * SIMPLE_ENEMY_SCORE_VALUE;
-        totalScore += meleeEnemiesKilled * MELEE_ENEMY_SCORE_VALUE;
-        totalScore += laserEnemiesKilled * LASER_ENEMY_SCORE_VALUE;
-        totalScore += tankEnemiesKilled * TANK_ENEMY_KILL_VALUE;
-        totalScore += hoverEnemiesKilled * HOVER_ENEMY_KILL_VALUE;
-        totalScore += bossEnemiesKilled * BOSS_ENEMY_KILL_VALUE;
-        totalScore += levelsCompleted * LEVEL_COMPLETE_VALUE;
+        totalScore += currentEnemiesKilledScoreTotal;
+        totalScore += levelsCompleted * levelCompleteValue;
         totalScore += pickupsObtained * PICKUP_SCORE_VALUE;
         totalScore += timesSpecialMoveUsed * SPECIAL_MOVE_VALUE;
         totalScore += bullseyes * BULLSEYE_VALUE;
         return totalScore;
     }
 
-    private int GetMultipliedTotal() {
+    public int GetMultipliedTotal() {
         return GetUnmultipliedTotal() * CurrentMultiplier;
     }
 
@@ -190,6 +182,7 @@ public class ComboManager : MonoBehaviour {
         }
 
         if (simpleEnemiesKilled > 0) {
+            if (comboString != "") { comboString += " + "; }
             comboString += "Basic Enemy Killed x" + simpleEnemiesKilled.ToString();
         }
 
@@ -255,6 +248,8 @@ public class ComboManager : MonoBehaviour {
         else if (playerKilledEnemyEvent.enemyKilled is HoveringEnemy) { hoverEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is SnailEnemy) { bossEnemiesKilled++; }
 
+        currentEnemiesKilledScoreTotal += playerKilledEnemyEvent.enemyKilled.scoreKillValue;
+
         StartIncreaseComboValueCoroutine();
     }
 
@@ -294,6 +289,10 @@ public class ComboManager : MonoBehaviour {
         EndCombo();
 
         StartIncreaseComboValueCoroutine();
+    }
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        EndCombo();
     }
 
     IEnumerator FuckOff() {

@@ -41,4 +41,9 @@ public class MyMath {
     public static float Average(List<float> values) {
         return Average(values.ToArray());
     }
+
+    public static float RoundToDecimalPlaces(float value, int decimalPlaces) {
+        float multiplier = Mathf.Pow(10, decimalPlaces);
+        return Mathf.Round(value * multiplier) / multiplier;
+    }
 }
