@@ -376,7 +376,6 @@
     <Compile Include="Assets\Scripts\UI\ComboFinisher.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHair.cs" />
     <Compile Include="Assets\Scripts\UI\CrossHairLines.cs" />
-    <Compile Include="Assets\Scripts\UI\FeedbackLine.cs" />
     <Compile Include="Assets\Scripts\UI\HealthBox.cs" />
     <Compile Include="Assets\Scripts\UI\Initial.cs" />
     <Compile Include="Assets\Scripts\UI\Menu Screens\ControlsScreen.cs" />
@@ -411,7 +410,6 @@
     <Compile Include="Assets\Scripts\Util\PerlinNoise.cs" />
     <Compile Include="Assets\Scripts\Util\PooledObject.cs" />
     <Compile Include="Assets\Scripts\Util\ReportTriggerToParent.cs" />
-    <Compile Include="Assets\Scripts\Util\TextUtil.cs" />
     <Compile Include="Assets\Scripts\Util\Timer.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\AlphaCutoffJitter.cs" />
     <Compile Include="Assets\Scripts\Visual Effect\BatchBillboard.cs" />

@@ -51,6 +51,6 @@ public class PlayerBulletMesh : MonoBehaviour {
 
     void GoBackToWhereICameFrom() {
         if (!GetComponent<PooledObject>()) { return; }
-        GetComponent<PooledObject>().ReturnToPool();
+        GetComponent<PooledObject>().GetReturned();
     }
 }

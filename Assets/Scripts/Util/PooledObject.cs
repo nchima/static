@@ -6,7 +6,7 @@ public class PooledObject : MonoBehaviour {
 
     [HideInInspector] public ObjectPooler m_ObjectPooler;
 
-    public void ReturnToPool() {
+    public void GetReturned() {
         m_ObjectPooler.ReturnObject(gameObject);
     }
 }

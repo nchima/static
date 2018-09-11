@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,14 +7,13 @@ using DG.Tweening;
 public class ComboManager : MonoBehaviour {
 
     // References
-    [SerializeField] Text textDisplay;
-    [SerializeField] Text scoreDisplay;
-    [SerializeField] Text multiplierDisplay;
+    [SerializeField] Text comboTextDisplay;
+    [SerializeField] Text comboScoreDisplay;
     [SerializeField] GameObject timerBar;
     [SerializeField] Transform timerBarReference;
     [SerializeField] float fontSizeIncreaseFactor = 2f;
     [SerializeField] GameObject comboFinisherPrefab;
-
+    
     //[SerializeField] FloatRange timerBarLengthRange = new FloatRange(0f, 5f);
 
     enum State { ComboActive, ComboIdle }
@@ -30,11 +28,19 @@ public class ComboManager : MonoBehaviour {
     const float PICKUP_OBTAINED_BONUS_TIME = 2f;
     const float MISC_BONUS_TIME = 1f;
 
+    // Enemy kill values.
+    const int SIMPLE_ENEMY_SCORE_VALUE = 100;
+    const int MELEE_ENEMY_SCORE_VALUE = 150;
+    const int LASER_ENEMY_SCORE_VALUE = 200;
+    const int TANK_ENEMY_KILL_VALUE = 200;
+    const int HOVER_ENEMY_KILL_VALUE = 175;
+    const int BOSS_ENEMY_KILL_VALUE = 500;
+    const int LEVEL_COMPLETE_VALUE = 500;
+
     // Other values
-    public const int PICKUP_SCORE_VALUE = 100;
+    const int PICKUP_SCORE_VALUE = 100;
     const int BULLSEYE_VALUE = 200;
     const int SPECIAL_MOVE_VALUE = 50;
-    public int levelCompleteValue = 500;
 
     // Current combo data.
     int simpleEnemiesKilled = 0;
@@ -48,13 +54,9 @@ public class ComboManager : MonoBehaviour {
     int bullseyes = 0;
     int timesSpecialMoveUsed = 0;
 
-    int currentEnemiesKilledScoreTotal = 0;
-
-    int initialMultiplierFontSize;
+    int initialFontSize;
     float modifiedFontSize;
-    int CurrentMultiplierFontSize { get { return Mathf.FloorToInt(MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierFontSize * 1.3f, 2000)); } }
-    float initialMultiplierScale;
-    float CurrentMultiplierScale { get { return MyMath.Map(CurrentMultiplier, 0, 400, initialMultiplierScale * 1.3f, 0.027f); } }
+    int CurrentFontSize { get { return Mathf.FloorToInt(MyMath.Map(GetMultipliedTotal(), 0, 100000, initialFontSize, 800)); } }
 
     int CurrentMultiplier { get { return simpleEnemiesKilled + meleeEnemiesKilled + laserEnemiesKilled + tankEnemiesKilled + hoverEnemiesKilled + bossEnemiesKilled + bullseyes + pickupsObtained + timesSpecialMoveUsed + levelsCompleted + 1; } }
 
@@ -67,7 +69,6 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
-        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void OnDisable() {
@@ -77,17 +78,14 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
-        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void Awake() {
-        initialMultiplierFontSize = multiplierDisplay.fontSize;
-        modifiedFontSize = initialMultiplierFontSize;
-        initialMultiplierScale = multiplierDisplay.rectTransform.localScale.x;
+        initialFontSize = comboScoreDisplay.fontSize;
+        modifiedFontSize = initialFontSize;
 
-        textDisplay.text = "";
-        multiplierDisplay.text = "";
-        scoreDisplay.text = "";
+        comboTextDisplay.text = "";
+        comboScoreDisplay.text = "";
         timerBar.SetActive(false);
     }
 
@@ -107,19 +105,11 @@ public class ComboManager : MonoBehaviour {
             newTimerBarPosition.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, timerBarReference.localPosition.x - timerBarReference.localScale.x * 0.5f, timerBarReference.localPosition.x);
             timerBar.transform.localPosition = newTimerBarPosition;
 
-            textDisplay.text = GenerateComboTextString();
-            scoreDisplay.text = GetUnmultipliedTotal().ToString();
-            multiplierDisplay.text = "X" + CurrentMultiplier.ToString();
+            comboTextDisplay.text = GenerateComboTextString();
+            comboScoreDisplay.text = GetComboTotalAsString();
         }
-
-        // Update size of multiplier display
-        multiplierDisplay.fontSize = Mathf.FloorToInt(modifiedFontSize);
-
-        // Move the multiplier display the correct distance from the score display
-        Vector3 newPosition = scoreDisplay.transform.localPosition;
-        newPosition.y = multiplierDisplay.rectTransform.localPosition.y;
-        newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x + 0.3f;
-        multiplierDisplay.rectTransform.localPosition = newPosition;
+        
+        comboScoreDisplay.fontSize = Mathf.FloorToInt(modifiedFontSize);
     }
 
     private void StartCombo() {
@@ -128,10 +118,11 @@ public class ComboManager : MonoBehaviour {
         state = State.ComboActive;
     }
 
-    public void EndCombo() {
-        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, scoreDisplay.transform.parent).GetComponent<ComboFinisher>();
-        comboFinisher.transform.position = scoreDisplay.transform.position;
-        comboFinisher.Initialize(GetMultipliedTotal(), CurrentMultiplierFontSize);
+    private void EndCombo() {
+        Debug.Log("ending combo");
+        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, comboScoreDisplay.transform.parent).GetComponent<ComboFinisher>();
+        comboFinisher.transform.position = comboScoreDisplay.transform.position;
+        comboFinisher.Initialize(GetMultipliedTotal(), CurrentFontSize);
 
         simpleEnemiesKilled = 0;
         meleeEnemiesKilled = 0;
@@ -143,11 +134,9 @@ public class ComboManager : MonoBehaviour {
         pickupsObtained = 0;
         bullseyes = 0;
         timesSpecialMoveUsed = 0;
-        currentEnemiesKilledScoreTotal = 0;
 
-        textDisplay.text = "";
-        scoreDisplay.text = "";
-        multiplierDisplay.text = "";
+        comboTextDisplay.text = "";
+        comboScoreDisplay.text = "";
 
         timerBar.SetActive(false);
 
@@ -161,15 +150,20 @@ public class ComboManager : MonoBehaviour {
 
     private int GetUnmultipliedTotal() {
         int totalScore = 0;
-        totalScore += currentEnemiesKilledScoreTotal;
-        totalScore += levelsCompleted * levelCompleteValue;
+        totalScore += simpleEnemiesKilled * SIMPLE_ENEMY_SCORE_VALUE;
+        totalScore += meleeEnemiesKilled * MELEE_ENEMY_SCORE_VALUE;
+        totalScore += laserEnemiesKilled * LASER_ENEMY_SCORE_VALUE;
+        totalScore += tankEnemiesKilled * TANK_ENEMY_KILL_VALUE;
+        totalScore += hoverEnemiesKilled * HOVER_ENEMY_KILL_VALUE;
+        totalScore += bossEnemiesKilled * BOSS_ENEMY_KILL_VALUE;
+        totalScore += levelsCompleted * LEVEL_COMPLETE_VALUE;
         totalScore += pickupsObtained * PICKUP_SCORE_VALUE;
         totalScore += timesSpecialMoveUsed * SPECIAL_MOVE_VALUE;
         totalScore += bullseyes * BULLSEYE_VALUE;
         return totalScore;
     }
 
-    public int GetMultipliedTotal() {
+    private int GetMultipliedTotal() {
         return GetUnmultipliedTotal() * CurrentMultiplier;
     }
 
@@ -182,7 +176,6 @@ public class ComboManager : MonoBehaviour {
         }
 
         if (simpleEnemiesKilled > 0) {
-            if (comboString != "") { comboString += " + "; }
             comboString += "Basic Enemy Killed x" + simpleEnemiesKilled.ToString();
         }
 
@@ -248,8 +241,6 @@ public class ComboManager : MonoBehaviour {
         else if (playerKilledEnemyEvent.enemyKilled is HoveringEnemy) { hoverEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is SnailEnemy) { bossEnemiesKilled++; }
 
-        currentEnemiesKilledScoreTotal += playerKilledEnemyEvent.enemyKilled.scoreKillValue;
-
         StartIncreaseComboValueCoroutine();
     }
 
@@ -291,44 +282,38 @@ public class ComboManager : MonoBehaviour {
         StartIncreaseComboValueCoroutine();
     }
 
-    public void PlayerWasHurtHandler(GameEvent gameEvent) {
-        EndCombo();
-    }
-
     IEnumerator FuckOff() {
 
         TextGenerationSettings settings = new TextGenerationSettings();
         settings.resizeTextForBestFit = true;
         settings.textAnchor = TextAnchor.MiddleCenter;
-        settings.color = textDisplay.color;
+        settings.color = comboTextDisplay.color;
         settings.generationExtents = new Vector2(1000f, 1000f);
         settings.pivot = Vector2.zero;
         settings.richText = true;
-        settings.font = textDisplay.font;
+        settings.font = comboTextDisplay.font;
         //settings.fontSize = comboTextDisplay.fontSize;
-        settings.fontStyle = textDisplay.fontStyle;
+        settings.fontStyle = comboTextDisplay.fontStyle;
         settings.verticalOverflow = VerticalWrapMode.Overflow;
         TextGenerator generator = new TextGenerator();
-        generator.Populate(textDisplay.text, settings);
+        generator.Populate(comboTextDisplay.text, settings);
 
         yield return new WaitForEndOfFrame();
 
-        textDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / textDisplay.canvas.scaleFactor);
+        comboTextDisplay.fontSize = Mathf.FloorToInt(generator.fontSizeUsedForBestFit / comboTextDisplay.canvas.scaleFactor);
 
         yield return null;
     }
 
     IEnumerator IncreaseComboValueCoroutine() {
-        modifiedFontSize = Mathf.FloorToInt(CurrentMultiplierFontSize * fontSizeIncreaseFactor);
-        multiplierDisplay.rectTransform.localScale = CurrentMultiplierScale * Vector2.one;
-        yield return new WaitForSeconds(0.5f);
+        modifiedFontSize = Mathf.FloorToInt(CurrentFontSize * fontSizeIncreaseFactor);
+        yield return new WaitForSeconds(0.1f);
 
         float duration = 0.2f;
-        DOTween.To(() => modifiedFontSize, x => modifiedFontSize = x, initialMultiplierFontSize, duration);
-        multiplierDisplay.rectTransform.DOScale(initialMultiplierScale, duration);
+        DOTween.To(() => modifiedFontSize, x => modifiedFontSize = x, CurrentFontSize, duration);
         yield return new WaitForSeconds(duration);
              
-        multiplierDisplay.fontSize = initialMultiplierFontSize;
+        comboScoreDisplay.fontSize = initialFontSize;
         yield return null;
     }
 }

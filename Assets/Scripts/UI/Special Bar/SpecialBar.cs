@@ -18,8 +18,8 @@ public class SpecialBar : MonoBehaviour {
         set {
             if (value >= 1f && !Services.specialBarManager.BothFirstBarsFull) { value = Mathf.Clamp01(value); }
             else { value = Mathf.Clamp(value, 0f, 2f); }
-            bar1SizeController.PercentageFilled = Mathf.Clamp01(value);
-            bar2SizeController.PercentageFilled = Mathf.Clamp01(value - 1);
+            bar1SizeController.percentageFilled = Mathf.Clamp01(value);
+            bar2SizeController.percentageFilled = Mathf.Clamp01(value - 1);
             currentValue = value;
         }
     }

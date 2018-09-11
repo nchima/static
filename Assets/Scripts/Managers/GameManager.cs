@@ -52,7 +52,6 @@ public class GameManager : MonoBehaviour {
         Services.extraScreenManager = GetComponentInChildren<ExtraScreenManager>();
         Services.steamLeaderboardManager = GetComponentInChildren<SteamLeaderboardManager>();
         Services.analyticsManager = GetComponentInChildren<AnalyticsManager>();
-        Services.comboManager = GetComponentInChildren<ComboManager>();
     }
 
     private void OnEnable() {
