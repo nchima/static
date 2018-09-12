@@ -137,26 +137,32 @@ public class PlayerController : MonoBehaviour {
 
         /* HANDLE DASHING INPUT */
         if (state == State.Normal) {
-            dashCooldownTimer += Time.deltaTime;
-            if (dashCooldownTimer >= dashCooldown && dashRechargeTimer >= DASH_RECHARGE_TIME) {
-                if (InputManager.dashButtonDown && !isSuperDashCharging) {
-                    BeginDash(false);
-                }
+            //dashCooldownTimer += Time.deltaTime;
+            //if (dashCooldownTimer >= dashCooldown && dashRechargeTimer >= DASH_RECHARGE_TIME) {
+            //    if (InputManager.dashButtonDown && !isSuperDashCharging) {
+            //        BeginDash(false);
+            //    }
 
-                if (InputManager.dashButton && !isSuperDashCharging) {
-                    superDashHoldTimer += Time.deltaTime;
-                    if (superDashHoldTimer > superDashHoldDuration /*&& Services.specialBarManager.bothBarsFull*/) {
-                        if (!Services.specialMoveManager.HasAmmo) { return; }
-                        Services.specialBarManager.PlayerUsedSpecialMove();
-                        Services.levelManager.SetFloorCollidersActive(false);
-                        //FindObjectOfType<ShotgunCharge>().BeginSequence();
-                        //Services.fallingSequenceManager.BeginFalling();
-                        //isSuperDashCharging = true;
-                        //BeginDash(true);
-                    }
-                } else {
-                    superDashHoldTimer = 0f;
-                }
+            //    if (InputManager.dashButton && !isSuperDashCharging) {
+            //        superDashHoldTimer += Time.deltaTime;
+            //        if (superDashHoldTimer > superDashHoldDuration /*&& Services.specialBarManager.bothBarsFull*/) {
+            //            if (!Services.specialMoveManager.HasAmmo) { return; }
+            //            Services.specialBarManager.PlayerUsedSpecialMove();
+            //            Services.levelManager.SetFloorCollidersActive(false);
+            //            //FindObjectOfType<ShotgunCharge>().BeginSequence();
+            //            //Services.fallingSequenceManager.BeginFalling();
+            //            //isSuperDashCharging = true;
+            //            //BeginDash(true);
+            //        }
+            //    } else {
+            //        superDashHoldTimer = 0f;
+            //    }
+            //}
+
+            if (InputManager.dashButtonDown && Services.specialBarManager.ShotsSaved > 0) {
+                //Services.comboManager.EndCombo();
+                Services.specialBarManager.PlayerUsedSpecialMove();
+                Services.levelManager.SetFloorCollidersActive(false);
             }
         }
 

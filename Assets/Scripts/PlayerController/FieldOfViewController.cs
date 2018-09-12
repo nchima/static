@@ -14,7 +14,7 @@ public class FieldOfViewController : MonoBehaviour {
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
     FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
 
-    [SerializeField] Camera perspectiveCam;
+    [SerializeField] public Camera perspectiveCam;
     [HideInInspector] public List<Camera> orthographicCams;
 
     FloatRange shotgunChargeFOVRange = new FloatRange(85f, 100f);
@@ -27,7 +27,7 @@ public class FieldOfViewController : MonoBehaviour {
     bool freezeUpdate = false;
 
     float _currentFOV;
-    float currentFOV {
+    public float CurrentFOV {
         get {
             return _currentFOV;
         }
@@ -39,7 +39,7 @@ public class FieldOfViewController : MonoBehaviour {
     }
 
     float _currentOrthoSize;
-    float CurrentOrthoSize {
+    public float CurrentOrthoSize {
         get {
             return _currentOrthoSize;
         }
@@ -50,7 +50,6 @@ public class FieldOfViewController : MonoBehaviour {
         }
     }
 
-
     private void Awake() {
         // Go through all cameras in my children and add them to the right array.
         orthographicCams = new List<Camera>();
@@ -60,18 +59,15 @@ public class FieldOfViewController : MonoBehaviour {
         }
     }
 
-
     private void Update() {
         SetFieldOfView(GunValueManager.currentValue);
     }
 
-
     void SetFieldOfView(float sineValue) {
         if (freezeUpdate) { return; }
-        currentFOV = MyMath.Map(sineValue, 1f, -1f, fieldOfViewRange.min, fieldOfViewRange.max);
+        CurrentFOV = MyMath.Map(sineValue, 1f, -1f, fieldOfViewRange.min, fieldOfViewRange.max);
         CurrentOrthoSize = MyMath.Map(sineValue, 1f, -1f, orthographicSizeRange.min, orthographicSizeRange.max);
     }
-
 
     Tween moveCameraTween;
     Tween rotateCameraTween;
@@ -87,7 +83,6 @@ public class FieldOfViewController : MonoBehaviour {
         freezeUpdate = true;
     }
 
-
     public void TweenToNormalFOV() {
         TweenFieldOfView(shotgunChargeFOVRange.min, shotgunChargeOrthoSizeRange.min, 0.14f);
 
@@ -99,19 +94,21 @@ public class FieldOfViewController : MonoBehaviour {
         freezeUpdate = false;
     }
 
-
     public void SetClearVeilActive(bool value) {
         backgroundClearVeil1.SetActive(value);
         foregroundClearVeil1.SetActive(!value);
         foregroundClearVeil2.SetActive(value);
     }
 
-
-    void TweenFieldOfView(float targetFOV, float targetOrthoSize, float duration) {
-        DOTween.To(() => currentFOV, x => currentFOV = x, targetFOV, duration);
+    public void TweenFieldOfView(float targetFOV, float targetOrthoSize, float duration) {
+        DOTween.To(() => CurrentFOV, x => CurrentFOV = x, targetFOV, duration);
         DOTween.To(() => CurrentOrthoSize, x => CurrentOrthoSize = x, targetOrthoSize, duration);
     }
 
+    public void SetFieldOfView(float targetFOV, float targetOrthoSize) {
+        CurrentFOV = targetFOV;
+        CurrentOrthoSize = targetOrthoSize;
+    }
 
     public void ActivateCameraClearing(bool value) {
         if (value == true) {
