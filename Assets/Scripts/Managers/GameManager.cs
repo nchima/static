@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour {
         Services.steamLeaderboardManager = GetComponentInChildren<SteamLeaderboardManager>();
         Services.analyticsManager = GetComponentInChildren<AnalyticsManager>();
         Services.comboManager = GetComponentInChildren<ComboManager>();
+        Services.timeScaleManager = GetComponentInChildren<TimeScaleManager>();
     }
 
     private void OnEnable() {
@@ -102,21 +103,19 @@ public class GameManager : MonoBehaviour {
 
 
     private void Update() {
-        pauseInputCooldownTimer += Time.deltaTime;
+        pauseInputCooldownTimer += Time.unscaledDeltaTime;
         if (!gamePaused && InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead && pauseInputCooldownTimer >= PAUSE_INPUT_COOLDOWN) {
             PauseGame(true);
         }
     }
 
 
-    float memorizedTimeScale;
     public static bool gamePaused;
     public void PauseGame(bool value) {
         pauseInputCooldownTimer = 0f;
         if (value == true) {
             Services.uiManager.ShowPauseScreen();
-            memorizedTimeScale = Time.timeScale;
-            Time.timeScale = 0f;
+            Services.timeScaleManager.Pause(true);
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             Services.gun.canShoot = false;
@@ -125,7 +124,7 @@ public class GameManager : MonoBehaviour {
 
         else {
             Services.uiManager.HidePauseScreen();
-            Time.timeScale = memorizedTimeScale;
+            Services.timeScaleManager.Pause(false);
             if (!isGameStarted) { Services.uiManager.titleScreen.SetActive(true); }
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
@@ -133,16 +132,6 @@ public class GameManager : MonoBehaviour {
             gamePaused = false;
         }
     }
-
-
-    // MOVE TO TIME SCALE MANAGER
-    public void ReturnToFullSpeed() {
-        // Begin tweening time scale, gun burst rate, and music pitch back to normal.
-        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        DOTween.To(() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        Services.musicManager.ReturnMusicPitchToFullSpeed();
-    }
-
 
     // MOVE TO UM... ENEMY MANAGER IF I MAKE ONE
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {

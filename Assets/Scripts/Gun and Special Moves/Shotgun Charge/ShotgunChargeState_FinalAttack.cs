@@ -58,7 +58,7 @@ public class ShotgunChargeState_FinalAttack : State {
 
     IEnumerator ShockwaveCoroutine() {
         //yield return new WaitForSeconds(0.25f);
-        Services.gameManager.ReturnToFullSpeed();
+        Services.timeScaleManager.ReturnToFullSpeed();
         //yield return new WaitForSeconds(0.25f);
         GetComponent<TriggerTransition>().isTriggerSet = true;
         yield return null;

@@ -50,7 +50,7 @@ public class FiringShockwaveState : State {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        Services.gameManager.ReturnToFullSpeed();
+        Services.timeScaleManager.ReturnToFullSpeed();
         Services.musicManager.ExitFallingSequence();
         Services.musicManager.RandomizeAllMusicVolumeLevels();
 

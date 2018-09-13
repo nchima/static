@@ -13,7 +13,7 @@ public class FallingSequenceManager : StateController {
 
     public bool isPlayerFalling {
         get {
-            if (currentState.name.ToLower().Contains("fall") || currentState.name.ToLower().Contains("fall")) { return true; }
+            if (currentState.name.ToLower().Contains("fall")) { return true; }
             else { return false; }
         }
     }
@@ -104,7 +104,7 @@ public class FallingSequenceManager : StateController {
 
     public void InstantiateShockwave(GameObject prefab, float gunRate) {
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
-        DOTween.To(() => Time.timeScale, x => Time.timeScale = x, 0.1f, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+        Services.timeScaleManager.TweenTimeScale(0.1f, 0.1f);
         Services.musicManager.PitchDownMusicForSlowMotion();
 
         // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
@@ -119,7 +119,7 @@ public class FallingSequenceManager : StateController {
 
     public void SetUpFallingVariables() {
         // In case the game is currently running in slow motion, return to full speed.
-        if (Time.timeScale != 1f) { Services.gameManager.ReturnToFullSpeed(); }
+        if (Services.timeScaleManager.IsAtFullSpeed) { Services.timeScaleManager.ReturnToFullSpeed(); }
 
         // If the player is not currently set to falling state, set them to that state.
         if (Services.playerController.state != PlayerController.State.SpeedFalling) {
@@ -149,7 +149,7 @@ public class FallingSequenceManager : StateController {
     }
 
     public void BeginFalling() {
-        TransitionToState(GetComponentInChildren<PauseAfterLevelCompleteFallingState>());
+        TransitionToState(GetComponentInChildren<FallIntoLevelState>());
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {

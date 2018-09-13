@@ -29,4 +29,5 @@ public class Services {
     public static SteamLeaderboardManager steamLeaderboardManager;
     public static AnalyticsManager analyticsManager;
     public static ComboManager comboManager;
+    public static TimeScaleManager timeScaleManager;
 }
