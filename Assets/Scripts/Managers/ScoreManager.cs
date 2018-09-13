@@ -53,12 +53,6 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] Transform highScoreListText;
 
     // TIME BONUS STUFF
-    [SerializeField] GameObject levelCompletedScreen;
-    [SerializeField] TextMesh levelCompletedDisplay;
-    [SerializeField] TextMesh secondsDisplay;
-    [SerializeField] TextMesh bonusScoreDisplay;
-    [SerializeField] TextMesh nextLevelDisplay;
-
     bool bonusTimerIsRunning;
     int maxTimeBonus;
     float maxBonusTime;
@@ -176,7 +170,7 @@ public class ScoreManager : MonoBehaviour
         //Score += CurrentTimeBonus;
         bonusTimerIsRunning = false;
 
-        ShowLevelCompleteScreen();
+        //ShowLevelCompleteScreen();
     }
 
 
@@ -188,20 +182,13 @@ public class ScoreManager : MonoBehaviour
     }
 
 
-    void ShowLevelCompleteScreen() {
-        levelCompletedScreen.SetActive(true);
-        levelCompletedDisplay.text = "LEVEL " + Services.levelManager.CurrentLevelNumber.ToString() + " COMPLETED";
-        secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
-        //bonusScoreDisplay.text = CurrentTimeBonus.ToString();
-        nextLevelDisplay.text = "NOW ENTERING LEVEL " + (Services.levelManager.CurrentLevelNumber + 1).ToString();
-    }
-
-
-    public void HideLevelCompleteScreen()
-    {
-        levelCompletedScreen.SetActive(false);
-    }
-    
+    //void ShowLevelCompleteScreen() {
+        //levelCompletedScreen.SetActive(true);
+        //levelCompletedDisplay.text = "LEVEL " + Services.levelManager.CurrentLevelNumber.ToString() + " COMPLETED";
+        //secondsDisplay.text = "IN " + (Mathf.Round(bonusTimer * 100f) / 100f).ToString() + " SECONDS!";
+        ////bonusScoreDisplay.text = CurrentTimeBonus.ToString();
+        //nextLevelDisplay.text = "NOW ENTERING LEVEL " + (Services.levelManager.CurrentLevelNumber + 1).ToString();
+    //}    
 
     /// <summary>
     /// Should be called when a bullet hits an enemy.

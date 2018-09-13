@@ -5,10 +5,11 @@ using DG.Tweening;
 
 public class FallingSequenceManager : StateController {
 
+    public GameObject shockwavePrefab;
+    [SerializeField] TriggerTransition fallingTrigger;
+
     [HideInInspector] public enum PlayerState { Normal, PauseAfterLevelComplete, FallingIntoLevel, FiringShockwave };
     [HideInInspector] public PlayerState playerState = PlayerState.Normal;
-
-    [SerializeField] TriggerTransition fallingTrigger;
 
     public bool isPlayerFalling {
         get {
@@ -39,8 +40,6 @@ public class FallingSequenceManager : StateController {
     [HideInInspector] public int timesMissedLevel = 0;
 
     [HideInInspector] public float normalPlayerBounciness;
-
-    public GameObject shockwavePrefab;
 
     [HideInInspector] public Transform playerSpawnPoint;
     Transform player;
@@ -150,11 +149,7 @@ public class FallingSequenceManager : StateController {
     }
 
     public void BeginFalling() {
-        TransitionToState(GetComponentInChildren<FallIntoLevelState>());
-    }
-
-    public void BeginFallingInstant() {
-        TransitionToState(GetComponentInChildren<FallIntoLevelState>());
+        TransitionToState(GetComponentInChildren<PauseAfterLevelCompleteFallingState>());
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {

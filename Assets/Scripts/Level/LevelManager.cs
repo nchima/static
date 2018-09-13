@@ -10,7 +10,7 @@ public class LevelManager : MonoBehaviour {
     [SerializeField] LevelSet overrideLevelSet;
     [SerializeField] LevelBranchNode firstBranchNode;
 
-    LevelSet currentLevelSet;
+    [HideInInspector] public LevelSet currentLevelSet;
     LevelBranchNode currentBranchNode;
 
     [HideInInspector] public LevelData currentlyLoadedLevelData;
@@ -116,7 +116,6 @@ public class LevelManager : MonoBehaviour {
         //for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         //SetEnemiesActive(false);
 
-        isLevelCompleted = false;
         currentlyLoadedLevelData = levelData;
 
         yield return null;

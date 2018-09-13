@@ -15,6 +15,16 @@ public class LevelSet : ScriptableObject {
 
     public bool AllLevelsCompleted { get { return levelsCompleted >= levelDataReferences.Count && levelDataReferences.Count != 0; } }
     public LevelData NextLevel { get { return levelDataReferences[levelsCompleted].levelData; } }
+    public string Name {
+        get {
+            string firstWordOfName = "";
+            for (int i = 0; i < this.name.Length; i++) {
+                if (this.name[i] != ' ') { firstWordOfName += this.name[i]; }
+                else { break; }
+            }
+            return firstWordOfName;
+        }
+    }
 
     public LevelData GetLevelData(int index) {
         return levelDataReferences[index].levelData;

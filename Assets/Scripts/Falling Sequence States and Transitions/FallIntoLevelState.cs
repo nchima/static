@@ -30,8 +30,18 @@ public class FallIntoLevelState : State {
             speedFallTrigger = false;
         }
 
-        if (Services.playerTransform.position.y <= 600f) {
-            Services.scoreManager.HideLevelCompleteScreen();
+        if (Services.levelManager.isLevelCompleted) {
+            if (Services.playerTransform.position.y <= 1450f && Services.uiManager.levelCompleteScreen.activeInHierarchy) {
+                Services.uiManager.ShowLevelCompleteScreen(false);
+            }
+
+            if (Services.playerTransform.position.y <= 1400f && !Services.uiManager.nowEnteringScreen.activeInHierarchy) {
+                Services.uiManager.ShowNowEnteringScreen(true);
+            }
+
+            if (Services.playerTransform.position.y <= 900f && Services.uiManager.nowEnteringScreen.activeInHierarchy) {
+                Services.uiManager.ShowNowEnteringScreen(false);
+            }
         }
 
         // Move the player off of any obstacles they might land on.
@@ -53,6 +63,7 @@ public class FallIntoLevelState : State {
         Services.fieldOfViewController.SetClearVeilActive(false);
         Services.fieldOfViewController.ActivateCameraClearing(false);
         Services.colorPaletteManager.LoadLevelPalette();
+        Services.levelManager.isLevelCompleted = false;
     }
 
     private void BeginSpeedFall(StateController stateController) {

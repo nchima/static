@@ -386,6 +386,7 @@
     <Compile Include="Assets\Scripts\UI\Menu Screens\HighScoreScreen.cs" />
     <Compile Include="Assets\Scripts\UI\Menu Screens\InitialEntry.cs" />
     <Compile Include="Assets\Scripts\UI\Menu Screens\MainMenuUI.cs" />
+    <Compile Include="Assets\Scripts\UI\Menu Screens\NowEnteringScreen.cs" />
     <Compile Include="Assets\Scripts\UI\Menu Screens\OptionsScreen.cs" />
     <Compile Include="Assets\Scripts\UI\Menu Screens\SeizureWarningScreen.cs" />
     <Compile Include="Assets\Scripts\UI\Menu Screens\TitleScreenButtons.cs" />

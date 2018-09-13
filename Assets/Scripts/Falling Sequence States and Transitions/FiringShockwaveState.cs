@@ -9,7 +9,8 @@ public class FiringShockwaveState : State {
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        Services.scoreManager.HideLevelCompleteScreen();
+        Services.uiManager.ShowLevelCompleteScreen(false);
+        Services.uiManager.ShowNowEnteringScreen(false);
         Services.gameManager.CountEnemies();
 
         // Set up bonus time for next level.
