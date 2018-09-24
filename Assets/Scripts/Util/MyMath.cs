@@ -20,6 +20,11 @@ public class MyMath {
         return Wrap(x, 0f, 1f);
     }
 
+    public static float ClampPositive(float value) {
+        if (value < 0) { value = 0; }
+        return value;
+    }
+
     public static float Either1orNegative1 {
         get {
             float rand = Random.value;
@@ -30,6 +35,15 @@ public class MyMath {
     public static int BoolToInt(bool input) {
         if (input) { return 1; }
         else { return 0; }
+    }
+
+    public static bool IntToBool(int input) {
+        if (input == 0) { return false; }
+        else if (input == 1) { return true; }
+        else {
+            Debug.LogError("The given integer was neither 0 or 1. Returning false.");
+            return false;
+        }
     }
 
     public static float Average(float[] values) {

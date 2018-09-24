@@ -31,6 +31,8 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void Awake() {
+        // Make sure the first level set is unlocked
+        firstBranchNode.IsUnlocked = true;
 
         // Load the first level set.
         if (overrideLevelSet != null) {
@@ -65,20 +67,14 @@ public class LevelManager : MonoBehaviour {
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
         isLevelCompleted = true;
-        Debug.Log("increasing levels completed of: " + currentLevelSet.name);
         currentLevelSet.levelsCompleted++;
         levelsCompleted++;
+        if (currentLevelSet.AllLevelsCompleted) { Services.uiManager.ShowEpisodeCompleteScreen(true); }
+        else { Services.uiManager.ShowLevelCompleteScreen(true); }
         SetFloorCollidersActive(false);
     }
 
     public void LoadNextLevel() {
-        // If the player has completed every level, show the end of demo screen.
-        //if (IsLevelLoaded && (levelsCompleted >= TotalNumberOfLevels)) {
-        //    SceneManager.UnloadSceneAsync(currentlyLoadedLevelData.buildIndex);
-        //    Services.uiManager.ShowEndOfDemoScreen();
-        //    return;
-        //}
-
         // If the player has completed all the levels in a set, load the next set.
         if (currentLevelSet.AllLevelsCompleted) {
             Debug.Log("all levels complete");
@@ -91,6 +87,8 @@ public class LevelManager : MonoBehaviour {
 
             // Determine the next level set and load it.
             currentBranchNode = currentBranchNode.DetermineNext();
+            Debug.Log("Unlocking: " + currentBranchNode.levelSet.Name);
+            currentBranchNode.IsUnlocked = true;
             currentLevelSet = currentBranchNode.levelSet;
             currentLevelSet.levelsCompleted = 0;
         }
@@ -192,6 +190,16 @@ public class LevelManager : MonoBehaviour {
 
         Debug.LogError("Hey, sorry but I couldn't find a level set with that name. :-(");
         return null;
+    }
+
+    public void ResetLevelProgress() {
+        RecursiveBranchReset(firstBranchNode);
+    }
+
+    void RecursiveBranchReset(LevelBranchNode node) {
+        node.IsUnlocked = false;
+        if (node.branch1 != null) { RecursiveBranchReset(node.branch1); }
+        if (node.branch2 != null) { RecursiveBranchReset(node.branch2); }
     }
 
     // Deprecated code:

@@ -30,28 +30,41 @@ public class ColorPaletteManager : MonoBehaviour {
     [SerializeField] ColorPalette playerVulnerablePalette;
     [SerializeField] ColorPalette fallingSequencePalette;
 
-    ColorPalette[] levelPalettes;
-    int levelPaletteIndex = 0;
- 
+    //ColorPalette[] levelPalettes;
+    //int levelPaletteIndex = 0;
+
+    Color randomBackgroundColor { get { return Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 0.75f); } }
+    Color[] ThreeColorPalette(float baseHueDifference, float maxVariation) {
+        float hue1 = Random.value;
+        float hue2 = MyMath.Wrap01(hue1 + baseHueDifference);
+        float hue3 = MyMath.Wrap01(hue2 + baseHueDifference);
+        hue1 += Random.Range(-maxVariation, maxVariation);
+        hue2 += Random.Range(-maxVariation, maxVariation);
+        hue3 += Random.Range(-maxVariation, maxVariation);
+        return new Color[3] {
+            Color.HSVToRGB(hue1, 1f, 1f),
+            Color.HSVToRGB(hue2, 1f, 1f),
+            Color.HSVToRGB(hue3, 1f, 1f)
+        };
+    }
+
     private void Awake() {
         // Memorize original colors.
         ChangePaletteImmediate(defaultPalette);
 
-        levelPalettes = new ColorPalette[Resources.LoadAll<ColorPalette>("Level Color Palettes").Length];
-        for (int i = 1; i < levelPalettes.Length; i++) {
-            string levelNumber = (i + 1).ToString();
-            levelPalettes[i] = Resources.Load<ColorPalette>("Level Color Palettes/Color Palette Level " + levelNumber);
-        }
+        //levelPalettes = new ColorPalette[Resources.LoadAll<ColorPalette>("Level Color Palettes").Length];
+        //for (int i = 1; i < levelPalettes.Length; i++) {
+        //    string levelNumber = (i + 1).ToString();
+        //    levelPalettes[i] = Resources.Load<ColorPalette>("Level Color Palettes/Color Palette Level " + levelNumber);
+        //}
     }
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
-        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
-        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     private void Start() {
@@ -134,21 +147,6 @@ public class ColorPaletteManager : MonoBehaviour {
         yield return null;
     }
 
-    Color randomBackgroundColor { get { return Random.ColorHSV(0f, 1f, 0f, 1f, 0f, 0.75f); } }
-    Color[] ThreeColorPalette(float baseHueDifference, float maxVariation) {
-        float hue1 = Random.value;
-        float hue2 = MyMath.Wrap01(hue1 + baseHueDifference);
-        float hue3 = MyMath.Wrap01(hue2 + baseHueDifference);
-        hue1 += Random.Range(-maxVariation, maxVariation);
-        hue2 += Random.Range(-maxVariation, maxVariation);
-        hue3 += Random.Range(-maxVariation, maxVariation);
-        return new Color[3] {
-            Color.HSVToRGB(hue1, 1f, 1f),
-            Color.HSVToRGB(hue2, 1f, 1f),
-            Color.HSVToRGB(hue3, 1f, 1f)
-        };
-    }
-
     public void LoadVulnerablePalette() {
         ChangePalette(playerVulnerablePalette, 0.1f);
     }
@@ -157,14 +155,16 @@ public class ColorPaletteManager : MonoBehaviour {
         ChangePalette(fallingSequencePalette, 0.1f);
     }
 
-    public void RestoreSavedPalette() {
+    public void LoadLevelPalette() {
         float duration = 0.78f;
-        if (levelPaletteIndex == 0) { ChangePalette(defaultPalette, duration); } 
-        else if (levelPaletteIndex > levelPalettes.Length-1) { ChangePalette(savedPalette, duration); }
-        else {
-            if (levelPalettes[levelPaletteIndex] == null) { ChangePalette(defaultPalette, duration); } 
-            else { ChangePalette(levelPalettes[levelPaletteIndex], duration); }
+
+        if (Services.levelManager.currentLevelSet.colorPalette == null) {
+            Debug.LogWarning("Current level set has not been assigned a color palette. Loading default.");
+            ChangePalette(defaultPalette, duration);
+            return;
         }
+
+        ChangePalette(Services.levelManager.currentLevelSet.colorPalette, duration);
     }
 
     void SaveCurrentPaletteAsNewAsset() {
@@ -180,24 +180,9 @@ public class ColorPaletteManager : MonoBehaviour {
 #endif
     }
 
-    public void LoadLevelPalette() {
-        if (useRandomPalettes || levelPaletteIndex >= levelPalettes.Length) {
-            Debug.Log("using random palette for next level.");
-            ChangeToRandomPalette(0.1f);
-        } else {
-            if (levelPalettes[levelPaletteIndex] == null) { ChangePalette(defaultPalette, 0.1f); }
-            else { ChangePalette(levelPalettes[levelPaletteIndex], 0.1f); }
-        }
-    }
-
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
         LoadVulnerablePalette();
-    }
-
-    public void LevelCompletedHandler(GameEvent gameEvent) {
-        levelPaletteIndex++;
-        //LoadLevelPalette();
     }
 }

@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour {
     public GameObject creditsScreen;
     public GameObject levelCompleteScreen;
     public GameObject nowEnteringScreen;
+    public GameObject episodeCompleteScreen;
     public GameObject pauseScreen;
     public GameObject gameOverScreen;
     public GameObject nameEntryScreen;
@@ -38,13 +39,11 @@ public class UIManager : MonoBehaviour {
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
-        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     public void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
-        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
     }
 
     public void ShowTitleScreen(bool value) {
@@ -115,6 +114,15 @@ public class UIManager : MonoBehaviour {
         levelCompleteScreen.SetActive(value);
     }
 
+    public void ShowEpisodeCompleteScreen(bool value) {
+        episodeCompleteScreen.SetActive(value);
+    }
+
+    public void HideCompleteScreens() {
+        ShowLevelCompleteScreen(false);
+        ShowEpisodeCompleteScreen(false);
+    }
+
     public void ShowNowEnteringScreen(bool value) {
         nowEnteringScreen.SetActive(value);
         nowEnteringScreen.GetComponent<NowEnteringScreen>().UpdateText();
@@ -163,9 +171,5 @@ public class UIManager : MonoBehaviour {
     public void GameStartedHandler(GameEvent gameEvent) {
         pauseVeil.SetActive(false);
         ShowTitleScreen(false);
-    }
-
-    public void LevelCompletedHandler(GameEvent gameEvent) {
-        ShowLevelCompleteScreen(true);
     }
 }

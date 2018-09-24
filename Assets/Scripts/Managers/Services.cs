@@ -30,4 +30,5 @@ public class Services {
     public static AnalyticsManager analyticsManager;
     public static ComboManager comboManager;
     public static TimeScaleManager timeScaleManager;
+    public static Camera finalCamera;
 }

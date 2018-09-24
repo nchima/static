@@ -31,8 +31,8 @@ public class FallIntoLevelState : State {
         }
 
         if (Services.levelManager.isLevelCompleted) {
-            if (Services.playerTransform.position.y <= 1450f && Services.uiManager.levelCompleteScreen.activeInHierarchy) {
-                Services.uiManager.ShowLevelCompleteScreen(false);
+            if (Services.playerTransform.position.y <= 1450f && (Services.uiManager.levelCompleteScreen.activeInHierarchy || Services.uiManager.nowEnteringScreen.activeInHierarchy)) {
+                Services.uiManager.HideCompleteScreens();
             }
 
             if (Services.playerTransform.position.y <= 1400f && !Services.uiManager.nowEnteringScreen.activeInHierarchy) {

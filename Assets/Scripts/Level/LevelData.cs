@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 public class LevelData : ScriptableObject {
 
     public int buildIndex;
-    public ColorPalette colorPalette;
 
     public string Path {
         get {

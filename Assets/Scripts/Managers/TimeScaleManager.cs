@@ -13,7 +13,6 @@ public class TimeScaleManager : MonoBehaviour {
     bool keepAtZero;
 
     private void Update() {
-        Debug.Log("Time scale: " + Time.timeScale);
         if (keepAtZero) { Time.timeScale = 0; }
     }
 
@@ -30,14 +29,12 @@ public class TimeScaleManager : MonoBehaviour {
     }
     
     public void ReturnToFullSpeed() {
-        Debug.Log("returning to full speed.");
         TweenTimeScale(normalTimeScale, 1f);
         DOTween.To(() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
         Services.musicManager.ReturnMusicPitchToFullSpeed();
     }
 
     public void TweenTimeScale(float targetValue, float duration) {
-        Debug.Log("tweening time scale.");
         if (timeScaleTween != null) { timeScaleTween.Kill(); }
         timeScaleTween = DOTween.To(() => Time.timeScale, x => Time.timeScale = x, targetValue, duration).SetEase(Ease.InQuad).SetUpdate(true);
     }

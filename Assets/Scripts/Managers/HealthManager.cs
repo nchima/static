@@ -111,7 +111,7 @@ public class HealthManager : MonoBehaviour {
         if (currentHealth == currentMaxHealth) {
             isInWarningState = false;
             Services.uiManager.healthWarningScreen.SetActive(false);
-            Services.colorPaletteManager.RestoreSavedPalette();
+            Services.colorPaletteManager.LoadLevelPalette();
         }
     }
 
