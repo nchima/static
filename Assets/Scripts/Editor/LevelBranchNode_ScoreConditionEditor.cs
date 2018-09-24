@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(LevelBranchNode_ScoreCondition))]
-public class LevelBranchNode_ScoreConditionEditor : Editor {
+public class LevelBranchNode_ScoreConditionEditor : LevelBranchNodeEditor {
 
     private LevelBranchNode_ScoreCondition levelBranchNode { get { return target as LevelBranchNode_ScoreCondition; } }
 

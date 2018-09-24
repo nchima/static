@@ -192,14 +192,14 @@ public class LevelManager : MonoBehaviour {
         return null;
     }
 
-    public void ResetLevelProgress() {
-        RecursiveBranchReset(firstBranchNode);
+    public void SetAllLevelsUnlockState(bool value) {
+        RecursiveBranchLock(firstBranchNode, value);
     }
 
-    void RecursiveBranchReset(LevelBranchNode node) {
-        node.IsUnlocked = false;
-        if (node.branch1 != null) { RecursiveBranchReset(node.branch1); }
-        if (node.branch2 != null) { RecursiveBranchReset(node.branch2); }
+    void RecursiveBranchLock(LevelBranchNode node, bool value) {
+        node.IsUnlocked = value;
+        if (node.branch1 != null) { RecursiveBranchLock(node.branch1, value); }
+        if (node.branch2 != null) { RecursiveBranchLock(node.branch2, value); }
     }
 
     // Deprecated code:
