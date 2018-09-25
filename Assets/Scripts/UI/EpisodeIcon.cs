@@ -57,6 +57,9 @@ public class EpisodeIcon : MonoBehaviour {
         lockedIconMesh.SetActive(!correspondingNode.IsUnlocked);
 
         // Light up the correct branches
+        // Actually if this thingy is locked then don't do anything just stop stop stop
+        if(!correspondingNode.IsUnlocked) { return; }
+
         // If this node has no branches, just deactivate all sliders.
         bool anyBranchUnlocked = false;
         for (int i = 0; i < correspondingNode.branches.Length; i++) {

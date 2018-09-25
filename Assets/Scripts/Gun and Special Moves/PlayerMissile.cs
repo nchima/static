@@ -121,7 +121,6 @@ public class PlayerMissile : MonoBehaviour {
         RaycastHit hit;
         int layerMask = (1 << 8) | (1 << 14) | (1 << 20) | (1 << 23);
         if (Physics.Raycast(Services.gun.tip.position, Services.gun.tip.forward, out hit, 500f, layerMask)) {
-            Debug.Log("setting it so this bulsfilea");  
             initialDirection = Vector3.Normalize(hit.point - Services.gun.tip.position);
             transform.forward = initialDirection;
             Debug.DrawLine(transform.position, hit.point, Color.red, 1f);
