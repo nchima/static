@@ -10,6 +10,10 @@ public class EpisodeIcon : MonoBehaviour {
     [SerializeField] GameObject unlockedIconMesh;
     [SerializeField] GameObject lockedIconMesh;
     [SerializeField] LevelBranchNode correspondingNode;
+    [SerializeField] GameObject branchStem;
+    [SerializeField] GameObject upperBranch;
+    [SerializeField] GameObject middleBranch;
+    [SerializeField] GameObject lowerBranch;
 
     enum SelectionState { Highlighted, Unhighlighted }
     SelectionState selectionState = SelectionState.Unhighlighted;
@@ -44,11 +48,49 @@ public class EpisodeIcon : MonoBehaviour {
     float currentRotationSpeed = 10f;
 
     private void Start() {
+        // Set name text
         if (correspondingNode.IsUnlocked) { m_Text.text = correspondingNode.levelSet.Name.ToUpper(); }
         else { m_Text.text = "???"; }
 
+        // Activate the proper 3D icon
         unlockedIconMesh.SetActive(correspondingNode.IsUnlocked);
         lockedIconMesh.SetActive(!correspondingNode.IsUnlocked);
+
+        // Light up the correct branches
+        // If this node has no branches, just deactivate all sliders.
+        bool anyBranchUnlocked = false;
+        for (int i = 0; i < correspondingNode.branches.Length; i++) {
+            if (correspondingNode.branches[i].IsUnlocked) {
+                anyBranchUnlocked = true;
+                break;
+            }
+        }
+
+        SetBranchHighlight(branchStem, MyMath.BoolToInt(anyBranchUnlocked));
+
+        if (correspondingNode.branches.Length == 0) {
+            SetBranchHighlight(upperBranch, 0);
+            SetBranchHighlight(middleBranch, 0);
+            SetBranchHighlight(lowerBranch, 0);
+        }
+
+        else if (correspondingNode.branches.Length == 2) {
+            if (upperBranch.activeInHierarchy) {
+                SetBranchHighlight(upperBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked));
+                SetBranchHighlight(middleBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
+            }
+
+            else {
+                SetBranchHighlight(middleBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked));
+                SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
+            }
+        }
+
+        else if (correspondingNode.branches.Length == 3) {
+            SetBranchHighlight(upperBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked));
+            SetBranchHighlight(middleBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
+            SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[2].IsUnlocked));
+        }
     }
 
     private void Update() {
@@ -120,5 +162,11 @@ public class EpisodeIcon : MonoBehaviour {
     void ClearActiveTweens() {
         foreach (Tween tween in activeTweens) { tween.Kill(); }
         activeTweens.Clear();
+    }
+
+    void SetBranchHighlight(GameObject branchParent, int value) {
+        foreach (Slider slider in branchParent.GetComponentsInChildren<Slider>()) {
+            slider.value = value;
+        }
     }
 }

@@ -198,8 +198,11 @@ public class LevelManager : MonoBehaviour {
 
     void RecursiveBranchLock(LevelBranchNode node, bool value) {
         node.IsUnlocked = value;
-        if (node.branch1 != null) { RecursiveBranchLock(node.branch1, value); }
-        if (node.branch2 != null) { RecursiveBranchLock(node.branch2, value); }
+        Debug.Log("Setting " + node.gameObject.name + " unlocked state to " + value);
+        if (node.branches == null || node.branches.Length == 0) { Debug.Log("Returning from " + node.gameObject.name);  return; }
+        foreach (LevelBranchNode branchNode in node.branches) {
+            if (branchNode != null) { RecursiveBranchLock(branchNode, value); }
+        }
     }
 
     // Deprecated code:
