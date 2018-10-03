@@ -95,6 +95,12 @@ public class FallingSequenceManager : StateController {
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+    }
+
+
     protected override void Update() {
         base.Update();
         if (timesMissedLevel > 2) {
@@ -158,10 +164,5 @@ public class FallingSequenceManager : StateController {
 
     public void GameStartedHandler(GameEvent gameEvent) {
         BeginFalling();
-    }
-
-    private void OnDisable() {
-        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
-        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 }

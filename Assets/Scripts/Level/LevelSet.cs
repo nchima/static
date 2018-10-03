@@ -15,7 +15,8 @@ public class LevelSet : ScriptableObject {
         get {
             string firstWordOfName = "";
             for (int i = 0; i < this.name.Length; i++) {
-                if (this.name[i] != ' ') { firstWordOfName += this.name[i]; } else { break; }
+                if (this.name[i] != ' ') { firstWordOfName += this.name[i]; }
+                else { break; }
             }
             return firstWordOfName;
         }

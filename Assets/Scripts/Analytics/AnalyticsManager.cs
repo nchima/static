@@ -99,7 +99,7 @@ public class AnalyticsManager : MonoBehaviour {
         Analytics.CustomEvent("Player Died", new Dictionary<string, object> {
             { "Level died on", Services.levelManager.currentlyLoadedLevelData.name },
             { "Starting level set", startingLevelSet },
-            { "Levels completed", Services.levelManager.levelsCompleted },
+            { "Levels completed", Services.levelManager.totalLevelsCompleted },
             { "Play time", timeAlive },
             { "Average tuning value", MyMath.Average(tuningValuesTotal) },
             { "Times special move used in level", timesSpecialMoveUsedTotal },

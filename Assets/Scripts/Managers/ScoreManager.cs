@@ -166,11 +166,7 @@ public class ScoreManager : MonoBehaviour
 
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        // Give the player a score boost for beating the level.
-        //Score += CurrentTimeBonus;
         bonusTimerIsRunning = false;
-
-        //ShowLevelCompleteScreen();
     }
 
 

@@ -16,7 +16,7 @@ public class SeizureWarningScreen : MonoBehaviour {
             Application.Quit();
         }
 
-        else if (InputManager.pauseButtonDown || InputManager.submitButtonDown) {
+        else if (InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.fireButtonDown) {
             FindObjectOfType<SkipSeizureWarning>().skipSeizureWarning = true;
             Services.uiManager.ShowTitleScreen(true);
         }

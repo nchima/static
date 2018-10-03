@@ -4,24 +4,15 @@ using UnityEngine;
 
 public class EpisodeSelectScreen : MonoBehaviour {
 
-	public void BeginningButton() {
-        //Services.levelManager.SetStartingLevelSet("GDC Level Set");
-        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
+    private void Start() {
+        Services.uiManager.gameMap.SetActive(true);
+        Services.uiManager.gameMap.GetComponent<GameMap>().AllowMouseInput(true);
+        Services.uiManager.gameMap.GetComponent<GameMap>().HighlightUnlockedPaths();
     }
 
-    public void CathedralButton() {
-        Services.levelManager.SetStartingLevelSet("Cathedral Level Set");
-        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
-    }
-
-    public void AnatomiaButton() {
-        Services.levelManager.SetStartingLevelSet("Anatomia Level Set");
-        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
-    }
-
-    public void IslandsButton() {
-        Services.levelManager.SetStartingLevelSet("Islands Level Set");
-        GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
+    private void OnDisable() {
+        Services.uiManager.gameMap.GetComponent<GameMap>().AllowMouseInput(false);
+        Services.uiManager.gameMap.SetActive(false);
     }
 
     public void BackButton() {

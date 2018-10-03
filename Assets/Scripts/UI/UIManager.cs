@@ -9,12 +9,14 @@ public class UIManager : MonoBehaviour {
     public GameObject seizureWarningScreen;
     public GameObject titleScreen;
     public GameObject episodeSelectScreen;
+    public GameObject gameMap;
     public GameObject controlsScreen;
     public GameObject optionsScreen;
     public GameObject creditsScreen;
     public GameObject levelCompleteScreen;
     public GameObject nowEnteringScreen;
     public GameObject episodeCompleteScreen;
+    public GameObject pathSelectedScreen;
     public GameObject pauseScreen;
     public GameObject gameOverScreen;
     public GameObject nameEntryScreen;
@@ -87,6 +89,7 @@ public class UIManager : MonoBehaviour {
         titleScreen.SetActive(false);
         levelCompleteScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
+        gameMap.SetActive(false);
     }
 
     public void ShowControlsScreen(bool value) {
@@ -108,6 +111,7 @@ public class UIManager : MonoBehaviour {
         titleScreen.SetActive(titleScreenActiveBeforePause);
         levelCompleteScreen.SetActive(levelCompleteScreenActiveBeforePause);
         healthWarningScreen.SetActive(healthWarningScreenActiveBeforePause);
+        gameMap.SetActive(levelCompleteScreenActiveBeforePause);
     }
 
     public void ShowLevelCompleteScreen(bool value) {
@@ -115,6 +119,7 @@ public class UIManager : MonoBehaviour {
     }
 
     public void ShowEpisodeCompleteScreen(bool value) {
+        pauseVeil.SetActive(value);
         episodeCompleteScreen.SetActive(value);
     }
 
@@ -140,6 +145,7 @@ public class UIManager : MonoBehaviour {
 
         levelCompleteScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
+        gameMap.SetActive(false);
     }
 
     public void ShowHighScoreScreen() {
@@ -157,6 +163,7 @@ public class UIManager : MonoBehaviour {
         endOfDemoScreen.SetActive(true);
         levelCompleteScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
+        gameMap.SetActive(false);
     }
 
     public void ReduceScreenShakeForGameOverScreen() {

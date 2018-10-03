@@ -11,6 +11,9 @@ public class LevelBranchNode_ScoreCondition : LevelBranchNode {
     [SerializeField] int scoreToEnter;
 
     public override LevelBranchNode DetermineNext() {
+        // >:] For the initial IGF build I'm going to make this random >:=] they prob. won't figure it out anyway
+        return branches[Random.Range(0, branches.Length)];
+
         // This code only works if all adjoining nodes are of type ScoreCondition (This may be how the game actually is in the end.)
         LevelBranchNode nextBranch = branches[0];
         foreach (LevelBranchNode branch in branches) {
@@ -52,7 +55,7 @@ public class LevelBranchNode_ScoreCondition : LevelBranchNode {
 
             Scene openedScene = EditorSceneManager.OpenScene(reference.levelData.Path, OpenSceneMode.Additive);
 
-            scoreValueTotal += Services.comboManager.levelCompleteValue;
+            //scoreValueTotal += FindObjectOfType<ComboManager>().levelCompleteValue;
 
             Enemy[] enemies = FindObjectsOfType<Enemy>();
             foreach (Enemy enemy in enemies) {

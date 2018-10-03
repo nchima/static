@@ -33,7 +33,7 @@ public class SpecialMoveManager : MonoBehaviour {
     int missilesFired = 0;
     float missileTimer;
     bool canFireMissiles = false;
-    bool goBackHome = false;    // Used to exit missile firing state early.
+    bool returnCameraTrigger = false;    // Used to exit missile firing state early.
    
     Vector3 originalCameraPosition;
     Quaternion originalCameraRotation;
@@ -52,7 +52,7 @@ public class SpecialMoveManager : MonoBehaviour {
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        goBackHome = true;
+        returnCameraTrigger = true;
     }
 
     private void Start() {
@@ -68,7 +68,7 @@ public class SpecialMoveManager : MonoBehaviour {
             // See if the player has fired a special move & if so, initialize proper variables.
             if (InputManager.specialMoveButtonDown && Services.gun.canShoot && !canFireMissiles && HasAmmo) {
                 //cameraMovementCoroutine = StartCoroutine(MoveCameraToPositionCoroutine(GetCameraPullbackPosition(), GetCameraPullbackRotation().eulerAngles, CameraState.PulledBack));
-                goBackHome = false;
+                returnCameraTrigger = false;
                 Services.gun.canShoot = false;
                 cameraMovementCoroutine = StartCoroutine(ANewCoroutineToCelebrateWithAllOurFriends());
                 Services.specialBarManager.PlayerUsedSpecialMove();
@@ -180,7 +180,10 @@ public class SpecialMoveManager : MonoBehaviour {
         yield return new WaitUntil(() => {
             timer += Time.deltaTime;
             if (timer < hangTime) {
-                if  (goBackHome) { goBackHome = false;  return true; }
+                if  (returnCameraTrigger) {
+                    returnCameraTrigger = false;
+                    return true;
+                }
 
                 Services.fieldOfViewController.transform.localPosition = GetCameraPullbackPosition();
                 Services.fieldOfViewController.transform.localRotation = GetCameraPullbackRotation();

@@ -80,22 +80,6 @@ public class GameManager : MonoBehaviour {
         Services.extraScreenManager.SetScreensActive(true);
         Services.extraScreenManager.SetRotationScale(1f);
 
-        // Load next level.
-        if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
-            //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-            //Services.levelManager.LoadNextLevel();
-        }
-
-        //levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-
-        //yield return new WaitUntil(() => {
-        //    if (SceneManager.GetSceneByBuildIndex(levelManager.levelsCompleted).isLoaded) { return true; } 
-        //    else { return false; }
-        //});
-
-        //levelManager.SetEnemiesActive(false);
-        //Services.fallingSequenceManager.BeginFallingInstant();
-
         initialGravity = Physics.gravity;
         Physics.gravity = Vector3.zero;
 
@@ -138,7 +122,7 @@ public class GameManager : MonoBehaviour {
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         // If player has killed all the enemies in the current level, begin the level completion sequence.
         currentEnemyAmt -= 1;
-        if (currentEnemyAmt <= 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
+        if (currentEnemyAmt == 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
             GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
         }
     }

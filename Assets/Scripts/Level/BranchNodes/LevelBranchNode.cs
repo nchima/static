@@ -8,6 +8,7 @@ public abstract class LevelBranchNode : MonoBehaviour {
     [SerializeField] public LevelBranchNode[] branches;
 
     public abstract LevelBranchNode DetermineNext();
+    public EpisodeIcon correspondingIcon { get { return Services.uiManager.gameMap.GetComponent<GameMap>().GetIconByCorrespondingNode(this); } }
 
     public bool IsUnlocked {
         get { return MyMath.IntToBool(PlayerPrefs.GetInt(levelSet.name + "_unlocked")); }

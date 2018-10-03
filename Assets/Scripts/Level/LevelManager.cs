@@ -6,7 +6,6 @@ using UnityEngine.AI;
 
 public class LevelManager : MonoBehaviour {
 
-    [SerializeField] List<LevelSet> levelSets;
     [SerializeField] LevelSet overrideLevelSet;
     [SerializeField] LevelBranchNode firstBranchNode;
 
@@ -14,21 +13,34 @@ public class LevelManager : MonoBehaviour {
     LevelBranchNode currentBranchNode;
 
     [HideInInspector] public LevelData currentlyLoadedLevelData;
-    [HideInInspector] public int levelsCompleted = 0;
+    [HideInInspector] public int totalLevelsCompleted = 0;
     [HideInInspector] public bool isLevelCompleted = false;
 
-    public int CurrentLevelNumber { get { return levelsCompleted + 1; } }
-    public int TotalNumberOfLevels { get {
-            int numberOfLevels = 0;
-            for (int i = 0; i < levelSets.Count; i++) { numberOfLevels += levelSets[i].levelDataReferences.Count; }
-            return numberOfLevels;
-        } }
-    bool IsLevelLoaded {
+    bool newEpisodeUITrigger = false;
+    LevelBranchNode previousNode;
+
+    // Key: name of branch node gameObject, Value: name of branch node gameObject entered from that one
+    public List<ChosenPath> chosenPaths = new List<ChosenPath>();
+    public class ChosenPath {
+        public LevelBranchNode fromNode;
+        public LevelBranchNode toNode;
+        public ChosenPath(LevelBranchNode fromNode, LevelBranchNode toNode) {
+            this.fromNode = fromNode;
+            this.toNode = toNode;
+        }
+    }
+
+    public int CurrentLevelNumber { get { return totalLevelsCompleted + 1; } }
+    bool IsLevelCurrentlyLoaded {
         get {
             if (currentlyLoadedLevelData == null) { return false; }
             return SceneManager.GetSceneByBuildIndex(currentlyLoadedLevelData.buildIndex).isLoaded;
         }
     }
+
+    // Triggers used by falling sequence
+    [HideInInspector] public bool loadingSequenceFinishedTrigger = false;
+    [HideInInspector] public bool uiSequencedFinishedTrigger = false;
 
     private void Awake() {
         // Make sure the first level set is unlocked
@@ -54,50 +66,147 @@ public class LevelManager : MonoBehaviour {
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
-
-        for (int i = 0; i < levelSets.Count; i++) {
-            levelSets[i].levelsCompleted = 0;
-        }
     }
 
     public void GameStartedHandler(GameEvent gameEvent) {
+        chosenPaths.Clear();
         LoadNextLevel();
         SetEnemiesAIActive(true);
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
         isLevelCompleted = true;
-        currentLevelSet.levelsCompleted++;
-        levelsCompleted++;
-        if (currentLevelSet.AllLevelsCompleted) { Services.uiManager.ShowEpisodeCompleteScreen(true); }
-        else { Services.uiManager.ShowLevelCompleteScreen(true); }
+
         SetFloorCollidersActive(false);
+
+        // Update completed level counts
+        currentLevelSet.levelsCompleted++;
+        totalLevelsCompleted++;
+
+        // Begin loading the next level
+        LoadNextLevel(1f);
+
+        // Determine whether we are entering a new episode and show the correct UI sequence
+        if (newEpisodeUITrigger) {
+            newEpisodeUITrigger = false;
+            StartCoroutine(EpisodeCompleteUISequence());
+        }
+        else { StartCoroutine(LevelCompleteUISequence()); }
     }
 
-    public void LoadNextLevel() {
+    IEnumerator EpisodeCompleteUISequence() {
+        // Hide HUD and show episode complete screen.
+        Services.uiManager.hud.SetActive(false);
+        Services.uiManager.ShowEpisodeCompleteScreen(true);
+
+        // Wait until a certain amount of time has transpired or the player has clicked.
+        float duration = 2f;
+        float timer = 0f;
+        bool inputAccepted = false;
+        yield return new WaitUntil(() => {
+            if ((InputManager.submitButtonDown || InputManager.fireButtonDown) && timer >= 0.5f && !inputAccepted) {
+                inputAccepted = true;
+                return true;
+            }
+
+            if (timer >= duration) {
+                return true;
+            }
+
+            else {
+                timer += Time.unscaledDeltaTime;
+                return false;
+            }
+        });
+
+        // Show game map
+        Services.uiManager.episodeCompleteScreen.SetActive(false);
+        Services.uiManager.gameMap.SetActive(true);
+        Services.uiManager.pathSelectedScreen.SetActive(true);
+        Services.uiManager.pathSelectedScreen.GetComponent<PathSelectedScreen>().UpdateText(Services.levelManager.currentLevelSet.Name);
+        Services.uiManager.gameMap.GetComponent<GameMap>().UnHighlightAll();
+        Services.uiManager.gameMap.GetComponent<GameMap>().HighlightPath();
+
+        // Wait for timer or mouseclick again...
+        duration = 5f;
+        timer = 0f;
+        yield return new WaitUntil(() => {
+            if ((InputManager.submitButtonDown || InputManager.fireButtonDown) && timer >= 0.5f && !inputAccepted) {
+                inputAccepted = true;
+                return true;
+            }
+
+            else {
+                inputAccepted = false;
+            }
+
+            if (timer >= duration) { return true; }
+            else {
+                timer += Time.unscaledDeltaTime;
+                return false;
+            }
+        });
+
+        // Show hud again
+        Services.uiManager.gameMap.SetActive(false);
+        Services.uiManager.pathSelectedScreen.SetActive(false);
+        Services.uiManager.hud.SetActive(true);
+
+        uiSequencedFinishedTrigger = true;
+
+        yield return null;
+    }
+
+    IEnumerator LevelCompleteUISequence() {
+
+        Services.uiManager.ShowLevelCompleteScreen(true);
+
+        yield return new WaitForSeconds(1.5f);
+
+        uiSequencedFinishedTrigger = true;
+
+        yield return null;
+    }
+
+    private void LoadNextLevel() {
+        LoadNextLevel(0f);
+    }
+    private void LoadNextLevel(float delay) {
         // If the player has completed all the levels in a set, load the next set.
         if (currentLevelSet.AllLevelsCompleted) {
-            Debug.Log("all levels complete");
+            newEpisodeUITrigger = true;
 
-            // See if the player has completed the final level.
+            // See if the player has completed one of the final nodes, end the game.
             if (currentBranchNode.DetermineNext() == null) {
+                Debug.Log("Player completed game.");
                 Services.gameManager.PlayerCompletedGame();
                 return;
             }
 
-            // Determine the next level set and load it.
+            // Otherwise, determine the next level set and set it as the current branch node
+            previousNode = currentBranchNode;
             currentBranchNode = currentBranchNode.DetermineNext();
-            Debug.Log("Unlocking: " + currentBranchNode.levelSet.Name);
+            Debug.Log("Entering branch node: " + currentBranchNode.name);
+
+            // Unlock the current branch and reset its levels complete count.
             currentBranchNode.IsUnlocked = true;
             currentLevelSet = currentBranchNode.levelSet;
             currentLevelSet.levelsCompleted = 0;
+
+            // Save the path taken
+            chosenPaths.Add(new ChosenPath(previousNode, currentBranchNode));
         }
 
-        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel));
+        // Begin loading the level
+        Debug.Log("Loading: " + currentLevelSet.NextLevel.LevelName);
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel, delay));
     }
 
-    private IEnumerator LoadLevelCoroutine(LevelData levelData) {
-        if (IsLevelLoaded) {
+    private IEnumerator LoadLevelCoroutine(LevelData levelData, float delay) {
+        // Delay is used when the player completes a level to give them a moment to fall below the floor of the current level before it is unloaded/reloaded.
+        yield return new WaitForSeconds(delay);
+
+        if (IsLevelCurrentlyLoaded) {
             AsyncOperation unload = SceneManager.UnloadSceneAsync(currentlyLoadedLevelData.buildIndex);
             while (!unload.isDone) { yield return null; }
         }
@@ -108,19 +217,15 @@ public class LevelManager : MonoBehaviour {
         // Scale level according to, you know, whatever I guess
         //levelScaler.ScaleLevel(levelInfos[levelsCompleted].levelSize);
 
-        yield return new WaitForSeconds(0.2f);
-
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         //for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         //SetEnemiesActive(false);
 
         currentlyLoadedLevelData = levelData;
 
-        yield return null;
-    }
+        loadingSequenceFinishedTrigger = true;
 
-    void LoadBranchNode(LevelBranchNode branchNode) {
-        currentLevelSet = branchNode.levelSet;
+        yield return null;
     }
 
     public void SetStartingLevelSet(LevelSet startingSet) {
@@ -131,18 +236,9 @@ public class LevelManager : MonoBehaviour {
             startingSet = overrideLevelSet;
         }
 #endif
-
-        if (!levelSets.Contains(startingSet)) {
-            levelSets.Add(startingSet);
-        }
-
         currentLevelSet = startingSet;
 
         Debug.Log("Setting starting level set to: " + currentLevelSet.name);
-    }
-
-    public void SetStartingLevelSet(string setName) {
-        SetStartingLevelSet(GetLevelSet(setName));
     }
 
     public void SetEnemiesAIActive(bool value) {
@@ -176,20 +272,8 @@ public class LevelManager : MonoBehaviour {
     public void LockInLevel() {
         Services.levelManager.SetEnemiesAIActive(true);
 
-        // Re-enable the floor's collision (since it is disabled when the player completes a level.)
-        Services.levelManager.SetFloorCollidersActive(true);
-
         // Update billboards.
         Services.gameManager.GetComponent<BatchBillboard>().FindAllBillboards();
-    }
-
-    public LevelSet GetLevelSet(string name) {
-        for (int i = 0; i < levelSets.Count; i++) {
-            if (levelSets[i].name == name) { return levelSets[i]; }
-        }
-
-        Debug.LogError("Hey, sorry but I couldn't find a level set with that name. :-(");
-        return null;
     }
 
     public void SetAllLevelsUnlockState(bool value) {

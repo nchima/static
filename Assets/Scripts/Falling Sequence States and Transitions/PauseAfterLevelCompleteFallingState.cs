@@ -8,7 +8,6 @@ public class PauseAfterLevelCompleteFallingState : State {
 
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
-        Services.levelManager.SetFloorCollidersActive(false);
         Services.playerGameObject.GetComponent<Rigidbody>().useGravity = true;
         Services.playerGameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         //Services.playerGameObject.GetComponent<Rigidbody>().AddForce(new Vector3(0f, 500f, 0f), ForceMode.Impulse);
@@ -24,13 +23,13 @@ public class PauseAfterLevelCompleteFallingState : State {
     public override void End(StateController stateController) {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
-        //fallingSequenceManager.SetUpFallingVariables();
-        
+        //fallingSequenceManager.SetUpFallingVariables();\
+
         // Load next level.
-        if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
+        //if (!Services.gameManager.dontChangeLevel && Services.levelManager.isLevelCompleted) {
             //Services.levelManager.loadingState = LevelManager.LoadingState.LoadingRandomly;
-            Services.levelManager.LoadNextLevel();
-        }
+        //    Services.levelManager.StartCoroutine(Services.levelManager.LoadLevelCoroutine(Services.levelManager.currentLevelSet.NextLevel));
+        //}
 
         Services.playerController.isMovementEnabled = true;
     }

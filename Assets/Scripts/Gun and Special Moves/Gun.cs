@@ -59,12 +59,10 @@ public class Gun : MonoBehaviour {
     }
 
     private void OnEnable() {
-        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
     private void OnDisable() {
-        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
@@ -221,10 +219,6 @@ public class Gun : MonoBehaviour {
         }
 
         return autoAimPoint;
-    }
-
-
-    public void LevelCompletedHandler(GameEvent gameEvent) {
     }
 
 

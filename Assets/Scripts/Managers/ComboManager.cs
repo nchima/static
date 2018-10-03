@@ -254,7 +254,8 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + LEVEL_COMPLETED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) { StartCombo(); }
+        else { comboTimer = Mathf.Clamp(comboTimer + LEVEL_COMPLETED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
 
         levelsCompleted++;
 

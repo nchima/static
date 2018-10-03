@@ -33,12 +33,10 @@ public class MusicManager : MonoBehaviour {
 
 
     private void OnEnable() {
-        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
     private void OnDisable() {
-        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
@@ -200,10 +198,6 @@ public class MusicManager : MonoBehaviour {
         transform.Find("Rhythm 1").GetComponent<AudioSource>().volume = state.oldMusicVol;
         transform.Find("Rhythm 2").GetComponent<AudioSource>().volume = state.oldMusicVol;
         transform.Find("New Music").GetComponent<AudioSource>().volume = state.newMusicVol;
-    }
-
-
-    public void LevelCompletedHandler(GameEvent gameEvent) {
     }
 
 

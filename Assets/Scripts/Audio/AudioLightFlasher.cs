@@ -14,7 +14,7 @@ public class AudioLightFlasher : MonoBehaviour {
 
     void Update() {
 
-        if (Input.GetKeyDown(KeyCode.P)) { PrintSpectrumDataToConsole(); }
+        //if (Input.GetKeyDown(KeyCode.P)) { PrintSpectrumDataToConsole(); }
 
         Graph();
 

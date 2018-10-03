@@ -84,10 +84,10 @@ public class Enemy : StateController {
     protected virtual void Die() {
         // isAlive is used to make sure that this function is not called more than once.
         if (!isAlive) { return; }
+        isAlive = false;
 
         Instantiate(deathParticles, transform.position, Quaternion.identity);
         GameEventManager.instance.FireEvent(new GameEvents.PlayerKilledEnemy(scoreKillValue, specialKillValue, this));
-        isAlive = false;
         Destroy(gameObject);
     }
 
