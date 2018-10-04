@@ -83,18 +83,31 @@ public class LevelManager : MonoBehaviour {
         currentLevelSet.levelsCompleted++;
         totalLevelsCompleted++;
 
+        // Determine if the player has reached the end of the game.
+        if (currentBranchNode.branches.Length == 0) {
+            Debug.Log("Player completed game.");
+            Services.gameManager.PlayerCompletedGame();
+            return;
+        }
+
+        // Determine whether the player has completed an episode:
+        bool playerCompletedEpisode = currentLevelSet.AllLevelsCompleted;
+
+        if (playerCompletedEpisode) { StartCoroutine(EpisodeCompleteSequence()); }
+        else { StartCoroutine(LevelCompleteSequence()); }
+
         // Begin loading the next level
-        LoadNextLevel(1f);
+        //LoadNextLevel(1f);
 
         // Determine whether we are entering a new episode and show the correct UI sequence
-        if (newEpisodeUITrigger) {
-            newEpisodeUITrigger = false;
-            StartCoroutine(EpisodeCompleteUISequence());
-        }
-        else { StartCoroutine(LevelCompleteUISequence()); }
+        //if (newEpisodeUITrigger) {
+        //    newEpisodeUITrigger = false;
+        //    StartCoroutine(EpisodeCompleteSequence());
+        //}
+        //else { StartCoroutine(LevelCompleteSequence()); }
     }
 
-    IEnumerator EpisodeCompleteUISequence() {
+    IEnumerator EpisodeCompleteSequence() {
         // Hide HUD and show episode complete screen.
         Services.uiManager.hud.SetActive(false);
         Services.uiManager.ShowEpisodeCompleteScreen(true);
@@ -119,37 +132,36 @@ public class LevelManager : MonoBehaviour {
             }
         });
 
-        // Show game map
+        // Show select path screen
         Services.uiManager.episodeCompleteScreen.SetActive(false);
-        Services.uiManager.gameMap.SetActive(true);
-        Services.uiManager.pathSelectedScreen.SetActive(true);
-        Services.uiManager.pathSelectedScreen.GetComponent<PathSelectedScreen>().UpdateText(Services.levelManager.currentLevelSet.Name);
-        Services.uiManager.gameMap.GetComponent<GameMap>().UnHighlightAll();
-        Services.uiManager.gameMap.GetComponent<GameMap>().HighlightPath();
+        Services.uiManager.selectPathScreen.SetActive(true);
+        Services.uiManager.selectPathScreen.GetComponent<PathSelectedScreen>().Initialize(currentBranchNode);
 
-        // Wait for timer or mouseclick again...
-        duration = 5f;
-        timer = 0f;
+        // Wait for select path screen to finish its thing.
+        PathSelectedScreen pathSelectedScreen = Services.uiManager.selectPathScreen.GetComponent<PathSelectedScreen>();
         yield return new WaitUntil(() => {
-            if ((InputManager.submitButtonDown || InputManager.fireButtonDown) && timer >= 0.5f && !inputAccepted) {
-                inputAccepted = true;
+            if (pathSelectedScreen.pathSelectedTrigger) {
+                pathSelectedScreen.pathSelectedTrigger = false;
                 return true;
             }
 
-            else {
-                inputAccepted = false;
-            }
-
-            if (timer >= duration) { return true; }
-            else {
-                timer += Time.unscaledDeltaTime;
-                return false;
-            }
+            return false;
         });
+
+        // Load selected level
+        previousNode = currentBranchNode;
+        currentBranchNode = pathSelectedScreen.GetSelectedNode();
+        Debug.Log("Entering branch node: " + currentBranchNode.name);
+        currentBranchNode.IsUnlocked = true;
+        currentLevelSet = currentBranchNode.levelSet;
+        currentLevelSet.levelsCompleted = 0;
+        chosenPaths.Add(new ChosenPath(previousNode, currentBranchNode));
+
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel, 1f));
 
         // Show hud again
         Services.uiManager.gameMap.SetActive(false);
-        Services.uiManager.pathSelectedScreen.SetActive(false);
+        Services.uiManager.selectPathScreen.SetActive(false);
         Services.uiManager.hud.SetActive(true);
 
         uiSequencedFinishedTrigger = true;
@@ -157,9 +169,9 @@ public class LevelManager : MonoBehaviour {
         yield return null;
     }
 
-    IEnumerator LevelCompleteUISequence() {
-
+    IEnumerator LevelCompleteSequence() {
         Services.uiManager.ShowLevelCompleteScreen(true);
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel, 2f));
 
         yield return new WaitForSeconds(1.5f);
 

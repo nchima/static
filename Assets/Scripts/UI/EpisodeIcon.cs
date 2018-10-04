@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class EpisodeIcon : MonoBehaviour {
 
+    [SerializeField] bool allowMouseSelection = true;
     [SerializeField] Collider mouseOverCollider;
     [SerializeField] GameObject unlockedIconMesh;
     [SerializeField] GameObject lockedIconMesh;
     public LevelBranchNode correspondingNode;
     [SerializeField] GameObject branchStem;
     [SerializeField] GameObject upperBranch;
-    [SerializeField] GameObject middleBranch;
     [SerializeField] GameObject lowerBranch;
 
     public enum SelectionState { Highlighted, Unhighlighted }
@@ -28,7 +28,7 @@ public class EpisodeIcon : MonoBehaviour {
     [HideInInspector] public bool recieveMouseInput = false;
     bool IsMouseOverlapping {
         get {
-            if (!recieveMouseInput) { return false; }
+            if (!recieveMouseInput || !allowMouseSelection) { return false; }
 
             Ray mouseRay = Services.finalCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -42,7 +42,9 @@ public class EpisodeIcon : MonoBehaviour {
             return false;
         }
     }
-    Text m_Text { get { return GetComponentInChildren<Text>(); } }
+    public Text m_Text { get { return GetComponentInChildren<Text>(); } }
+
+    [HideInInspector] public bool forceHighlighting = false;
 
     float MaterialThickness {
         get { return ActiveIconMesh.GetComponent<MeshRenderer>().material.GetFloat("_Thickness"); }
@@ -63,7 +65,7 @@ public class EpisodeIcon : MonoBehaviour {
             case SelectionState.Unhighlighted:
 
                 // Switch to selected state
-                if (correspondingNode.IsUnlocked && IsMouseOverlapping) {
+                if ((correspondingNode.IsUnlocked && IsMouseOverlapping) || forceHighlighting) {
                     selectionState = SelectionState.Highlighted;
                     ClearActiveTweens();
                     ActiveIconMesh.transform.parent.localScale = Vector3.one * 1.1f;
@@ -75,12 +77,12 @@ public class EpisodeIcon : MonoBehaviour {
             case SelectionState.Highlighted:
 
                 // Get clicked on
-                if (InputManager.fireButtonDown) {
+                if (InputManager.fireButtonDown && recieveMouseInput) {
                     Services.levelManager.SetStartingLevelSet(correspondingNode.levelSet);
                     GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
                 }
 
-                if (!IsMouseOverlapping) {
+                if (!IsMouseOverlapping && !forceHighlighting) {
                     selectionState = SelectionState.Unhighlighted;
                     ClearActiveTweens();
                     ActiveIconMesh.transform.parent.localScale = Vector3.one;
@@ -146,31 +148,23 @@ public class EpisodeIcon : MonoBehaviour {
 
         if (correspondingNode.branches.Length == 0) {
             SetBranchHighlight(upperBranch, 0);
-            SetBranchHighlight(middleBranch, 0);
             SetBranchHighlight(lowerBranch, 0);
         }
 
-        else if (correspondingNode.branches.Length == 2) {
-            if (upperBranch.activeInHierarchy) {
-                SetBranchHighlight(upperBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked));
-                SetBranchHighlight(middleBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
-            }
-            else {
-                SetBranchHighlight(middleBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked));
-                SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
-            }
+        else if (correspondingNode.branches.Length == 1) {
+            if (upperBranch.activeInHierarchy) { SetBranchHighlight(upperBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked)); }
+            else { SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked)); }
         }
-        else if (correspondingNode.branches.Length == 3) {
+
+        else {
             SetBranchHighlight(upperBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked));
-            SetBranchHighlight(middleBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
-            SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[2].IsUnlocked));
+            SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked));
         }
     }
 
     public void UnHighlightAllBranches() {
         SetBranchHighlight(branchStem, 0);
         SetBranchHighlight(upperBranch, 0);
-        SetBranchHighlight(middleBranch, 0);
         SetBranchHighlight(lowerBranch, 0);
     }
 
@@ -185,23 +179,19 @@ public class EpisodeIcon : MonoBehaviour {
 
     public void SetBranchHighlight(int branchIndex, int value) {
         SetBranchHighlight(branchStem, value);
-        
-        if (correspondingNode.branches.Length == 2) {
-            if (upperBranch.activeInHierarchy) {
-                if (branchIndex == 0) { SetBranchHighlight(upperBranch, value); }
-                else if (branchIndex == 1) { SetBranchHighlight(middleBranch, value); }
-            } 
-            
-            else {
-                if (branchIndex == 0) { SetBranchHighlight(middleBranch, value); }
-                else if (branchIndex == 1) { SetBranchHighlight(lowerBranch, value); }
-            }
-        } 
-        
-        else if (correspondingNode.branches.Length == 3) {
+
+        if (correspondingNode.branches.Length == 0) {
+            return;
+        }
+
+        else if (correspondingNode.branches.Length == 1) {
+            if (upperBranch.activeInHierarchy) { SetBranchHighlight(upperBranch, value); }
+            else { SetBranchHighlight(lowerBranch, value); }
+        }
+
+        else {
             if (branchIndex == 0) { SetBranchHighlight(upperBranch, value); }
-            else if (branchIndex == 1) { SetBranchHighlight(middleBranch, value); }
-            else if (branchIndex == 2) { SetBranchHighlight(lowerBranch, value); }
+            else if (branchIndex == 1) { SetBranchHighlight(lowerBranch, value); }
         }
     }
 

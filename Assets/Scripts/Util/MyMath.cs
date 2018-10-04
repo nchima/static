@@ -16,8 +16,16 @@ public class MyMath {
         return (((x - min) % (max - min)) + (max - min)) % (max - min) + min;
     }
 
+    public static int Wrap(int x, int min, int max) {
+        return (((x - min) % (max - min)) + (max - min)) % (max - min) + min;
+    }
+
     public static float Wrap01(float x) {
         return Wrap(x, 0f, 1f);
+    }
+
+    public static int Wrap01(int x) {
+        return Wrap(x, 0, 1);
     }
 
     public static float ClampPositive(float value) {

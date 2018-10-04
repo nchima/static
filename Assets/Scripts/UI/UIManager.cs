@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour {
     public GameObject levelCompleteScreen;
     public GameObject nowEnteringScreen;
     public GameObject episodeCompleteScreen;
-    public GameObject pathSelectedScreen;
+    public GameObject selectPathScreen;
     public GameObject pauseScreen;
     public GameObject gameOverScreen;
     public GameObject nameEntryScreen;
