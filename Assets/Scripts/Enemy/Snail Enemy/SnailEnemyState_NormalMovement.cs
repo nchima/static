@@ -66,7 +66,7 @@ public class SnailEnemyState_NormalMovement : State {
     void FireShotInDirection(Vector3 position, Vector3 direction, StateController stateController) {
         GameObject newShot = Instantiate(shotPrefab);
         newShot.transform.position = position;
-        newShot.GetComponent<NormalShot>().direction = direction;
+        newShot.GetComponent<NormalShot>().Direction = direction;
         newShot.GetComponent<EnemyShot>().firedEnemy = stateController.gameObject;
     }
 

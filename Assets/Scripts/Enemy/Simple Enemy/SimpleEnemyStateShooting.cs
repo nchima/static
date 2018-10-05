@@ -68,6 +68,6 @@ public class SimpleEnemyStateShooting : State {
 
         direction.Normalize();
 
-        newShot.GetComponent<NormalShot>().direction = direction;
+        newShot.GetComponent<NormalShot>().Direction = direction;
     }
 }

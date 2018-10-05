@@ -4,8 +4,16 @@ using System.Collections;
 public class NormalShot : EnemyShot {
 
 	[SerializeField] private float speed = 2f;  // The speed at which I travel.
-    public Vector3 direction;   // The direction in which I travel.
+    private Vector3 direction;   // The direction in which I travel.
+    public Vector3 Direction {
+        get { return direction; }
+        set {
+            direction = value;
+            meshTransform.LookAt(transform.position + direction);
+        }
+    }
     float inaccuracy = 30f;
+    Transform meshTransform { get { return GetComponent<MeshRenderer>().transform; } }
 
 
 	new void Start ()
@@ -27,7 +35,11 @@ public class NormalShot : EnemyShot {
     {
         base.Update();
 
+        Vector3 newRotation = meshTransform.localRotation.eulerAngles;
+        newRotation.z += 1000f * Time.deltaTime;
+        meshTransform.localRotation = Quaternion.Euler(newRotation);
+
         // Move in my precalculated direction.
-        transform.position = transform.position + direction * speed * Time.deltaTime;
+        transform.position = transform.position + Direction * speed * Time.deltaTime;
 	}
 }
