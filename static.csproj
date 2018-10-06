@@ -293,6 +293,8 @@
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_Wandering.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyTransition_PlayerIsClose.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyTransition_ShotReady.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Tougher Enemy\TougherEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Tougher Enemy\TougherEnemyState_Movement.cs" />
     <Compile Include="Assets\Scripts\Event System\GameEvent.cs" />
     <Compile Include="Assets\Scripts\Event System\GameEventManager.cs" />
     <Compile Include="Assets\Scripts\Event System\GameEvents.cs" />
