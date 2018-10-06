@@ -22,13 +22,13 @@ public class ComboManager : MonoBehaviour {
     State state = State.ComboIdle;
 
     // Timer
-    const float MAX_COMBO_TIME = 5f;
-    float comboTimer = 0f;
+    const float MAX_COMBO_TIME = 20f;
+    float comboTimer = 20f;
 
-    const float KILL_BONUS_TIME = 1f;
-    const float LEVEL_COMPLETED_BONUS_TIME = 1f;
-    const float PICKUP_OBTAINED_BONUS_TIME = 2f;
-    const float MISC_BONUS_TIME = 1f;
+    const float KILL_BONUS_TIME = 5f;
+    const float LEVEL_COMPLETED_BONUS_TIME = 10f;
+    const float PICKUP_OBTAINED_BONUS_TIME = 5f;
+    const float MISC_BONUS_TIME = 3f;
 
     // Other values
     public const int PICKUP_SCORE_VALUE = 100;
@@ -69,6 +69,7 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+		GameEventManager.instance.Subscribe<GameEvents.GameStarted>(PlayerWasHurtHandler);
     }
 
     private void OnDisable() {
@@ -79,6 +80,7 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+		GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(PlayerWasHurtHandler);
     }
 
     private void Awake() {
@@ -123,7 +125,7 @@ public class ComboManager : MonoBehaviour {
         multiplierDisplay.rectTransform.localPosition = newPosition;
     }
 
-    private void StartCombo() {
+	private void StartCombo() {
         comboTimer = MAX_COMBO_TIME;
         timerBar.SetActive(true);
         state = State.ComboActive;
@@ -152,6 +154,10 @@ public class ComboManager : MonoBehaviour {
         multiplierDisplay.text = "";
 
         timerBar.SetActive(false);
+
+		GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
+
+		StartCombo ();
 
         state = State.ComboIdle;
     }
