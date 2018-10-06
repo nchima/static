@@ -669,7 +669,10 @@ public class Mesher : MonoBehaviour {
 
     public static void SaveMesh(Mesh mesh, string name, bool makeNewInstance, bool optimizeMesh) {
 #if UNITY_EDITOR
-        string path = UnityEditor.EditorUtility.SaveFilePanel("Save Separate Mesh Asset", "Assets/Models/Level Geo/Level Floors/", name, "asset");
+        //string path = UnityEditor.EditorUtility.SaveFilePanel("Save Separate Mesh Asset", "Assets/Models/Level Geo/Level Floors/", name, "asset");
+		string path = Application.dataPath + "/Models/Level Geo/Level Floors/" + name + ".asset";
+		Debug.Log("Path: " + path);
+	
         if (string.IsNullOrEmpty(path)) return;
 
         path = UnityEditor.FileUtil.GetProjectRelativePath(path);
