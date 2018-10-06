@@ -43,6 +43,7 @@ public class ComboManager : MonoBehaviour {
     int tankEnemiesKilled = 0;
     int hoverEnemiesKilled = 0;
     int bossEnemiesKilled = 0;
+    int tougherEnemiesKilled = 0;
     int pickupsObtained = 0;
     int levelsCompleted = 0;
     int bullseyes = 0;
@@ -139,6 +140,7 @@ public class ComboManager : MonoBehaviour {
         tankEnemiesKilled = 0;
         hoverEnemiesKilled = 0;
         bossEnemiesKilled = 0;
+        tougherEnemiesKilled = 0;
         levelsCompleted = 0;
         pickupsObtained = 0;
         bullseyes = 0;
@@ -211,6 +213,11 @@ public class ComboManager : MonoBehaviour {
             comboString += "Boss Enemy Killed x" + bossEnemiesKilled.ToString();
         }
 
+        if (tougherEnemiesKilled > 0) {
+            if (comboString != "") { comboString += " + "; }
+            comboString += "Tough Enemies Killed x" + tougherEnemiesKilled.ToString();
+        }
+
         if (levelsCompleted > 0) {
             if (comboString != "") { comboString += " + "; }
             comboString += "Level Completed x" + levelsCompleted.ToString();
@@ -247,6 +254,7 @@ public class ComboManager : MonoBehaviour {
         else if (playerKilledEnemyEvent.enemyKilled is TankEnemy) { tankEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is HoveringEnemy) { hoverEnemiesKilled++; }
         else if (playerKilledEnemyEvent.enemyKilled is SnailEnemy) { bossEnemiesKilled++; }
+        else if (playerKilledEnemyEvent.enemyKilled is TougherEnemy) { tougherEnemiesKilled++; }
 
         currentEnemiesKilledScoreTotal += playerKilledEnemyEvent.enemyKilled.scoreKillValue;
 
@@ -297,7 +305,6 @@ public class ComboManager : MonoBehaviour {
     }
 
     IEnumerator FuckOff() {
-
         TextGenerationSettings settings = new TextGenerationSettings();
         settings.resizeTextForBestFit = true;
         settings.textAnchor = TextAnchor.MiddleCenter;
