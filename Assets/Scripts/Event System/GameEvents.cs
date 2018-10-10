@@ -38,6 +38,10 @@ namespace GameEvents {
         public PlayerWasHurt() { }
     }
 
+    public class PlayerWasTased : GameEvent {
+        public PlayerWasTased() { }
+    }
+
     public class PickupObtained : GameEvent {
         public PickupObtained() { }
     }

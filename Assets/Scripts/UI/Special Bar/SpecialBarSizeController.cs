@@ -45,6 +45,8 @@ public class SpecialBarSizeController : MonoBehaviour {
 
     public void SpawnFeedbackLine(float edge1, float edge2) {
         GameObject feedbackLine = feedbackLinePooler.GrabObject();
+        if (!Services.gameManager.isGameStarted) { return; }
+
         feedbackLine.transform.parent = transform.parent;
         feedbackLine.transform.localRotation = Quaternion.Euler(90f, 90f, 90f);
 

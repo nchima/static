@@ -59,6 +59,7 @@ public class FallIntoLevelState : State {
     public override void End(StateController stateController) {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
+        Services.uiManager.crosshair.SetActive(true);
         Services.levelManager.LockInLevel();
         Services.fieldOfViewController.SetClearVeilActive(false);
         Services.fieldOfViewController.ActivateCameraClearing(false);

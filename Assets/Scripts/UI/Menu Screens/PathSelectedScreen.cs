@@ -20,6 +20,7 @@ public class PathSelectedScreen : MonoBehaviour {
 
     public void Initialize(LevelBranchNode clearedEpisodeNode) {
 
+        Debug.Log("cleared episode node: " + clearedEpisodeNode.gameObject.name);
         SetUpIcon(clearedEpisodeIcon, clearedEpisodeNode);
 
         // I'll need to have more specialized code for this case eventually.
@@ -55,11 +56,12 @@ public class PathSelectedScreen : MonoBehaviour {
     void WaitForSelection() {
         // Increase selection timer.
         selectTimer += Time.deltaTime;
-        // For now this does nothing... just a time crunch thing.
+        // For now this does nothing, but it should pressure the player into choosing quickly.
+        // Idea: player is tased, and a random path is chosen if they don't make a decision in time.
 
         // Recieve input from player to select path.
         if (clearedEpisodeIcon.correspondingNode.branches.Length == 1) {
-            // In this case, keep the one branch constantly highlighted.
+            // In this case, keep the one branch constantly highlighted but I won't worry about this yet because yolo
         }
 
         // If there are two potential paths use directional input to select between them.
@@ -85,7 +87,7 @@ public class PathSelectedScreen : MonoBehaviour {
 
     void SetUpIcon(EpisodeIcon targetIcon, LevelBranchNode correspondingNode) {
         targetIcon.correspondingNode = correspondingNode;
-        clearedEpisodeIcon.m_Text.text = correspondingNode.levelSet.Name;
+        targetIcon.m_Text.text = correspondingNode.levelSet.Name;
 
         // Also give the icons the proper meshes (Once I've actually implemented them.)
     }

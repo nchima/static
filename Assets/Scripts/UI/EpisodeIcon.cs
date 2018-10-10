@@ -78,7 +78,7 @@ public class EpisodeIcon : MonoBehaviour {
 
                 // Get clicked on
                 if (InputManager.fireButtonDown && recieveMouseInput) {
-                    Services.levelManager.SetStartingLevelSet(correspondingNode.levelSet);
+                    Services.levelManager.SetCurrentBranchNode(correspondingNode);
                     GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
                 }
 
@@ -153,7 +153,7 @@ public class EpisodeIcon : MonoBehaviour {
 
         else if (correspondingNode.branches.Length == 1) {
             if (upperBranch.activeInHierarchy) { SetBranchHighlight(upperBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked)); }
-            else { SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[1].IsUnlocked)); }
+            else { SetBranchHighlight(lowerBranch, MyMath.BoolToInt(correspondingNode.branches[0].IsUnlocked)); }
         }
 
         else {

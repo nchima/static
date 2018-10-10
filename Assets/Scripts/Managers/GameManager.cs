@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour {
         Services.comboManager = GetComponentInChildren<ComboManager>();
         Services.timeScaleManager = GetComponentInChildren<TimeScaleManager>();
         Services.finalCamera = GameObject.Find("Final Camera").GetComponent<Camera>();
+        Services.taserManager = GetComponentInChildren<TaserManager>();
     }
 
     private void OnEnable() {

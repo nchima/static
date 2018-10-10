@@ -31,4 +31,5 @@ public class Services {
     public static ComboManager comboManager;
     public static TimeScaleManager timeScaleManager;
     public static Camera finalCamera;
+    public static TaserManager taserManager;
 }
