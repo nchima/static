@@ -8,6 +8,7 @@ public class PauseAfterLevelCompleteFallingState : State {
 
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
+        Services.uiManager.crosshair.SetActive(false);
         Services.playerGameObject.GetComponent<Rigidbody>().useGravity = true;
         Services.playerGameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         //Services.playerGameObject.GetComponent<Rigidbody>().AddForce(new Vector3(0f, 500f, 0f), ForceMode.Impulse);

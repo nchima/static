@@ -197,15 +197,16 @@ public class SpecialMoveManager : MonoBehaviour {
         });
         //yield return new WaitForSeconds(hangTime);
 
+        canFireMissiles = false;
+        Services.gun.canShoot = true;
+        Services.taserManager.forcePauseSpecialMove = false;
+
         // Move the camera back to where it normally is.
         duration = 0.7f;
         Services.fieldOfViewController.transform.DOLocalMove(originalCameraPosition, duration).SetEase(Ease.OutExpo);
         Services.fieldOfViewController.transform.DOLocalRotate(originalCameraRotation.eulerAngles, duration).SetEase(Ease.OutExpo);
         Services.fieldOfViewController.TweenToNormalFOV();
         yield return new WaitForSeconds(duration);
-
-        canFireMissiles = false;
-        Services.gun.canShoot = true;
 
         yield return null;
     }

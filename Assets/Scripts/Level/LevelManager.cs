@@ -46,16 +46,7 @@ public class LevelManager : MonoBehaviour {
         // Make sure the first level set is unlocked
         firstBranchNode.IsUnlocked = true;
 
-        // Load the first level set.
-        if (overrideLevelSet != null) {
-#if UNITY_EDITOR
-            SetStartingLevelSet(overrideLevelSet);
-#endif
-        } else {
-            currentBranchNode = firstBranchNode;
-            currentBranchNode.levelSet.levelsCompleted = 0;
-            SetStartingLevelSet(currentBranchNode.levelSet);
-        }
+        SetCurrentBranchNode(firstBranchNode);
     }
 
     private void OnEnable() {
@@ -66,6 +57,10 @@ public class LevelManager : MonoBehaviour {
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+
+        if (currentBranchNode != null) {
+            currentBranchNode.levelSet.levelsCompleted = 0;
+        }
     }
 
     public void GameStartedHandler(GameEvent gameEvent) {
@@ -75,6 +70,9 @@ public class LevelManager : MonoBehaviour {
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
+        uiSequencedFinishedTrigger = false;
+        loadingSequenceFinishedTrigger = false;
+
         isLevelCompleted = true;
 
         SetFloorCollidersActive(false);
@@ -109,8 +107,9 @@ public class LevelManager : MonoBehaviour {
 
     IEnumerator EpisodeCompleteSequence() {
         // Hide HUD and show episode complete screen.
-        Services.uiManager.hud.SetActive(false);
+        //Services.uiManager.hud.SetActive(false);
         Services.uiManager.ShowEpisodeCompleteScreen(true);
+        Services.taserManager.EpisodeComplete();    // I'm going to call this twice, don't worry about it. Trust me on this one bro.
 
         // Wait until a certain amount of time has transpired or the player has clicked.
         float duration = 2f;
@@ -133,6 +132,7 @@ public class LevelManager : MonoBehaviour {
         });
 
         // Show select path screen
+        Services.taserManager.EpisodeComplete();    // See, I told you I'd call this twice. It's not a mistake, do not delete!
         Services.uiManager.episodeCompleteScreen.SetActive(false);
         Services.uiManager.selectPathScreen.SetActive(true);
         Services.uiManager.selectPathScreen.GetComponent<PathSelectedScreen>().Initialize(currentBranchNode);
@@ -150,6 +150,7 @@ public class LevelManager : MonoBehaviour {
 
         // Load selected level
         previousNode = currentBranchNode;
+        currentBranchNode.levelSet.levelsCompleted = 0;
         currentBranchNode = pathSelectedScreen.GetSelectedNode();
         Debug.Log("Entering branch node: " + currentBranchNode.name);
         currentBranchNode.IsUnlocked = true;
@@ -160,9 +161,11 @@ public class LevelManager : MonoBehaviour {
         StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel, 1f));
 
         // Show hud again
-        Services.uiManager.gameMap.SetActive(false);
+        //Services.uiManager.gameMap.SetActive(false);
         Services.uiManager.selectPathScreen.SetActive(false);
-        Services.uiManager.hud.SetActive(true);
+        //Services.uiManager.hud.SetActive(true);
+
+        Services.taserManager.EpisodeComplete();    // You know what? I changed my mind. I'm going to call this three times. That's right.
 
         uiSequencedFinishedTrigger = true;
 
@@ -232,7 +235,7 @@ public class LevelManager : MonoBehaviour {
         //enemyPlacer.PlaceEnemies(levelInfos[levelsCompleted]);
         //for (int i = 0; i < 5; i++) { enemyPlacer.PlaceObject(scoreBonusPrefab); }
         //SetEnemiesActive(false);
-
+        
         currentlyLoadedLevelData = levelData;
 
         loadingSequenceFinishedTrigger = true;
@@ -251,6 +254,12 @@ public class LevelManager : MonoBehaviour {
         currentLevelSet = startingSet;
 
         Debug.Log("Setting starting level set to: " + currentLevelSet.name);
+    }
+
+    public void SetCurrentBranchNode(LevelBranchNode branchNode) {
+        currentBranchNode = branchNode;
+        currentBranchNode.levelSet.levelsCompleted = 0;
+        SetStartingLevelSet(currentBranchNode.levelSet);
     }
 
     public void SetEnemiesAIActive(bool value) {

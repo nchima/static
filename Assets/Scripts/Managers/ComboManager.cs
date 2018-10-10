@@ -11,24 +11,20 @@ public class ComboManager : MonoBehaviour {
     [SerializeField] Text textDisplay;
     [SerializeField] Text scoreDisplay;
     [SerializeField] Text multiplierDisplay;
-    [SerializeField] GameObject timerBar;
-    [SerializeField] Transform timerBarReference;
     [SerializeField] float fontSizeIncreaseFactor = 2f;
     [SerializeField] GameObject comboFinisherPrefab;
-
-    //[SerializeField] FloatRange timerBarLengthRange = new FloatRange(0f, 5f);
 
     enum State { ComboActive, ComboIdle }
     State state = State.ComboIdle;
 
     // Timer
-    const float MAX_COMBO_TIME = 20f;
-    float comboTimer = 20f;
+    const float MAX_COMBO_TIME = 2f;
+    float comboTimer = 2f;
 
-    const float KILL_BONUS_TIME = 5f;
-    const float LEVEL_COMPLETED_BONUS_TIME = 10f;
-    const float PICKUP_OBTAINED_BONUS_TIME = 5f;
-    const float MISC_BONUS_TIME = 3f;
+    const float KILL_BONUS_TIME = 1f;
+    const float LEVEL_COMPLETED_BONUS_TIME = 2f;
+    const float PICKUP_OBTAINED_BONUS_TIME = 1f;
+    const float MISC_BONUS_TIME = 1f;
 
     // Other values
     public const int PICKUP_SCORE_VALUE = 100;
@@ -69,7 +65,6 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
-		GameEventManager.instance.Subscribe<GameEvents.GameStarted>(PlayerWasHurtHandler);
     }
 
     private void OnDisable() {
@@ -80,7 +75,6 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
-		GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(PlayerWasHurtHandler);
     }
 
     private void Awake() {
@@ -91,7 +85,6 @@ public class ComboManager : MonoBehaviour {
         textDisplay.text = "";
         multiplierDisplay.text = "";
         scoreDisplay.text = "";
-        timerBar.SetActive(false);
     }
 
     private void Update() {
@@ -101,14 +94,6 @@ public class ComboManager : MonoBehaviour {
                 EndCombo();
                 return;
             }
-
-            Vector3 newTimerBarScale = timerBar.transform.localScale;
-            newTimerBarScale.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, 0.001f, timerBarReference.localScale.x);
-            timerBar.transform.localScale = newTimerBarScale;
-
-            Vector3 newTimerBarPosition = timerBar.transform.localPosition;
-            newTimerBarPosition.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, timerBarReference.localPosition.x - timerBarReference.localScale.x * 0.5f, timerBarReference.localPosition.x);
-            timerBar.transform.localPosition = newTimerBarPosition;
 
             textDisplay.text = GenerateComboTextString();
             scoreDisplay.text = GetUnmultipliedTotal().ToString();
@@ -127,7 +112,6 @@ public class ComboManager : MonoBehaviour {
 
 	private void StartCombo() {
         comboTimer = MAX_COMBO_TIME;
-        timerBar.SetActive(true);
         state = State.ComboActive;
     }
 
@@ -152,10 +136,6 @@ public class ComboManager : MonoBehaviour {
         textDisplay.text = "";
         scoreDisplay.text = "";
         multiplierDisplay.text = "";
-
-        timerBar.SetActive(false);
-
-		GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
 
 		StartCombo ();
 
