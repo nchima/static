@@ -16,6 +16,16 @@ public class TaserManager : MonoBehaviour {
     [SerializeField] float maxTime = 6f;
     float mainTimer = 0f;
 
+    [SerializeField] float bulletHitHangTime = 0.01f;
+    float _bulletHangTimer;
+    float BulletHangTimer {
+        get { return _bulletHangTimer; }
+        set {
+            _bulletHangTimer = value;
+            _bulletHangTimer = Mathf.Clamp(_bulletHangTimer, 0f, bulletHitHangTime);
+        }
+    }
+
     // Pausing
     [HideInInspector] public bool forcePauseSpecialMove = false;
     [HideInInspector] public bool forcePauseForEpisodeComplete = false;
@@ -35,6 +45,7 @@ public class TaserManager : MonoBehaviour {
     [SerializeField] float killEnemyBonusTime = 3f;
     [SerializeField] float killEnemyHangTime = 0.1f;
     [SerializeField] float levelCompletedBonusTime = 6f;
+    [SerializeField] float levelCompleteHangTime = 5f;
     [SerializeField] float pickupObtainedBonusTime = 3f;
     [SerializeField] float pickupObtainedHangTime = 0.1f;
     [SerializeField] float miscBonusTime = 1f;
@@ -68,7 +79,7 @@ public class TaserManager : MonoBehaviour {
 
     private void Update() {
         // Run timer.
-        if (!forcePauseSpecialMove && HangTimer <= 0f) {
+        if (!forcePauseSpecialMove && HangTimer <= 0f && BulletHangTimer <= 0f) {
             mainTimer -= Time.deltaTime;
             if (mainTimer <= 0) {
                 TasePlayer();
@@ -77,8 +88,14 @@ public class TaserManager : MonoBehaviour {
         }
 
         // Handle temporary puase.
-        else if (HangTimer > 0) {
-            HangTimer -= Time.deltaTime;
+        else {
+            if (HangTimer > 0) {
+                HangTimer -= Time.deltaTime;
+            }
+
+            if (BulletHangTimer > 0) {
+                BulletHangTimer -= Time.deltaTime;
+            }
         }
 
         Vector3 newTimerBarScale = timerBar.transform.localScale;
@@ -93,6 +110,7 @@ public class TaserManager : MonoBehaviour {
     public void TasePlayer() {
         // Hurt player
         GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerWasTased());
         StartCoroutine(ShowTasedPromptSequence());
 
         // Reset timer
@@ -102,7 +120,7 @@ public class TaserManager : MonoBehaviour {
         HangTimer = 0.5f;
     }
 
-    public void PlayerFellThroughFloor() {
+    public void PlayerUsedFallThroughFloorMove() {
         mainTimer = maxTime;
         HangTimer += fallThroughFloorHangTime;
     }
@@ -112,6 +130,10 @@ public class TaserManager : MonoBehaviour {
         HangTimer += episodeCompleteHangTime;
     }
 
+    public void PlayerShotEnemy() {
+        BulletHangTimer += bulletHitHangTime;
+    }
+
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         mainTimer = Mathf.Clamp(mainTimer + killEnemyBonusTime, 0f, maxTime);
         HangTimer += killEnemyHangTime;
@@ -119,6 +141,7 @@ public class TaserManager : MonoBehaviour {
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
         mainTimer = Mathf.Clamp(mainTimer + levelCompletedBonusTime, 0f, maxTime);
+        HangTimer += levelCompleteHangTime;
     }
 
     public void PickupObtainedHandler(GameEvent gameEvent) {

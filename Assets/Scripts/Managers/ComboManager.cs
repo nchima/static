@@ -13,6 +13,7 @@ public class ComboManager : MonoBehaviour {
     [SerializeField] Text multiplierDisplay;
     [SerializeField] float fontSizeIncreaseFactor = 2f;
     [SerializeField] GameObject comboFinisherPrefab;
+    [SerializeField] GameObject comboFinisherParent;
 
     enum State { ComboActive, ComboIdle }
     State state = State.ComboIdle;
@@ -56,6 +57,9 @@ public class ComboManager : MonoBehaviour {
     int CurrentMultiplier { get { return simpleEnemiesKilled + meleeEnemiesKilled + laserEnemiesKilled + tankEnemiesKilled + hoverEnemiesKilled + bossEnemiesKilled + bullseyes + pickupsObtained + timesSpecialMoveUsed + levelsCompleted + 1; } }
 
     Coroutine increaseComboValueCoroutine;
+
+    bool comboFinishersPaused = false;
+    bool comboFinishersVisible = true;
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
@@ -116,9 +120,11 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void EndCombo() {
-        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, scoreDisplay.transform.parent).GetComponent<ComboFinisher>();
+        ComboFinisher comboFinisher = Instantiate(comboFinisherPrefab, comboFinisherParent.transform).GetComponent<ComboFinisher>();
         comboFinisher.transform.position = scoreDisplay.transform.position;
         comboFinisher.Initialize(GetMultipliedTotal(), CurrentMultiplierFontSize);
+        if (!comboFinishersVisible) { comboFinisher.SetVisible(false); }
+        if (comboFinishersPaused) { comboFinisher.Pause(true); }
 
         simpleEnemiesKilled = 0;
         meleeEnemiesKilled = 0;
@@ -226,6 +232,22 @@ public class ComboManager : MonoBehaviour {
         string total = GetUnmultipliedTotal().ToString();
         if (CurrentMultiplier > 1) { total += " X " + CurrentMultiplier.ToString(); }
         return total;
+    }
+
+    public void PauseAllFinishers(bool value) {
+        foreach(ComboFinisher finisher in comboFinisherParent.GetComponentsInChildren<ComboFinisher>()) {
+            finisher.Pause(value);
+        }
+
+        comboFinishersPaused = value;
+    }
+
+    public void SetAllFinishersVisible(bool value) {
+        foreach(ComboFinisher finisher in comboFinisherParent.GetComponentsInChildren<ComboFinisher>()) {
+            finisher.SetVisible(value);
+        }
+
+        comboFinishersVisible = value;
     }
 
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {

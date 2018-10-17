@@ -79,8 +79,11 @@ public class FiringShockwaveState : State {
 
         fallingSequenceManager.isSpeedFallActive = false;
 
-        Services.healthManager.forceInvincibility = false;
+        //Services.healthManager.forceInvincibility = false;
 
         Services.playerGameObject.GetComponent<Collider>().material.bounciness = fallingSequenceManager.normalPlayerBounciness;
+
+        // Reset player fall through floor cooldown
+        Services.playerController.fallThroughFloorTimer = 0f;
     }
 }

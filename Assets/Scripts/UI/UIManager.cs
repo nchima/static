@@ -37,6 +37,9 @@ public class UIManager : MonoBehaviour {
     bool titleScreenActiveBeforePause;
     bool levelCompleteScreenActiveBeforePause;
     bool healthWarningScreenActiveBeforePause;
+    bool episodeCompleteScreenActiveBeforePause;
+    bool pathSelectScreenActiveBeforePause;
+    bool crosshairActiveBeforePause;
 
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
@@ -76,22 +79,6 @@ public class UIManager : MonoBehaviour {
         }
     }
 
-    public void ShowPauseScreen() {
-        pauseScreen.SetActive(true);
-        pauseVeil.SetActive(true);
-        crosshair.SetActive(false);
-        hud.SetActive(false);
-
-        titleScreenActiveBeforePause = titleScreen.activeSelf;
-        levelCompleteScreenActiveBeforePause = levelCompleteScreen.activeSelf;
-        healthWarningScreenActiveBeforePause = healthWarningScreen.activeSelf;
-
-        titleScreen.SetActive(false);
-        levelCompleteScreen.SetActive(false);
-        healthWarningScreen.SetActive(false);
-        gameMap.SetActive(false);
-    }
-
     public void ShowControlsScreen(bool value) {
         titleScreen.SetActive(!value);
         controlsScreen.SetActive(value);
@@ -102,25 +89,53 @@ public class UIManager : MonoBehaviour {
         creditsScreen.SetActive(value);
     }
 
+    public void ShowPauseScreen() {
+        pauseScreen.SetActive(true);
+        pauseVeil.SetActive(true);
+
+        titleScreenActiveBeforePause = titleScreen.activeSelf;
+        levelCompleteScreenActiveBeforePause = levelCompleteScreen.activeSelf;
+        healthWarningScreenActiveBeforePause = healthWarningScreen.activeSelf;
+        episodeCompleteScreenActiveBeforePause = episodeCompleteScreen.activeSelf;
+        pathSelectScreenActiveBeforePause = selectPathScreen.activeSelf;
+        crosshairActiveBeforePause = crosshair.activeSelf;
+
+        crosshair.SetActive(false);
+        hud.SetActive(false);
+        titleScreen.SetActive(false);
+        levelCompleteScreen.SetActive(false);
+        healthWarningScreen.SetActive(false);
+        episodeCompleteScreen.SetActive(false);
+        selectPathScreen.SetActive(false);
+
+        Services.comboManager.PauseAllFinishers(true);
+    }
+
     public void HidePauseScreen() {
         pauseScreen.SetActive(false);
         pauseVeil.SetActive(false);
-        crosshair.SetActive(true);
         hud.SetActive(true);
+
+        Services.comboManager.PauseAllFinishers(false);
 
         titleScreen.SetActive(titleScreenActiveBeforePause);
         levelCompleteScreen.SetActive(levelCompleteScreenActiveBeforePause);
         healthWarningScreen.SetActive(healthWarningScreenActiveBeforePause);
-        gameMap.SetActive(levelCompleteScreenActiveBeforePause);
+        episodeCompleteScreen.SetActive(episodeCompleteScreenActiveBeforePause);
+        selectPathScreen.SetActive(pathSelectScreenActiveBeforePause);
+        crosshair.SetActive(crosshairActiveBeforePause);
     }
 
     public void ShowLevelCompleteScreen(bool value) {
         levelCompleteScreen.SetActive(value);
+        Services.specialBarManager.ShowDisplay(!value);
+        Services.comboManager.SetAllFinishersVisible(!value);
     }
 
     public void ShowEpisodeCompleteScreen(bool value) {
         pauseVeil.SetActive(value);
         episodeCompleteScreen.SetActive(value);
+        Services.comboManager.SetAllFinishersVisible(!value);
     }
 
     public void HideCompleteScreens() {
@@ -138,6 +153,8 @@ public class UIManager : MonoBehaviour {
         gameOverScreen.SetActive(true);
         pauseVeil.SetActive(true);
         crosshair.SetActive(false);
+
+        Services.comboManager.PauseAllFinishers(true);
 
         foreach (ScreenShake turnMeOff in screenShakesToTurnOffOnGameOver) {
             turnMeOff.shakeScale = Vector3.zero;
@@ -164,6 +181,8 @@ public class UIManager : MonoBehaviour {
         levelCompleteScreen.SetActive(false);
         healthWarningScreen.SetActive(false);
         gameMap.SetActive(false);
+
+        Services.comboManager.PauseAllFinishers(true);
     }
 
     public void ReduceScreenShakeForGameOverScreen() {
@@ -178,5 +197,14 @@ public class UIManager : MonoBehaviour {
     public void GameStartedHandler(GameEvent gameEvent) {
         pauseVeil.SetActive(false);
         ShowTitleScreen(false);
+    }
+
+    public void SetHealthWarningTemporaryVisibility(bool value) {
+        // Get all ui texts of health warning screen.
+        Text[] texts = healthWarningScreen.transform.GetChild(0).GetComponentsInChildren<Text>();
+        foreach (Text text in texts) {
+            if (value == true) { text.color = Color.white; }
+            else { text.color = new Color(0, 0, 0, 0); }
+        }
     }
 }

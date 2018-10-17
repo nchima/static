@@ -53,7 +53,6 @@ public class Gun : MonoBehaviour {
     Vector3 recoilPosition;
     ScreenShake[] screenShakes;
 
-
     private void Awake() {
         screenShakes = FindObjectsOfType<ScreenShake>();
     }
@@ -66,7 +65,6 @@ public class Gun : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
-
     void Start() {
         // Get the point from which bullets will spawn.
         bulletSpawnTransform = GameObject.Find("BulletSpawnPoint").transform;
@@ -78,12 +76,10 @@ public class Gun : MonoBehaviour {
         recoilPosition = new Vector3(0f, -3.68f, 10.68f);
     }
 
-
     void Update() {
         timeSinceLastShot += Time.deltaTime;
         if (InputManager.fireButton) { FireBurst(); }
     }
-
 
     public void FireBurst() {
         if (!Services.gameManager.isGameStarted) { return; }
@@ -152,7 +148,6 @@ public class Gun : MonoBehaviour {
         timeSinceLastShot = 0f;
     }
 
-
     // Firing an individual bullet.
     void FireBullet(Vector3 target, float inaccuracy) {
         // Rotate bullet spawner to get the direction of the next bullet.
@@ -181,7 +176,6 @@ public class Gun : MonoBehaviour {
             Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f))
         );
     }
-
 
     Vector3 AutoAim(string tag, float bandSize) {
         
@@ -220,7 +214,6 @@ public class Gun : MonoBehaviour {
 
         return autoAimPoint;
     }
-
 
     public void GameStartedHandler(GameEvent gameEvent) {
         this.enabled = true;

@@ -109,6 +109,7 @@ public class LevelManager : MonoBehaviour {
         // Hide HUD and show episode complete screen.
         //Services.uiManager.hud.SetActive(false);
         Services.uiManager.ShowEpisodeCompleteScreen(true);
+        Services.uiManager.SetHealthWarningTemporaryVisibility(false);
         Services.taserManager.EpisodeComplete();    // I'm going to call this twice, don't worry about it. Trust me on this one bro.
 
         // Wait until a certain amount of time has transpired or the player has clicked.
@@ -116,6 +117,10 @@ public class LevelManager : MonoBehaviour {
         float timer = 0f;
         bool inputAccepted = false;
         yield return new WaitUntil(() => {
+            if (GameManager.gamePaused) {
+                return false;
+            }
+
             if ((InputManager.submitButtonDown || InputManager.fireButtonDown) && timer >= 0.5f && !inputAccepted) {
                 inputAccepted = true;
                 return true;
@@ -140,6 +145,8 @@ public class LevelManager : MonoBehaviour {
         // Wait for select path screen to finish its thing.
         PathSelectedScreen pathSelectedScreen = Services.uiManager.selectPathScreen.GetComponent<PathSelectedScreen>();
         yield return new WaitUntil(() => {
+            if (GameManager.gamePaused) { return false; }
+
             if (pathSelectedScreen.pathSelectedTrigger) {
                 pathSelectedScreen.pathSelectedTrigger = false;
                 return true;
@@ -163,6 +170,7 @@ public class LevelManager : MonoBehaviour {
         // Show hud again
         //Services.uiManager.gameMap.SetActive(false);
         Services.uiManager.selectPathScreen.SetActive(false);
+        Services.uiManager.SetHealthWarningTemporaryVisibility(false);
         //Services.uiManager.hud.SetActive(true);
 
         Services.taserManager.EpisodeComplete();    // You know what? I changed my mind. I'm going to call this three times. That's right.

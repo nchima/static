@@ -8,9 +8,28 @@ public class ComboFinisher : MonoBehaviour {
 
     Text m_Text { get { return GetComponent<Text>(); } }
     RectTransform m_RectTransform { get { return GetComponent<RectTransform>(); } }
+    bool isPaused = false;
+    bool visibleBeforePause = true;
 
     public void Initialize(int amount, int fontSize) {
         StartCoroutine(Sequence(amount, fontSize));
+    }
+
+    public void Pause(bool value) {
+        isPaused = value;
+
+        if (value == true) {
+            visibleBeforePause = m_Text.enabled;
+            SetVisible(false);
+        }
+
+        else {
+            SetVisible(visibleBeforePause);
+        }
+    }
+
+    public void SetVisible(bool value) {
+        m_Text.enabled = value;
     }
 
     private IEnumerator Sequence(int comboAmount, int fontSize) {
@@ -25,6 +44,8 @@ public class ComboFinisher : MonoBehaviour {
         //nextPosition.x = 20f;
         m_RectTransform.DOAnchorPos(nextPosition, duration * 0.7f);
         yield return new WaitUntil(() => {
+            if (isPaused) { return false; }
+
             if (countUpAmount >= comboAmount) {
                 m_Text.text = Mathf.CeilToInt(comboAmount).ToString();
                 return true;

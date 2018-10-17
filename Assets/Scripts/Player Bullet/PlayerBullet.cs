@@ -24,16 +24,13 @@ public class PlayerBullet : MonoBehaviour {
 
     ShotgunCharge shotgunCharge;
 
-
     private void Awake() {
         shotgunCharge = FindObjectOfType<ShotgunCharge>();
     }
 
-
     private void Update() {
         FixedUpdateMove();
     }
-
 
     void FixedUpdateMove() {
         Vector3 nextPosition = transform.position + transform.forward * speed * Time.fixedDeltaTime;
@@ -76,7 +73,6 @@ public class PlayerBullet : MonoBehaviour {
         previousPosition = transform.position;
     }
 
-
     RaycastHit SphereCastOnLayer(Vector3 toPosition, int layerBitmask) {
         RaycastHit hit;
 
@@ -102,7 +98,6 @@ public class PlayerBullet : MonoBehaviour {
         return hit;
     }
 
-
     public void GetFired(Vector3 _position, Vector3 _direction, float _thickness, float _speed, Color _color) {
         transform.position = _position;
         transform.forward = _direction;
@@ -126,11 +121,12 @@ public class PlayerBullet : MonoBehaviour {
         FixedUpdateMove();
     }
 
-
     public void HandleHit(RaycastHit hit) {
 
         if (hit.collider.GetComponent<EnemyOld>() != null || hit.collider.GetComponent<Enemy>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
+
+            Services.taserManager.PlayerShotEnemy();
 
             if (hit.collider.GetComponent<EnemyOld>() != null) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
             else if (hit.collider.GetComponent<Enemy>() != null) { hit.collider.GetComponent<Enemy>().currentHealth -= 1; }
@@ -148,6 +144,8 @@ public class PlayerBullet : MonoBehaviour {
         else if (hit.collider.name.Contains("Weak Point")) {
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
+            Services.taserManager.PlayerShotEnemy();
+
             Services.sfxManager.PlayBulletHitWeakPointSound();
 
             if (hit.collider.GetComponent<EnemyWeakPointGrower>() != null) { hit.collider.GetComponent<EnemyWeakPointGrower>().YouHurtMyDad(2); }
@@ -160,7 +158,6 @@ public class PlayerBullet : MonoBehaviour {
 
         EndBulletsExistence();
     }
-
 
     private void EndBulletsExistence() {
         GetComponent<PooledObject>().ReturnToPool();

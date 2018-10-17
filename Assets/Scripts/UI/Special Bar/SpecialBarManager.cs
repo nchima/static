@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class SpecialBarManager : MonoBehaviour {
 
@@ -162,5 +163,14 @@ public class SpecialBarManager : MonoBehaviour {
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
         AddValue(playerKilledEnemyEvent.specialValue);
+    }
+
+    public void ShowDisplay(bool value) {
+        if (value == true) { earnedPrompt.GetComponent<Text>().color = Color.white; }
+        else { earnedPrompt.GetComponent<Text>().color = new Color(0, 0, 0, 0); }
+
+        for (int i = 0; i < savedShotBoxes.Length; i++) {
+            savedShotBoxes[i].SetActive(value);
+        }
     }
 }

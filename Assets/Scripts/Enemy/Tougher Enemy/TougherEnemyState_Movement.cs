@@ -7,6 +7,9 @@ public class TougherEnemyState_Movement : State {
     float shotTimer = 0f;
     float shotCooldown = 0.75f;
 
+    float chargeUpTimer = 0f;
+    float chargeUpTime = 0.9f;
+
     public override void Initialize(StateController stateController) {
         base.Initialize(stateController);
         TougherEnemy controller = stateController as TougherEnemy;
@@ -48,17 +51,31 @@ public class TougherEnemyState_Movement : State {
         newPosition.y = 3.2f;
         controller.m_Rigidbody.MovePosition(newPosition);
 
-        // Fire guns
-        shotTimer += Time.deltaTime;
-        if (shotTimer >= shotCooldown && (moveSpeed == controller.shootingMovementSpeed || moveSpeed == 0f)) {
+        // If the player is in range:
+        if ((moveSpeed == controller.shootingMovementSpeed || moveSpeed == 0f) && controller.CanSeePlayer) {
 
-            NormalShot shot1 = Instantiate(controller.shotPrefab, controller.shotOriginLeft.position, Quaternion.identity).GetComponent<NormalShot>();
-            NormalShot shot2 = Instantiate(controller.shotPrefab, controller.shotOriginRight.position, Quaternion.identity).GetComponent<NormalShot>();
+            // Charge guns
+            if (chargeUpTimer <= chargeUpTime) {
+                chargeUpTimer += Time.deltaTime;
+                return;
+            }
 
-            shot1.Direction = controller.transform.forward;
-            shot2.Direction = controller.transform.forward;
+            // Fire guns
+            shotTimer += Time.deltaTime;
+            if (shotTimer >= shotCooldown) {
 
-            shotTimer = 0f;
+                NormalShot shot1 = Instantiate(controller.shotPrefab, controller.shotOriginLeft.position, Quaternion.identity).GetComponent<NormalShot>();
+                NormalShot shot2 = Instantiate(controller.shotPrefab, controller.shotOriginRight.position, Quaternion.identity).GetComponent<NormalShot>();
+
+                shot1.Direction = controller.transform.forward;
+                shot2.Direction = controller.transform.forward;
+
+                shotTimer = 0f;
+            }
+        }
+
+        else {
+            chargeUpTimer = 0f;
         }
     }
 

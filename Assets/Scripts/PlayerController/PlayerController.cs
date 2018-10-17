@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour {
     // SHOTGUN CHARGE STUFF
     float shotGunChargeSpeed = 1000f;
 
-    // DASHING STUFF
+    // DASHING STUFF (this all deprecated but I'll leave it in because the code could be usefully repurposed)
     [SerializeField] float dashDistance = 20f;
     [SerializeField] float dashCooldown = 0.5f;
     [SerializeField] float dashSpeed = 10f;
@@ -41,6 +41,10 @@ public class PlayerController : MonoBehaviour {
     float superDashHoldTimer;
     float dashCooldownTimer;
     Coroutine dashCoroutine;
+
+    // FALLING THROUGH FLOOR STUFF
+    [SerializeField] float fallThroughFloorCooldown = 5f;
+    [HideInInspector] public float fallThroughFloorTimer = 0f;
 
     // PHYSICS MATERIAL STUFF
     float normalBounciness;
@@ -88,7 +92,6 @@ public class PlayerController : MonoBehaviour {
     public static Vector3 currentVelocity;
     Vector3 previousPosition;   // Used to calculate velocity.
 
-
     private void Awake() {
         m_Rigidbody = GetComponent<Rigidbody>();
         dashCooldownTimer = dashCooldown;
@@ -106,12 +109,10 @@ public class PlayerController : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
-
     private void Start() {
         targetRotation = transform.localRotation;
         normalBounciness = GetComponent<Collider>().material.bounciness;
     }
-
 
     private void Update() {
 
@@ -159,17 +160,19 @@ public class PlayerController : MonoBehaviour {
             //    }
             //}
 
-            if (InputManager.dashButtonDown && Services.specialBarManager.ShotsSaved > 0) {
+            // Increment fall through floor cooldown timer.
+            if (!Services.fallingSequenceManager.isPlayerFalling) { fallThroughFloorTimer += Time.deltaTime; }
+
+            if (InputManager.dashButtonDown && fallThroughFloorTimer >= fallThroughFloorCooldown) {
                 //Services.comboManager.EndCombo();
-                Services.taserManager.PlayerFellThroughFloor();
-                Services.specialBarManager.PlayerUsedSpecialMove();
+                Services.taserManager.PlayerUsedFallThroughFloorMove();
+                //Services.specialBarManager.PlayerUsedSpecialMove();
                 Services.levelManager.SetFloorCollidersActive(false);
             }
         }
 
         HandleCursorLocking();
     }
-
 
     private void FixedUpdate() {
 
@@ -263,7 +266,6 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-
     void CheckMovementKick() {
         // Check whether we should add movement kick.
         movementKickTimer += Time.fixedDeltaTime;
@@ -273,7 +275,6 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-
     void AddMovementKick(Vector3 desiredMove) {
         lastKickDirection = directionalInput;
         movementKickTimer = 0f;
@@ -282,7 +283,6 @@ public class PlayerController : MonoBehaviour {
         kickForce.y = 0f;
         m_Rigidbody.AddForce(kickForce, ForceMode.VelocityChange);
     }
-
 
     void HandleCursorLocking() {
         if (!Services.gameManager.isGameStarted) { return; }
@@ -296,18 +296,15 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-
     public void LockCursor() {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-
     public void UnlockCursor() {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
-
 
     public void AddRecoil(float forceAmt) {
         //transform.Find("FirstPersonCharacter").transform.DOBlendableLocalRotateBy(new Vector3(-0.1f, 0f, 0f), 0.1f, RotateMode.Fast).SetLoops(1, LoopType.Yoyo);
@@ -319,12 +316,10 @@ public class PlayerController : MonoBehaviour {
         GetComponent<Rigidbody>().AddForce(forceVector, ForceMode.Impulse);
     }
 
-
     void BeginDash(bool buttonHeld) {
         state = State.Dashing;
         dashCoroutine = StartCoroutine(DashCoroutine(buttonHeld));
     }
-
 
     IEnumerator DashCoroutine(bool buttonHeld) {
         Vector3 dashDirection = transform.forward * directionalInput.y + transform.right * directionalInput.x;
@@ -358,7 +353,6 @@ public class PlayerController : MonoBehaviour {
         yield return null;
     }
 
-
     void EndDashEarly() {
         if (state == State.Falling || state == State.SpeedFalling) { return; }
         if (dashCoroutine != null) { StopCoroutine(dashCoroutine); }
@@ -369,13 +363,11 @@ public class PlayerController : MonoBehaviour {
         state = State.Normal;
     }
 
-
     void IgnoreCollisionsWithRailings(bool ignore) {
         foreach(GameObject railing in GameObject.FindGameObjectsWithTag("Railing")) {
             Physics.IgnoreCollision(GetComponent<Collider>(), railing.GetComponent<Collider>(), ignore);
         }
     }
-
 
     private void OnCollisionEnter(Collision collision) {
         // If the player collides with a wall while shotgun charging, end the shotgun charge.
@@ -391,7 +383,6 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
 
@@ -401,13 +392,11 @@ public class PlayerController : MonoBehaviour {
         movementKickReady = true;
     }
 
-
     public void GameOverHandler(GameEvent gameEvent) {
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         state = State.Dead;
         this.enabled = false;
     }
-
 
     public void GameStartedHandler(GameEvent gameEvent) {
         isMovementEnabled = true;
