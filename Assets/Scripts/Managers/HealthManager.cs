@@ -19,8 +19,8 @@ public class HealthManager : MonoBehaviour {
         
     /* MISC */
     // Player's health.
-    [HideInInspector] public int currentHealth = 5;
-    int currentMaxHealth = 5;
+    [HideInInspector] public int currentHealth = 3;
+    int currentMaxHealth = 3;
     float healthRechargeTimer = 0f;
 
     bool isInWarningState = false;
@@ -38,16 +38,17 @@ public class HealthManager : MonoBehaviour {
 
     public bool PlayerIsDead { get { return currentHealth <= 0 || currentMaxHealth <= 0; } }
 
-
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
-
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
+    private void Awake() {
+        UpdateHealthBoxes();
+    }
 
     private void Update() {
         // Handle health recharging.
@@ -86,8 +87,9 @@ public class HealthManager : MonoBehaviour {
         if (forceInvincibility || godMode) isInvincible = true;
     }
 
-
     void UpdateHealthBoxes() {
+        Debug.Log("Updating health boxes. Current health: " + currentHealth.ToString() + ". Current max health: " + currentMaxHealth.ToString());
+
         for (int i = 0; i < healthBlocks.Length; i++) {
             if (i >= currentMaxHealth) { healthBlocks[i].BecomeXedOut(); }
             else { healthBlocks[i].BecomeUnXedOut(); }
@@ -98,14 +100,12 @@ public class HealthManager : MonoBehaviour {
         MoveRegainPrompt();
     }
 
-
-    void AddMaxHealth() {
+    public void AddMaxHealth() {
         currentMaxHealth = Mathf.Clamp(currentMaxHealth + 1, 0, 5);
         currentHealth = currentMaxHealth;
         UpdateHealthBoxes();
         CheckWarningState();
     }
-
 
     void CheckWarningState() {
         if (currentHealth == currentMaxHealth) {
@@ -114,7 +114,6 @@ public class HealthManager : MonoBehaviour {
             Services.colorPaletteManager.LoadLevelPalette();
         }
     }
-
 
     public void MoveRegainPrompt() {
         Vector3 promptOffset = new Vector3(1.3f, 0f, 0f);
@@ -131,12 +130,10 @@ public class HealthManager : MonoBehaviour {
         regainPrompt.transform.localPosition = target.transform.localPosition + promptOffset;
     }
 
-
     public void ApplyPointsToBonus(int points) {
         if (currentMaxHealth == 5) { return; }
         pointsAppliedTowardsBonus += points;
     }
-
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (isInvincible) { return; }

@@ -20,7 +20,7 @@ public class EpisodeIcon : MonoBehaviour {
 
     GameObject ActiveIconMesh {
         get {
-            if (correspondingNode.IsUnlocked) { return unlockedIconMesh; }
+            if (correspondingNode!= null && correspondingNode.IsUnlocked) { return unlockedIconMesh; }
             else { return lockedIconMesh; }
         }
     }
@@ -54,6 +54,14 @@ public class EpisodeIcon : MonoBehaviour {
 
     float currentRotationSpeed = 10f;
 
+    Vector3 originalLocalScale = Vector3.zero;
+
+    private void Awake() {
+        if (originalLocalScale == Vector3.zero) {
+            originalLocalScale = ActiveIconMesh.transform.parent.localScale;
+        }
+    }
+
     private void Start() {
         // Activate the proper 3D icon and text
         UpdateVisuals();
@@ -68,7 +76,7 @@ public class EpisodeIcon : MonoBehaviour {
                 if ((correspondingNode.IsUnlocked && IsMouseOverlapping) || forceHighlighting) {
                     selectionState = SelectionState.Highlighted;
                     ClearActiveTweens();
-                    ActiveIconMesh.transform.parent.localScale = Vector3.one * 1.1f;
+                    ActiveIconMesh.transform.parent.localScale = originalLocalScale * 1.1f;
                     if (selectionCoroutine != null) { StopCoroutine(selectionCoroutine); }
                     selectionCoroutine = StartCoroutine(SelectionSequence());
                 }
@@ -85,7 +93,7 @@ public class EpisodeIcon : MonoBehaviour {
                 if (!IsMouseOverlapping && !forceHighlighting) {
                     selectionState = SelectionState.Unhighlighted;
                     ClearActiveTweens();
-                    ActiveIconMesh.transform.parent.localScale = Vector3.one;
+                    ActiveIconMesh.transform.parent.localScale = originalLocalScale;
                     if (selectionCoroutine != null) { StopCoroutine(selectionCoroutine); }
                     selectionCoroutine = StartCoroutine(DeselectionSequence());
                 }
@@ -169,6 +177,8 @@ public class EpisodeIcon : MonoBehaviour {
     }
 
     public void UpdateVisuals() {
+        if (correspondingNode == null) { return; }
+
         unlockedIconMesh.SetActive(correspondingNode.IsUnlocked);
         lockedIconMesh.SetActive(!correspondingNode.IsUnlocked);
 

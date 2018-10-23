@@ -159,7 +159,6 @@ public class LevelManager : MonoBehaviour {
         previousNode = currentBranchNode;
         currentBranchNode.levelSet.levelsCompleted = 0;
         currentBranchNode = pathSelectedScreen.GetSelectedNode();
-        Debug.Log("Entering branch node: " + currentBranchNode.name);
         currentBranchNode.IsUnlocked = true;
         currentLevelSet = currentBranchNode.levelSet;
         currentLevelSet.levelsCompleted = 0;

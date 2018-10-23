@@ -24,7 +24,6 @@ public class CircleDrawer {
         }
     }
 
-
     public static void DrawCrosshair(LineRenderer lineRenderer, float xRadius, float yRadius, int segments, float jitter) {
         float x;
         float y;

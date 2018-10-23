@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityStandardAssets.Characters.FirstPerson;
 using System.Collections;
 using System.Collections.Generic;   
@@ -6,26 +7,42 @@ using System.Collections.Generic;
 public class Gun : MonoBehaviour {
 
     /* INSPECTOR */
+    public Weapon shotgunWeapon;
+    public Weapon sniperRifle;
+    public Weapon machineGun;
+
+    public Weapon upperWeapon;
+    public Weapon lowerWeapon;
+
     public IntRange bulletsPerBurstRange = new IntRange(2, 50);   // How many bullets are fired per shot.
     [SerializeField] AnimationCurve bulletsPerBurstCurve;
+
     [SerializeField] FloatRange burstsPerSecondRange = new FloatRange(2f, 9f);  // How many shots can be fired per second.
     [SerializeField] AnimationCurve burstsPerSecondCurve;
+
     [SerializeField] FloatRange bulletSpreadRange = new FloatRange(1f, 10f);
     [SerializeField] AnimationCurve bulletSpreadCurve;
+
     [SerializeField] FloatRange bulletSpeedRange = new FloatRange(300f, 600f);
+
     [SerializeField] FloatRange bulletThicknessRange = new FloatRange(0.1f, 0.3f);
     [SerializeField] AnimationCurve bulletThicknessCurve;
+
     [SerializeField] int bulletDamage = 1;
     [SerializeField] float bulletRecoil = 0.2f;
+
     [SerializeField] Color bulletColor1;
     [SerializeField] Color bulletColor2;
+
     [SerializeField] public float burstsPerSecondSloMoModifierMax = 2f;   // Modifies rate of fire during slow motion sequence.
 
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
 
     // USED DURING SHOOTING
-    public int bulletsPerBurst {
-        get { return Mathf.RoundToInt(MyMath.Map(bulletsPerBurstCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletsPerBurstRange.min, bulletsPerBurstRange.max)); } }
+    public int BulletsPerBurst {
+        get { return Mathf.RoundToInt(CombineWeaponValue(upperWeapon.bulletsPerBurst.CurrentValue, lowerWeapon.bulletsPerBurst.CurrentValueInverse)); }
+        //get { return Mathf.RoundToInt(MyMath.Map(bulletsPerBurstCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletsPerBurstRange.min, bulletsPerBurstRange.max)); }
+    }
     int bulletsHitThisBurst = 0;
     [HideInInspector] public bool canShoot = true;  // Used by other scripts to disable the gun at certain times.
 
@@ -44,6 +61,8 @@ public class Gun : MonoBehaviour {
     /* REFERENCES */
     [HideInInspector] public Transform bulletSpawnTransform; // The point where bullets originate (ie the tip of the player's gun)
     [HideInInspector] public Transform tip;
+    [SerializeField] private Text upperWeaponText;
+    [SerializeField] private Text lowerWeaponText;
     GameObject screen;
 
     /* MISC */
@@ -74,6 +93,9 @@ public class Gun : MonoBehaviour {
 
         originalPosition = transform.localPosition;
         recoilPosition = new Vector3(0f, -3.68f, 10.68f);
+
+        upperWeaponText.text = upperWeapon.weaponName;
+        lowerWeaponText.text = lowerWeapon.weaponName;
     }
 
     void Update() {
@@ -81,19 +103,34 @@ public class Gun : MonoBehaviour {
         if (InputManager.fireButton) { FireBurst(); }
     }
 
+    float CombineWeaponValue(float value1, float value2) {
+        if (upperWeapon == lowerWeapon) {
+            return (value1 + value2) * (1.25f - Mathf.Abs(0 - GunValueManager.currentValue));
+        }
+        else {
+            if (value1 > value2) { return value1; }
+            else { return value2; }
+        }
+    }
+
     public void FireBurst() {
         if (!Services.gameManager.isGameStarted) { return; }
 
+        // OLD SYSTEM:
         // Get new firing variables based on current oscillation.
         //float burstsPerSecond = MyMath.Map(GunValueManager.currentValue, -1f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
         float burstsPerSecond = MyMath.Map(burstsPerSecondCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, burstsPerSecondRange.min, burstsPerSecondRange.max) * burstsPerSecondSloMoModifierCurrent;
-        float accuracy = MyMath.Map(bulletSpreadCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletSpreadRange.min, bulletSpreadRange.max);
+        float bulletSpread = MyMath.Map(bulletSpreadCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletSpreadRange.min, bulletSpreadRange.max);
         //float accuracy = MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
+
+        // NEW SYSTEM:
+        burstsPerSecond = CombineWeaponValue(upperWeapon.burstsPerSecond.CurrentValue, lowerWeapon.burstsPerSecond.CurrentValueInverse);
+        bulletSpread = CombineWeaponValue(upperWeapon.bulletSpread.CurrentValue, lowerWeapon.bulletSpread.CurrentValueInverse);
 
         // Make sure enough time has passed since the last shot.
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
 
-        // Handle audio.
+        // Handle audio. [MOVE THIS TO WEAPON SCRIPT LATER]
         //rifleAudioSource.clip = rifleAudioClips[Random.Range(0, rifleAudioClips.Length)];
         rifleAudioSource.pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.2f, 1f);
         rifleAudioSource.volume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.2f, 1f);
@@ -101,17 +138,17 @@ public class Gun : MonoBehaviour {
         shotgunAudioSource.pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.8f, 2f);
         shotgunAudioSource.volume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 1f, 0.2f);
 
-        bulletsHitThisBurst = 0;
-
-        GameEventManager.instance.FireEvent(new GameEvents.PlayerFiredGun());
-
         // Play shooting sound.
         rifleAudioSource.Play();
         shotgunAudioSource.Play();
 
+        bulletsHitThisBurst = 0;
+
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerFiredGun());
+
         // Handle screen shake
         foreach (ScreenShake screenShake in screenShakes) {
-            float newShake = MyMath.Map(bulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f);
+            float newShake = MyMath.Map(BulletsPerBurst, bulletsPerBurstRange.min, bulletsPerBurstRange.max, 0.025f, 0.2f);
             if (bulletsPerBurstRange.min == bulletsPerBurstRange.max) { newShake = 0.1f; }
             screenShake.SetShake(newShake, (1 / burstsPerSecond) * 0.6f);
         }
@@ -126,8 +163,6 @@ public class Gun : MonoBehaviour {
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.5f, 0.3f)
             );
 
-        // Flash screen
-
         // Auto aim for weak points.
         Vector3 autoAimPoint = Services.playerTransform.position + Services.playerTransform.forward * 1000f;
         autoAimPoint = AutoAim("Weak Point", 0.15f);
@@ -138,8 +173,8 @@ public class Gun : MonoBehaviour {
         }
 
         // Fire the specified number of bullets.
-        for (int i = 0; i < bulletsPerBurst; i++) {
-            FireBullet(autoAimPoint, accuracy);
+        for (int i = 0; i < BulletsPerBurst; i++) {
+            FireBullet(autoAimPoint, bulletSpread);
         }
 
         // Add recoil to player controller.
@@ -170,8 +205,8 @@ public class Gun : MonoBehaviour {
         newBullet.GetComponent<PlayerBullet>().GetFired(
             bulletSpawnTransform.position,
             bulletSpawnTransform.forward,
-            MyMath.Map(bulletThicknessCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
-            //MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
+            //MyMath.Map(bulletThicknessCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
+            CombineWeaponValue(upperWeapon.bulletThickness.CurrentValue, lowerWeapon.bulletThickness.CurrentValueInverse),
             MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
             Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f))
         );
@@ -217,5 +252,19 @@ public class Gun : MonoBehaviour {
 
     public void GameStartedHandler(GameEvent gameEvent) {
         this.enabled = true;
+    }
+
+    public enum WeaponPosition { Upper, Lower }
+    public void SwitchWeapon(WeaponPosition weaponPosition, Weapon newWeapon) {
+        if (weaponPosition == WeaponPosition.Upper) {
+            upperWeapon = newWeapon;
+            upperWeaponText.text = newWeapon.weaponName;
+            Services.uiManager.crosshair.GetComponent<CrossHair>().upperWeaponPositions = newWeapon.CrosshairVectors;
+        }
+        else if (weaponPosition == WeaponPosition.Lower) {
+            lowerWeapon = newWeapon;
+            lowerWeaponText.text = newWeapon.weaponName;
+            Services.uiManager.crosshair.GetComponent<CrossHair>().lowerWeaponPositions = newWeapon.CrosshairVectors;
+        }
     }
 }

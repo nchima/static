@@ -22,9 +22,9 @@ public class SpecialBarManager : MonoBehaviour {
     // Relating to the decay of the special bar.
     public float decayRate;     // How quickly the special bar currently shrinks.
 
-    [SerializeField] private float enemyValue = 0.4f; // How much the player's special increases for killing an enemy.
-    [SerializeField] private float bulletHitValue = 0.01f;    // How much the player's special increases for hitting an enemy with one bullet.
-    [SerializeField] private float getHurtPenalty = 0.1f; // How much the special bar decreases when the player is hurt.
+    [SerializeField] private float enemyValue = 0.2f;         // How much the player's special increases for killing an enemy.
+    [SerializeField] private float bulletHitValue = 0.005f;    // How much the player's special increases for hitting an enemy with one bullet.
+    [SerializeField] private float getHurtPenalty = 0.2f;     // How much the special bar decreases when the player is hurt.
 
     [HideInInspector] public bool screenHidden = false;
 
@@ -54,12 +54,6 @@ public class SpecialBarManager : MonoBehaviour {
 
         set {
             shotsSaved = Mathf.Clamp(value, 0, maxSavedShots+1);
-            //if (shotsSaved == 1) {
-            //    savedShotBoxes[0].SetActive(true);
-            //    earnedPrompt.gameObject.SetActive(true);
-            //    earnedPrompt.Activate();
-            //}
-            //else { savedShotBoxes[0].SetActive(false); }
         }
     }
 
@@ -96,18 +90,6 @@ public class SpecialBarManager : MonoBehaviour {
             if (!BothFirstBarsFull && ShotsSaved > 0) {
                 RemoveAmmoCharge();
             }
-
-            //if (BothFirstBarsFull) {
-            //    if (ShotsSaved < maxSavedShots) {
-            //        ShotsSaved++;
-            //        leftBar.CurrentValue = 0f;
-            //        rightBar.CurrentValue = 0f;
-            //    } else {
-            //        earnedPrompt.gameObject.SetActive(true);
-            //        earnedPrompt.Activate();
-            //        savedShotBoxes[1].SetActive(true);
-            //    }
-            //}
         }
     }
 

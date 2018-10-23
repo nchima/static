@@ -323,6 +323,7 @@
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_PlayerReleasedButton.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\Shotgun Charge\ShotgunChargeTransition_ReachedEndPoint.cs" />
     <Compile Include="Assets\Scripts\Gun and Special Moves\SpecialMoveManager.cs" />
+    <Compile Include="Assets\Scripts\Gun and Special Moves\Weapon.cs" />
     <Compile Include="Assets\Scripts\Input\InputManager.cs" />
     <Compile Include="Assets\Scripts\Level\BranchNodes\LevelBranchNode.cs" />
     <Compile Include="Assets\Scripts\Level\BranchNodes\LevelBranchNode_ScoreCondition.cs" />
@@ -412,6 +413,7 @@
     <Compile Include="Assets\Scripts\Util\CollisionListener.cs" />
     <Compile Include="Assets\Scripts\Util\CollisionReporter.cs" />
     <Compile Include="Assets\Scripts\Util\DebugUtil.cs" />
+    <Compile Include="Assets\Scripts\Util\DenGeometry.cs" />
     <Compile Include="Assets\Scripts\Util\FloatRange.cs" />
     <Compile Include="Assets\Scripts\Util\Int2.cs" />
     <Compile Include="Assets\Scripts\Util\IntRange.cs" />
