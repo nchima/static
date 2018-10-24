@@ -152,7 +152,10 @@ public class SpecialBarManager : MonoBehaviour {
         else { earnedPrompt.GetComponent<Text>().color = new Color(0, 0, 0, 0); }
 
         for (int i = 0; i < savedShotBoxes.Length; i++) {
-            savedShotBoxes[i].SetActive(value);
+            if (value == false) { savedShotBoxes[i].SetActive(false); }
+            else {
+                if (ShotsSaved - 1 >= i) { savedShotBoxes[i].SetActive(true); }
+            }
         }
     }
 }

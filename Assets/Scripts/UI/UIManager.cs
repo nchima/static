@@ -135,6 +135,7 @@ public class UIManager : MonoBehaviour {
     public void ShowEpisodeCompleteScreen(bool value) {
         pauseVeil.SetActive(value);
         episodeCompleteScreen.SetActive(value);
+        Services.specialBarManager.ShowDisplay(!value);
         Services.comboManager.SetAllFinishersVisible(!value);
     }
 
