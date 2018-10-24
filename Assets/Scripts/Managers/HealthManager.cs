@@ -16,10 +16,17 @@ public class HealthManager : MonoBehaviour {
     [SerializeField] HealthBox[] healthBlocks;
     [SerializeField] AudioSource getHurtAudio;
     [SerializeField] GameObject regainPrompt;
-        
+
     /* MISC */
     // Player's health.
-    [HideInInspector] public int currentHealth = 3;
+    int _currentHealth = 3;
+    [HideInInspector] public int CurrentHealth {
+        get { return _currentHealth; }
+        set {
+            _currentHealth = value;
+            Debug.Log("current health set to: " + _currentHealth);
+        }
+    }
     int currentMaxHealth = 3;
     float healthRechargeTimer = 0f;
 
@@ -36,14 +43,16 @@ public class HealthManager : MonoBehaviour {
     [HideInInspector] public bool isInvincible;
     float invincibilityTimer = 0f;
 
-    public bool PlayerIsDead { get { return currentHealth <= 0 || currentMaxHealth <= 0; } }
+    public bool PlayerIsDead { get { return CurrentHealth <= 0 || currentMaxHealth <= 0; } }
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
     private void Awake() {
@@ -52,11 +61,11 @@ public class HealthManager : MonoBehaviour {
 
     private void Update() {
         // Handle health recharging.
-        if (currentHealth < currentMaxHealth) {
+        if (CurrentHealth < currentMaxHealth) {
             healthRechargeTimer += Time.deltaTime;
             if (healthRechargeTimer >= healthRechargeRate) {
                 // Add one health point
-                currentHealth++;
+                CurrentHealth++;
                 UpdateHealthBoxes();
                 healthRechargeTimer = 0f;
 
@@ -88,12 +97,12 @@ public class HealthManager : MonoBehaviour {
     }
 
     void UpdateHealthBoxes() {
-        Debug.Log("Updating health boxes. Current health: " + currentHealth.ToString() + ". Current max health: " + currentMaxHealth.ToString());
+        Debug.Log("Updating health boxes. Current health: " + CurrentHealth.ToString() + ". Current max health: " + currentMaxHealth.ToString());
 
         for (int i = 0; i < healthBlocks.Length; i++) {
             if (i >= currentMaxHealth) { healthBlocks[i].BecomeXedOut(); }
             else { healthBlocks[i].BecomeUnXedOut(); }
-            if (i >= currentHealth) { healthBlocks[i].BecomeEmpty(); }
+            if (i >= CurrentHealth) { healthBlocks[i].BecomeEmpty(); }
             else { healthBlocks[i].BecomeFull(); }
         }
 
@@ -102,13 +111,13 @@ public class HealthManager : MonoBehaviour {
 
     public void AddMaxHealth() {
         currentMaxHealth = Mathf.Clamp(currentMaxHealth + 1, 0, 5);
-        currentHealth = currentMaxHealth;
+        CurrentHealth = currentMaxHealth;
         UpdateHealthBoxes();
         CheckWarningState();
     }
 
     void CheckWarningState() {
-        if (currentHealth == currentMaxHealth) {
+        if (CurrentHealth == currentMaxHealth) {
             isInWarningState = false;
             Services.uiManager.healthWarningScreen.SetActive(false);
             Services.colorPaletteManager.LoadLevelPalette();
@@ -140,14 +149,14 @@ public class HealthManager : MonoBehaviour {
 
         // If the player is in warning state, die immediately.
         if (isInWarningState) {
-            currentHealth = 0;
+            CurrentHealth = 0;
             currentMaxHealth = 0;
         }
 
         Services.uiManager.healthWarningScreen.SetActive(true);
 
         currentMaxHealth--;
-        currentHealth = 1;
+        CurrentHealth = 1;
 
         invincibilityTimer = 0f;
         isInvincible = true;
@@ -160,5 +169,9 @@ public class HealthManager : MonoBehaviour {
         if (PlayerIsDead) {
             GameEventManager.instance.FireEvent(new GameEvents.GameOver());
         }
+    }
+
+    public void GameStartedHandler(GameEvent gameEvent) {
+        UpdateHealthBoxes();
     }
 }
