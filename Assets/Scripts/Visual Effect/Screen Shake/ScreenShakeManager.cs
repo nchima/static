@@ -26,6 +26,12 @@ public class ScreenShakeManager : MonoBehaviour {
         }
     }
 
+    public void SetShake(float value, float time) {
+        foreach(ScreenShake screenShake in screenShakeScripts) {
+            screenShake.SetShake(value, time);
+        }
+    }
+
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
         IncreaseShake(playerHurtShakeAmount);

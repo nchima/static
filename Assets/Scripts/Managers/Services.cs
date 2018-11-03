@@ -32,4 +32,5 @@ public class Services {
     public static TimeScaleManager timeScaleManager;
     public static Camera finalCamera;
     public static TaserManager taserManager;
+    public static ScreenShakeManager screenShakeManager;
 }

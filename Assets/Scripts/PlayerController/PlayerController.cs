@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour {
     private Quaternion targetRotation;
 
     // STATE    
-    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling, Dashing, Dead }
+    public enum State { Normal, ShotgunCharge, Falling, SpeedFalling, Dashing, GettingTased, Dead }
     public State state;
 
     // INPUT
@@ -180,7 +180,7 @@ public class PlayerController : MonoBehaviour {
         previousPosition = transform.position;
 
         /* HANDLE MOVEMENT */
-        if (state == State.Dead) { return; }
+        if (state == State.Dead || state == State.GettingTased) { return; }
         if (!isMovementEnabled) return;
 
         // Get desired movement from input.

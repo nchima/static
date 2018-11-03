@@ -20,8 +20,8 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] FloatRange masterVolumeRange;
     [SerializeField] FloatRange musicMasterVolumeRange;
 
-    enum State { Normal, SpeedFall, FallingSequence, DashCharging, Dashing }
-    State state = State.Normal;
+    public enum State { Normal, SpeedFall, FallingSequence, DashCharging, Dashing, GettingTased }
+    public State state = State.Normal;
 
     int tracksPerLayer = 2;
 
@@ -31,7 +31,6 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] AudioClip[] newMusicSpeedClips;
     int currentSpeedClip = 0;
 
-
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
@@ -40,7 +39,6 @@ public class MusicManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
-
     private void Start() {
         musicDebugStates = new MusicDebugState[3];
         musicDebugStates[0] = new MusicDebugState(0f, 0f);
@@ -48,9 +46,11 @@ public class MusicManager : MonoBehaviour {
         musicDebugStates[2] = new MusicDebugState(0f, 1f);
     }
 
-
     private void Update() {
         if (state == State.Normal) { SetLayerVolumeByGunValue(); }
+        else if (state == State.GettingTased) {
+            SetMusicVolume(0.2f);
+        }
 
         if (Input.GetKeyDown(KeyCode.M)) {
             int nextDebugState = currentDebugState;
@@ -70,7 +70,6 @@ public class MusicManager : MonoBehaviour {
         }
     }
 
-
     public void EnterFallingSequence() {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);
@@ -79,7 +78,6 @@ public class MusicManager : MonoBehaviour {
         RandomizeAllMusicVolumeLevels();
         state = State.FallingSequence;
     }
-
 
     public void EnterSpeedFall() {
         masterMixer.SetFloat("Pitch", 1f);
@@ -90,14 +88,12 @@ public class MusicManager : MonoBehaviour {
         state = State.SpeedFall;
     }
 
-
     public void ExitFallingSequence() {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
         masterMixer.SetFloat("Pitch", 1f);
         state = State.Normal;
     }
-
 
     public void EnterDashCharge() {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 23f);
@@ -108,7 +104,6 @@ public class MusicManager : MonoBehaviour {
         state = State.DashCharging;
     }
 
-
     public void BeginDash() {
         masterMixer.SetFloat("Pitch", 1f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
@@ -118,7 +113,6 @@ public class MusicManager : MonoBehaviour {
         state = State.Dashing;
     }
 
-
     public void ExitDash() {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
@@ -127,7 +121,6 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Pitch", 0.1f);
         state = State.Normal;
     }
-
 
     void SetLayerVolumeByGunValue() {
         //float layerABVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, ABVolumeRange.min, ABVolumeRange.max);
@@ -148,14 +141,12 @@ public class MusicManager : MonoBehaviour {
         musicAudioSource.pitch = pitch;
     }
 
-
     // Selects one track from each layer to play at full volume and randomized the volume of all others.
     public void RandomizeAllMusicVolumeLevels() {
         RandomizeAllTrackVolumeLevels(layerAMixer);
         RandomizeAllTrackVolumeLevels(layerBMixer);
         RandomizeAllTrackVolumeLevels(rhythmMixer);
     }
-
 
     // Unused.
     void SelectRandomTrack(AudioMixer mixer) {
@@ -189,7 +180,6 @@ public class MusicManager : MonoBehaviour {
         }
     }
 
-
     void ApplyDebugState(MusicDebugState state) {
         transform.Find("Layer A 1").GetComponent<AudioSource>().volume = state.oldMusicVol;
         transform.Find("Layer A 2").GetComponent<AudioSource>().volume = state.oldMusicVol;
@@ -200,7 +190,6 @@ public class MusicManager : MonoBehaviour {
         transform.Find("New Music").GetComponent<AudioSource>().volume = state.newMusicVol;
     }
 
-
     public void GameStartedHandler(GameEvent gameEvent) {
         musicMasterMixer.SetFloat("Layer A Volume", -80f);
         musicMasterMixer.SetFloat("Layer B Volume", -80f);
@@ -208,12 +197,10 @@ public class MusicManager : MonoBehaviour {
         musicAudioSource.Play();
     }
 
-
     public void SetMasterVolume(float value) {
         value = Mathf.Clamp01(value);
         masterMixer.SetFloat("Master Volume", masterVolumeRange.MapTo(value, 0f, 1f));
     }
-
 
     public void SetMusicVolume(float value) {
         value = Mathf.Clamp01(value);

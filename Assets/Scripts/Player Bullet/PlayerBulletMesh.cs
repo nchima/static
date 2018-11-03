@@ -20,6 +20,8 @@ public class PlayerBulletMesh : MonoBehaviour {
 
     public void SetTransformByEndPoints(Vector3 back, Vector3 front, float thickness) {
 
+        Debug.DrawLine(back, front, Color.green);
+
         transform.position = Vector3.Lerp(back, front, 0.5f);
 
         Vector3 lookDirection = (front - back);

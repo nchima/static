@@ -118,8 +118,10 @@ public class ColorPaletteManager : MonoBehaviour {
         saveTarget.backgroundColor = backgroundScreen.GetComponent<MeshRenderer>().material.color;
     }
 
+    Coroutine changeToRandomPaletteCoroutine;
     public void ChangeToRandomPalette(float duration) {
-        StartCoroutine(ChangeToRandomPaletteCoroutine(duration));
+        if (changeToRandomPaletteCoroutine != null) { StopCoroutine(changeToRandomPaletteCoroutine); }
+        changeToRandomPaletteCoroutine = StartCoroutine(ChangeToRandomPaletteCoroutine(duration));
     }
 
     IEnumerator ChangeToRandomPaletteCoroutine(float duration) {
@@ -184,5 +186,7 @@ public class ColorPaletteManager : MonoBehaviour {
         if (Services.healthManager.isInvincible) { return; }
 
         LoadVulnerablePalette();
+
+        Invoke("LoadLevelPalette", 1.5f);
     }
 }

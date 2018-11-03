@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour {
         Services.timeScaleManager = GetComponentInChildren<TimeScaleManager>();
         Services.finalCamera = GameObject.Find("Final Camera").GetComponent<Camera>();
         Services.taserManager = GetComponentInChildren<TaserManager>();
+        Services.screenShakeManager = GetComponentInChildren<ScreenShakeManager>();
     }
 
     private void OnEnable() {

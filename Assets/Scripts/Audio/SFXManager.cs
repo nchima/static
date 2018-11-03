@@ -11,13 +11,16 @@ public class SFXManager : MonoBehaviour {
     [SerializeField] AudioSource bulletHitEnemyAudioSource;
     [SerializeField] AudioSource bulletHitWeakPointAudioSource;
     [SerializeField] AudioSource playerWasHurtAudioSource;
+    [SerializeField] AudioSource taserShockAudioSource;
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasTased>(PlayerWasTasedHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasTased>(PlayerWasTasedHandler);
     }
 
     public void PlayBulletEnemyHitSoundOld(EnemyOld hitEnemy) {
@@ -46,14 +49,17 @@ public class SFXManager : MonoBehaviour {
         bulletHitWeakPointAudioSource.Play();
     }
 
-    public void PlayerWasHurtHandler(GameEvent gameEvent) {
-        if (Services.healthManager.isInvincible) { return; }
-
-        playerWasHurtAudioSource.Play();
-    }
-
     public void SetVolume(float value) {
         value = Mathf.Clamp01(value);
         sfxMasterMixer.SetFloat("Master Volume", sfxMasterVolumeRange.MapTo(value, 0f, 1f));
+    }
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        if (Services.healthManager.isInvincible) { return; }
+        playerWasHurtAudioSource.Play();
+    }
+
+    public void PlayerWasTasedHandler(GameEvent gameEvent) {
+        taserShockAudioSource.Play();
     }
 }

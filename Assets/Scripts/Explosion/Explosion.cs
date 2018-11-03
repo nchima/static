@@ -8,7 +8,7 @@ public class Explosion : MonoBehaviour {
     enum ExplosionState { Expanding, Fading };
     ExplosionState explosionState;
 
-	public float explosionRadius;
+	public float radius;
     [SerializeField] float pushForce;
     [SerializeField] float expandDuration;
     [SerializeField] float fadeDuration;
@@ -26,7 +26,7 @@ public class Explosion : MonoBehaviour {
     private void Start() {
         explosionState = ExplosionState.Expanding;
 
-        explosionSphere.transform.DOScale(explosionRadius, expandDuration);
+        explosionSphere.transform.DOScale(radius, expandDuration);
         affectedObjects = new List<Collider>();
     }
 
@@ -35,7 +35,7 @@ public class Explosion : MonoBehaviour {
     {
         if (explosionState == ExplosionState.Expanding)
         {
-            if (explosionSphere.transform.localScale.x >= explosionRadius * 0.99f)
+            if (explosionSphere.transform.localScale.x >= radius * 0.99f)
             {
                 //Debug.Log("Explosion reached full size.");
                 foreach(Renderer renderer in explosionSphere.GetComponentsInChildren<Renderer>()) renderer.material.DOFade(0f, fadeDuration);
@@ -74,7 +74,7 @@ public class Explosion : MonoBehaviour {
 
             // Raycast to see if player is behind cover.
             RaycastHit hit;
-            if (Physics.Raycast(transform.position + Vector3.up * 0.5f, collider.transform.position - transform.position, out hit, explosionRadius, 1<<8)) {
+            if (Physics.Raycast(transform.position + Vector3.up * 0.5f, collider.transform.position - transform.position, out hit, radius, 1<<8)) {
                 if (hit.transform != collider.transform) return;
             }
 
@@ -84,7 +84,7 @@ public class Explosion : MonoBehaviour {
         else if (collider.tag == "Enemy") {
             //Debug.Log("Enemy affected by explosion.");
             //collider.GetComponent<Enemy>().BecomePhysicsObject(1f);
-            collider.GetComponent<Rigidbody>().AddExplosionForce(pushForce, Vector3.Scale(transform.position, new Vector3(1f, 0f, 1f)), explosionRadius, pushForce*0.01f, ForceMode.Impulse);
+            collider.GetComponent<Rigidbody>().AddExplosionForce(pushForce, Vector3.Scale(transform.position, new Vector3(1f, 0f, 1f)), radius, pushForce*0.01f, ForceMode.Impulse);
 
             // Affordance for old enemy system.
             if (collider.GetComponent<Enemy>()) { collider.GetComponent<Enemy>().currentHealth -= damageMax; }

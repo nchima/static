@@ -5,22 +5,24 @@ public class PlayerBullet : MonoBehaviour {
 
     [SerializeField] bool justBeInstant;
 
-    [SerializeField] float maxDistance = 1000f;
-    [SerializeField] float speed;
-
     [SerializeField] GameObject strikeEnemyPrefab;
     [SerializeField] GameObject strikeWeakPointPrefab;
     [SerializeField] GameObject strikeWallPrefab;
+    [SerializeField] GameObject explosionPrefab;
 
     [SerializeField] GameObject headVisuals;
-    [SerializeField] FloatRange headSizeRange = new FloatRange(0f, 0.75f);
+
+    float maxDistance;
+    float speed;
+    public Color m_Color;
+    float trailThickness;
+    float explosionPower;
 
     PlayerBulletTrail m_playerBulletTrail;
-
-    public Color m_Color;
-    public float thickness = 0.2f;
     Vector3 previousPosition = Vector3.zero;
     float travelledDistance = 0f;
+
+    bool isActive;
 
     ShotgunCharge shotgunCharge;
 
@@ -28,14 +30,18 @@ public class PlayerBullet : MonoBehaviour {
         shotgunCharge = FindObjectOfType<ShotgunCharge>();
     }
 
-    private void Update() {
-        FixedUpdateMove();
+    private void FixedUpdate() {
+        Move();
     }
 
-    void FixedUpdateMove() {
+    void Move() {
+        if (!isActive) { return; }
+
         Vector3 nextPosition = transform.position + transform.forward * speed * Time.fixedDeltaTime;
 
-        if (justBeInstant) { nextPosition = transform.position + transform.forward * 1000f; }
+        headVisuals.transform.Rotate(Vector3.forward, 10f * Time.fixedDeltaTime);
+
+        //if (justBeInstant) { nextPosition = transform.position + transform.forward * 1000f; }
 
         //Debug.DrawLine(transform.position, nextPosition, Color.red, 1f);
 
@@ -54,7 +60,7 @@ public class PlayerBullet : MonoBehaviour {
             // Raycast from my previous position to my new position to see if I hit an enemy's regular surface.
             hit = SphereCastOnLayer(nextPosition, (1 << 8) | (1 << 13) | (1 << 14) | (1 << 23));
 
-            // If we hit a something.
+            // If we hit something.
             if (hit.collider != null) {
                 transform.position = hit.point;
                 HandleHit(hit);
@@ -63,14 +69,20 @@ public class PlayerBullet : MonoBehaviour {
             else {
                 transform.position = nextPosition;
                 travelledDistance += Vector3.Distance(transform.position, previousPosition);
-                if (travelledDistance >= maxDistance) { EndBulletsExistence(); }
+                if (travelledDistance >= maxDistance) {
+                    AddTrailSegmentAtCurrentPosition();
+                    RemoveFromPlay();
+                }
             }
         }
 
-        float modifier = 0.5f;
-        m_playerBulletTrail.AddSegment(transform.position + Random.insideUnitSphere * modifier, previousPosition + Random.insideUnitSphere * modifier, PlayerController.currentVelocity);
-
+        AddTrailSegmentAtCurrentPosition();
         previousPosition = transform.position;
+    }
+
+    void AddTrailSegmentAtCurrentPosition() {
+        float modifier = 0f;
+        m_playerBulletTrail.AddSegment(transform.position + Random.insideUnitSphere * modifier, previousPosition + Random.insideUnitSphere * modifier, PlayerController.currentVelocity);
     }
 
     RaycastHit SphereCastOnLayer(Vector3 toPosition, int layerBitmask) {
@@ -93,36 +105,50 @@ public class PlayerBullet : MonoBehaviour {
         //    layerBitmask
         //);
 
-        Debug.DrawLine(previousPosition, hit.point, Color.red, 1.5f);
+        if (hit.point != Vector3.zero) {
+            Debug.DrawLine(previousPosition, hit.point, Color.red, 1.5f);
+        }
 
         return hit;
     }
 
-    public void GetFired(Vector3 _position, Vector3 _direction, float _thickness, float _speed, Color _color) {
-        transform.position = _position;
-        transform.forward = _direction;
-        thickness = _thickness;
-        speed = _speed;
+    public void GetFired(Gun.BulletInfo bulletInfo) {
+
+        // Initialize all weapon type variables
+        transform.position = bulletInfo.spawnPosition;
+        transform.forward = bulletInfo.direction;
+        trailThickness = bulletInfo.trailThickness;
+        speed = bulletInfo.speed;
+        maxDistance = bulletInfo.maxDistance;
+        explosionPower = bulletInfo.explosionPower;
+        m_Color = bulletInfo.color;
+
+        // Reset tracking variables
         travelledDistance = 0f;
         previousPosition = transform.position;
-        headVisuals.transform.localScale = Vector3.one * MyMath.Map(GunValueManager.currentValue, -1f, 1f, headSizeRange.min, headSizeRange.max);
-        m_Color = _color;
+
+        // Handle head visuals
+        headVisuals.transform.localScale = Vector3.one * bulletInfo.headScale;
         headVisuals.GetComponentInChildren<Renderer>().material.SetColor("_Tint", m_Color);
 
+        // Grab a bullet trail object if we don't already have one
         if (m_playerBulletTrail == null) {
             GameObject trail = new GameObject("Player Bullet Trail");
-            trail.transform.parent = transform.parent;
+            //trail.transform.parent = transform.parent;
             m_playerBulletTrail = trail.AddComponent<PlayerBulletTrail>();
         }
 
-        m_playerBulletTrail.thickness = thickness;
+        // Initialize trail variables
+        m_playerBulletTrail.thickness = trailThickness;
         m_playerBulletTrail.m_Color = m_Color;
 
-        FixedUpdateMove();
+        // Set active
+        isActive = true;
     }
 
     public void HandleHit(RaycastHit hit) {
 
+        // If this bullet hit an enemy
         if (hit.collider.GetComponent<EnemyOld>() != null || hit.collider.GetComponent<Enemy>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
@@ -141,6 +167,7 @@ public class PlayerBullet : MonoBehaviour {
         //    hit.collider.gameObject.GetComponent<HomingShot>().GotShot(hit.point);
         //} 
 
+        // If this bullet hit an enemy's weak point
         else if (hit.collider.name.Contains("Weak Point")) {
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
@@ -152,14 +179,22 @@ public class PlayerBullet : MonoBehaviour {
             Services.sfxManager.PlayBulletHitEnemySound(hit.collider.transform.parent.parent.GetComponent<Enemy>());
         }
         
+        // If this bullet hit an inanimate object
         else {
             Instantiate(strikeWallPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
         }
 
-        EndBulletsExistence();
+        SpawnExplosion(hit.point);
+        RemoveFromPlay();
     }
 
-    private void EndBulletsExistence() {
+    void SpawnExplosion(Vector3 position) {
+        if (explosionPower < 0.2f) { return; }
+        Explosion explosion = Instantiate(explosionPrefab, position, Quaternion.identity).GetComponent<Explosion>();
+        explosion.radius = MyMath.Map(explosionPower, 0f, 1f, 0f, 40f);
+    }
+
+    private void RemoveFromPlay() {
         GetComponent<PooledObject>().ReturnToPool();
     }
 }

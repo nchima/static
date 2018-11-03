@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerBulletTrail : MonoBehaviour {
 
-    float lingerDuration = 0.3f;
+    float lingerDuration = 0.4f;
     float lingerTimer = 0f;
 
     static ObjectPooler meshPooler;
@@ -36,7 +36,6 @@ public class PlayerBulletTrail : MonoBehaviour {
     private void Update() {
         // Check to see if any segments need to be deleted.
         for (int i = 0; i < segments.Count; i++) {
-            segments[i].beginningPoint += Services.playerGameObject.GetComponent<Rigidbody>().velocity;
             if (Time.time >= segments[i].deleteTime) {
                 segments.Remove(segments[i]);
                 RedrawTrail();
@@ -52,15 +51,20 @@ public class PlayerBulletTrail : MonoBehaviour {
             return;
         }
 
-        trailPiece.GetComponent<PlayerBulletMesh>().SetTransformByEndPoints(segments[segments.Count-1].endPoint, segments[0].beginningPoint, thickness);
+        trailPiece.GetComponent<PlayerBulletMesh>().SetTransformByEndPoints(segments[segments.Count-1].beginningPoint, segments[0].endPoint, thickness);
         trailPiece.GetComponent<PlayerBulletMesh>().SetColor(m_Color);
     }
 
 
     public void AddSegment(Vector3 beginning, Vector3 end, Vector3 velocity) {
+        Debug.DrawRay(beginning, Vector3.up, Color.yellow);
+        Debug.DrawRay(end, Vector3.up, Color.yellow);
         trailPiece.SetActive(true);
         trailPiece.GetComponent<PlayerBulletMesh>().screenTime = lingerDuration;
-        segments.Add(new Segment(beginning, end, Time.time + lingerDuration, velocity));
+        segments.Add(new Segment(beginning, end, Time.time + lingerDuration));
+        foreach(Segment segment in segments) {
+            Debug.DrawLine(segment.beginningPoint, segment.endPoint, Color.red);
+        }
         RedrawTrail();
     }
 
@@ -69,13 +73,11 @@ public class PlayerBulletTrail : MonoBehaviour {
         public Vector3 beginningPoint;
         public Vector3 endPoint;
         public float deleteTime;
-        public Vector3 velocity;
 
-        public Segment(Vector3 beginningPoint, Vector3 endPoint, float deleteTime, Vector3 velocity) {
+        public Segment(Vector3 beginningPoint, Vector3 endPoint, float deleteTime) {
             this.beginningPoint = beginningPoint;
             this.endPoint = endPoint;
             this.deleteTime = deleteTime;
-            this.velocity = velocity;
         }
     }
 }

@@ -108,16 +108,50 @@ public class TaserManager : MonoBehaviour {
     }
 
     public void TasePlayer() {
+        StartCoroutine(TasingSequence());
+    }
+
+    IEnumerator TasingSequence() {
         // Hurt player
-        GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
+        //Services.healthManager.currentMaxHealth--;
+        //Services.healthManager.CurrentHealth--;
         GameEventManager.instance.FireEvent(new GameEvents.PlayerWasTased());
         StartCoroutine(ShowTasedPromptSequence());
+
+        // Freeze player
+        PlayerController.State savedPlayerState = Services.playerController.state;
+        Services.playerController.state = PlayerController.State.GettingTased;
 
         // Reset timer
         mainTimer = maxTime;
 
         // Add temporary pause
-        HangTimer = 0.5f;
+        HangTimer = 1.6f;
+
+        float savedTimeScale = Time.timeScale;
+
+        MusicManager.State savedMusicState = Services.musicManager.state;
+        Services.musicManager.state = MusicManager.State.GettingTased;
+
+        // Cycle through random color palettes
+        int colorChanges = 10;
+        float frequency = 1.6f / colorChanges;
+        for (int i = 0; i < colorChanges; i++) {
+            Services.screenShakeManager.IncreaseShake(0.7f);
+            Services.timeScaleManager.TweenTimeScale(UnityEngine.Random.Range(0.1f, 0.5f), frequency * 0.5f);
+            Services.colorPaletteManager.ChangeToRandomPalette(frequency * 0.5f);
+            yield return new WaitForSecondsRealtime(frequency);
+        }
+
+        Services.timeScaleManager.TweenTimeScale(savedTimeScale, 0.5f);
+        Services.playerController.state = savedPlayerState;
+        Services.screenShakeManager.SetShake(0f, 0f);
+        Services.musicManager.SetMusicVolume(1f);
+        Services.musicManager.state = savedMusicState;
+
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerWasHurt());
+
+        yield return null;
     }
 
     public void PlayerUsedFallThroughFloorMove() {
@@ -166,7 +200,7 @@ public class TaserManager : MonoBehaviour {
 
     private IEnumerator ShowTasedPromptSequence() {
         tasedPrompt.SetActive(true);
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(3f);
         tasedPrompt.SetActive(false);
     }
 }

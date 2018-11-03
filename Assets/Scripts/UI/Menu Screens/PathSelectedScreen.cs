@@ -15,7 +15,7 @@ public class PathSelectedScreen : MonoBehaviour {
     enum SelectionState { Inactive, Active }
     SelectionState selectionState;
 
-    enum BonusType { Health, MachineGun, SniperRifle, Shotgun }
+    enum BonusType { Health, MachineGun, SniperRifle, Shotgun, Pulse, Saw, Rocket }
     BonusType upperBonus;
     BonusType lowerBonus;
 
@@ -90,6 +90,21 @@ public class PathSelectedScreen : MonoBehaviour {
                 break;
             case BonusType.SniperRifle:
                 if (Services.gun.upperWeapon == Services.gun.sniperRifle || Services.gun.lowerWeapon == Services.gun.sniperRifle) {
+                    return false;
+                }
+                break;
+            case BonusType.Pulse:
+                if (Services.gun.upperWeapon == Services.gun.pulseWeapon || Services.gun.lowerWeapon == Services.gun.pulseWeapon) {
+                    return false;
+                }
+                break;
+            case BonusType.Saw:
+                if (Services.gun.upperWeapon == Services.gun.sawWeapon || Services.gun.lowerWeapon == Services.gun.sawWeapon) {
+                    return false;
+                }
+                break;
+            case BonusType.Rocket:
+                if (Services.gun.upperWeapon == Services.gun.rocketWeapon || Services.gun.lowerWeapon == Services.gun.rocketWeapon) {
                     return false;
                 }
                 break;
@@ -193,6 +208,15 @@ public class PathSelectedScreen : MonoBehaviour {
             case BonusType.SniperRifle:
                 Services.gun.SwitchWeapon(weaponPosition, Services.gun.sniperRifle);
                 break;
+            case BonusType.Pulse:
+                Services.gun.SwitchWeapon(weaponPosition, Services.gun.pulseWeapon);
+                break;
+            case BonusType.Saw:
+                Services.gun.SwitchWeapon(weaponPosition, Services.gun.sawWeapon);
+                break;
+            case BonusType.Rocket:
+                Services.gun.SwitchWeapon(weaponPosition, Services.gun.rocketWeapon);
+                break;
         }
 
     }
@@ -233,11 +257,17 @@ public class PathSelectedScreen : MonoBehaviour {
             case BonusType.Health:
                 return "+1 HEALTH";
             case BonusType.MachineGun:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.machineGun.weaponName;
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.machineGun.displayName + ". " + Services.gun.machineGun.description + ". ";
             case BonusType.Shotgun:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.shotgunWeapon.weaponName;
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.shotgunWeapon.displayName + ". " + Services.gun.shotgunWeapon.description + ". ";
             case BonusType.SniperRifle:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.sniperRifle.weaponName;
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.sniperRifle.displayName + ". " + Services.gun.sniperRifle.description + ". ";
+            case BonusType.Pulse:
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.pulseWeapon.displayName + ". " + Services.gun.pulseWeapon.description + ". ";
+            case BonusType.Saw:
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.sawWeapon.displayName + ". " + Services.gun.sawWeapon.description + ". ";
+            case BonusType.Rocket:
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.rocketWeapon.displayName + ". " + Services.gun.rocketWeapon.description + ". ";
             default:
                 return "MEOW MEOW, TIRED COW";
         }

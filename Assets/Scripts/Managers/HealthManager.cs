@@ -27,7 +27,7 @@ public class HealthManager : MonoBehaviour {
             Debug.Log("current health set to: " + _currentHealth);
         }
     }
-    int currentMaxHealth = 3;
+    public int currentMaxHealth = 3;
     float healthRechargeTimer = 0f;
 
     bool isInWarningState = false;
@@ -148,21 +148,22 @@ public class HealthManager : MonoBehaviour {
         if (isInvincible) { return; }
 
         // If the player is in warning state, die immediately.
-        if (isInWarningState) {
-            CurrentHealth = 0;
-            currentMaxHealth = 0;
-        }
+        //if (isInWarningState) {
+        //    CurrentHealth = 0;
+        //    currentMaxHealth = 0;
+        //}
 
-        Services.uiManager.healthWarningScreen.SetActive(true);
+        //Services.uiManager.healthWarningScreen.SetActive(true);
 
         currentMaxHealth--;
-        CurrentHealth = 1;
+        CurrentHealth = currentMaxHealth;
+        //CurrentHealth = 1;
 
         invincibilityTimer = 0f;
         isInvincible = true;
-        healthRechargeTimer = 0f;
+        //healthRechargeTimer = 0f;
 
-        isInWarningState = true;
+        //isInWarningState = true;
 
         UpdateHealthBoxes();
 

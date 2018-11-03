@@ -10,6 +10,9 @@ public class Gun : MonoBehaviour {
     public Weapon shotgunWeapon;
     public Weapon sniperRifle;
     public Weapon machineGun;
+    public Weapon pulseWeapon;
+    public Weapon sawWeapon;
+    public Weapon rocketWeapon;
 
     public Weapon upperWeapon;
     public Weapon lowerWeapon;
@@ -40,7 +43,7 @@ public class Gun : MonoBehaviour {
 
     // USED DURING SHOOTING
     public int BulletsPerBurst {
-        get { return Mathf.RoundToInt(CombineWeaponValue(upperWeapon.bulletsPerBurst.CurrentValue, lowerWeapon.bulletsPerBurst.CurrentValueInverse)); }
+        get { return Mathf.RoundToInt(CombineWeaponValue(upperWeapon.bulletsPerBurst.maxValue, lowerWeapon.bulletsPerBurst.maxValue)); }
         //get { return Mathf.RoundToInt(MyMath.Map(bulletsPerBurstCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletsPerBurstRange.min, bulletsPerBurstRange.max)); }
     }
     int bulletsHitThisBurst = 0;
@@ -94,8 +97,8 @@ public class Gun : MonoBehaviour {
         originalPosition = transform.localPosition;
         recoilPosition = new Vector3(0f, -3.68f, 10.68f);
 
-        upperWeaponText.text = upperWeapon.weaponName;
-        lowerWeaponText.text = lowerWeapon.weaponName;
+        upperWeaponText.text = upperWeapon.displayName;
+        lowerWeaponText.text = lowerWeapon.displayName;
     }
 
     void Update() {
@@ -108,6 +111,7 @@ public class Gun : MonoBehaviour {
             return (value1 + value2) * (1.25f - Mathf.Abs(0 - GunValueManager.currentValue));
         }
         else {
+            return Mathf.Lerp(value2, value1, GunValueManager.MapTo(0f, 1f));
             if (value1 > value2) { return value1; }
             else { return value2; }
         }
@@ -124,8 +128,8 @@ public class Gun : MonoBehaviour {
         //float accuracy = MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpreadRange.max, bulletSpreadRange.min);
 
         // NEW SYSTEM:
-        burstsPerSecond = CombineWeaponValue(upperWeapon.burstsPerSecond.CurrentValue, lowerWeapon.burstsPerSecond.CurrentValueInverse);
-        bulletSpread = CombineWeaponValue(upperWeapon.bulletSpread.CurrentValue, lowerWeapon.bulletSpread.CurrentValueInverse);
+        burstsPerSecond = CombineWeaponValue(upperWeapon.burstsPerSecond.maxValue, lowerWeapon.burstsPerSecond.maxValue);
+        bulletSpread = CombineWeaponValue(upperWeapon.bulletSpread.maxValue, lowerWeapon.bulletSpread.maxValue);
 
         // Make sure enough time has passed since the last shot.
         if (!canShoot || timeSinceLastShot < 1 / burstsPerSecond) { return; }
@@ -202,14 +206,17 @@ public class Gun : MonoBehaviour {
         GameObject newBullet = bulletPooler.GrabObject();
 
         // Fire bullet.
-        newBullet.GetComponent<PlayerBullet>().GetFired(
-            bulletSpawnTransform.position,
-            bulletSpawnTransform.forward,
-            //MyMath.Map(bulletThicknessCurve.Evaluate(GunValueManager.currentValue), 0f, 1f, bulletThicknessRange.min, bulletThicknessRange.max),
-            CombineWeaponValue(upperWeapon.bulletThickness.CurrentValue, lowerWeapon.bulletThickness.CurrentValueInverse),
-            MyMath.Map(GunValueManager.currentValue, -1f, 1f, bulletSpeedRange.max, bulletSpeedRange.min),
-            Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f))
-        );
+        BulletInfo newBulletInfo = new BulletInfo();
+        newBulletInfo.spawnPosition = bulletSpawnTransform.position + Vector3.up * CombineWeaponValue(upperWeapon.tipHeightOffset.maxValue, lowerWeapon.tipHeightOffset.maxValue);
+        newBulletInfo.direction = bulletSpawnTransform.forward;
+        newBulletInfo.trailThickness = CombineWeaponValue(upperWeapon.trailThickness.maxValue, lowerWeapon.trailThickness.maxValue);
+        newBulletInfo.speed = CombineWeaponValue(upperWeapon.bulletSpeed.maxValue, lowerWeapon.bulletSpeed.maxValue);
+        newBulletInfo.maxDistance = CombineWeaponValue(upperWeapon.maxDistance.maxValue, lowerWeapon.maxDistance.maxValue);
+        newBulletInfo.headScale = CombineWeaponValue(upperWeapon.bulletHeadScale.maxValue, lowerWeapon.bulletHeadScale.maxValue);
+        newBulletInfo.explosionPower = CombineWeaponValue(upperWeapon.explosionPower.maxValue, lowerWeapon.explosionPower.maxValue);
+        newBulletInfo.color = Color.Lerp(bulletColor1, bulletColor2, MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0f, 1f));
+
+        newBullet.GetComponent<PlayerBullet>().GetFired(newBulletInfo);
     }
 
     Vector3 AutoAim(string tag, float bandSize) {
@@ -258,13 +265,24 @@ public class Gun : MonoBehaviour {
     public void SwitchWeapon(WeaponPosition weaponPosition, Weapon newWeapon) {
         if (weaponPosition == WeaponPosition.Upper) {
             upperWeapon = newWeapon;
-            upperWeaponText.text = newWeapon.weaponName;
+            upperWeaponText.text = newWeapon.displayName;
             Services.uiManager.crosshair.GetComponent<CrossHair>().upperWeaponPositions = newWeapon.CrosshairVectors;
         }
         else if (weaponPosition == WeaponPosition.Lower) {
             lowerWeapon = newWeapon;
-            lowerWeaponText.text = newWeapon.weaponName;
+            lowerWeaponText.text = newWeapon.displayName;
             Services.uiManager.crosshair.GetComponent<CrossHair>().lowerWeaponPositions = newWeapon.CrosshairVectors;
         }
+    }
+
+    public class BulletInfo {
+        public Vector3 spawnPosition;
+        public Vector3 direction;
+        public float trailThickness;
+        public float speed;
+        public float maxDistance;
+        public float headScale;
+        public float explosionPower;
+        public Color color;
     }
 }

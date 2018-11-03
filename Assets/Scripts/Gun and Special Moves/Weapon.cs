@@ -6,10 +6,11 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class Weapon : MonoBehaviour {
 
-    public string weaponName;
+    public string displayName;
+    public string description;
 
     [Serializable] public class WeaponValue {
-        [SerializeField] private float maxValue;
+        [SerializeField] public float maxValue;
         [SerializeField] private AnimationCurve curve;
 
         public float CurrentValue { get { return MyMath.Map(curve.Evaluate(MyMath.Map01(GunValueManager.currentValue, -1f, 1f)), 0f, 1f, 0f, maxValue); } }
@@ -19,7 +20,12 @@ public class Weapon : MonoBehaviour {
     public WeaponValue bulletsPerBurst;
     public WeaponValue burstsPerSecond;
     public WeaponValue bulletSpread;
-    public WeaponValue bulletThickness;
+    public WeaponValue trailThickness;
+    public WeaponValue bulletSpeed;
+    public WeaponValue maxDistance;
+    public WeaponValue tipHeightOffset;
+    public WeaponValue bulletHeadScale;
+    public WeaponValue explosionPower;
 
     private enum CrosshairType { LineRendererReference, Circle }
     [SerializeField] CrosshairType crosshairType = CrosshairType.Circle;
@@ -35,7 +41,7 @@ public class Weapon : MonoBehaviour {
             // Use an attached line renderer component for the crosshair reference.
             if (crosshairType == CrosshairType.LineRendererReference) {
                 if (GetComponent<LineRenderer>() == null) {
-                    Debug.LogError("Crosshair type for " + weaponName + " weapon was set to use a line renderer as reference, but a line renderer was not attached to its game object.");
+                    Debug.LogError("Crosshair type for " + displayName + " weapon was set to use a line renderer as reference, but a line renderer was not attached to its game object.");
                     return null;
                 }
 
