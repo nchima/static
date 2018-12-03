@@ -20,8 +20,8 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] FloatRange masterVolumeRange;
     [SerializeField] FloatRange musicMasterVolumeRange;
 
-    public enum State { Normal, SpeedFall, FallingSequence, DashCharging, Dashing, GettingTased }
-    public State state = State.Normal;
+    public enum State { MainMenu, Normal, SpeedFall, FallingSequence, DashCharging, Dashing, GettingTased }
+    public State state = State.MainMenu;
 
     int tracksPerLayer = 2;
 
@@ -47,11 +47,33 @@ public class MusicManager : MonoBehaviour {
     }
 
     private void Update() {
-        if (state == State.Normal) { SetLayerVolumeByGunValue(); }
-        else if (state == State.GettingTased) {
-            SetMusicVolume(0.2f);
+        switch (state) {
+
+            case State.MainMenu:
+                AdjustMusicForGunValueMainMenu();
+
+                // If the menu music has finished playing, loop all audio sources
+                if (!GetComponentInChildren<AudioSource>().isPlaying) {
+                    foreach(AudioSource audioSource in GetComponentsInChildren<AudioSource>()) {
+                        if (audioSource.playOnAwake) { audioSource.Play(); }
+                    }
+                }
+                break;
+
+            case State.Normal:
+                AdjustMusicForGunValueGameplay();
+                break;
+
+            case State.GettingTased:
+                SetMusicVolume(0.2f);
+                break;
+
+            case State.SpeedFall:
+                break;
         }
 
+#if UNITY_EDITOR
+        // The following code is for debugging
         if (Input.GetKeyDown(KeyCode.M)) {
             int nextDebugState = currentDebugState;
             nextDebugState++;
@@ -68,6 +90,7 @@ public class MusicManager : MonoBehaviour {
             transform.Find("New Music").GetComponent<AudioSource>().Play();
             currentSpeedClip = nextSpeedClip;
         }
+#endif
     }
 
     public void EnterFallingSequence() {
@@ -122,19 +145,29 @@ public class MusicManager : MonoBehaviour {
         state = State.Normal;
     }
 
-    void SetLayerVolumeByGunValue() {
-        //float layerABVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, ABVolumeRange.min, ABVolumeRange.max);
-        //musicMasterMixer.SetFloat("Layer A Volume", layerABVolume);
-        //musicMasterMixer.SetFloat("Layer B Volume", layerABVolume);
+    void AdjustMusicForGunValueMainMenu() {
+        float layerABVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, ABVolumeRange.min, ABVolumeRange.max);
+        musicMasterMixer.SetFloat("Layer A Volume", layerABVolume);
+        musicMasterMixer.SetFloat("Layer B Volume", layerABVolume);
 
-        //float rhythmVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, rhythmVolumeRange.max, rhythmVolumeRange.min);
-        //musicMasterMixer.SetFloat("Rhythm Volume", rhythmVolume);
+        float rhythmVolume = MyMath.Map(GunValueManager.currentValue, -1f, 1f, rhythmVolumeRange.max, rhythmVolumeRange.min);
+        musicMasterMixer.SetFloat("Rhythm Volume", rhythmVolume);
 
         float lowpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 1000f, 9000f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", lowpassCutoffFreq);
 
-        //float highpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 10f, 11000f);
-        //masterMixer.SetFloat("Highpass Cutoff Freq", highpassCutoffFreq);
+        float highpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 10f, 11000f);
+        masterMixer.SetFloat("Highpass Cutoff Freq", highpassCutoffFreq);
+
+        if (Services.fallingSequenceManager.isSpeedFallActive) { return; }
+        float pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.98f, 1.02f);
+        musicAudioSource.pitch = pitch;
+    }
+
+
+    void AdjustMusicForGunValueGameplay() {
+        float lowpassCutoffFreq = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 1000f, 9000f);
+        masterMixer.SetFloat("Lowpass Cutoff Freq", lowpassCutoffFreq);
 
         if (Services.fallingSequenceManager.isSpeedFallActive) { return; }
         float pitch = MyMath.Map(GunValueManager.currentValue, -1f, 1f, 0.98f, 1.02f);
