@@ -94,6 +94,8 @@ public class MusicManager : MonoBehaviour {
     }
 
     public void EnterFallingSequence() {
+        if (state == State.FallingSequence) { return; }
+
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);
         masterMixer.SetFloat("Pitch", 0.5f);
@@ -103,6 +105,8 @@ public class MusicManager : MonoBehaviour {
     }
 
     public void EnterSpeedFall() {
+        if (state == State.SpeedFall) { return; }
+
         masterMixer.SetFloat("Pitch", 1f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
