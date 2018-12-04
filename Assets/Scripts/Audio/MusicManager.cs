@@ -20,6 +20,8 @@ public class MusicManager : MonoBehaviour {
     [SerializeField] FloatRange masterVolumeRange;
     [SerializeField] FloatRange musicMasterVolumeRange;
 
+    [HideInInspector] public float masterVolumeMax = 1;
+
     public enum State { MainMenu, Normal, SpeedFall, FallingSequence, DashCharging, Dashing, GettingTased }
     public State state = State.MainMenu;
 
@@ -99,7 +101,7 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);
         masterMixer.SetFloat("Pitch", 0.5f);
-        masterMixer.SetFloat("Master Volume", -5f);
+        musicMasterMixer.SetFloat("Master Volume", -5f);
         RandomizeAllMusicVolumeLevels();
         state = State.FallingSequence;
     }
@@ -110,7 +112,7 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Pitch", 1f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
-        masterMixer.SetFloat("Master Volume", 0f);
+        musicMasterMixer.SetFloat("Master Volume", 0f);
         SetAllAudioSourcePitch(3f, 0.1f);
         state = State.SpeedFall;
     }
@@ -135,7 +137,7 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Pitch", 1f);
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
-        masterMixer.SetFloat("Master Volume", 0f);
+        musicMasterMixer.SetFloat("Master Volume", 0f);
         SetAllAudioSourcePitch(3f, 0.1f);
         state = State.Dashing;
     }
@@ -237,7 +239,7 @@ public class MusicManager : MonoBehaviour {
     }
 
     public void SetMasterVolume(float value) {
-        value = Mathf.Clamp01(value);
+        value = Mathf.Clamp(value, 0f, masterVolumeMax);
         masterMixer.SetFloat("Master Volume", masterVolumeRange.MapTo(value, 0f, 1f));
     }
 
