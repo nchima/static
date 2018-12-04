@@ -140,8 +140,13 @@ public class FallingSequenceManager : StateController {
         // Drain color palette.
         //Services.colorPaletteManager.LoadFallingSequencePalette();
 
-        // Place the player in the correct spot above the level.
+        // Place the player in the correct spot above the level and reset their rotation.
         Services.playerTransform.position = playerSpawnPoint.position;
+        Services.playerController.skipRotationForThisFrame = true;
+        Vector3 newPlayerRotation = Services.playerTransform.rotation.eulerAngles;
+        newPlayerRotation.y = 0f;
+        Services.playerTransform.rotation = Quaternion.identity;
+        Debug.Log("I should have done this");
 
         // Set up variables for falling.
         savedRegularMoveSpeed = Services.playerController.maxAirSpeed;
