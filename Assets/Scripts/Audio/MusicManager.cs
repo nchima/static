@@ -176,6 +176,8 @@ public class MusicManager : MonoBehaviour {
 
     // Selects one track from each layer to play at full volume and randomized the volume of all others.
     public void RandomizeAllMusicVolumeLevels() {
+        // Right now I don't want this to do anything because it's just fucking up the main menu music but you know, later if I do end up separating the music into multiple tracks by instrument then I might want to you know do um yeah!
+        return;
         RandomizeAllTrackVolumeLevels(layerAMixer);
         RandomizeAllTrackVolumeLevels(layerBMixer);
         RandomizeAllTrackVolumeLevels(rhythmMixer);
@@ -239,7 +241,6 @@ public class MusicManager : MonoBehaviour {
         value = Mathf.Clamp01(value);
         musicMasterMixer.SetFloat("Master Volume", musicMasterVolumeRange.MapTo(value, 0f, 1f));
     }
-
 
     class MusicDebugState {
         public float oldMusicVol;
