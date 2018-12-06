@@ -14,7 +14,7 @@ public class FieldOfViewController : MonoBehaviour {
     FloatRange fieldOfViewRange = new FloatRange(58f, 85f);
     FloatRange orthographicSizeRange = new FloatRange(15f, 32f);
 
-    [SerializeField] public Camera perspectiveCam;
+    [HideInInspector] public List<Camera> perspectiveCams;
     [HideInInspector] public List<Camera> orthographicCams;
 
     FloatRange shotgunChargeFOVRange = new FloatRange(85f, 100f);
@@ -33,7 +33,7 @@ public class FieldOfViewController : MonoBehaviour {
         }
 
         set {
-            perspectiveCam.fieldOfView = value;
+            foreach (Camera camera in perspectiveCams) { camera.fieldOfView = value; }
             _currentFOV = value;
         }
     }
@@ -56,6 +56,7 @@ public class FieldOfViewController : MonoBehaviour {
         Camera[] camerasInChildren = GetComponentsInChildren<Camera>();
         for (int i = 0; i < camerasInChildren.Length; i++) {
             if (camerasInChildren[i].orthographic) { camerasInChildren[i].enabled = false;  orthographicCams.Add(camerasInChildren[i]); }
+            else { perspectiveCams.Add(camerasInChildren[i]); }
         }
     }
 
@@ -111,10 +112,10 @@ public class FieldOfViewController : MonoBehaviour {
     }
 
     public void ActivateCameraClearing(bool value) {
-        if (value == true) {
-            perspectiveCam.clearFlags = CameraClearFlags.SolidColor;
-        } else {
-            perspectiveCam.clearFlags = CameraClearFlags.Depth;
-        }
+        CameraClearFlags newClearFlags;
+        if (value == true) { newClearFlags = CameraClearFlags.SolidColor; }
+        else { newClearFlags = CameraClearFlags.Depth; }
+
+        perspectiveCams[0].clearFlags = newClearFlags;
     }
 }

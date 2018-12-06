@@ -7,6 +7,10 @@ public class SkipSeizureWarning : MonoBehaviour {
     public bool skipSeizureWarning = false;
 
     private void Start() {
-        DontDestroyOnLoad(this);
+        if (FindObjectsOfType<SkipSeizureWarning>().Length == 1) {
+            DontDestroyOnLoad(this);
+        } else {
+            Destroy(gameObject);
+        }
     }
 }

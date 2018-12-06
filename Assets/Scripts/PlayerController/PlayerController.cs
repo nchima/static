@@ -91,6 +91,7 @@ public class PlayerController : MonoBehaviour {
     }
     public static Vector3 currentVelocity;
     Vector3 previousPosition;   // Used to calculate velocity.
+    [HideInInspector] public bool skipRotationForThisFrame = false;
 
     private void Awake() {
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -129,12 +130,18 @@ public class PlayerController : MonoBehaviour {
         }
 
         /* HANDLE VIEW ROTATION */
-        //if (InputManager.inputMode == InputManager.InputMode.Controller) { _mouseSensitivity = controllerSensitivity; }
-        //if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
-        mouseInput = InputManager.turningValue * (1 / Time.timeScale) * Time.deltaTime;
-        float rotation = mouseInput * 50f;
-        targetRotation *= Quaternion.Euler(0f, rotation, 0f);
-        transform.localRotation = targetRotation;
+        if (skipRotationForThisFrame) {
+            skipRotationForThisFrame = false;
+            targetRotation = Quaternion.identity;
+        } else {
+            //if (InputManager.inputMode == InputManager.InputMode.Controller) { _mouseSensitivity = controllerSensitivity; }
+            //if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
+
+            mouseInput = InputManager.turningValue * (1 / Time.timeScale) * Time.deltaTime;
+            float rotation = mouseInput * 50f;
+            targetRotation *= Quaternion.Euler(0f, rotation, 0f);
+            transform.localRotation = targetRotation;
+        }
 
         /* HANDLE DASHING INPUT */
         if (state == State.Normal) {
