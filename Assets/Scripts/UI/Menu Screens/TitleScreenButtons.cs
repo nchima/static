@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class TitleScreenButtons : MonoBehaviour {
 
+    private void Awake() {
+        // Deselect
+    }
+
     private void Start() {
         Services.gameManager.LoadGame();
     }

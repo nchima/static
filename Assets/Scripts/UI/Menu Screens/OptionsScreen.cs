@@ -45,6 +45,7 @@ public class OptionsScreen : MonoBehaviour {
     }
 
     public void MasterVolumeChanged() {
+        Services.musicManager.masterVolumeMax = masterVolumeSlider.value;
         Services.musicManager.SetMasterVolume(masterVolumeSlider.value);
         masterVolumeSlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(masterVolumeSlider.value, numericalValueDecimalPlaces).ToString();
     }

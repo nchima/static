@@ -58,7 +58,7 @@ public class SpecialMoveManager : MonoBehaviour {
     private void Start() {
         originalCameraPosition = Services.fieldOfViewController.transform.localPosition;
         originalCameraRotation = Quaternion.Euler(Vector3.zero);
-        originalFOV = Services.fieldOfViewController.perspectiveCam.fieldOfView;
+        originalFOV = Services.fieldOfViewController.CurrentFOV;
         originalOrthoSize = Services.fieldOfViewController.orthographicCams[0].orthographicSize;
     }
 

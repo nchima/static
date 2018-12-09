@@ -34,6 +34,6 @@ public class Rotator : MonoBehaviour {
             rotateDirection.z + MyMath.Map(Mathf.PerlinNoise(noiseTime + noiseOffset4, 0f), 0f, 1f, -1f, 1f) * Time.deltaTime * directionModifier.z
             ).normalized;
 
-        transform.Rotate(rotateDirection, rotateSpeed, Space.Self);
+        transform.Rotate(rotateDirection, rotateSpeed * Time.deltaTime, Space.Self);
     }
 }
