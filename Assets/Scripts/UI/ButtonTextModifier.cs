@@ -16,10 +16,6 @@ public class ButtonTextModifier : MonoBehaviour, ISelectHandler, IDeselectHandle
         modifiedText = GetModifiedText();
     }
 
-    private void OnDisable() {
-        m_Text = originalText;
-    }
-
     public void OnSelect(BaseEventData eventData) {
         m_Text = modifiedText;
     }

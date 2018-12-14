@@ -14,14 +14,14 @@ public class HighScoreScreen : MonoBehaviour {
     private void Update()
     {
         if (!Services.gameManager.isGameStarted) {
-            if (InputManager.pauseButtonDown || InputManager.submitButtonDown) {
+            if (InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.cancelButtonDown) {
                 Services.uiManager.highScoreScreen.SetActive(false);
                 Services.uiManager.titleScreen.SetActive(true);
             }
         } else {
             timer += Time.unscaledDeltaTime;
             if (timer >= time) {
-                if (InputManager.pauseButtonDown || InputManager.submitButtonDown) {
+                if (InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.cancelButtonDown) {
                     Services.gameManager.GetComponent<GameManager>().RestartGame();
                 }
             }

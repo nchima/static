@@ -39,10 +39,11 @@ public class InputManager : MonoBehaviour {
     [HideInInspector] public static bool cancelButton;
     [HideInInspector] public static bool cancelButtonDown;
 
-
     public static bool AnyControllerButtonPressed {
         get {
 
+            if (Input.GetAxisRaw("Horizontal Controller Gameplay") != 0) { return true; }
+            if (Input.GetAxisRaw("Vertical Controller Gameplay") != 0) { return true; }
             if (Input.GetAxisRaw("Horizontal Controller") != 0) { return true; }
             if (Input.GetAxisRaw("Vertical Controller") != 0) { return true; }
             if (Input.GetAxisRaw("Controller Right Stick Horizontal") != 0) { return true; }
@@ -50,7 +51,9 @@ public class InputManager : MonoBehaviour {
             if (Input.GetAxisRaw("Fire Controller") != 0) { return true; }
             if (Input.GetAxisRaw("Dash Controller") != 0) { return true; }
             if (Input.GetButton("Special Move Controller")) { return true; }
-            if (Input.GetButton("Start")) { return true; }
+            if (Input.GetButton("Submit Controller")) { return true; }
+            if (Input.GetButton("Cancel Controller")) { return true; }
+            if (Input.GetButton("Pause Controller")) { return true; }
 
             return false;
         }
@@ -70,15 +73,14 @@ public class InputManager : MonoBehaviour {
         }
     }
 
+    const float UI_INPUT_COOLDOWN = 0.15f;
+    float uiInputTimer = UI_INPUT_COOLDOWN;
 
     void Awake() {
         RetrieveSavedSettings();
         inputMode = InputMode.MouseAndKeyboard;
     }
 
-
-    const float UI_INPUT_COOLDOWN = 0.1f;
-    float uiInputTimer = UI_INPUT_COOLDOWN;
     private void Update() {
 
         ResetTriggers();
@@ -114,15 +116,23 @@ public class InputManager : MonoBehaviour {
 
             AxisEventData ad = new AxisEventData(EventSystem.current);
             ad.moveDir = MoveDirection.None;
-            if (movementAxis.x < 0) { ad.moveDir = MoveDirection.Left; } 
-            else if (movementAxis.x > 0) { ad.moveDir = MoveDirection.Right; } 
-            else if (movementAxis.y < 0) { ad.moveDir = MoveDirection.Down; } 
+            if (movementAxis.x < 0) { ad.moveDir = MoveDirection.Left; }
+            else if (movementAxis.x > 0) { ad.moveDir = MoveDirection.Right; }
+            else if (movementAxis.y < 0) { ad.moveDir = MoveDirection.Down; }
             else if (movementAxis.y > 0) { ad.moveDir = MoveDirection.Up; }
 
             if (ad.moveDir != MoveDirection.None) {
                 //ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.deselectHandler);
                 ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.moveHandler);
                 uiInputTimer = 0f;
+            }
+
+            if (submitButtonDown) {
+                ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.submitHandler);
+            }
+
+            if (cancelButtonDown) {
+                ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.cancelHandler);
             }
         }
     } 
@@ -161,22 +171,20 @@ public class InputManager : MonoBehaviour {
         dashButtonDown = Input.GetButtonDown("Dash Mouse and Keyboard");
         dashButtonUp = Input.GetButtonUp("Dash Mouse and Keyboard");
 
-        pauseButton = Input.GetKey(KeyCode.Escape);
-        pauseButtonDown = Input.GetKeyDown(KeyCode.Escape);
+        pauseButton = Input.GetButton("Pause Mouse and Keyboard");
+        pauseButtonDown = Input.GetButtonDown("Pause Mouse and Keyboard");
 
-        submitButton = Input.GetButton("Submit");
-        submitButtonDown = Input.GetButton("Submit");
-
-        cancelButton = Input.GetKey(KeyCode.Delete);
-        cancelButton = Input.GetKey(KeyCode.Backspace);
-        cancelButtonDown = Input.GetKeyDown(KeyCode.Delete);
-        cancelButtonDown = Input.GetKeyDown(KeyCode.Backspace);
+        submitButton = Input.GetButton("Submit Mouse and Keyboard");
+        submitButtonDown = Input.GetButtonDown("Submit Mouse and Keyboard");
+        
+        cancelButton = Input.GetButton("Cancel Mouse and Keyboard");
+        cancelButtonDown = Input.GetButtonDown("Cancel Mouse and Keyboard");
     }
 
     
     void GetControllerInput() {
-        movementAxis.x = Input.GetAxis("Horizontal Controller");
-        movementAxis.y = Input.GetAxis("Vertical Controller");
+        movementAxis.x = Input.GetAxis("Horizontal Controller Gameplay");
+        movementAxis.y = Input.GetAxis("Vertical Controller Gameplay");
 
         turningValue = Input.GetAxis("Controller Right Stick Horizontal");
 
@@ -191,16 +199,15 @@ public class InputManager : MonoBehaviour {
 
         dashButton = Input.GetAxisRaw("Dash Controller") != 0;
         dashButtonDown = Input.GetAxisRaw("Dash Controller") != 0;
-        //dashButtonUp = Input.GetButton("Dash Controller");
 
-        pauseButton = Input.GetButton("Start");
-        pauseButtonDown = Input.GetButtonDown("Start");
+        pauseButton = Input.GetButton("Pause Controller");
+        pauseButtonDown = Input.GetButtonDown("Pause Controller");
 
-        submitButton = Input.GetButton("Special Move Controller");
-        submitButtonDown = Input.GetButtonDown("Special Move Controller");
+        submitButton = Input.GetButton("Submit Controller");
+        submitButtonDown = Input.GetButtonDown("Submit Controller");
 
-        cancelButton = Input.GetButton("Cancel");
-        cancelButtonDown = Input.GetButtonDown("Cancel");
+        cancelButton = Input.GetButton("Cancel Controller");
+        cancelButtonDown = Input.GetButtonDown("Cancel Controller");
     }
 
 
