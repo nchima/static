@@ -11,9 +11,9 @@ public class GameMap : MonoBehaviour {
         episodeIcons = transform.GetChild(0).GetComponentsInChildren<EpisodeIcon>();
     }
 
-    public void AllowMouseInput(bool value) {
+    public void AllowSelection(bool value) {
         foreach (EpisodeIcon icon in episodeIcons) {
-            icon.recieveMouseInput = value;
+            icon.isSelectable = value;
         }
     }
 

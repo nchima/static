@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public class EpisodeIcon : MonoBehaviour {
 
-    [SerializeField] bool allowMouseSelection = true;
+    [SerializeField] bool startWithControllerSelection = false;
+    [SerializeField] bool allowSelection = true;
     [SerializeField] Collider mouseOverCollider;
     [SerializeField] GameObject unlockedIconMesh;
     [SerializeField] GameObject lockedIconMesh;
@@ -25,10 +26,10 @@ public class EpisodeIcon : MonoBehaviour {
         }
     }
 
-    [HideInInspector] public bool recieveMouseInput = false;
+    [HideInInspector] public bool isSelectable = false;
     bool IsMouseOverlapping {
         get {
-            if (!recieveMouseInput || !allowMouseSelection) { return false; }
+            if (!isSelectable || !allowSelection) { return false; }
 
             Ray mouseRay = Services.finalCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
@@ -56,6 +57,9 @@ public class EpisodeIcon : MonoBehaviour {
 
     Vector3 originalLocalScale = Vector3.zero;
 
+    float inputCooldown = 0.3f;
+    float inputCooldownTimer = 0f;
+
     private void Awake() {
         if (originalLocalScale == Vector3.zero) {
             originalLocalScale = ActiveIconMesh.transform.parent.localScale;
@@ -67,36 +71,62 @@ public class EpisodeIcon : MonoBehaviour {
         UpdateVisuals();
     }
 
+    private void OnEnable() {
+        if (startWithControllerSelection && InputManager.inputMode == InputManager.InputMode.Controller) {
+            BecomeHighlighted();
+        }
+    }
+
     private void Update() {
+
+        inputCooldownTimer += Time.deltaTime;
+
         switch (selectionState) {
 
             case SelectionState.Unhighlighted:
 
-                // Switch to selected state
-                if ((correspondingNode.IsUnlocked && IsMouseOverlapping) || forceHighlighting) {
-                    selectionState = SelectionState.Highlighted;
-                    ClearActiveTweens();
-                    ActiveIconMesh.transform.parent.localScale = originalLocalScale * 1.1f;
-                    if (selectionCoroutine != null) { StopCoroutine(selectionCoroutine); }
-                    selectionCoroutine = StartCoroutine(SelectionSequence());
+                // Switch to selected state if mouse is overlapping.
+                if (InputManager.inputMode == InputManager.InputMode.MouseAndKeyboard) {
+                    if ((correspondingNode.IsUnlocked && IsMouseOverlapping) || forceHighlighting) {
+                        BecomeHighlighted();
+                    }
                 }
                 break;
 
             case SelectionState.Highlighted:
 
-                // Get clicked on
-                if (InputManager.fireButtonDown && recieveMouseInput) {
+                if (InputManager.inputMode == InputManager.InputMode.Controller) {
+                    if (inputCooldownTimer >= inputCooldown) {
+                        // Get input direction and check to see if we can move that way.
+                        Vector2 inputDirection = InputManager.movementAxis.normalized;
+                        if (inputDirection.x < 0 && correspondingNode.previousNode != null) {
+                            BecomeUnhighlighted();
+                            correspondingNode.previousNode.correspondingIcon.BecomeHighlighted();
+                        }
+
+                        else if (Vector2.Angle(inputDirection, (Vector2.up + Vector2.right).normalized) < 45f) {
+                            if (correspondingNode.branches.Length < 0) { return; }
+                            if (!correspondingNode.branches[0].IsUnlocked) { return; }
+                            BecomeUnhighlighted();
+                            Debug.Log("breanches" + correspondingNode.branches.Length);
+                            correspondingNode.branches[0].correspondingIcon.BecomeHighlighted();
+                        }
+                    }
+                }
+
+                else {
+                    // Check to see if this icon stopped being highlighted
+                    if (!IsMouseOverlapping && !forceHighlighting) {
+                        BecomeUnhighlighted();
+                    }
+                }
+
+                // Check to see if the player selected this icon
+                if (InputManager.fireButtonDown || InputManager.submitButtonDown && isSelectable) {
                     Services.levelManager.SetCurrentBranchNode(correspondingNode);
                     GameEventManager.instance.FireEvent(new GameEvents.GameStarted());
                 }
 
-                if (!IsMouseOverlapping && !forceHighlighting) {
-                    selectionState = SelectionState.Unhighlighted;
-                    ClearActiveTweens();
-                    ActiveIconMesh.transform.parent.localScale = originalLocalScale;
-                    if (selectionCoroutine != null) { StopCoroutine(selectionCoroutine); }
-                    selectionCoroutine = StartCoroutine(DeselectionSequence());
-                }
                 break;
         }
 
@@ -105,6 +135,23 @@ public class EpisodeIcon : MonoBehaviour {
 
         // Rotate
         ActiveIconMesh.transform.parent.Rotate(transform.forward, currentRotationSpeed * Time.deltaTime);
+    }
+
+    public void BecomeHighlighted() {
+        selectionState = SelectionState.Highlighted;
+        inputCooldownTimer = 0f;
+        ClearActiveTweens();
+        ActiveIconMesh.transform.parent.localScale = originalLocalScale * 1.1f;
+        if (selectionCoroutine != null) { StopCoroutine(selectionCoroutine); }
+        selectionCoroutine = StartCoroutine(SelectionSequence());
+    }
+
+    void BecomeUnhighlighted() {
+        selectionState = SelectionState.Unhighlighted;
+        ClearActiveTweens();
+        ActiveIconMesh.transform.parent.localScale = originalLocalScale;
+        if (selectionCoroutine != null) { StopCoroutine(selectionCoroutine); }
+        selectionCoroutine = StartCoroutine(DeselectionSequence());
     }
 
     Coroutine selectionCoroutine;

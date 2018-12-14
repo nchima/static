@@ -6,12 +6,12 @@ public class EpisodeSelectScreen : MonoBehaviour {
 
     private void OnEnable() {
         Services.uiManager.gameMap.SetActive(true);
-        Services.uiManager.gameMap.GetComponent<GameMap>().AllowMouseInput(true);
+        Services.uiManager.gameMap.GetComponent<GameMap>().AllowSelection(true);
         Services.uiManager.gameMap.GetComponent<GameMap>().HighlightUnlockedPaths();
     }
 
     private void OnDisable() {
-        Services.uiManager.gameMap.GetComponent<GameMap>().AllowMouseInput(false);
+        Services.uiManager.gameMap.GetComponent<GameMap>().AllowSelection(false);
         Services.uiManager.gameMap.SetActive(false);
     }
 
