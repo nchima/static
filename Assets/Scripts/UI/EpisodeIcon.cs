@@ -98,18 +98,20 @@ public class EpisodeIcon : MonoBehaviour {
                 if (InputManager.inputMode == InputManager.InputMode.Controller) {
                     if (inputCooldownTimer >= inputCooldown) {
                         // Get input direction and check to see if we can move that way.
-                        Vector2 inputDirection = InputManager.movementAxis.normalized;
-                        if (inputDirection.x < 0 && correspondingNode.previousNode != null) {
-                            BecomeUnhighlighted();
-                            correspondingNode.previousNode.correspondingIcon.BecomeHighlighted();
-                        }
+                        Vector3 inputDirection = InputManager.movementAxis.normalized;
+                        inputDirection.y *= -1f;
+                        inputDirection = transform.parent.InverseTransformDirection(inputDirection);
+                        Debug.DrawRay(transform.position, inputDirection * 4f, Color.cyan);
 
-                        else if (Vector2.Angle(inputDirection, (Vector2.up + Vector2.right).normalized) < 45f) {
-                            if (correspondingNode.branches.Length < 0) { return; }
-                            if (!correspondingNode.branches[0].IsUnlocked) { return; }
-                            BecomeUnhighlighted();
-                            Debug.Log("breanches" + correspondingNode.branches.Length);
-                            correspondingNode.branches[0].correspondingIcon.BecomeHighlighted();
+                        RaycastHit hit;
+                        if (Physics.SphereCast(transform.position, 0.5f, inputDirection, out hit, 4f)) {
+                            if (hit.collider.transform.parent.GetComponent<EpisodeIcon>() != null) {
+                                EpisodeIcon hitEpisodeIcon = hit.collider.transform.parent.GetComponent<EpisodeIcon>();
+                                if (hitEpisodeIcon.correspondingNode.IsUnlocked) {
+                                    BecomeUnhighlighted();
+                                    hitEpisodeIcon.BecomeHighlighted();
+                                }
+                            }
                         }
                     }
                 }
