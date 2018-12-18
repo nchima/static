@@ -77,7 +77,6 @@ public class ScoreManager : MonoBehaviour
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
-
     void Start() {
         // Set up high score list.
         highScoreEntries = RetrieveHighScores();
@@ -86,7 +85,6 @@ public class ScoreManager : MonoBehaviour
         Score = 0;
         multNumber.text = Multiplier.ToString() + "X";
     }
-
 
     void Update() {
         comboTimer -= Time.deltaTime;
@@ -106,7 +104,6 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-
     public void UpdateHighScoreDisplay() {
         if (leaderboardType == LeaderboardType.Local) {
             highScoreDisplay.text = GetHighestScore().name + ": " + TextUtil.AddZerosToBeginningOfNumber(GetHighestScore().score, 9);
@@ -114,7 +111,6 @@ public class ScoreManager : MonoBehaviour
             StartCoroutine(UpdateHighScoreDisplayCoroutine());
         }
     }
-
 
     IEnumerator UpdateHighScoreDisplayCoroutine() {
         Services.steamLeaderboardManager.DownloadLeaderboardEntries(0, 0);
@@ -128,7 +124,6 @@ public class ScoreManager : MonoBehaviour
 
         yield return null;
     }
-
 
     public void DetermineBonusTime() {
         maxBonusTime = 0;
@@ -146,7 +141,6 @@ public class ScoreManager : MonoBehaviour
         bonusTimerIsRunning = true;
     }
 
-
     //public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
     //    GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
 
@@ -158,17 +152,14 @@ public class ScoreManager : MonoBehaviour
     //    IncreaseMultiplier();
     //}
 
-
     public void IncreaseMultiplier() {
         Multiplier += multiplierIncreaseValue;
         comboTimer = comboTime;
     }
 
-
     public void LevelCompletedHandler(GameEvent gameEvent) {
         bonusTimerIsRunning = false;
     }
-
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {
         if (Services.healthManager.isInvincible) { return; }
@@ -176,7 +167,6 @@ public class ScoreManager : MonoBehaviour
         Multiplier = 1f;
         comboTimer = 0f;
     }
-
 
     //void ShowLevelCompleteScreen() {
         //levelCompletedScreen.SetActive(true);
@@ -192,7 +182,6 @@ public class ScoreManager : MonoBehaviour
     public void BulletHitEnemy() {
         Score += 1;
     }
-
 
     /// <summary>
     /// Loads saved high scores from PlayerPrefs.
@@ -220,11 +209,9 @@ public class ScoreManager : MonoBehaviour
         return newHighScoreList;
     }
 
-
     public void UploadAndDownloadScores() {
         StartCoroutine(UploadAndDownloadScoresCoroutine());
     }
-
 
     IEnumerator UploadAndDownloadScoresCoroutine() {
 
@@ -246,7 +233,6 @@ public class ScoreManager : MonoBehaviour
 
         yield return null;
     }
-
 
     IEnumerator DownloadScores() {
         // Download scores
@@ -284,7 +270,6 @@ public class ScoreManager : MonoBehaviour
         yield return null;
     }
 
-
     // Saves high scores
     void SaveHighScores() {
         if (leaderboardType == LeaderboardType.Local) {
@@ -300,19 +285,18 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-
     public void RetrieveScoresForHighScoreScreen() {
         if (leaderboardType == LeaderboardType.Steam) {
             StartCoroutine(DownloadScores());
             return;
         }
-        
+
+        Debug.Log("retrieving local scores");
         highScoreEntries = RetrieveHighScores();
 
-        highScoreListText.GetComponent<TextMesh>().text = GetScoreListAsString();
+        highScoreListText.GetComponent<Text>().text = GetScoreListAsString();
         SaveHighScores();
     }
-
 
     string GetScoreListAsString() {
         string scoreList = "";
@@ -331,7 +315,6 @@ public class ScoreManager : MonoBehaviour
         return scoreList;
     }
 
-
     // Insters a score into the list.
     public void InsertScoreLocal(string initials) {
         highScoreEntries = RetrieveHighScores();
@@ -345,12 +328,10 @@ public class ScoreManager : MonoBehaviour
         SaveHighScores();
     }
 
-
     ScoreEntry GetHighestScore() {
         SortScores();
         return highScoreEntries[0];
     }
-
 
     void SortScores() {
         // Add and sort list
@@ -366,7 +347,6 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-
     public void ResetScores() {
         highScoreEntries = RetrieveHighScores();
 
@@ -377,11 +357,8 @@ public class ScoreManager : MonoBehaviour
             highScoreEntries[i].newest = 0;
         }
 
-        PlayerPrefs.DeleteAll();
-
         SaveHighScores();
     }
-
 
     public void PrintHighScores() {
         for (int i = 0; i < 10; i++) {
@@ -391,7 +368,6 @@ public class ScoreManager : MonoBehaviour
             + PlayerPrefs.GetInt("Newest" + i, highScoreEntries[i].newest));
         }
     }
-
 
     public class ScoreEntry {
         public string name;

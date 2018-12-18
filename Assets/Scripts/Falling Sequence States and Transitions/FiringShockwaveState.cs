@@ -55,6 +55,7 @@ public class FiringShockwaveState : State {
         Services.musicManager.RandomizeAllMusicVolumeLevels();
 
         Services.gun.canShoot = true;
+        Services.specialMoveManager.canShoot = true;
 
         // Allow enemies to start attacking.
         Services.levelManager.SetEnemiesAIActive(true);

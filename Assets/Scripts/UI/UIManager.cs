@@ -40,6 +40,7 @@ public class UIManager : MonoBehaviour {
     bool episodeCompleteScreenActiveBeforePause;
     bool pathSelectScreenActiveBeforePause;
     bool crosshairActiveBeforePause;
+    bool nowEnteringScreenActiveBeforePause;
 
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
@@ -99,6 +100,7 @@ public class UIManager : MonoBehaviour {
         episodeCompleteScreenActiveBeforePause = episodeCompleteScreen.activeSelf;
         pathSelectScreenActiveBeforePause = selectPathScreen.activeSelf;
         crosshairActiveBeforePause = crosshair.activeSelf;
+        nowEnteringScreenActiveBeforePause = nowEnteringScreen.activeSelf;
 
         crosshair.SetActive(false);
         hud.SetActive(false);
@@ -107,6 +109,7 @@ public class UIManager : MonoBehaviour {
         healthWarningScreen.SetActive(false);
         episodeCompleteScreen.SetActive(false);
         selectPathScreen.SetActive(false);
+        nowEnteringScreen.SetActive(false);
 
         Services.comboManager.PauseAllFinishers(true);
     }
@@ -124,6 +127,7 @@ public class UIManager : MonoBehaviour {
         episodeCompleteScreen.SetActive(episodeCompleteScreenActiveBeforePause);
         selectPathScreen.SetActive(pathSelectScreenActiveBeforePause);
         crosshair.SetActive(crosshairActiveBeforePause);
+        nowEnteringScreen.SetActive(nowEnteringScreenActiveBeforePause);
     }
 
     public void ShowLevelCompleteScreen(bool value) {

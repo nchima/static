@@ -91,13 +91,14 @@ public class GameManager : MonoBehaviour {
 
     private void Update() {
         pauseInputCooldownTimer += Time.unscaledDeltaTime;
-        if (!gamePaused && InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead && pauseInputCooldownTimer >= PAUSE_INPUT_COOLDOWN) {
+        if (!isGamePaused && InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead && pauseInputCooldownTimer >= PAUSE_INPUT_COOLDOWN) {
             PauseGame(true);
         }
     }
 
-
-    public static bool gamePaused;
+    private bool canShootBeforePause;
+    private bool canUseSpecialBeforePause;
+    public static bool isGamePaused;
     public void PauseGame(bool value) {
         pauseInputCooldownTimer = 0f;
         if (value == true) {
@@ -105,8 +106,11 @@ public class GameManager : MonoBehaviour {
             Services.timeScaleManager.Pause(true);
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
+            canShootBeforePause = Services.gun.canShoot;
+            canUseSpecialBeforePause = Services.specialMoveManager.canShoot;
             Services.gun.canShoot = false;
-            gamePaused = true;
+            Services.specialMoveManager.canShoot = false;
+            isGamePaused = true;
         }
 
         else {
@@ -115,8 +119,9 @@ public class GameManager : MonoBehaviour {
             if (!isGameStarted) { Services.uiManager.titleScreen.SetActive(true); }
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
-            Services.gun.canShoot = true;
-            gamePaused = false;
+            Services.gun.canShoot = canShootBeforePause;
+            Services.specialMoveManager.canShoot = canUseSpecialBeforePause;
+            isGamePaused = false;
         }
     }
 

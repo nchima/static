@@ -117,7 +117,7 @@ public class PlayerController : MonoBehaviour {
 
     private void Update() {
 
-        if (GameManager.gamePaused || state == State.Dead) { return; }
+        if (GameManager.isGamePaused || state == State.Dead) { return; }
 
         dashRechargeTimer += Time.deltaTime;
         dashRechargeTimer = Mathf.Clamp(dashRechargeTimer, 0f, DASH_RECHARGE_TIME);
@@ -138,6 +138,9 @@ public class PlayerController : MonoBehaviour {
             //if (state == State.ShotgunCharge) _mouseSensitivity = shotGunChargeMouseSensitivity;
 
             mouseInput = InputManager.turningValue * (1 / Time.timeScale) * Time.deltaTime;
+            if (InputManager.inputMode ==  InputManager.InputMode.Controller && (!Services.gameManager.isGameStarted || GameManager.isGamePaused)) {
+                mouseInput = InputManager.movementAxis.x * (1 / Time.timeScale) * Time.deltaTime;
+            }
             float rotation = mouseInput * 50f;
             targetRotation *= Quaternion.Euler(0f, rotation, 0f);
             transform.localRotation = targetRotation;

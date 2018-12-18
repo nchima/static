@@ -10,19 +10,42 @@ public class OptionsScreen : MonoBehaviour {
     [SerializeField] Slider overallSensitivitySlider;
     [SerializeField] Slider XSensitivitySlider;
     [SerializeField] Slider YSensitivitySlider;
+    [SerializeField] Slider controllerSensitivitySlider;
+    [SerializeField] Slider controllerXSensitivitySlider;
+    [SerializeField] Slider controllerYSensitivitySlider;
     [SerializeField] Slider masterVolumeSlider;
     [SerializeField] Slider musicVolumeSlider;
     [SerializeField] Slider sfxVolumeSlider;
+
+    bool isUsingControllerInput = false;
 
     private void OnEnable() {
         overallSensitivitySlider.value = InputManager.mouseSensitivityOverall;
         XSensitivitySlider.value = InputManager.mouseSensitivityXMod;
         YSensitivitySlider.value = InputManager.mouseSensitivityYMod;
+        controllerSensitivitySlider.value = InputManager.controllerSensitivityOverall;
+        controllerXSensitivitySlider.value = InputManager.controllerSensitivityXMod;
+        controllerYSensitivitySlider.value = InputManager.controllerSensitivityYMod;
+
+        isUsingControllerInput = false;
+    }
+
+    private void OnDisable() {
+        isUsingControllerInput = false;
     }
 
     private void Update() {
         if (InputManager.cancelButtonDown || InputManager.pauseButtonDown) {
             Services.uiManager.ShowOptionsScreen(false);
+        }
+
+        if (isUsingControllerInput && InputManager.inputMode != InputManager.InputMode.Controller) {
+            isUsingControllerInput = false;
+        }
+
+        else if (!isUsingControllerInput && InputManager.inputMode == InputManager.InputMode.Controller) {
+            overallSensitivitySlider.Select();
+            isUsingControllerInput = true;
         }
     }
 
@@ -43,6 +66,25 @@ public class OptionsScreen : MonoBehaviour {
         InputManager.SaveSettings();
         YSensitivitySlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(YSensitivitySlider.value, numericalValueDecimalPlaces).ToString();
     }
+
+    public void OverallControllerSensitivityChanged() {
+        InputManager.controllerSensitivityOverall = controllerSensitivitySlider.value;
+        InputManager.SaveSettings();
+        controllerSensitivitySlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(controllerSensitivitySlider.value, numericalValueDecimalPlaces).ToString();
+    }
+
+    public void ControllerXSensitivityChanged() {
+        InputManager.controllerSensitivityXMod = controllerXSensitivitySlider.value;
+        InputManager.SaveSettings();
+        controllerXSensitivitySlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(controllerXSensitivitySlider.value, numericalValueDecimalPlaces).ToString();
+    }
+
+    public void ControllerYSensitivityChanged() {
+        InputManager.controllerSensitivityYMod = controllerYSensitivitySlider.value;
+        InputManager.SaveSettings();
+        controllerYSensitivitySlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(controllerYSensitivitySlider.value, numericalValueDecimalPlaces).ToString();
+    }
+
 
     public void MasterVolumeChanged() {
         Services.musicManager.masterVolumeMax = masterVolumeSlider.value;

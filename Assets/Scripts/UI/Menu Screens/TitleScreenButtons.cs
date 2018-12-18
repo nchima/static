@@ -11,53 +11,67 @@ public class TitleScreenButtons : MonoBehaviour {
     [SerializeField] private Button optionsButton;
     [SerializeField] private Button creditsButton;
 
-    private Button buttonToSelect;
+    Button buttonToSelect;
+
+    bool isUsingControllerInput = false;
 
     private void Awake() {
         buttonToSelect = startGameButton;
-        startGameButton.Select();
-    }
-
-    private void OnEnable() {
-        //buttonToSelect.Select();
-        StartCoroutine(SelectionCoroutine());
-    }
-
-    IEnumerator SelectionCoroutine() {
-        yield return new WaitForEndOfFrame();
-        buttonToSelect.Select();
-        yield return null;
     }
 
     private void Start() {
         Services.gameManager.LoadGame();
-        startGameButton.Select();
-        startGameButton.GetComponent<ButtonTextModifier>().OnSelect(new UnityEngine.EventSystems.BaseEventData(UnityEngine.EventSystems.EventSystem.current));
+    }
+
+    private void OnEnable() {
+        if (InputManager.inputMode == InputManager.InputMode.Controller) {
+            StartCoroutine(SelectionCoroutine());
+        }
+    }
+
+    IEnumerator SelectionCoroutine() {
+        yield return new WaitForEndOfFrame();
+        buttonToSelect.GetComponent<ButtonTextModifier>().ForceHighlight();
+    }
+
+    private void OnDisable() {
+        isUsingControllerInput = false;
+    }
+
+    private void Update() {
+        if (!isUsingControllerInput && InputManager.inputMode == InputManager.InputMode.Controller) {
+            buttonToSelect.Select();
+            isUsingControllerInput = true;
+        }
+
+        else if (isUsingControllerInput && InputManager.inputMode == InputManager.InputMode.MouseAndKeyboard) {
+            isUsingControllerInput = false;
+        }
     }
 
     public void StartGameButtonPressed() {
-        Services.uiManager.ShowEpisodeSelectScreen();
         buttonToSelect = startGameButton;
+        Services.uiManager.ShowEpisodeSelectScreen();
     }
 
     public void ViewControlsButtonPressed() {
-        Services.uiManager.ShowControlsScreen(true);
         buttonToSelect = viewControlsButton;
+        Services.uiManager.ShowControlsScreen(true);
     }
 
     public void LeaderboardsButtonPressed() {
-        Services.uiManager.ShowHighScoreScreen();
         buttonToSelect = leaderboardsButton;
+        Services.uiManager.ShowHighScoreScreen();
     }
 
     public void OptionsButtonPressed() {
-        Services.uiManager.ShowOptionsScreen(true);
         buttonToSelect = optionsButton;
+        Services.uiManager.ShowOptionsScreen(true);
     }
 
     public void CreditsButtonPressed() {
-        Services.uiManager.ShowCreditsScreen(true);
         buttonToSelect = creditsButton;
+        Services.uiManager.ShowCreditsScreen(true);
     }
 
     public void QuitButton() {

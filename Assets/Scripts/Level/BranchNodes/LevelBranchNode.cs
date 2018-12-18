@@ -13,7 +13,10 @@ public abstract class LevelBranchNode : MonoBehaviour {
     public EpisodeIcon correspondingIcon { get { return Services.uiManager.gameMap.GetComponent<GameMap>().GetIconByCorrespondingNode(this); } }
 
     public bool IsUnlocked {
-        get { return MyMath.IntToBool(PlayerPrefs.GetInt(levelSet.name + "_unlocked")); }
+        get {
+            if (!PlayerPrefs.HasKey(levelSet.name + "_unlocked")) { PlayerPrefs.SetInt(levelSet.name + "_unlocked", 0); }
+            return MyMath.IntToBool(PlayerPrefs.GetInt(levelSet.name + "_unlocked"));
+        }
         set { PlayerPrefs.SetInt(levelSet.name + "_unlocked", MyMath.BoolToInt(value)); }
     }
 

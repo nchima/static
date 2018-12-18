@@ -32,8 +32,10 @@ public class SpecialMoveManager : MonoBehaviour {
 
     int missilesFired = 0;
     float missileTimer;
-    bool canFireMissiles = false;
+    [HideInInspector] public bool isFiringMissiles = false;
     bool returnCameraTrigger = false;    // Used to exit missile firing state early.
+
+    [HideInInspector] public bool canShoot = false;
    
     Vector3 originalCameraPosition;
     Quaternion originalCameraRotation;
@@ -66,7 +68,7 @@ public class SpecialMoveManager : MonoBehaviour {
 
         if (cameraState == CameraState.Idle) {
             // See if the player has fired a special move & if so, initialize proper variables.
-            if (InputManager.specialMoveButtonDown && Services.gun.canShoot && !canFireMissiles && HasAmmo) {
+            if (InputManager.specialMoveButtonDown && canShoot && !isFiringMissiles && HasAmmo && Services.playerController.state != PlayerController.State.Dead) {
                 //cameraMovementCoroutine = StartCoroutine(MoveCameraToPositionCoroutine(GetCameraPullbackPosition(), GetCameraPullbackRotation().eulerAngles, CameraState.PulledBack));
                 returnCameraTrigger = false;
                 Services.gun.canShoot = false;
@@ -75,7 +77,7 @@ public class SpecialMoveManager : MonoBehaviour {
                 GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedSpecialMove());
                 missilesFired = 0;
                 missileTimer = 0f;
-                canFireMissiles = true;
+                isFiringMissiles = true;
 
                 //cameraState = CameraState.WaitingForMoveToFinish;
             }
@@ -108,7 +110,7 @@ public class SpecialMoveManager : MonoBehaviour {
         //else if (cameraState == CameraState.Returning) {}
 
         // Any state:
-        if (canFireMissiles) {
+        if (isFiringMissiles) {
             Services.gun.canShoot = false;
             FireMissiles();
         }
@@ -197,8 +199,8 @@ public class SpecialMoveManager : MonoBehaviour {
         });
         //yield return new WaitForSeconds(hangTime);
 
-        canFireMissiles = false;
         Services.gun.canShoot = true;
+        isFiringMissiles = false;
         Services.taserManager.forcePauseSpecialMove = false;
 
         // Move the camera back to where it normally is.

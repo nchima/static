@@ -35,7 +35,7 @@ public class FallIntoLevelState : State {
                 Services.uiManager.HideCompleteScreens();
             }
 
-            if (Services.playerTransform.position.y <= 1400f && !Services.uiManager.nowEnteringScreen.activeInHierarchy) {
+            if (!GameManager.isGamePaused && Services.playerTransform.position.y <= 1400f && !Services.uiManager.nowEnteringScreen.activeInHierarchy) {
                 Services.uiManager.ShowNowEnteringScreen(true);
             }
 

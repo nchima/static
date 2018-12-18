@@ -42,6 +42,8 @@ public class SteamManager : MonoBehaviour {
 	}
 
 	private void Awake() {
+        if (Services.scoreManager.leaderboardType != ScoreManager.LeaderboardType.Steam) { return; }
+
 		// Only one instance of SteamManager at a time!
 		if (s_instance != null) {
 			Destroy(gameObject);

@@ -5,10 +5,31 @@ using UnityEngine;
 public class GameMap : MonoBehaviour {
 
     EpisodeIcon[] episodeIcons;
+    InputManager.InputMode inputMode;
 
     private void Awake() {
         // Get references to all episode icons.
         episodeIcons = transform.GetChild(0).GetComponentsInChildren<EpisodeIcon>();
+        inputMode = InputManager.inputMode;
+    }
+
+    private void Update() {
+        // Check to see if the input mode has switched.
+        if (inputMode != InputManager.InputMode.Controller && InputManager.inputMode == InputManager.InputMode.Controller) {
+            foreach(EpisodeIcon icon in episodeIcons) {
+                icon.BecomeUnhighlighted();
+            }
+            episodeIcons[0].BecomeHighlighted();
+            inputMode = InputManager.inputMode;
+        }
+
+        else if (inputMode != InputManager.InputMode.MouseAndKeyboard && InputManager.inputMode == InputManager.InputMode.MouseAndKeyboard) {
+            foreach (EpisodeIcon icon in episodeIcons) {
+                icon.BecomeUnhighlighted();
+            }
+            inputMode = InputManager.inputMode;
+        }
+
     }
 
     public void AllowSelection(bool value) {

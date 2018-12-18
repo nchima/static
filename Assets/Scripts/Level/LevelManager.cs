@@ -117,7 +117,7 @@ public class LevelManager : MonoBehaviour {
         float timer = 0f;
         bool inputAccepted = false;
         yield return new WaitUntil(() => {
-            if (GameManager.gamePaused) {
+            if (GameManager.isGamePaused) {
                 return false;
             }
 
@@ -145,7 +145,7 @@ public class LevelManager : MonoBehaviour {
         // Wait for select path screen to finish its thing.
         PathSelectedScreen pathSelectedScreen = Services.uiManager.selectPathScreen.GetComponent<PathSelectedScreen>();
         yield return new WaitUntil(() => {
-            if (GameManager.gamePaused) { return false; }
+            if (GameManager.isGamePaused) { return false; }
 
             if (pathSelectedScreen.pathSelectedTrigger) {
                 pathSelectedScreen.pathSelectedTrigger = false;
@@ -305,15 +305,20 @@ public class LevelManager : MonoBehaviour {
     }
 
     public void SetAllLevelsUnlockState(bool value) {
+        usedNodes = new List<LevelBranchNode>();
         RecursiveBranchLock(firstBranchNode, value);
     }
 
+    List<LevelBranchNode> usedNodes = new List<LevelBranchNode>();
     void RecursiveBranchLock(LevelBranchNode node, bool value) {
         node.IsUnlocked = value;
         Debug.Log("Setting " + node.gameObject.name + " unlocked state to " + value);
         if (node.branches == null || node.branches.Length == 0) { Debug.Log("Returning from " + node.gameObject.name);  return; }
         foreach (LevelBranchNode branchNode in node.branches) {
-            if (branchNode != null) { RecursiveBranchLock(branchNode, value); }
+            if (branchNode != null && !usedNodes.Contains(branchNode)) {
+                RecursiveBranchLock(branchNode, value);
+                usedNodes.Add(branchNode);
+            }
         }
     }
 

@@ -16,8 +16,12 @@ public class TextureOffsetChanger : MonoBehaviour {
         //if (GetComponent<OffsetPropertyBlockControl>()) {
 
         if (!timeIndependent) {
+            float input = Input.GetAxis("Mouse X");
+            if (InputManager.inputMode == InputManager.InputMode.Controller && (!Services.gameManager.isGameStarted || GameManager.isGamePaused)) {
+                input = InputManager.movementAxis.y;
+            }
             mat.mainTextureOffset = new Vector2(
-                mat.mainTextureOffset.x + MyMath.Map(Input.GetAxis("Mouse X") * MyMath.BoolToInt(useMouseMovement), -1f, 1f, -relativeSpeed, relativeSpeed),
+                mat.mainTextureOffset.x + MyMath.Map(input * MyMath.BoolToInt(useMouseMovement), -1f, 1f, -relativeSpeed, relativeSpeed),
                 MyMath.Map(Mathf.Sin(Time.time), -1, 1, -20, 20)
             );
         }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(LevelBranchNode), true)]
+[CanEditMultipleObjects]
 public class LevelBranchNodeEditor : Editor {
 
     public override void OnInspectorGUI() {

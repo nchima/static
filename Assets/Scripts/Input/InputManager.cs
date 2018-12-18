@@ -16,6 +16,10 @@ public class InputManager : MonoBehaviour {
     [HideInInspector] public static float mouseSensitivityXMod = 1.5f;
     [HideInInspector] public static float mouseSensitivityYMod = 1.5f;
 
+    [HideInInspector] public static float controllerSensitivityOverall = 3.5f;
+    [HideInInspector] public static float controllerSensitivityXMod = 1f;
+    [HideInInspector] public static float controllerSensitivityYMod = 1f;
+
     [HideInInspector] public static float gunTuningValue;
 
     [HideInInspector] public static bool fireButton;
@@ -75,6 +79,7 @@ public class InputManager : MonoBehaviour {
 
     const float UI_INPUT_COOLDOWN = 0.15f;
     float uiInputTimer = UI_INPUT_COOLDOWN;
+    const float UI_DEAD_ZONE = 0.5f;
 
     void Awake() {
         RetrieveSavedSettings();
@@ -86,12 +91,17 @@ public class InputManager : MonoBehaviour {
         ResetTriggers();
 
         // Figure out which input mode to use.
-        if (MouseAndKeyboardUsed) {
+        if (inputMode != InputMode.MouseAndKeyboard && MouseAndKeyboardUsed) {
             inputMode = InputMode.MouseAndKeyboard;
+            if (!Services.gameManager.isGameStarted || GameManager.isGamePaused) {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+                //EventSystem.current.SetSelectedGameObject(null);
+            }
             Services.uiManager.SwitchControlPrompts(InputMode.MouseAndKeyboard);
         }
 
-        if (AnyControllerButtonPressed) {
+        if (inputMode != InputMode.Controller && AnyControllerButtonPressed) {
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             inputMode = InputMode.Controller;
@@ -110,16 +120,16 @@ public class InputManager : MonoBehaviour {
         }
 
         // Handle UI input
-        uiInputTimer += Time.deltaTime;
-        if (movementAxis == Vector2.zero) { uiInputTimer = UI_INPUT_COOLDOWN; }
-        if (uiInputTimer >= UI_INPUT_COOLDOWN) {
+        uiInputTimer += Time.unscaledDeltaTime;
+        if (movementAxis.magnitude < UI_DEAD_ZONE) { uiInputTimer = UI_INPUT_COOLDOWN; }
 
+        if (uiInputTimer >= UI_INPUT_COOLDOWN) {
             AxisEventData ad = new AxisEventData(EventSystem.current);
             ad.moveDir = MoveDirection.None;
-            if (movementAxis.x < 0) { ad.moveDir = MoveDirection.Left; }
-            else if (movementAxis.x > 0) { ad.moveDir = MoveDirection.Right; }
-            else if (movementAxis.y < 0) { ad.moveDir = MoveDirection.Down; }
-            else if (movementAxis.y > 0) { ad.moveDir = MoveDirection.Up; }
+            if (movementAxis.x < -UI_DEAD_ZONE) { ad.moveDir = MoveDirection.Left; }
+            else if (movementAxis.x > UI_DEAD_ZONE) { ad.moveDir = MoveDirection.Right; }
+            else if (movementAxis.y < -UI_DEAD_ZONE) { ad.moveDir = MoveDirection.Down; }
+            else if (movementAxis.y > UI_DEAD_ZONE) { ad.moveDir = MoveDirection.Up; }
 
             if (ad.moveDir != MoveDirection.None) {
                 //ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, ad, ExecuteEvents.deselectHandler);
@@ -137,7 +147,6 @@ public class InputManager : MonoBehaviour {
         }
     } 
 
-
     void ResetTriggers() {
         fireButtonDown = false;
         fireButtonUp = false;
@@ -150,13 +159,11 @@ public class InputManager : MonoBehaviour {
         cancelButtonDown = false;
     }
 
-
     void GetMouseAndKeyboardInput() {
         movementAxis.x = Input.GetAxisRaw("Horizontal Keyboard");
         movementAxis.y = Input.GetAxisRaw("Vertical Keyboard");
 
         turningValue = Input.GetAxis("Mouse X") * mouseSensitivityOverall * mouseSensitivityXMod;
-
         gunTuningValue = Input.GetAxis("Mouse Y") * mouseSensitivityOverall * mouseSensitivityYMod;
 
         fireButton = Input.GetButton("Fire Mouse and Keyboard");
@@ -181,14 +188,12 @@ public class InputManager : MonoBehaviour {
         cancelButtonDown = Input.GetButtonDown("Cancel Mouse and Keyboard");
     }
 
-    
     void GetControllerInput() {
         movementAxis.x = Input.GetAxis("Horizontal Controller Gameplay");
         movementAxis.y = Input.GetAxis("Vertical Controller Gameplay");
 
-        turningValue = Input.GetAxis("Controller Right Stick Horizontal");
-
-        gunTuningValue = Input.GetAxis("Controller Right Stick Vertical");
+        turningValue = Input.GetAxis("Controller Right Stick Horizontal") * controllerSensitivityOverall * controllerSensitivityXMod;
+        gunTuningValue = Input.GetAxis("Controller Right Stick Vertical") * controllerSensitivityOverall * controllerSensitivityYMod;
 
         fireButton = Input.GetAxisRaw("Fire Controller") != 0;
         fireButtonDown = Input.GetAxisRaw("Fire Controller") == 1f;
@@ -210,19 +215,24 @@ public class InputManager : MonoBehaviour {
         cancelButtonDown = Input.GetButtonDown("Cancel Controller");
     }
 
-
     public static void SaveSettings() {
         PlayerPrefs.SetFloat("Overall Mouse Sensitivity", mouseSensitivityOverall);
         PlayerPrefs.SetFloat("Mouse Sensitivity X Modifier", mouseSensitivityXMod);
         PlayerPrefs.SetFloat("Mouse Sensitivity Y Modifier", mouseSensitivityYMod);
+        PlayerPrefs.SetFloat("Overall Controller Sensitivity", controllerSensitivityOverall);
+        PlayerPrefs.SetFloat("Controller Sensitivity X Modifier", controllerSensitivityXMod);
+        PlayerPrefs.SetFloat("Controller Sensitivity Y Modifier", controllerSensitivityYMod);
     }
 
-
     private void RetrieveSavedSettings() {
-        if (PlayerPrefs.GetFloat("Overall Mouse Sensitivity") != 0) {
+        // Check to see if player prefs have been saved to previously.
+        if (PlayerPrefs.GetFloat("Overall Mouse Sensitivity") != 0 && PlayerPrefs.GetFloat("Overall Controller Sensitivity") != 0) {
             mouseSensitivityOverall = PlayerPrefs.GetFloat("Overall Mouse Sensitivity");
             mouseSensitivityXMod = PlayerPrefs.GetFloat("Mouse Sensitivity X Modifier");
             mouseSensitivityYMod = PlayerPrefs.GetFloat("Mouse Sensitivity Y Modifier");
+            controllerSensitivityOverall = PlayerPrefs.GetFloat("Overall Controller Sensitivity");
+            controllerSensitivityXMod = PlayerPrefs.GetFloat("Controller Sensitivity X Modifier");
+            controllerSensitivityYMod = PlayerPrefs.GetFloat("Controller Sensitivity Y Modifier");
         }
 
         // If player prefs do not already exist for these settings, create them.

@@ -33,11 +33,14 @@ public class GunValueManager : MonoBehaviour {
         //    CheckNotch(1f);
         //}
         //if (!inNotch)
-            internalValue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
+        internalValue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
+        if (InputManager.inputMode == InputManager.InputMode.Controller && (!Services.gameManager.isGameStarted || GameManager.isGamePaused)) {
+            internalValue += InputManager.movementAxis.y * inputMod * Time.deltaTime;
+        }
         //else
         //    internalValue += Mathf.Clamp((notchedValue - internalValue), -notchInSpeed * Time.deltaTime, notchInSpeed * Time.deltaTime);
 
-       // internalVlaue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
+        // internalVlaue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
         internalValue = Mathf.Clamp(internalValue, -1f, 1f);
 
         currentValue = internalValue;//tuningCurve.Evaluate(internalVlaue);

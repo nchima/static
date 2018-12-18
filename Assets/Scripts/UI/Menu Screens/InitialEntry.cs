@@ -91,7 +91,7 @@ public class InitialEntry : MonoBehaviour {
             sinceLastKeypress = 0f;
 
             // If the player is finished they should press fire.
-            if (/*AllInitialsEntered() && */InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.fireButtonDown)
+            if (AllInitialsEntered() && InputManager.pauseButtonDown || InputManager.submitButtonDown || InputManager.fireButtonDown)
             {
                 // Go through each initial and add it to a string.
                 string enteredInitials = "";
@@ -109,10 +109,16 @@ public class InitialEntry : MonoBehaviour {
 
                 // Tell the score controller to add this entry to its score list and then close this screen.
                 if (!cancel) {
-                    Services.scoreManager.InsertScoreLocal(enteredInitials);
+                    StartCoroutine(InsertScoreCoroutine(enteredInitials));
                 }
             }
         }
+    }
+
+    IEnumerator InsertScoreCoroutine(string enteredInitials) {
+        Services.scoreManager.InsertScoreLocal(enteredInitials);
+        yield return new WaitForEndOfFrame();
+        Services.uiManager.ShowHighScoreScreen();
     }
 
 

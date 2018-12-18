@@ -15,12 +15,14 @@ public class PathSelectedScreen : MonoBehaviour {
     enum SelectionState { Inactive, Active }
     SelectionState selectionState;
 
-    enum BonusType { Health, MachineGun, SniperRifle, Shotgun, Pulse, Saw, Rocket }
+    enum BonusType { /*Health, */MachineGun, SniperRifle, Shotgun, Pulse, Saw, Rocket }
     BonusType upperBonus;
     BonusType lowerBonus;
 
     float selectTime = 5f;
     float selectTimer = 0f;
+
+    bool isUsingRightAnalogStickForControllerSelection = false;
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasTased>(PlayerWasTasedHandler);
@@ -52,14 +54,16 @@ public class PathSelectedScreen : MonoBehaviour {
         int enumCount = System.Enum.GetValues(typeof(BonusType)).Length;
         upperBonus = (BonusType)Random.Range(0, enumCount);
         for (int i = 0; i < 100; i++) {
-            if(!IsBonusValid(upperBonus, true)) { upperBonus = (BonusType)Random.Range(0, enumCount); Debug.Log("Upper bonus: " + upperBonus.ToString()); }
+            if(!IsBonusValid(upperBonus, true)) {
+                upperBonus = (BonusType)Random.Range(0, enumCount); Debug.Log("Upper bonus: " + upperBonus.ToString());
+            }
             else { break; }
         }
-        Debug.Log("Successfully chose upper bonus.");
+
         lowerBonus = upperBonus;
         for (int i = 0; i < 100; i++) {
-            if(!IsBonusValid(lowerBonus, false)) { lowerBonus = (BonusType)MyMath.Wrap((int)upperBonus + Random.Range(0, enumCount), 0, enumCount);
-                Debug.Log("Lower bonus: " + lowerBonus.ToString());
+            if(!IsBonusValid(lowerBonus, false)) {
+                lowerBonus = (BonusType)MyMath.Wrap((int)upperBonus + Random.Range(0, enumCount), 0, enumCount);
             }
             else { break; }
         }
@@ -145,21 +149,56 @@ public class PathSelectedScreen : MonoBehaviour {
 
         // If there are two potential paths use directional input to select between them.
         else {
-            if (InputManager.movementAxis.y > 0.5f) {
-                SelectBranch(0);
+            if (InputManager.inputMode == InputManager.InputMode.MouseAndKeyboard) {
+                if (GunValueManager.currentValue >= 0f) {
+                    HighlightBranch(0);
+                }
+                else {
+                    HighlightBranch(1);
+                }
             }
-            else if (InputManager.movementAxis.y < -0.5f) {
-                SelectBranch(1);
+
+            else if (InputManager.inputMode == InputManager.InputMode.Controller) {
+
+                // See which analog stick we should use for selection.
+                if (isUsingRightAnalogStickForControllerSelection) {
+                    if (Mathf.Abs(InputManager.movementAxis.y) > 0.5f) {
+                        isUsingRightAnalogStickForControllerSelection = false;
+                    }
+                }
+                else {
+                    if (Mathf.Abs(InputManager.gunTuningValue) > 0.5f) {
+                        isUsingRightAnalogStickForControllerSelection = true;
+                    }
+                }
+
+                if (isUsingRightAnalogStickForControllerSelection) {
+                    if (GunValueManager.currentValue >= 0f) {
+                        HighlightBranch(0);
+                    }
+                    else {
+                        HighlightBranch(1);
+                    }
+                }
+
+                else {
+                    if (InputManager.movementAxis.y > 0.5f) {
+                        HighlightBranch(0);
+                    }
+                    else if (InputManager.movementAxis.y < -0.5f) {
+                        HighlightBranch(1);
+                    }
+                }
             }
         }
 
         // If the player presses the fire button then choose the currently selected branch.
-        if (InputManager.fireButtonDown) {
+        if (InputManager.fireButtonDown || InputManager.submitButtonDown) {
             MakeSelection();
         }
     }
 
-    void SelectBranch(int branchIndex) {
+    void HighlightBranch(int branchIndex) {
         if (clearedEpisodeIcon.correspondingNode.branches.Length == 1) {
             // In this case, keep the one branch constantly highlighted but I won't worry about this yet because yolo
         }
@@ -179,6 +218,20 @@ public class PathSelectedScreen : MonoBehaviour {
         }
     }
 
+    // For path index, up = 0 and down = 1
+    void HighlightPath(int pathIndex, bool isHighlighted) {
+        clearedEpisodeIcon.SetBranchHighlight(pathIndex, MyMath.BoolToInt(isHighlighted));
+        if (pathIndex == 0 && isHighlighted) {
+            upperBranchIcon.forceHighlighting = true;
+            lowerBranchIcon.forceHighlighting = false;
+        }
+        else if (pathIndex == 1 && isHighlighted) {
+            upperBranchIcon.forceHighlighting = false;
+            lowerBranchIcon.forceHighlighting = true;
+        }
+    }
+
+
     void MakeSelection() {
         if (selectionState != SelectionState.Active) { return; }
         if (GetSelectedNode() == null) { return; }
@@ -196,9 +249,9 @@ public class PathSelectedScreen : MonoBehaviour {
         if (!isUpper) { weaponPosition = Gun.WeaponPosition.Lower; }
 
         switch (bonusType) {
-            case BonusType.Health:
-                Services.healthManager.AddMaxHealth();
-                break;
+            //case BonusType.Health:
+            //    Services.healthManager.AddMaxHealth();
+            //    break;
             case BonusType.MachineGun:
                 Services.gun.SwitchWeapon(weaponPosition, Services.gun.machineGun);
                 break;
@@ -228,13 +281,6 @@ public class PathSelectedScreen : MonoBehaviour {
         // Also give the icons the proper meshes (Once I've actually implemented them.)
     }
 
-    // For path index, left = 0 and right = 1
-    void HighlightPath(int pathIndex, bool isHighlighted) {
-        clearedEpisodeIcon.SetBranchHighlight(pathIndex, MyMath.BoolToInt(isHighlighted));
-        if (pathIndex == 0) { upperBranchIcon.forceHighlighting = isHighlighted; }
-        else { lowerBranchIcon.forceHighlighting = isHighlighted; }
-    }
-
     public LevelBranchNode GetSelectedNode() {
         if (selectedBranchIndex == 0) { return upperBranchIcon.correspondingNode; }
         else if (selectedBranchIndex == 1) { return lowerBranchIcon.correspondingNode; }
@@ -243,7 +289,7 @@ public class PathSelectedScreen : MonoBehaviour {
 
     public void PlayerWasTasedHandler(GameEvent gameEvent) {
         if (selectionState == SelectionState.Active) {
-            SelectBranch(Random.Range(0, 2));
+            HighlightBranch(Random.Range(0, 2));
             MakeSelection();
         }
     }
@@ -254,20 +300,20 @@ public class PathSelectedScreen : MonoBehaviour {
         if (!isUpper) { weaponPosition = "LOWER"; }
 
         switch(bonusType) {
-            case BonusType.Health:
-                return "+1 HEALTH";
+            //case BonusType.Health:
+            //    return "+1 HEALTH";
             case BonusType.MachineGun:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.machineGun.displayName + ". " + Services.gun.machineGun.description + ". ";
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.machineGun.displayName + ". " /*+ Services.gun.machineGun.description + ". " */;
             case BonusType.Shotgun:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.shotgunWeapon.displayName + ". " + Services.gun.shotgunWeapon.description + ". ";
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.shotgunWeapon.displayName + ". " /*+ Services.gun.shotgunWeapon.description + ". " */;
             case BonusType.SniperRifle:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.sniperRifle.displayName + ". " + Services.gun.sniperRifle.description + ". ";
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.sniperRifle.displayName + ". " /*+ Services.gun.sniperRifle.description + ". " */;
             case BonusType.Pulse:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.pulseWeapon.displayName + ". " + Services.gun.pulseWeapon.description + ". ";
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.pulseWeapon.displayName + ". " /*+ Services.gun.pulseWeapon.description + ". " */;
             case BonusType.Saw:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.sawWeapon.displayName + ". " + Services.gun.sawWeapon.description + ". ";
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.sawWeapon.displayName + ". " /*+ Services.gun.sawWeapon.description + ". " */;
             case BonusType.Rocket:
-                return weaponPosition + " WEAPON BECOMES " + Services.gun.rocketWeapon.displayName + ". " + Services.gun.rocketWeapon.description + ". ";
+                return weaponPosition + " WEAPON BECOMES " + Services.gun.rocketWeapon.displayName + ". " /*+ Services.gun.rocketWeapon.description + ". " */;
             default:
                 return "MEOW MEOW, TIRED COW";
         }

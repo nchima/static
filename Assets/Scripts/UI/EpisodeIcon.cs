@@ -91,11 +91,17 @@ public class EpisodeIcon : MonoBehaviour {
                         BecomeHighlighted();
                     }
                 }
+
+                else if (InputManager.inputMode == InputManager.InputMode.Controller) {
+                    if (forceHighlighting) {
+                        BecomeHighlighted();
+                    }
+                }
                 break;
 
             case SelectionState.Highlighted:
 
-                if (InputManager.inputMode == InputManager.InputMode.Controller) {
+                if (InputManager.inputMode == InputManager.InputMode.Controller && Services.uiManager.episodeSelectScreen.activeInHierarchy) {
                     if (inputCooldownTimer >= inputCooldown) {
                         // Get input direction and check to see if we can move that way.
                         Vector3 inputDirection = InputManager.movementAxis.normalized;
@@ -107,9 +113,20 @@ public class EpisodeIcon : MonoBehaviour {
                         if (Physics.SphereCast(transform.position, 0.5f, inputDirection, out hit, 4f)) {
                             if (hit.collider.transform.parent.GetComponent<EpisodeIcon>() != null) {
                                 EpisodeIcon hitEpisodeIcon = hit.collider.transform.parent.GetComponent<EpisodeIcon>();
+
+
                                 if (hitEpisodeIcon.correspondingNode.IsUnlocked) {
                                     BecomeUnhighlighted();
                                     hitEpisodeIcon.BecomeHighlighted();
+                                }
+
+                                else {
+                                    for (int i = 0; i < correspondingNode.branches.Length; i++) {
+                                        if  (correspondingNode.branches[i].IsUnlocked) {
+                                            BecomeUnhighlighted();
+                                            correspondingNode.branches[i].correspondingIcon.BecomeHighlighted();
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -148,7 +165,7 @@ public class EpisodeIcon : MonoBehaviour {
         selectionCoroutine = StartCoroutine(SelectionSequence());
     }
 
-    void BecomeUnhighlighted() {
+    public void BecomeUnhighlighted() {
         selectionState = SelectionState.Unhighlighted;
         ClearActiveTweens();
         ActiveIconMesh.transform.parent.localScale = originalLocalScale;

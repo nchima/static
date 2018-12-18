@@ -118,6 +118,8 @@ public class FallingSequenceManager : StateController {
         DOTween.To
             (() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
 
+        Services.specialMoveManager.canShoot = true;
+
         Vector3 shockwavePosition = Services.playerTransform.position;
         shockwavePosition.y = 0f;
         Instantiate(prefab, shockwavePosition, Quaternion.identity);
@@ -133,6 +135,7 @@ public class FallingSequenceManager : StateController {
         }
 
         Services.gun.canShoot = false;
+        Services.specialMoveManager.canShoot = false;
 
         Services.playerGameObject.GetComponent<Collider>().material.bounciness = 0f;
         Services.healthManager.forceInvincibility = false;
@@ -146,7 +149,6 @@ public class FallingSequenceManager : StateController {
         Vector3 newPlayerRotation = Services.playerTransform.rotation.eulerAngles;
         newPlayerRotation.y = 0f;
         Services.playerTransform.rotation = Quaternion.identity;
-        Debug.Log("I should have done this");
 
         // Set up variables for falling.
         savedRegularMoveSpeed = Services.playerController.maxAirSpeed;
