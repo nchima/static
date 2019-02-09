@@ -286,6 +286,10 @@
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\EnemyTransition_ReachedNavMeshDestination.cs" />
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\SnailEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\SnailEnemyState_NormalMovement.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyState_Firing.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyState_PoweringUp.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyState_Scanning.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemy.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Tank Enemy\TankEnemyState_RunFromPlayer.cs" />
@@ -373,6 +377,8 @@
     <Compile Include="Assets\Scripts\Steamworks.NET\SteamManager.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_ButtonReleased.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_Collision.cs" />
+    <Compile Include="Assets\Scripts\Transitions\Transition_EnemyCannotSeePlayer.cs" />
+    <Compile Include="Assets\Scripts\Transitions\Transition_EnemyCanSeePlayer.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_LevelStarted.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_MouseButtonPressed.cs" />
     <Compile Include="Assets\Scripts\Transitions\Transition_WaitForSecondsRange.cs" />

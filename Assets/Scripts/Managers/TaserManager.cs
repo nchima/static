@@ -59,6 +59,7 @@ public class TaserManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void OnDisable() {
@@ -68,6 +69,7 @@ public class TaserManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
     }
 
     private void Awake() {
@@ -121,9 +123,6 @@ public class TaserManager : MonoBehaviour {
         // Freeze player
         PlayerController.State savedPlayerState = Services.playerController.state;
         Services.playerController.state = PlayerController.State.GettingTased;
-
-        // Reset timer
-        mainTimer = maxTime;
 
         // Add temporary pause
         HangTimer = 1.6f;
@@ -196,6 +195,11 @@ public class TaserManager : MonoBehaviour {
         mainTimer = maxTime;
         forcePauseSpecialMove = false;
         forcePauseForEpisodeComplete = false;
+    }
+
+    public void PlayerWasHurtHandler(GameEvent gameEvent) {
+        // Reset timer
+        mainTimer = maxTime;
     }
 
     private IEnumerator ShowTasedPromptSequence() {
