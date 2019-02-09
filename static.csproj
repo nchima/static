@@ -287,6 +287,7 @@
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\SnailEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Snail Enemy\SnailEnemyState_NormalMovement.cs" />
     <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemy.cs" />
+    <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyAnimationController.cs" />
     <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyState_Firing.cs" />
     <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyState_PoweringUp.cs" />
     <Compile Include="Assets\Scripts\Enemy\Stationary Enemy\StationaryEnemyState_Scanning.cs" />
