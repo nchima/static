@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class StationaryEnemyState_PoweringUp : State {
 
+    [SerializeField] private float openUpTime = 1f;
     [SerializeField] private float powerUpTime = 3f;
     [SerializeField] private float warningTime = 0.5f;
     [SerializeField] private float firingTime = 0.7f;
@@ -26,6 +27,12 @@ public class StationaryEnemyState_PoweringUp : State {
     }
 
     IEnumerator PowerUpCoroutine(StationaryEnemy controller) {
+
+        // Have body open and orb rise
+        controller.m_AnimationController.OpenTop(100f, openUpTime);
+        controller.m_AnimationController.OrbRise(openUpTime);
+        controller.m_AnimationController.BloomOrb(100f, openUpTime);
+        yield return new WaitForSeconds(openUpTime);
 
         targettingLine1.enabled = true;
         targettingLine2.enabled = true;
@@ -92,7 +99,7 @@ public class StationaryEnemyState_PoweringUp : State {
         targettingLine1.widthMultiplier = laserWidth;
         targettingLine2.widthMultiplier = laserWidth;
 
-        // Raycast towards the player and see if we hit em
+        // Spawn an explosion at the end of the laser.
         Explosion explosion = Instantiate(explosionPrefab).GetComponent<Explosion>();
         explosion.gameObject.transform.position = targettingLine1.GetPosition(1);
 
@@ -103,6 +110,11 @@ public class StationaryEnemyState_PoweringUp : State {
 
         targettingLine1.enabled = false;
         targettingLine2.enabled = false;
+
+        // Retract back to normal shape.
+        controller.m_AnimationController.OpenTop(0f, afterFiringPause * 0.8f);
+        controller.m_AnimationController.OrbDescend(afterFiringPause * 0.8f);
+        controller.m_AnimationController.BloomOrb(0f, afterFiringPause * 0.8f);
 
         yield return new WaitForSeconds(afterFiringPause);
 

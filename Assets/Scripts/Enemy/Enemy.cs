@@ -68,7 +68,7 @@ public class Enemy : StateController {
     // REFERENCES
     public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
     private Rigidbody m_Rigidbody { get { return GetComponent<Rigidbody>(); } }
-    [SerializeField] protected GameObject myGeometry;
+    [SerializeField] public GameObject myGeometry;
 
 
     protected virtual void Start() {
