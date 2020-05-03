@@ -29,6 +29,7 @@ public class StationaryEnemyState_PoweringUp : State {
     IEnumerator PowerUpCoroutine(StationaryEnemy controller) {
 
         // Have body open and orb rise
+        controller.emergeAudio.Play();
         controller.m_AnimationController.OpenTop(100f, openUpTime);
         controller.m_AnimationController.OrbRise(openUpTime);
         controller.m_AnimationController.BloomOrb(100f, openUpTime);
@@ -37,13 +38,16 @@ public class StationaryEnemyState_PoweringUp : State {
         targettingLine1.enabled = true;
         targettingLine2.enabled = true;
 
-        // Wait to charge up
-        float powerUpTimer = 0f;
+        // Show targetting lines and have them converge on the player's position.
+        controller.powerUpAudio.Play();
+        controller.powerUpAudio.volume = 1f;
+        controller.m_AnimationController.MakeOrbAngry(100f, powerUpTime * 0.9f);
+        float reusableTimer = 0f;
         yield return new WaitUntil(() => {
-            powerUpTimer += Time.deltaTime;
+            reusableTimer += Time.deltaTime;
 
             // Make targetting lines creep towards player
-            float progress = MyMath.Map(powerUpTimer, 0f, powerUpTime, 0f, 1f);
+            float progress = MyMath.Map(reusableTimer, 0f, powerUpTime, 0f, 1f);
 
             targettingLine1.SetPosition(0, controller.enemyTop.transform.position);
             targettingLine1.SetPosition(1, GetSecondLinePosition(targettingLine1.GetPosition(0), 90f, progress));
@@ -51,7 +55,9 @@ public class StationaryEnemyState_PoweringUp : State {
             targettingLine2.SetPosition(0, controller.enemyTop.transform.position);
             targettingLine2.SetPosition(1, GetSecondLinePosition(targettingLine2.GetPosition(0), -90f, progress));
 
-            if (powerUpTimer < powerUpTime + warningTime) {
+            controller.powerUpAudio.pitch = MyMath.Map(progress, 0f, 0.75f, 1f, 3f);
+
+            if (reusableTimer < powerUpTime + warningTime) {
                 return false;
             }
 
@@ -61,10 +67,10 @@ public class StationaryEnemyState_PoweringUp : State {
         });
 
         // Fade targetting lines out.
-        powerUpTimer = 0f;
+        reusableTimer = 0f;
         float originalWidthMultiplier = targettingLine1.widthMultiplier;
         yield return new WaitUntil(() => {
-            powerUpTimer += Time.deltaTime;
+            reusableTimer += Time.deltaTime;
 
             targettingLine1.SetPosition(0, controller.enemyTop.transform.position);
             targettingLine1.SetPosition(1, GetSecondLinePosition(targettingLine1.GetPosition(0), 90f, 1f));
@@ -72,49 +78,82 @@ public class StationaryEnemyState_PoweringUp : State {
             targettingLine2.SetPosition(0, controller.enemyTop.transform.position);
             targettingLine2.SetPosition(1, GetSecondLinePosition(targettingLine2.GetPosition(0), -90f, 1f));
 
-            targettingLine1.widthMultiplier = MyMath.Map(powerUpTimer, 0f, warningTime * 0.5f, originalWidthMultiplier, 0f);
-            targettingLine2.widthMultiplier = MyMath.Map(powerUpTimer, 0f, warningTime * 0.5f, originalWidthMultiplier, 0f);
+            targettingLine1.widthMultiplier = MyMath.Map(reusableTimer, 0f, warningTime * 0.5f, originalWidthMultiplier, 0f);
+            targettingLine2.widthMultiplier = MyMath.Map(reusableTimer, 0f, warningTime * 0.5f, originalWidthMultiplier, 0f);
 
-            if (powerUpTimer >= warningTime) { return true; }
+            controller.powerUpAudio.volume = MyMath.Map(reusableTimer, 0f, warningTime, 1f, 0f);
+            controller.powerUpAudio.pitch = MyMath.Map(reusableTimer, 0f, warningTime, 3f, 1f);
+
+            if (reusableTimer >= warningTime) { return true; }
             else { return false; }
         });
 
         targettingLine1.enabled = false;
         targettingLine2.enabled = false;
 
-        yield return new WaitForSeconds(warningTime);
+        controller.powerUpAudio.Stop();
+        controller.powerUpAudio.volume = 1f;
+        controller.powerUpAudio.pitch = 1f;
+
+        yield return new WaitForSeconds(warningTime * 0.7f);
+
+        controller.emergeAudio.Play();
+
+        yield return new WaitForSeconds(warningTime * 0.3f);
 
         // Fire the laser:
+        controller.shootAudio.Play();
+
         targettingLine1.enabled = true;
-        targettingLine2.enabled = true;
+        targettingLine2.enabled = false;
 
         targettingLine1.SetPosition(0, controller.enemyTop.transform.position);
         targettingLine1.SetPosition(1, GetSecondLinePosition(targettingLine1.GetPosition(0), 90f, 1f));
 
-        targettingLine2.SetPosition(0, controller.enemyTop.transform.position);
-        targettingLine2.SetPosition(1, GetSecondLinePosition(targettingLine2.GetPosition(0), -90f, 1f));
+        //targettingLine2.SetPosition(0, controller.enemyTop.transform.position);
+        //targettingLine2.SetPosition(1, GetSecondLinePosition(targettingLine2.GetPosition(0), -90f, 1f));
 
         yield return new WaitForEndOfFrame();
 
         targettingLine1.widthMultiplier = laserWidth;
-        targettingLine2.widthMultiplier = laserWidth;
 
         // Spawn an explosion at the end of the laser.
         Explosion explosion = Instantiate(explosionPrefab).GetComponent<Explosion>();
         explosion.gameObject.transform.position = targettingLine1.GetPosition(1);
 
-        yield return new WaitForSeconds(firingTime);
+        // Begin the laser decay animation:
+        targettingLine1.positionCount = 10;
 
+        reusableTimer = 0f;
+        Vector3 lineEndPosition = targettingLine1.GetPosition(1);
+        yield return new WaitUntil(() => {
+            reusableTimer += Time.deltaTime;
+            float t = MyMath.Map01(reusableTimer, 0f, firingTime);
+            float lerpValue = t * t * t;
+
+            for (int i = 1; i < targettingLine1.positionCount; i++) {
+                Vector3 newPosition = Vector3.Lerp(targettingLine1.GetPosition(0), lineEndPosition, MyMath.Map01(i, 0, targettingLine1.positionCount - 1));
+                newPosition += Random.insideUnitSphere * MyMath.Map(lerpValue, 0f, firingTime, 0f, 20f);
+                targettingLine1.SetPosition(i, newPosition);
+            }
+
+            targettingLine1.widthMultiplier = MyMath.Map(lerpValue, 0f, firingTime, laserWidth, 0f);
+
+            if (lerpValue >= firingTime) { return true; }
+            else { return false; }
+        });
+
+        targettingLine1.positionCount = 2;
         targettingLine1.widthMultiplier = originalWidthMultiplier;
         targettingLine2.widthMultiplier = originalWidthMultiplier;
 
         targettingLine1.enabled = false;
-        targettingLine2.enabled = false;
 
         // Retract back to normal shape.
         controller.m_AnimationController.OpenTop(0f, afterFiringPause * 0.8f);
         controller.m_AnimationController.OrbDescend(afterFiringPause * 0.8f);
         controller.m_AnimationController.BloomOrb(0f, afterFiringPause * 0.8f);
+        controller.m_AnimationController.MakeOrbAngry(0f, afterFiringPause * 0.8f);
 
         yield return new WaitForSeconds(afterFiringPause);
 

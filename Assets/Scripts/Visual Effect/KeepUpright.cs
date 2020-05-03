@@ -9,7 +9,13 @@ public class KeepUpright : MonoBehaviour {
 
     float widthAtMaxDistance = 0.5f;
 
-	private void Update () {
+    private void Awake() {
+        Vector3 newScale = transform.localScale;
+        newScale.y = 625f;
+        transform.localScale = newScale;
+    }
+
+    private void Update () {
 		if (Services.fallingSequenceManager.isPlayerFalling) {
 			transform.localScale = new Vector3 (widthAtMaxDistance * 0.1f, transform.localScale.y, widthAtMaxDistance * 0.1f);
 		} else {

@@ -17,8 +17,10 @@ public class WadLoader : MonoBehaviour
     public Color ambientLightColor = Color.white;
     public bool deathmatch;
     public static List<Lump> lumps = new List<Lump>();
-    public string autoloadWad = "Doom1.WAD";
-    public string autoloadMap = "E1M1";
+    public string filePath = "Doom1.WAD";
+    public string wadName;
+    public string autoloadMapName = "E1M1";
+    public UnityEngine.SceneManagement.Scene scene;
     public GameObject PlayerObject;
 
     public void ConvertMap()
@@ -27,10 +29,10 @@ public class WadLoader : MonoBehaviour
 
         Shader.SetGlobalColor("_AMBIENTLIGHT", ambientLightColor);
 
-        if (string.IsNullOrEmpty(autoloadWad))
+        if (string.IsNullOrEmpty(filePath))
             return;
 
-        if (!Load(autoloadWad))
+        if (!Load(filePath))
             return;
 
         GetComponent<TextureLoader>().Initialize();
@@ -39,10 +41,10 @@ public class WadLoader : MonoBehaviour
 
         //TextureLoader.Instance.LoadAndBuildAll();
 
-        if (!string.IsNullOrEmpty(autoloadMap))
-            if (MapLoader.Instance.Load(autoloadMap))
+        if (!string.IsNullOrEmpty(autoloadMapName))
+            if (MapLoader.Instance.Load(autoloadMapName))
             {
-                Mesher.Instance.CreateMeshes(autoloadWad);
+                Mesher.Instance.CreateMeshes(wadName, scene);
 
                 //MapLoader.Instance.ApplyLinedefBehavior();
 
@@ -61,19 +63,19 @@ public class WadLoader : MonoBehaviour
             }
     }
 
-    public bool Load(string file)
+    public bool Load(string filePath)
     {
-        string path = Application.streamingAssetsPath + "/" + file;
+        string path = filePath;
         if (!File.Exists(path))
         {
-            Debug.LogError("WadLoader: Load: File \"" + file + "\" does not exist!");
+            Debug.LogError("WadLoader: Load: File \"" + filePath + "\" does not exist!");
             return false;
         }
 
         FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         BinaryReader reader = new BinaryReader(stream, Encoding.ASCII);
 
-        if (file.Length < 4)
+        if (filePath.Length < 4)
         {
             reader.Close();
             stream.Close();
@@ -114,7 +116,7 @@ public class WadLoader : MonoBehaviour
                 bytes += l.length;
             }
 
-            Debug.Log("Loaded WAD \"" + file + "\" (" + bytes + " bytes in lumps)");
+            Debug.Log("Loaded WAD \"" + filePath + "\" (" + bytes + " bytes in lumps)");
         }
         catch(Exception e)
         {

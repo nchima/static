@@ -71,11 +71,21 @@ public class GameManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
 
+    private void Start() {
+#if UNITY_EDITOR
+        // If any scenes aside from the main scene is currently loaded, unload them. This is to make testing levels in the editor more convenient.
+        for (int i = 0; i < UnityEditor.SceneManagement.EditorSceneManager.sceneCount; i++) {
+            Scene scene = UnityEditor.SceneManagement.EditorSceneManager.GetSceneAt(i);
+            if (scene.name != "Main") {
+                SceneManager.UnloadSceneAsync(scene);
+            }
+        }
+#endif
+    }
 
     public void LoadGame() {
         StartCoroutine(InitialSetup());
     }
-
 
     IEnumerator InitialSetup() {
         //Services.gun.enabled = false;

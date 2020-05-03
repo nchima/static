@@ -79,8 +79,6 @@ public class FallingSequenceManager : StateController {
         }
     }
 
-
-
     private void Awake() {
         playerSpawnPoint = GameObject.Find("Player Spawn Point").transform;
         savedGravity = Physics.gravity;
@@ -99,7 +97,6 @@ public class FallingSequenceManager : StateController {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
     }
-
 
     protected override void Update() {
         base.Update();

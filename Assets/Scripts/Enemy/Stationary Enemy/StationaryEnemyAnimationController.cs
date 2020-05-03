@@ -12,6 +12,8 @@ public class StationaryEnemyAnimationController : EnemyAnimationController {
 
     private float openTopValue = 0f;
     private float orbBloomValue = 0f;
+    private float orbAngerValue = 0f;
+    private float angrinessFactor = 0f;
 
     private SkinnedMeshRenderer[] baseMeshRenderers;
     private SkinnedMeshRenderer[] orbMeshRenderers;
@@ -27,8 +29,18 @@ public class StationaryEnemyAnimationController : EnemyAnimationController {
     }
 
     private void Update() {
+        float trueBloomValue = orbBloomValue;
+        if (angrinessFactor > 0) {
+            float randomness = Random.Range(0, MyMath.Map(angrinessFactor, 0f, 100f, 0f, 75f));
+            orbAngerValue = Mathf.Clamp(angrinessFactor + Random.Range(-randomness, randomness), 0, 100f);
+            trueBloomValue = Mathf.Clamp(trueBloomValue + Random.Range(-randomness, randomness), 0f, orbAngerValue);
+        }
+
         foreach(SkinnedMeshRenderer renderer in baseMeshRenderers) { renderer.SetBlendShapeWeight(0, openTopValue); }
-        foreach(SkinnedMeshRenderer renderer in orbMeshRenderers) { renderer.SetBlendShapeWeight(0, orbBloomValue); }
+        foreach(SkinnedMeshRenderer renderer in orbMeshRenderers) {
+            renderer.SetBlendShapeWeight(0, orbAngerValue);
+            renderer.SetBlendShapeWeight(1, trueBloomValue);
+        }
 
         orbParent.transform.LookAt(Services.playerTransform);
     }
@@ -45,10 +57,17 @@ public class StationaryEnemyAnimationController : EnemyAnimationController {
     Tween orbBloomTween;
     public void BloomOrb(float finalValue, float duration) {
         if (orbBloomTween != null) {
-            orbBloomTween.Complete();
-            orbBloomValue = 0f;
+            orbBloomTween.Kill();
         }
         orbBloomTween = DOTween.To(() => orbBloomValue, x => orbBloomValue = x, finalValue, duration);
+    }
+
+    Tween angrinessTween;
+    public void MakeOrbAngry(float finalValue, float duration) {
+        if (angrinessTween != null) {
+            angrinessTween.Kill();
+        }
+        angrinessTween = DOTween.To(() => angrinessFactor, x => angrinessFactor = x, finalValue, duration);
     }
 
     Tween orbRiseTween;
@@ -64,12 +83,17 @@ public class StationaryEnemyAnimationController : EnemyAnimationController {
         orbGrowTween = orbParent.transform.DOScale(riseScale, duration);
     }
 
+
     public void OrbDescend(float duration) {
         if (orbRiseTween != null) { orbRiseTween.Kill(); }
         if (orbGrowTween != null) { orbGrowTween.Kill(); }
+        if (orbBloomTween != null) { orbBloomTween.Kill(); }
+        if (angrinessTween != null) { angrinessTween.Kill(); }
         orbParent.transform.localPosition = originalOrbPosition + Vector3.up * orbRiseHeight;
         orbParent.transform.localScale = originalOrbScale * orbScaleMultiplier;
         orbRiseTween = orbParent.transform.DOLocalMove(originalOrbPosition, duration);
         orbGrowTween = orbParent.transform.DOScale(originalOrbScale, duration);
+        orbBloomTween = DOTween.To(() => orbBloomValue, x => orbBloomValue = x, 0, duration);
+        angrinessTween = DOTween.To(() => angrinessFactor, x => angrinessFactor = x, 0, duration);
     }
 }

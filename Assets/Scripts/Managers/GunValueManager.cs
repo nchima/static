@@ -42,6 +42,7 @@ public class GunValueManager : MonoBehaviour {
 
         // internalVlaue += InputManager.gunTuningValue * inputMod * Time.deltaTime;
         internalValue = Mathf.Clamp(internalValue, -1f, 1f);
+        //internalValue = MyMath.Wrap(internalValue, -1f, 1f);
 
         currentValue = internalValue;//tuningCurve.Evaluate(internalVlaue);
 

@@ -17,7 +17,7 @@ public class FallIntoLevelState : State {
         Services.levelManager.SetFloorCollidersActive(true);
         Services.fieldOfViewController.SetClearVeilActive(true);
         Services.fieldOfViewController.ActivateCameraClearing(true);
-        Services.colorPaletteManager.LoadFallingSequencePalette();
+        // Services.colorPaletteManager.LoadFallingSequencePalette();
         fallingSequenceManager.SetUpFallingVariables();
     }
 

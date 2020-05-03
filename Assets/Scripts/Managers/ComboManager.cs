@@ -8,6 +8,8 @@ using DG.Tweening;
 public class ComboManager : MonoBehaviour {
 
     // References
+    [SerializeField] GameObject timerBar;
+    [SerializeField] Transform timerBarReference;
     [SerializeField] Text textDisplay;
     [SerializeField] Text scoreDisplay;
     [SerializeField] Text multiplierDisplay;
@@ -19,19 +21,44 @@ public class ComboManager : MonoBehaviour {
     State state = State.ComboIdle;
 
     // Timer
-    const float MAX_COMBO_TIME = 2f;
-    float comboTimer = 2f;
+    const float MAX_COMBO_TIME = 3f;
+    float comboTimer = 0f;
 
     const float KILL_BONUS_TIME = 1f;
     const float LEVEL_COMPLETED_BONUS_TIME = 2f;
     const float PICKUP_OBTAINED_BONUS_TIME = 1f;
     const float MISC_BONUS_TIME = 1f;
 
+    // Hang time
+    [SerializeField] float maxHangTime = 2f;
+    float _hangTimer = 0f;
+    float HangTimer {
+        get { return _hangTimer; }
+        set {
+            _hangTimer = value;
+            _hangTimer = Mathf.Clamp(_hangTimer, 0f, maxHangTime);
+        }
+    }
+
+    [SerializeField] float bulletHitHangTime = 0.01f;
+    float _bulletHangTimer;
+    float BulletHangTimer {
+        get { return _bulletHangTimer; }
+        set {
+            _bulletHangTimer = value;
+            _bulletHangTimer = Mathf.Clamp(_bulletHangTimer, 0f, bulletHitHangTime);
+        }
+    }
+
     // Other values
+    const float KILL_ENEMY_HANG_TIME = 0.1f;
     public const int PICKUP_SCORE_VALUE = 100;
+    const float PICKUP_HANG_TIME = 0.1f;
     const int BULLSEYE_VALUE = 200;
     const int SPECIAL_MOVE_VALUE = 50;
     public int levelCompleteValue = 500;
+    const float LEVEL_COMPLETE_HANG_TIME = 5f;
+    const float FALL_THROUGH_FLOOR_HANG_TIME = 1f;
 
     // Current combo data.
     int simpleEnemiesKilled = 0;
@@ -93,10 +120,22 @@ public class ComboManager : MonoBehaviour {
 
     private void Update() {
         if (state == State.ComboActive) {
-            comboTimer -= Time.deltaTime;
-            if (comboTimer <= 0) {
-                EndCombo();
-                return;
+            if (HangTimer <= 0f && BulletHangTimer <= 0f) {
+                comboTimer -= Time.deltaTime;
+                if (comboTimer <= 0) {
+                    EndCombo();
+                    return;
+                }
+            }
+            // Handle temporary puase.
+            else {
+                if (HangTimer > 0) {
+                    HangTimer -= Time.deltaTime;
+                }
+
+                if (BulletHangTimer > 0) {
+                    BulletHangTimer -= Time.deltaTime;
+                }
             }
 
             textDisplay.text = GenerateComboTextString();
@@ -112,6 +151,15 @@ public class ComboManager : MonoBehaviour {
         newPosition.y = multiplierDisplay.rectTransform.localPosition.y;
         newPosition.x += scoreDisplay.rectTransform.sizeDelta.x * scoreDisplay.rectTransform.lossyScale.x + 0.3f;
         multiplierDisplay.rectTransform.localPosition = newPosition;
+
+        // Update timer bar
+        Vector3 newTimerBarScale = timerBar.transform.localScale;
+        newTimerBarScale.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, 0.001f, timerBarReference.localScale.x);
+        timerBar.transform.localScale = newTimerBarScale;
+
+        Vector3 newTimerBarPosition = timerBar.transform.localPosition;
+        newTimerBarPosition.x = MyMath.Map(comboTimer, 0f, MAX_COMBO_TIME, timerBarReference.localPosition.x - timerBarReference.localScale.x * 0.5f, timerBarReference.localPosition.x);
+        timerBar.transform.localPosition = newTimerBarPosition;
     }
 
 	private void StartCombo() {
@@ -143,7 +191,7 @@ public class ComboManager : MonoBehaviour {
         scoreDisplay.text = "";
         multiplierDisplay.text = "";
 
-		StartCombo ();
+		//StartCombo ();
 
         state = State.ComboIdle;
     }
@@ -250,11 +298,25 @@ public class ComboManager : MonoBehaviour {
         comboFinishersVisible = value;
     }
 
+    public void PlayerUsedFallThroughFloorMove() {
+        comboTimer = MAX_COMBO_TIME;
+        HangTimer += FALL_THROUGH_FLOOR_HANG_TIME;
+    }
+
+    public void PlayerShotEnemy() {
+        BulletHangTimer += bulletHitHangTime;
+    }
+
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         GameEvents.PlayerKilledEnemy playerKilledEnemyEvent = gameEvent as GameEvents.PlayerKilledEnemy;
 
-        if (state == State.ComboIdle) { StartCombo(); }
-        else { comboTimer = Mathf.Clamp(comboTimer + KILL_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) {
+            StartCombo();
+        }
+        else {
+            HangTimer += KILL_ENEMY_HANG_TIME;
+            comboTimer = Mathf.Clamp(comboTimer + KILL_BONUS_TIME, 0f, MAX_COMBO_TIME);
+        }
 
         if (playerKilledEnemyEvent.enemyKilled is SimpleEnemy) { simpleEnemiesKilled++; } 
         else if (playerKilledEnemyEvent.enemyKilled is MeleeEnemy) { meleeEnemiesKilled++; }
@@ -270,8 +332,13 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); }
-        else { comboTimer = Mathf.Clamp(comboTimer + LEVEL_COMPLETED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) {
+            StartCombo();
+        }
+        else {
+            comboTimer = Mathf.Clamp(comboTimer + LEVEL_COMPLETED_BONUS_TIME, 0f, MAX_COMBO_TIME);
+            HangTimer += LEVEL_COMPLETE_HANG_TIME;
+        }
 
         levelsCompleted++;
 
@@ -279,7 +346,13 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void PickupObtainedHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + PICKUP_OBTAINED_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) {
+            StartCombo();
+        }
+        else {
+            comboTimer = Mathf.Clamp(comboTimer + PICKUP_OBTAINED_BONUS_TIME, 0f, MAX_COMBO_TIME);
+            HangTimer += PICKUP_HANG_TIME;
+        }
 
         pickupsObtained++;
 
@@ -287,7 +360,12 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void PlayerUsedSpecialMoveHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) {
+            StartCombo();
+        }
+        else {
+            comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME);
+        }
 
         timesSpecialMoveUsed++;
 
@@ -295,7 +373,12 @@ public class ComboManager : MonoBehaviour {
     }
 
     public void BullseyeHandler(GameEvent gameEvent) {
-        if (state == State.ComboIdle) { StartCombo(); } else { comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME); }
+        if (state == State.ComboIdle) {
+            StartCombo();
+        }
+        else {
+            comboTimer = Mathf.Clamp(comboTimer + MISC_BONUS_TIME, 0f, MAX_COMBO_TIME);
+        }
 
         bullseyes++;
 

@@ -3,13 +3,13 @@ using UnityEditor;
 
 public class MenuItems
 {
-	[MenuItem("Nerve Damage Tools/Clear PlayerPrefs")]
+	[MenuItem("Tools/Clear PlayerPrefs")]
 	private static void ClearPlayerPrefs() {
 		PlayerPrefs.DeleteAll();
 	}
 
-//	[MenuItem("Nerve Damage Tools/Create Level Data")]
-//	private static void () {
-//		
-//	}
+    [MenuItem("Tools/Import Wad")]
+    private static void CreateLevelData() {
+        WadImporter.ImportWad();
+	}
 }

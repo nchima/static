@@ -44,7 +44,6 @@ public class ObjectPooler : MonoBehaviour {
         index++;
         if (index >= startingNumber) { index = 0; }
 
-
         // If there are inactive objects in the list, return the top one. Otherwise, instantiate a new one and return that.
         //if (inactiveObjects.Count > 0) {
         //grabbedObject = inactiveObjects[0];

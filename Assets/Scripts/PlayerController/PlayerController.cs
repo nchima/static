@@ -175,6 +175,7 @@ public class PlayerController : MonoBehaviour {
 
             if (InputManager.dashButtonDown && fallThroughFloorTimer >= fallThroughFloorCooldown) {
                 //Services.comboManager.EndCombo();
+                Services.comboManager.PlayerUsedFallThroughFloorMove();
                 Services.taserManager.PlayerUsedFallThroughFloorMove();
                 //Services.specialBarManager.PlayerUsedSpecialMove();
                 Services.levelManager.SetFloorCollidersActive(false);

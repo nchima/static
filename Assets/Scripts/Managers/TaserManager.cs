@@ -11,12 +11,13 @@ public class TaserManager : MonoBehaviour {
     [SerializeField] GameObject timerBar;
     [SerializeField] Transform timerBarReference;
     [SerializeField] GameObject tasedPrompt;
-
+    
     // Timer
     [SerializeField] float maxTime = 6f;
     float mainTimer = 0f;
 
     [SerializeField] float bulletHitHangTime = 0.01f;
+    [SerializeField] float bulletHitBonus = 0.01f;
     float _bulletHangTimer;
     float BulletHangTimer {
         get { return _bulletHangTimer; }
@@ -80,6 +81,7 @@ public class TaserManager : MonoBehaviour {
     }
 
     private void Update() {
+        return;
         // Run timer.
         if (!forcePauseSpecialMove && HangTimer <= 0f && BulletHangTimer <= 0f) {
             mainTimer -= Time.deltaTime;
@@ -165,6 +167,7 @@ public class TaserManager : MonoBehaviour {
 
     public void PlayerShotEnemy() {
         BulletHangTimer += bulletHitHangTime;
+        mainTimer += bulletHitBonus;
     }
 
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {

@@ -10,9 +10,7 @@ public class Enemy : StateController {
     public int maxHealth;
     int _currentHealth;
     public virtual int currentHealth {
-        get {
-            return _currentHealth;
-        }
+        get { return _currentHealth; }
 
         set {
             // See if I should die.
@@ -44,7 +42,7 @@ public class Enemy : StateController {
     public bool CanSeePlayer {
         get {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position, Services.playerTransform.position - transform.position, out hit, 200f, 1 << 8 | 1 << 16)) {
+            if (Physics.Raycast(transform.position, Services.playerTransform.position - transform.position, out hit, 500f, 1 << 8 | 1 << 16)) {
                 if (hit.transform == Services.playerTransform) return true;
             }
 
@@ -67,19 +65,16 @@ public class Enemy : StateController {
 
     // REFERENCES
     public NavMeshAgent m_NavMeshAgent { get { return GetComponent<NavMeshAgent>(); } }
-    private Rigidbody m_Rigidbody { get { return GetComponent<Rigidbody>(); } }
+    public Rigidbody m_Rigidbody { get { return GetComponent<Rigidbody>(); } }
     [SerializeField] public GameObject myGeometry;
-
 
     protected virtual void Start() {
         _currentHealth = maxHealth;
     }
 
-
     protected override void Update() {
         base.Update();
     }
-
 
     protected virtual void Die() {
         // isAlive is used to make sure that this function is not called more than once.
@@ -90,7 +85,6 @@ public class Enemy : StateController {
         GameEventManager.instance.FireEvent(new GameEvents.PlayerKilledEnemy(scoreKillValue, specialKillValue, this));
         Destroy(gameObject);
     }
-
 
     public bool IsPointOnNavMesh(Vector3 inputPoint) {
         // Check to see if the new position is on the navmesh.
@@ -110,7 +104,6 @@ public class Enemy : StateController {
         return true;
     }
 
-
     void GetHurt() {
         if (myGeometry.GetComponent<EnemyAnimationController>() == null) {
             Debug.Log("Enemy animation controller not found.");
@@ -120,7 +113,6 @@ public class Enemy : StateController {
         myGeometry.GetComponent<EnemyAnimationController>().GetHurt();
     }
 
-
     void TestPainChance() {
         if (Random.value <= painChance) {
             if (painCoroutine != null) { StopCoroutine(painCoroutine); }
@@ -128,14 +120,12 @@ public class Enemy : StateController {
         }
     }
 
-
     IEnumerator PainCoroutine() {
         //SetAIActive(false);
         yield return new WaitForSeconds(painTime);
         //SetAIActive(true);
         yield return null;
     }
-
 
     public void SetAIActive(bool value) {
         ReturnToInitialState();
@@ -148,7 +138,6 @@ public class Enemy : StateController {
         }
         activeTweens.Clear();
     }
-
 
     //void KnockBack() {
     //    BecomePhysicsObject(true);
@@ -164,7 +153,6 @@ public class Enemy : StateController {
     //    else { m_Rigidbody.constraints = RigidbodyConstraints.None; }
     //    m_Rigidbody.useGravity = value;
     //}
-
 
     private void OnTriggerEnter(Collider other) {
         // Make sure we die instantly if, for some reason, we fall off the level.

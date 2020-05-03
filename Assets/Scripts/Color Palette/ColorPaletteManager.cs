@@ -13,7 +13,7 @@ public class ColorPaletteManager : MonoBehaviour {
     // Environment materials.
     [SerializeField] Material wallMaterial;
     [SerializeField] Material floorMaterial;
-    [SerializeField] Material obstacleMaterial;
+    [SerializeField] Material[] obstacleMaterials;
 
     // Screen materials
     [SerializeField] GameObject perspectiveScreen1;
@@ -82,7 +82,7 @@ public class ColorPaletteManager : MonoBehaviour {
     void ChangePalette(ColorPalette newPalette, float duration) {
         wallMaterial.DOColor(newPalette.wallColor, duration);
         floorMaterial.DOColor(newPalette.floorColor, duration);
-        obstacleMaterial.DOColor(newPalette.obstacleColor, duration);
+        foreach(Material obstacleMaterial in obstacleMaterials) { obstacleMaterial.DOColor(newPalette.obstacleColor, duration); }
         perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(newPalette.perspectiveColor1, duration);
         perspectiveScreen2.GetComponent<MeshRenderer>().material.DOColor(newPalette.perspectiveColor2, duration);
         perspectiveScreen3.GetComponent<MeshRenderer>().material.DOColor(newPalette.perspectiveColor3, duration);
@@ -95,7 +95,7 @@ public class ColorPaletteManager : MonoBehaviour {
     void ChangePaletteImmediate(ColorPalette newPalette) {
         wallMaterial.color = newPalette.wallColor;
         floorMaterial.color = newPalette.floorColor;
-        obstacleMaterial.color = newPalette.obstacleColor;
+        foreach(Material obstacleMaterial in obstacleMaterials) { obstacleMaterial.color = newPalette.obstacleColor; }
         perspectiveScreen1.GetComponent<MeshRenderer>().material.color = newPalette.perspectiveColor1;
         perspectiveScreen2.GetComponent<MeshRenderer>().material.color = newPalette.perspectiveColor2;
         perspectiveScreen3.GetComponent<MeshRenderer>().material.color = newPalette.perspectiveColor3;
@@ -108,7 +108,7 @@ public class ColorPaletteManager : MonoBehaviour {
     void SaveCurrentPalette(ColorPalette saveTarget) {
         saveTarget.wallColor = wallMaterial.color;
         saveTarget.floorColor = floorMaterial.color;
-        saveTarget.obstacleColor = obstacleMaterial.color;
+        saveTarget.obstacleColor = obstacleMaterials[0].color;
         saveTarget.perspectiveColor1 = perspectiveScreen1.GetComponent<MeshRenderer>().material.color;
         saveTarget.perspectiveColor2 = perspectiveScreen2.GetComponent<MeshRenderer>().material.color;
         saveTarget.perspectiveColor3 = perspectiveScreen3.GetComponent<MeshRenderer>().material.color;
@@ -128,7 +128,7 @@ public class ColorPaletteManager : MonoBehaviour {
         Color[] environmentPalette = ThreeColorPalette(0.33f, 0.2f);
         wallMaterial.DOColor(environmentPalette[0], duration);
         floorMaterial.DOColor(environmentPalette[1], duration);
-        obstacleMaterial.DOColor(environmentPalette[2], duration);
+        foreach(Material obstacleMaterial in obstacleMaterials) { obstacleMaterial.DOColor(environmentPalette[2], duration); }
 
         Color[] perspectiveScreenPalette = ThreeColorPalette(0.33f, 0.2f);
         perspectiveScreen1.GetComponent<MeshRenderer>().material.DOColor(perspectiveScreenPalette[0], duration);

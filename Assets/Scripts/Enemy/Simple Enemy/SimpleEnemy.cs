@@ -10,7 +10,6 @@ public class SimpleEnemy : Enemy {
     public GameObject chargeParticles;
     public SimpleEnemyAnimationController animationController { get { return myGeometry.GetComponent<SimpleEnemyAnimationController>(); } }
 
-
     private void Awake() {
         navMeshAgent = GetComponent<NavMeshAgent>();
     }

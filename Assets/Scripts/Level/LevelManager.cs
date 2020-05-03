@@ -245,6 +245,12 @@ public class LevelManager : MonoBehaviour {
         
         currentlyLoadedLevelData = levelData;
 
+        foreach(BoxCollider boxCollider in FindObjectsOfType<BoxCollider>()) {
+            if (boxCollider.gameObject.name.ToUpper().Contains("BLOCKER")) {
+                boxCollider.enabled = true;
+            }
+        }
+
         loadingSequenceFinishedTrigger = true;
 
         yield return null;

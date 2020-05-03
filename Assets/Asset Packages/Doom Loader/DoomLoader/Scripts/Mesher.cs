@@ -23,9 +23,9 @@ public class Mesher : MonoBehaviour {
         Instance = this;
     }
 
-    public void CreateMeshes(string mapName) {
+    public void CreateMeshes(string mapName, UnityEngine.SceneManagement.Scene scene) {
         // Create game objects to hold static level.
-        level = new GameObject("Level");
+        level = new GameObject("LEVEL");
         railingParent = new GameObject("Railings");
         railingParent.transform.parent = level.transform;
         obstacleParent = new GameObject("Obstacles");
@@ -112,12 +112,12 @@ public class Mesher : MonoBehaviour {
 
                     // Save as floor
                     if (sectorType == 0) {
-                        CreateFloorMesh(mesh, mapName, index, false);
+                        CreateFloorMesh(mesh, mapName, index, false, scene);
                     }
 
                     // Save as obstacle
                     else if (sectorType == 1) {
-                        CreateFloorMesh(mesh, mapName, index, true);
+                        CreateFloorMesh(mesh, mapName, index, true, scene);
                     }
 
                     // Do nothing :)
@@ -204,7 +204,8 @@ public class Mesher : MonoBehaviour {
                                 false,
                                 l.Front.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_top_front"
+                                "Wall_" + index + "_top_front",
+                                scene
                             //holder
                             );
 
@@ -222,7 +223,8 @@ public class Mesher : MonoBehaviour {
                                 true,
                                 l.Back.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_top_back"
+                                "Wall_" + index + "_top_back",
+                                scene
                             //holder
                             );
 
@@ -240,7 +242,8 @@ public class Mesher : MonoBehaviour {
                                 false,
                                 l.Front.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_bot_front"
+                                "Wall_" + index + "_bot_front", 
+                                scene
                             //holder
                             );
 
@@ -258,7 +261,8 @@ public class Mesher : MonoBehaviour {
                                 true,
                                 l.Back.Sector.brightness,
                                 true,
-                                "Wall_" + index + "_bot_back"
+                                "Wall_" + index + "_bot_back", 
+                                scene
                             //holder
                             );
 
@@ -276,7 +280,8 @@ public class Mesher : MonoBehaviour {
                                 false,
                                 l.Front.Sector.brightness,
                                 false,
-                                "Wall_" + index + "_mid_front"
+                                "Wall_" + index + "_mid_front", 
+                                scene
                             //holder
                             );
 
@@ -294,7 +299,8 @@ public class Mesher : MonoBehaviour {
                                 true,
                                 l.Back.Sector.brightness,
                                 false,
-                                "Wall_" + index + "_mid_back"
+                                "Wall_" + index + "_mid_back", 
+                                scene
                             //holder
                             );
 
@@ -322,7 +328,8 @@ public class Mesher : MonoBehaviour {
                             false,
                             l.Front.Sector.brightness,
                             true,
-                            "Wall_" + index
+                            "Wall_" + index, 
+                            scene
                         //holder
                         );
 
@@ -331,12 +338,12 @@ public class Mesher : MonoBehaviour {
         }
     }
 
-    void CreateFloorMesh(Mesh mesh, string mapName, int index, bool isObstacle) {
+    void CreateFloorMesh(Mesh mesh, string mapName, int index, bool isObstacle, UnityEngine.SceneManagement.Scene scene) {
         GameObject floorObject;
         if (isObstacle) {
-            floorObject = PrefabUtility.InstantiatePrefab(obstacleTopPrefab as GameObject) as GameObject;
+            floorObject = PrefabUtility.InstantiatePrefab(obstacleTopPrefab as GameObject, scene) as GameObject;
         } else {
-            floorObject = PrefabUtility.InstantiatePrefab(floorPrefab as GameObject) as GameObject;
+            floorObject = PrefabUtility.InstantiatePrefab(floorPrefab as GameObject, scene) as GameObject;
         }
         floorObject.transform.parent = floorParent.transform;
 
@@ -360,7 +367,7 @@ public class Mesher : MonoBehaviour {
     }
 
 
-    public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname /*Transform holder*/) {
+    public GameObject CreateLineQuad(Sidedef s, float min, float max, string tex, int offsetX, int offsetY, int peg, bool invert, float brightness, bool blocks, string objname /*Transform holder*/, UnityEngine.SceneManagement.Scene scene) {
         if (max - min <= 0)
             return null;
 
@@ -490,10 +497,9 @@ public class Mesher : MonoBehaviour {
         if (distanceBetweenVertices == 0.625f) { wallType = 0; }
         else if (distanceBetweenVertices == 3.375f) { wallType = 1; }
         else if (distanceBetweenVertices == 4) { wallType = 2; }
-        else { Debug.Log("Unrecognized wall type."); }
+        else { /*Debug.Log("Unrecognized wall type.");*/ }
 
         if (s.IsFront) {
-            Debug.Log("doing.");
             if (s.Other == null) { wallType = 1; }
             else if (s.Other.Sector.floorHeight == 0.3125f) { wallType = 2; }
             else if (s.Other.Sector.floorHeight == 0.625f) { wallType = 0; }
@@ -504,21 +510,21 @@ public class Mesher : MonoBehaviour {
 
         // Railing
         if (wallType == 0) {
-            newObject = PrefabUtility.InstantiatePrefab(railingPrefab as GameObject) as GameObject;
+            newObject = PrefabUtility.InstantiatePrefab(railingPrefab as GameObject, scene) as GameObject;
             newObject.transform.parent = wallParent.transform;
             newObjectHeight = 1f;
         }
 
         // Wall
         else if (wallType == 1) {
-            newObject = PrefabUtility.InstantiatePrefab(wallPrefab as GameObject) as GameObject;
+            newObject = PrefabUtility.InstantiatePrefab(wallPrefab as GameObject, scene) as GameObject;
             newObject.transform.parent = railingParent.transform;
             newObjectHeight = 10f;
         }
         
         // Obstacle type
         else if (wallType == 2) {
-            newObject = PrefabUtility.InstantiatePrefab(obstacleSidePrefab as GameObject) as GameObject;
+            newObject = PrefabUtility.InstantiatePrefab(obstacleSidePrefab as GameObject, scene) as GameObject;
             newObject.transform.parent = obstacleParent.transform;
             newObjectHeight = obstacleHeight;
         }

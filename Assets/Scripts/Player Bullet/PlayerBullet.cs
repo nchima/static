@@ -113,7 +113,6 @@ public class PlayerBullet : MonoBehaviour {
     }
 
     public void GetFired(Gun.BulletInfo bulletInfo) {
-
         // Initialize all weapon type variables
         transform.position = bulletInfo.spawnPosition;
         transform.forward = bulletInfo.direction;
@@ -147,11 +146,11 @@ public class PlayerBullet : MonoBehaviour {
     }
 
     public void HandleHit(RaycastHit hit) {
-
         // If this bullet hit an enemy
         if (hit.collider.GetComponent<EnemyOld>() != null || hit.collider.GetComponent<Enemy>() != null) {
             Instantiate(strikeEnemyPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
+            Services.comboManager.PlayerShotEnemy();
             Services.taserManager.PlayerShotEnemy();
 
             if (hit.collider.GetComponent<EnemyOld>() != null) { hit.collider.GetComponent<EnemyOld>().HP -= 1; }
@@ -171,6 +170,7 @@ public class PlayerBullet : MonoBehaviour {
         else if (hit.collider.name.Contains("Weak Point")) {
             Instantiate(strikeWeakPointPrefab, hit.point, Quaternion.LookRotation(Vector3.up));
 
+            Services.comboManager.PlayerShotEnemy();
             Services.taserManager.PlayerShotEnemy();
 
             Services.sfxManager.PlayBulletHitWeakPointSound();
