@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour {
     public int currentEnemyAmt;    // The number of enemies currently alive in this level.
 
     // RANDOM USEFUL STUFF
+    [SerializeField] private int maxFrameRate = 21;
     public bool isGameStarted = false;
     Vector3 initialGravity;
     const float PAUSE_INPUT_COOLDOWN = 0.2f;
@@ -57,6 +58,10 @@ public class GameManager : MonoBehaviour {
         Services.finalCamera = GameObject.Find("Final Camera").GetComponent<Camera>();
         Services.taserManager = GetComponentInChildren<TaserManager>();
         Services.screenShakeManager = GetComponentInChildren<ScreenShakeManager>();
+
+        // Limit FPS
+        QualitySettings.vSyncCount = 0;
+        Application.targetFrameRate = maxFrameRate;
     }
 
     private void OnEnable() {
@@ -103,6 +108,11 @@ public class GameManager : MonoBehaviour {
         pauseInputCooldownTimer += Time.unscaledDeltaTime;
         if (!isGamePaused && InputManager.pauseButtonDown && isGameStarted && !Services.healthManager.PlayerIsDead && pauseInputCooldownTimer >= PAUSE_INPUT_COOLDOWN) {
             PauseGame(true);
+        }
+
+        // Limit fps
+        if (Application.targetFrameRate != maxFrameRate) {
+            Application.targetFrameRate = maxFrameRate;
         }
     }
 
