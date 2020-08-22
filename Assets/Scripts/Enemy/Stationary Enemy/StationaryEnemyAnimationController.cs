@@ -39,7 +39,7 @@ public class StationaryEnemyAnimationController : EnemyAnimationController {
         foreach(SkinnedMeshRenderer renderer in baseMeshRenderers) { renderer.SetBlendShapeWeight(0, openTopValue); }
         foreach(SkinnedMeshRenderer renderer in orbMeshRenderers) {
             renderer.SetBlendShapeWeight(0, orbAngerValue);
-            renderer.SetBlendShapeWeight(1, trueBloomValue);
+            //renderer.SetBlendShapeWeight(1, trueBloomValue);
         }
 
         orbParent.transform.LookAt(Services.playerTransform);
