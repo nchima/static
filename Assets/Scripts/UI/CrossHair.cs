@@ -13,8 +13,13 @@ public class CrossHair : MonoBehaviour {
     public FloatRange shakeRange = new FloatRange(0.1f, 0.4f);
     float shakeValue;
 
+    // Not onger in useage: 
     [HideInInspector] public Vector3[] upperWeaponPositions;
     [HideInInspector] public Vector3[] lowerWeaponPositions;
+
+    private Vector3[] sniperPositions;
+    private Vector3[] machineGunPositions;
+    private Vector3[] shotgunPositions;
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerFiredGun>(PlayerFiredGunHandler);
@@ -31,25 +36,44 @@ public class CrossHair : MonoBehaviour {
         m_LineRenderer.useWorldSpace = false;
         //CircleDrawer.Draw(m_LineRenderer, xRadius, yRadius, circleSegments, shakeValue);
 
-        upperWeaponPositions = Services.gun.upperWeapon.CrosshairVectors;
-        lowerWeaponPositions = Services.gun.lowerWeapon.CrosshairVectors;
+        upperWeaponPositions = Services.gun.sniperRifle.CrosshairVectors;
+        lowerWeaponPositions = Services.gun.shotgunWeapon.CrosshairVectors;
+
+        sniperPositions = Services.gun.sniperRifle.CrosshairVectors;
+        machineGunPositions = Services.gun.machineGun.CrosshairVectors;
+        shotgunPositions = Services.gun.shotgunWeapon.CrosshairVectors;
 
         shakeValue = shakeRange.min;
     }
 
     int lastPositionCount = 0;
     private void Update() {
+        Vector3[] lowerVertices, upperVertices;
+        float gunValue;
+        if (GunValueManager.currentValue < 0) {
+            lowerVertices = shotgunPositions;
+            upperVertices = machineGunPositions;
+            gunValue = MyMath.Map(GunValueManager.currentValue, -1, 0, 0, 1);
+        }
+        else {
+            lowerVertices = machineGunPositions;
+            upperVertices = sniperPositions;
+            gunValue = GunValueManager.currentValue;
+        }
+
         // Draw the crosshair:
-        int positionCount = Mathf.FloorToInt(GunValueManager.MapTo(lowerWeaponPositions.Length, upperWeaponPositions.Length));
+        Debug.Log("vertexas: " + upperVertices.Length);
+        int positionCount = Mathf.FloorToInt(MyMath.Map(gunValue, 0, 1, lowerVertices.Length, upperVertices.Length));
+        Debug.Log("positin cunt: " + positionCount);
         Vector3[] positions = new Vector3[positionCount];
         m_LineRenderer.positionCount = positionCount;
 
         for (int i = 0; i < positions.Length; i++) {
             Vector3 newPosition = Vector3.zero;
 
-            int upperVectorIndex = Mathf.FloorToInt(MyMath.Map(i, 0, positions.Length, 0, upperWeaponPositions.Length));
-            int lowerVectorIndex = Mathf.FloorToInt(MyMath.Map(i, 0, positions.Length, 0, lowerWeaponPositions.Length));
-            newPosition = Vector3.Lerp(lowerWeaponPositions[lowerVectorIndex], upperWeaponPositions[upperVectorIndex], GunValueManager.MapTo(0f, 1f));
+            int upperVectorIndex = Mathf.FloorToInt(MyMath.Map(i, 0, positions.Length, 0, upperVertices.Length));
+            int lowerVectorIndex = Mathf.FloorToInt(MyMath.Map(i, 0, positions.Length, 0, lowerVertices.Length));
+            newPosition = Vector3.Lerp(lowerVertices[lowerVectorIndex], upperVertices[upperVectorIndex], gunValue);
             newPosition.x += Random.Range(-shakeValue, shakeValue);
             newPosition.z += Random.Range(-shakeValue, shakeValue);
 
