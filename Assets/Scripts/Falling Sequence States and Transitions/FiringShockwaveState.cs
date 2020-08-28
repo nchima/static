@@ -6,6 +6,8 @@ using DG.Tweening;
 
 public class FiringShockwaveState : State {
 
+    float sloMoDuration = 0f;
+
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
@@ -39,7 +41,9 @@ public class FiringShockwaveState : State {
         fallingSequenceManager.timesMissedLevel = 0;
         Services.uiManager.landOnLevelScreen.SetActive(false);
 
-        fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, Services.gun.burstsPerSecondSloMoModifierMax);
+        sloMoDuration = GunValueManager.MapTo(0f, 0.25f);
+        GetComponent<WaitForSecondsTransition>().duration = sloMoDuration;
+        fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, Services.gun.burstsPerSecondSloMoModifierMax, sloMoDuration);
     }
 
     public override void Run(StateController stateController) {
@@ -50,7 +54,8 @@ public class FiringShockwaveState : State {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        Services.timeScaleManager.ReturnToFullSpeed();
+        Debug.Log("slomodur: " + sloMoDuration);
+        Services.timeScaleManager.ReturnToFullSpeed(sloMoDuration);
         Services.musicManager.ExitFallingSequence();
         Services.musicManager.RandomizeAllMusicVolumeLevels();
 

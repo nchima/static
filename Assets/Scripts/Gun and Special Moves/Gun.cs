@@ -42,6 +42,8 @@ public class Gun : MonoBehaviour {
 
     [HideInInspector] public float burstsPerSecondSloMoModifierCurrent = 1f;
 
+    [HideInInspector] public bool fireOnEveryMouseDown = false;
+
     // USED DURING SHOOTING
     public int BulletsPerBurst {
         //get { return Mathf.RoundToInt(CombineWeaponValue(upperWeapon.bulletsPerBurst.maxValue, lowerWeapon.bulletsPerBurst.maxValue)); }
@@ -104,6 +106,7 @@ public class Gun : MonoBehaviour {
 
     void Update() {
         timeSinceLastShot += Time.deltaTime;
+        if (fireOnEveryMouseDown && InputManager.fireButtonDown) { timeSinceLastShot = 1000f; }
         if (InputManager.fireButton) { FireBurst(); }
     }
 

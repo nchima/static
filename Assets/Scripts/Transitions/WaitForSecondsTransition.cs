@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class WaitForSecondsTransition : Transition {
 
-    [SerializeField] float duration = 0f;
+    [SerializeField] public float duration = 0f;
     float elapsed = 0f;
 
     public override void Initialize() {

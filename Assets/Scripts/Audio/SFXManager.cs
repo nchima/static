@@ -13,6 +13,9 @@ public class SFXManager : MonoBehaviour {
     [SerializeField] AudioSource playerWasHurtAudioSource;
     [SerializeField] AudioSource taserShockAudioSource;
 
+    private float volume = 1f;
+    private float volumeSliderValue = 1f;
+
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasTased>(PlayerWasTasedHandler);
@@ -49,9 +52,15 @@ public class SFXManager : MonoBehaviour {
         bulletHitWeakPointAudioSource.Play();
     }
 
-    public void SetVolume(float value) {
+    public void SetVolumeSliderValue(float value) {
         value = Mathf.Clamp01(value);
-        sfxMasterMixer.SetFloat("Master Volume", sfxMasterVolumeRange.MapTo(value, 0f, 1f));
+        volumeSliderValue = value;
+        SetVolume(volume);
+    }
+
+    public void SetVolume(float value) {
+        volume = Mathf.Clamp01(value);
+        sfxMasterMixer.SetFloat("Master Volume", sfxMasterVolumeRange.MapTo(volume * volumeSliderValue, 0f, 1f));
     }
 
     public void PlayerWasHurtHandler(GameEvent gameEvent) {

@@ -87,13 +87,12 @@ public class OptionsScreen : MonoBehaviour {
 
 
     public void MasterVolumeChanged() {
-        Services.musicManager.masterVolumeMax = masterVolumeSlider.value;
-        Services.musicManager.SetMasterVolume(masterVolumeSlider.value);
+        Services.musicManager.SetMasterVolumeSliderValue(masterVolumeSlider.value);
         masterVolumeSlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(masterVolumeSlider.value, numericalValueDecimalPlaces).ToString();
     }
 
     public void MusicVolumeChanged() {
-        Services.musicManager.SetMusicVolume(musicVolumeSlider.value);
+        Services.musicManager.SetMusicVolumeSliderValue(musicVolumeSlider.value);
         musicVolumeSlider.GetComponentInChildren<Text>().text = MyMath.RoundToDecimalPlaces(musicVolumeSlider.value, numericalValueDecimalPlaces).ToString();
     }
 

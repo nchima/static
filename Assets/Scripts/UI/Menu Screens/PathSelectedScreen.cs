@@ -70,8 +70,8 @@ public class PathSelectedScreen : MonoBehaviour {
 
         Debug.Log("Upper Bonus: " + upperBonus.ToString() + ". Lower Bonus: " + lowerBonus.ToString());
 
-        upperBranchIcon.transform.Find("Bonus Description").GetComponent<Text>().text = GetBonusTypeDescription(upperBonus, true);
-        lowerBranchIcon.transform.Find("Bonus Description").GetComponent<Text>().text = GetBonusTypeDescription(lowerBonus, false);
+        //upperBranchIcon.transform.Find("Bonus Description").GetComponent<Text>().text = GetBonusTypeDescription(upperBonus, true);
+        //lowerBranchIcon.transform.Find("Bonus Description").GetComponent<Text>().text = GetBonusTypeDescription(lowerBonus, false);
 
         selectedBranchIndex = Random.Range(0, 2);
         HighlightPath(selectedBranchIndex, false);

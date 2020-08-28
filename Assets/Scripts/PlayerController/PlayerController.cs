@@ -255,9 +255,18 @@ public class PlayerController : MonoBehaviour {
         
         // Handle air movement.
         else if (state == State.Falling || state == State.SpeedFalling) {
-            if (desiredMove == Vector3.zero) { m_Rigidbody.velocity = new Vector3(0f, m_Rigidbody.velocity.y, 0f); }
-            else { m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * maxAirSpeed * Time.fixedDeltaTime); }
-            m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, 1400f);
+            if (desiredMove == Vector3.zero) {
+                m_Rigidbody.velocity = new Vector3(0f, m_Rigidbody.velocity.y, 0f);
+            }
+            else {
+                float tempAirSpeed = GunValueManager.MapTo(maxAirSpeed, 50f);
+                m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * tempAirSpeed * Time.fixedDeltaTime);
+            }
+
+            float tempFallingSpeed = GunValueManager.MapTo(200f, 1400f);
+
+            //m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, 1400f);
+            m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, -tempFallingSpeed, m_Rigidbody.velocity.z);
         }
         
         // Handle shotgun charge movement.

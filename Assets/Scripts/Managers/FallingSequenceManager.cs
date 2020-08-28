@@ -105,15 +105,17 @@ public class FallingSequenceManager : StateController {
         }
     }
 
-    public void InstantiateShockwave(GameObject prefab, float gunRate) {
+    public void InstantiateShockwave(GameObject prefab, float gunRate, float duration) {
         // Begin tweening the time scale towards slow-motion. (Also lower music pitch.)
-        Services.timeScaleManager.TweenTimeScale(0.1f, 0.1f);
-        Services.musicManager.PitchDownMusicForSlowMotion();
+        Services.timeScaleManager.TweenTimeScale(0.1f, duration * 0.4f);
+
+        Services.musicManager.PitchDownMusicForSlowMotion(duration);
 
         // Re-enable gun and begin tweening its burst rate to quick-fire. (This allows the player to fire more quickly during slow motion.
         Services.gun.canShoot = true;
+        Services.gun.fireOnEveryMouseDown = true;
         DOTween.To
-            (() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, 0.1f).SetEase(Ease.InQuad).SetUpdate(true);
+            (() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, duration * 0.4f).SetEase(Ease.InQuad).SetUpdate(true);
 
         Services.specialMoveManager.canShoot = true;
 
@@ -124,7 +126,7 @@ public class FallingSequenceManager : StateController {
 
     public void SetUpFallingVariables() {
         // In case the game is currently running in slow motion, return to full speed.
-        if (!Services.timeScaleManager.IsAtFullSpeed) { Services.timeScaleManager.ReturnToFullSpeed(); }
+        if (!Services.timeScaleManager.IsAtFullSpeed) { Services.timeScaleManager.ReturnToFullSpeed(1f); }
 
         // If the player is not currently set to falling state, set them to that state.
         if (Services.playerController.state != PlayerController.State.SpeedFalling) {

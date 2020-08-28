@@ -22,7 +22,12 @@ public class MusicManager : MonoBehaviour {
 
     [HideInInspector] public float masterVolumeMax = 1;
 
-    public enum State { MainMenu, Normal, SpeedFall, FallingSequence, DashCharging, Dashing, GettingTased }
+    [HideInInspector] private float masterVolume = 1;
+    [HideInInspector] private float masterVolumeSliderValue = 1;
+    [HideInInspector] private float musicVolume = 1;
+    [HideInInspector] private float musicVolumeSliderValue = 1;
+
+    public enum State { MainMenu, Normal, SpeedFall, FallingSequence, DashCharging, Dashing, GettingTased, Nothing }
     public State state = State.MainMenu;
 
     int tracksPerLayer = 2;
@@ -46,6 +51,9 @@ public class MusicManager : MonoBehaviour {
         musicDebugStates[0] = new MusicDebugState(0f, 0f);
         musicDebugStates[1] = new MusicDebugState(1f, 0f);
         musicDebugStates[2] = new MusicDebugState(0f, 1f);
+
+        SetMasterVolume(masterVolume);
+        SetMusicVolume(musicVolume);
     }
 
     private void Update() {
@@ -70,7 +78,15 @@ public class MusicManager : MonoBehaviour {
                 SetMusicVolume(0.2f);
                 break;
 
+            case State.FallingSequence:
+                float newPitch = GunValueManager.MapTo(0.5f, 3f);
+                SetAllAudioSourcePitch(newPitch, 0f);
+                break;
+
             case State.SpeedFall:
+                break;
+
+            case State.Nothing:
                 break;
         }
 
@@ -100,7 +116,7 @@ public class MusicManager : MonoBehaviour {
 
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);
-        masterMixer.SetFloat("Pitch", 0.5f);
+        //masterMixer.SetFloat("Pitch", 0.5f);
         musicMasterMixer.SetFloat("Master Volume", -5f);
         RandomizeAllMusicVolumeLevels();
         state = State.FallingSequence;
@@ -207,17 +223,23 @@ public class MusicManager : MonoBehaviour {
         }
     }
 
-    public void ReturnMusicPitchToFullSpeed() {
-        SetAllAudioSourcePitch(1f, 1f);
+    public void ReturnMusicPitchToFullSpeed(float duration) {
+        SetAllAudioSourcePitch(1f, duration);
     }
 
-    public void PitchDownMusicForSlowMotion() {
-        SetAllAudioSourcePitch(0.1f, 0.1f);
+    public void PitchDownMusicForSlowMotion(float duration) {
+        state = State.Nothing;
+        SetAllAudioSourcePitch(0.1f, duration * 0.4f);
     }
 
     void SetAllAudioSourcePitch(float pitch, float duration) {
         foreach (AudioSource audioSource in FindObjectsOfType<AudioSource>()) {
-            audioSource.DOPitch(pitch, duration).SetUpdate(true);
+            if (duration == 0) {
+                audioSource.pitch = pitch;
+            }
+            else {
+                audioSource.DOPitch(pitch, duration).SetUpdate(true);
+            }
         }
     }
 
@@ -238,14 +260,24 @@ public class MusicManager : MonoBehaviour {
         musicAudioSource.Play();
     }
 
+    public void SetMasterVolumeSliderValue(float value) {
+        masterVolumeSliderValue = Mathf.Clamp01(value);
+        SetMasterVolume(masterVolume);
+    }
+
     public void SetMasterVolume(float value) {
-        value = Mathf.Clamp(value, 0f, masterVolumeMax);
-        masterMixer.SetFloat("Master Volume", masterVolumeRange.MapTo(value, 0f, 1f));
+        masterVolume = Mathf.Clamp(value, 0f, 1f);
+        masterMixer.SetFloat("Master Volume", masterVolumeRange.MapTo(masterVolume * masterVolumeSliderValue, 0f, 1f));
+    }
+
+    public void SetMusicVolumeSliderValue(float value) {
+        musicVolumeSliderValue = Mathf.Clamp01(value);
+        SetMusicVolume(musicVolume);
     }
 
     public void SetMusicVolume(float value) {
-        value = Mathf.Clamp01(value);
-        musicMasterMixer.SetFloat("Master Volume", musicMasterVolumeRange.MapTo(value, 0f, 1f));
+        musicVolume = Mathf.Clamp01(value);
+        musicMasterMixer.SetFloat("Master Volume", musicMasterVolumeRange.MapTo(musicVolume * musicVolumeSliderValue, 0f, 1f));
     }
 
     class MusicDebugState {

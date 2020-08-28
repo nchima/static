@@ -27,15 +27,21 @@ public class TimeScaleManager : MonoBehaviour {
             Time.timeScale = memorizedTimeScale;
         }
     }
+
+    private void ResetGunFiring() {
+        Services.gun.fireOnEveryMouseDown = false;
+    }
     
-    public void ReturnToFullSpeed() {
-        TweenTimeScale(normalTimeScale, 1f);
-        DOTween.To(() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, 1f, 1f).SetEase(Ease.InQuad).SetUpdate(true);
-        Services.musicManager.ReturnMusicPitchToFullSpeed();
+    public void ReturnToFullSpeed(float duration) {
+        Invoke("ResetGunFiring", duration);
+        TweenTimeScale(normalTimeScale, duration);
+        DOTween.To(() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, 1f, duration).SetEase(Ease.InQuad).SetUpdate(true);
+        Services.musicManager.ReturnMusicPitchToFullSpeed(duration);
     }
 
     public void TweenTimeScale(float targetValue, float duration) {
         if (timeScaleTween != null) { timeScaleTween.Kill(); }
+        Debug.Log(duration);
         timeScaleTween = DOTween.To(() => Time.timeScale, x => Time.timeScale = x, targetValue, duration).SetEase(Ease.InQuad).SetUpdate(true);
     }
 }

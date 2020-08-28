@@ -62,9 +62,7 @@ public class CrossHair : MonoBehaviour {
         }
 
         // Draw the crosshair:
-        Debug.Log("vertexas: " + upperVertices.Length);
         int positionCount = Mathf.FloorToInt(MyMath.Map(gunValue, 0, 1, lowerVertices.Length, upperVertices.Length));
-        Debug.Log("positin cunt: " + positionCount);
         Vector3[] positions = new Vector3[positionCount];
         m_LineRenderer.positionCount = positionCount;
 

@@ -17,7 +17,8 @@ public class FallIntoLevelState : State {
         Services.levelManager.SetFloorCollidersActive(true);
         Services.fieldOfViewController.SetClearVeilActive(true);
         Services.fieldOfViewController.ActivateCameraClearing(true);
-        // Services.colorPaletteManager.LoadFallingSequencePalette();
+        Services.musicManager.EnterFallingSequence();
+        Services.colorPaletteManager.LoadFallingSequencePalette();
         fallingSequenceManager.SetUpFallingVariables();
     }
 
@@ -25,10 +26,10 @@ public class FallIntoLevelState : State {
         base.Run(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        if (InputManager.fireButtonDown && !fallingSequenceManager.isSpeedFallActive || speedFallTrigger) {
-            BeginSpeedFall(stateController);
-            speedFallTrigger = false;
-        }
+        //if (InputManager.fireButtonDown && !fallingSequenceManager.isSpeedFallActive || speedFallTrigger) {
+        //    BeginSpeedFall(stateController);
+        //    speedFallTrigger = false;
+        //}
 
         if (Services.levelManager.isLevelCompleted) {
             if (Services.playerTransform.position.y <= 1450f && (Services.uiManager.levelCompleteScreen.activeInHierarchy || Services.uiManager.nowEnteringScreen.activeInHierarchy)) {
