@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 using DG.Tweening;
+using System.IO;
 
 public class MusicManager : MonoBehaviour {
 
@@ -109,6 +110,19 @@ public class MusicManager : MonoBehaviour {
             currentSpeedClip = nextSpeedClip;
         }
 #endif
+
+        if (Input.GetKeyDown(KeyCode.P)) {
+            StartCoroutine(LoadTestMusicCo());
+        }
+    }
+
+    private WWW www;
+    IEnumerator LoadTestMusicCo() {
+        www = new WWW("file://" + Path.Combine(Application.streamingAssetsPath, "testMusic.wav"));
+        yield return new WaitUntil(()=>{ return www.isDone; });
+        transform.Find("New Music").GetComponent<AudioSource>().clip = www.GetAudioClip();
+        transform.Find("New Music").GetComponent<AudioSource>().Play();
+        yield return null;
     }
 
     public void EnterFallingSequence() {
