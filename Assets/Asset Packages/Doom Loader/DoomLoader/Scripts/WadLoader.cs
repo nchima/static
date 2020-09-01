@@ -44,6 +44,8 @@ public class WadLoader : MonoBehaviour
         if (!string.IsNullOrEmpty(autoloadMapName))
             if (MapLoader.Instance.Load(autoloadMapName))
             {
+                scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+                Debug.Log(scene);
                 Mesher.Instance.CreateMeshes(wadName, scene);
 
                 //MapLoader.Instance.ApplyLinedefBehavior();
