@@ -49,4 +49,11 @@ namespace GameEvents {
     public class Bullseye : GameEvent {
         public Bullseye() { }
     }
+
+    public class EnableFeet : GameEvent {
+        public bool value;
+        public EnableFeet(bool value) {
+            this.value = value;
+        }
+    }
 }

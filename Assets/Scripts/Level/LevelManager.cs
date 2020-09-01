@@ -251,6 +251,8 @@ public class LevelManager : MonoBehaviour {
             }
         }
 
+        GameEventManager.instance.FireEvent(new GameEvents.EnableFeet(Services.gameManager.feetEnabled));
+
         loadingSequenceFinishedTrigger = true;
 
         yield return null;

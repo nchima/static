@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour {
     Vector3 initialGravity;
     const float PAUSE_INPUT_COOLDOWN = 0.2f;
     float pauseInputCooldownTimer = 0.2f;
+    [SerializeField] public bool feetEnabled;
 
 
     void Awake() {
@@ -86,6 +87,10 @@ public class GameManager : MonoBehaviour {
             }
         }
 #endif
+
+        if (feetEnabled) {
+            GameEventManager.instance.FireEvent(new GameEvents.EnableFeet(true));
+        }
     }
 
     public void LoadGame() {
