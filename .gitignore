@@ -7,3 +7,6 @@ Assembly-CSharp-Editor.csproj
 Assembly-CSharp.csproj
 NavMeshComponents.sln
 NavMeshComponents.userprefs
+static.csproj
+static.Editor.csproj
+static.Plugins.csproj
