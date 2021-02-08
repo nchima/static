@@ -259,7 +259,9 @@ public class PlayerController : MonoBehaviour {
                 m_Rigidbody.velocity = new Vector3(0f, m_Rigidbody.velocity.y, 0f);
             }
             else {
-                float tempAirSpeed = GunValueManager.MapTo(maxAirSpeed, 50f);
+                // Enable the following line to have air speed be based on gun value
+                // float tempAirSpeed = GunValueManager.MapTo(maxAirSpeed, 50f);
+                float tempAirSpeed = maxAirSpeed;
                 m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * tempAirSpeed * Time.fixedDeltaTime);
             }
 
