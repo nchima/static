@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ObjectPooler : MonoBehaviour {
 
-    [SerializeField] GameObject objectPrefab;
+    [SerializeField] public GameObject objectPrefab;
     [SerializeField] int startingNumber = 1000;
     GameObject[] objects;
     int index;

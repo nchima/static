@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 public class FallIntoLevelState : State {
 
     public bool speedFallTrigger = false;
+    int speedFallInputFrames;
 
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
@@ -20,16 +21,29 @@ public class FallIntoLevelState : State {
         Services.musicManager.EnterFallingSequence();
         Services.colorPaletteManager.LoadFallingSequencePalette();
         fallingSequenceManager.SetUpFallingVariables();
+        speedFallInputFrames = 5;
+        GameEventManager.instance.FireEvent(new GameEvents.FallingSequenceStarted());
     }
 
     public override void Run(StateController stateController) {
         base.Run(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        //if (InputManager.fireButtonDown && !fallingSequenceManager.isSpeedFallActive || speedFallTrigger) {
-        //    BeginSpeedFall(stateController);
-        //    speedFallTrigger = false;
-        //}
+        if (speedFallInputFrames > 0)
+        {
+            speedFallInputFrames--;
+        }
+        else
+        {
+            // If the game is set up to activate speed fall on a button press, do that
+            if (Services.playerController.fallSpeedControlType == PlayerController.FallSpeedControlType.Button)
+            {
+                if (InputManager.fireButtonDown && !fallingSequenceManager.isSpeedFallActive || speedFallTrigger) {
+                    BeginSpeedFall(stateController);
+                    speedFallTrigger = false;
+                }
+            }
+        }
 
         if (Services.levelManager.isLevelCompleted) {
             if (Services.playerTransform.position.y <= 1450f && (Services.uiManager.levelCompleteScreen.activeInHierarchy || Services.uiManager.nowEnteringScreen.activeInHierarchy)) {

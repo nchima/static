@@ -96,6 +96,7 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
     }
 
     private void OnDisable() {
@@ -106,6 +107,7 @@ public class ComboManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
     }
 
     private void Awake() {
@@ -298,13 +300,13 @@ public class ComboManager : MonoBehaviour {
         comboFinishersVisible = value;
     }
 
-    public void PlayerUsedFallThroughFloorMove() {
-        comboTimer = MAX_COMBO_TIME;
-        HangTimer += FALL_THROUGH_FLOOR_HANG_TIME;
-    }
-
     public void PlayerShotEnemy() {
         BulletHangTimer += bulletHitHangTime;
+    }
+
+    public void PlayerUsedFallThroughFloorMoveHandler(GameEvent gameEvent) {
+        comboTimer = MAX_COMBO_TIME;
+        HangTimer += FALL_THROUGH_FLOOR_HANG_TIME;
     }
 
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {

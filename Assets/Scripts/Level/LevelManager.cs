@@ -52,11 +52,15 @@ public class LevelManager : MonoBehaviour {
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
 
         if (currentBranchNode != null) {
             currentBranchNode.levelSet.levelsCompleted = 0;
@@ -67,6 +71,18 @@ public class LevelManager : MonoBehaviour {
         chosenPaths.Clear();
         LoadNextLevel();
         SetEnemiesAIActive(true);
+    }
+
+    public void PlayerUsedFallThroughFloorMoveHandler(GameEvent gameEvent) {
+        SetFloorCollidersActive(false);
+    }
+
+    public void PlayerUsedSpecialMoveHandler(GameEvent gameEvent) {
+        bool deactivateFloor = Services.specialMoveManager.specialMoveMode == SpecialMoveManager.SpecialMoveMode.ActivateFallingSequence;
+        deactivateFloor &= !(Services.fallingSequenceManager.GetCurrentState() is FallIntoLevelState);
+        if (deactivateFloor) {
+            SetFloorCollidersActive(false);
+        }
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
@@ -252,6 +268,7 @@ public class LevelManager : MonoBehaviour {
         }
 
         GameEventManager.instance.FireEvent(new GameEvents.EnableFeet(Services.gameManager.feetEnabled));
+        GameEventManager.instance.FireEvent(new GameEvents.LevelLoaded());
 
         loadingSequenceFinishedTrigger = true;
 

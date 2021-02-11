@@ -41,7 +41,7 @@ public class TimeScaleManager : MonoBehaviour {
 
     public void TweenTimeScale(float targetValue, float duration) {
         if (timeScaleTween != null) { timeScaleTween.Kill(); }
-        Debug.Log(duration);
+        // Debug.Log(duration);
         timeScaleTween = DOTween.To(() => Time.timeScale, x => Time.timeScale = x, targetValue, duration).SetEase(Ease.InQuad).SetUpdate(true);
     }
 }

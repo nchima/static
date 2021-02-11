@@ -13,7 +13,6 @@ public class FiringShockwaveState : State {
 
         Services.uiManager.ShowLevelCompleteScreen(false);
         Services.uiManager.ShowNowEnteringScreen(false);
-        Services.gameManager.CountEnemies();
 
         // Set up bonus time for next level.
         Services.scoreManager.DetermineBonusTime();
@@ -23,9 +22,6 @@ public class FiringShockwaveState : State {
         }
 
         Services.playerTransform.position = new Vector3(Services.playerTransform.position.x, 2.15f, Services.playerTransform.position.z);
-
-        // Begin rotating camera back to regular position.
-        Services.playerTransform.Find("Cameras").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), fallingSequenceManager.lookUpSpeed * 0.6f, RotateMode.Fast);
 
         // Reset movement variables.
         Services.playerTransform.position = new Vector3(Services.playerTransform.position.x, 2.8f, Services.playerTransform.position.z);
@@ -44,6 +40,8 @@ public class FiringShockwaveState : State {
         sloMoDuration = GunValueManager.MapTo(0f, 0.25f);
         GetComponent<WaitForSecondsTransition>().duration = sloMoDuration;
         fallingSequenceManager.InstantiateShockwave(fallingSequenceManager.shockwavePrefab, Services.gun.burstsPerSecondSloMoModifierMax, sloMoDuration);
+
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerLanded());
     }
 
     public override void Run(StateController stateController) {
@@ -54,13 +52,12 @@ public class FiringShockwaveState : State {
         base.End(stateController);
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
 
-        Debug.Log("slomodur: " + sloMoDuration);
+        // Debug.Log("slomodur: " + sloMoDuration);
         Services.timeScaleManager.ReturnToFullSpeed(sloMoDuration);
         Services.musicManager.ExitFallingSequence();
         Services.musicManager.RandomizeAllMusicVolumeLevels();
 
         Services.gun.canShoot = true;
-        Services.specialMoveManager.canShoot = true;
 
         // Allow enemies to start attacking.
         Services.levelManager.SetEnemiesAIActive(true);
@@ -91,5 +88,7 @@ public class FiringShockwaveState : State {
 
         // Reset player fall through floor cooldown
         Services.playerController.fallThroughFloorTimer = 0f;
+
+        GameEventManager.instance.FireEvent(new GameEvents.FallingSequenceFinished());
     }
 }

@@ -22,10 +22,7 @@ public class HealthManager : MonoBehaviour {
     int _currentHealth = 3;
     [HideInInspector] public int CurrentHealth {
         get { return _currentHealth; }
-        set {
-            _currentHealth = value;
-            Debug.Log("current health set to: " + _currentHealth);
-        }
+        set { _currentHealth = value; }
     }
     public int currentMaxHealth = 3;
     float healthRechargeTimer = 0f;
@@ -97,7 +94,7 @@ public class HealthManager : MonoBehaviour {
     }
 
     void UpdateHealthBoxes() {
-        Debug.Log("Updating health boxes. Current health: " + CurrentHealth.ToString() + ". Current max health: " + currentMaxHealth.ToString());
+        // Debug.Log("Updating health boxes. Current health: " + CurrentHealth.ToString() + ". Current max health: " + currentMaxHealth.ToString());
 
         for (int i = 0; i < healthBlocks.Length; i++) {
             if (i >= currentMaxHealth) { healthBlocks[i].BecomeXedOut(); }

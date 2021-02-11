@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class EnemySheatheGrower : MonoBehaviour {
 
-    const float MAX_SCALE_MULTIPLIER = 5f;
+    const float MAX_SCALE_MULTIPLIER = 10f;
     float playerSpawnHeight = 2000f;
     Vector3 originalScale;
-
 
     private void Awake() {
         originalScale = transform.localScale;
     }
-
 
     private void Update() {
         if (Services.fallingSequenceManager.isPlayerFalling) {

@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour {
     // STATE    
     public enum State { Normal, ShotgunCharge, Falling, SpeedFalling, Dashing, GettingTased, Dead }
     public State state;
+    public enum FallSpeedControlType { Mouse, Button }
+    public FallSpeedControlType fallSpeedControlType = FallSpeedControlType.Button;
 
     // INPUT
     Vector2 directionalInput;
@@ -92,7 +94,7 @@ public class PlayerController : MonoBehaviour {
     public static Vector3 currentVelocity;
     Vector3 previousPosition;   // Used to calculate velocity.
     [HideInInspector] public bool skipRotationForThisFrame = false;
-
+    
     private void Awake() {
         m_Rigidbody = GetComponent<Rigidbody>();
         dashCooldownTimer = dashCooldown;
@@ -175,10 +177,11 @@ public class PlayerController : MonoBehaviour {
 
             if (InputManager.dashButtonDown && fallThroughFloorTimer >= fallThroughFloorCooldown) {
                 //Services.comboManager.EndCombo();
-                Services.comboManager.PlayerUsedFallThroughFloorMove();
-                Services.taserManager.PlayerUsedFallThroughFloorMove();
                 //Services.specialBarManager.PlayerUsedSpecialMove();
-                Services.levelManager.SetFloorCollidersActive(false);
+                var newVelocity = m_Rigidbody.velocity;
+                newVelocity.y = -maxFallingSpeed;
+                m_Rigidbody.velocity = newVelocity;
+                GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedFallThroughFloorMove());
             }
         }
 
@@ -265,10 +268,17 @@ public class PlayerController : MonoBehaviour {
                 m_Rigidbody.MovePosition(transform.position + desiredMove.normalized * tempAirSpeed * Time.fixedDeltaTime);
             }
 
-            float tempFallingSpeed = GunValueManager.MapTo(200f, 1400f);
+            switch (fallSpeedControlType)
+            {
+                case FallSpeedControlType.Button:
+                    m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, 1400f);
+                    break;
 
-            //m_Rigidbody.velocity = Vector3.ClampMagnitude(m_Rigidbody.velocity, 1400f);
-            m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, -tempFallingSpeed, m_Rigidbody.velocity.z);
+                case FallSpeedControlType.Mouse:
+                    float tempFallingSpeed = GunValueManager.MapTo(200f, 1400f);
+                    m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, -tempFallingSpeed, m_Rigidbody.velocity.z);
+                    break;
+            }
         }
         
         // Handle shotgun charge movement.

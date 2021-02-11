@@ -69,12 +69,16 @@ public class GameManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     private void Start() {
@@ -122,7 +126,7 @@ public class GameManager : MonoBehaviour {
     }
 
     private bool canShootBeforePause;
-    private bool canUseSpecialBeforePause;
+    // private bool canUseSpecialBeforePause;
     public static bool isGamePaused;
     public void PauseGame(bool value) {
         pauseInputCooldownTimer = 0f;
@@ -132,9 +136,9 @@ public class GameManager : MonoBehaviour {
             Cursor.lockState = CursorLockMode.Confined;
             Cursor.visible = true;
             canShootBeforePause = Services.gun.canShoot;
-            canUseSpecialBeforePause = Services.specialMoveManager.canShoot;
+            // canUseSpecialBeforePause = Services.specialMoveManager.canShoot;
             Services.gun.canShoot = false;
-            Services.specialMoveManager.canShoot = false;
+            // Services.specialMoveManager.canShoot = false;
             isGamePaused = true;
         }
 
@@ -145,7 +149,7 @@ public class GameManager : MonoBehaviour {
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
             Services.gun.canShoot = canShootBeforePause;
-            Services.specialMoveManager.canShoot = canUseSpecialBeforePause;
+            // Services.specialMoveManager.canShoot = canUseSpecialBeforePause;
             isGamePaused = false;
         }
     }
@@ -156,9 +160,15 @@ public class GameManager : MonoBehaviour {
         currentEnemyAmt -= 1;
         if (currentEnemyAmt == 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
             GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
+            Debug.Log("lev compl because of kill");
         }
     }
 
+    public void PlayerLandedHandler(GameEvent gameEvent) {
+        if (currentEnemyAmt == 0) {
+            GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
+        }
+    }
 
     // Maybe move this functionality to various managers at some point.
     public void LevelCompletedHandler(GameEvent gameEvent) {
@@ -169,12 +179,13 @@ public class GameManager : MonoBehaviour {
 
     void DeleteThings() {
         foreach(Pickup pickup in FindObjectsOfType<Pickup>()) { pickup.Delete(); }
-        foreach(PlayerMissile missile in FindObjectsOfType<PlayerMissile>()) { missile.GetDestroyed(); }
+        foreach(PlayerMissile missile in FindObjectsOfType<PlayerMissile>()) { missile.Destroy(); }
     }
 
 
     public void CountEnemies() {
         currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        Debug.Log("enemy amt: " + currentEnemyAmt);
     }
 
 
@@ -188,10 +199,12 @@ public class GameManager : MonoBehaviour {
         Services.fallingSequenceManager.SetUpFallingVariables();
         Services.scoreManager.UpdateHighScoreDisplay();
         Physics.gravity = initialGravity;   // Move to gravity manager
-        FindObjectOfType<FallIntoLevelState>().speedFallTrigger = true;
         isGameStarted = true;
     }
 
+    public void LevelLoadedHandler(GameEvent gameEvent) {
+        CountEnemies();
+    }
 
     public void RestartGame() {
         SceneManager.LoadScene(0, LoadSceneMode.Single);

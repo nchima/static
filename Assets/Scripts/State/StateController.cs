@@ -33,4 +33,8 @@ public class StateController : MonoBehaviour {
     protected void ReturnToInitialState() {
         TransitionToState(initialState);
     }
+
+    public State GetCurrentState() {
+        return currentState;
+    }
 }

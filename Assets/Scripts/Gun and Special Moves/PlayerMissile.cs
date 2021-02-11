@@ -24,6 +24,7 @@ public class PlayerMissile : MonoBehaviour {
     [SerializeField] private GameObject explosionPrefab;
     [SerializeField] private GameObject lockOnTrigger;
     [SerializeField] private GameObject sphereVisuals;
+    [SerializeField] private GameObject markerPrefab;
 
 
     /* PRIVATE VARIALBES */
@@ -54,6 +55,7 @@ public class PlayerMissile : MonoBehaviour {
     private Vector3 lockOnTarget;
     private Vector3 initialTargetPosition;
     private float lockOnDistance = 15f;
+    private Vector3 landingPosition;
 
     // Perlin noise
     float noiseOffsetX;
@@ -80,7 +82,8 @@ public class PlayerMissile : MonoBehaviour {
     }
 
 
-    public void GetFired() {
+    public void Fire() {
+
         // Set up variables modified by player's gun value.
         initialSpeed = GunValueManager.MapToFloatRange(initialSpeedRange);
         turnSpeed = GunValueManager.MapToFloatRange(turnSpeedRange);
@@ -92,6 +95,7 @@ public class PlayerMissile : MonoBehaviour {
         spreadX = GunValueManager.MapToFloatRange(spreadXRange);
         spreadY = GunValueManager.MapToFloatRange(spreadYRange);
         decelerationOverLifetimeMultiplier = GunValueManager.MapToFloatRange(decelerationOverLifetimeMultiplierRange);
+        lifetimeTimer = 0f;
 
         // Get random rotation
         RotateMesh();
@@ -130,30 +134,52 @@ public class PlayerMissile : MonoBehaviour {
 
         transform.Rotate(new Vector3(-upwardTilt + Random.Range(-spreadY, spreadY), Random.Range(-spreadX, spreadX), 0f));
         velocity = initialDirection * initialSpeed;
+
+        // If the special move mode is the one where you fire missiles while falling, add a marker to the ground where we are destined to land.
+        if (Services.specialMoveManager.specialMoveMode == SpecialMoveManager.SpecialMoveMode.ActivateFallingSequence) {
+            // landingPosition = transform.position;
+            // landingPosition.y = 0.5f;
+
+            // GameObject marker = Instantiate(markerPrefab);
+            // marker.transform.position = new Vector3(landingPosition.x, 0.5f, landingPosition.z);
+
+            // transform.position = landingPosition;
+            // Detonate();
+        }
+
+        currentState = State.NotLockedOn;
     }
 
 
     void Update() {
         // Get destroyed if lifetime is expired.
         lifetimeTimer += Time.deltaTime;
-        if (lifetimeTimer >= lifetimeDuration) { GetDestroyed(); }
+        if (lifetimeTimer >= lifetimeDuration) { Destroy(); }
 
         lockonDelayTimer += Time.deltaTime;
 
-        // Update position of lock-on trigger (always keep it at ground level and in front of missile)
-        float lockOnTriggerRadius = lockOnTrigger.GetComponent<SphereCollider>().radius;
-        lockOnTrigger.transform.localPosition = new Vector3(0f, 0f, lockOnTriggerRadius);
-        lockOnTrigger.transform.position = new Vector3(lockOnTrigger.transform.position.x, lockOnTriggerRadius / 4f, lockOnTrigger.transform.position.z);
+        // switch (Services.specialMoveManager.specialMoveMode) {
+        //     case SpecialMoveManager.SpecialMoveMode.FireWhileOnGround:
+                // Update position of lock-on trigger (always keep it at ground level and in front of missile)
+                float lockOnTriggerRadius = lockOnTrigger.GetComponent<SphereCollider>().radius;
+                lockOnTrigger.transform.localPosition = new Vector3(0f, 0f, lockOnTriggerRadius);
+                lockOnTrigger.transform.position = new Vector3(lockOnTrigger.transform.position.x, lockOnTriggerRadius / 4f, lockOnTrigger.transform.position.z);
+                // break;
+
+            // case SpecialMoveManager.SpecialMoveMode.ActivateFallingSequence:
+                // lockOnTrigger.transform.position = landingPosition;
+                // break;
+        // }
 
         // Update desired velocity direction based on current state.
-        switch (currentState) {
-            case State.NotLockedOn:
+        // switch (currentState) {
+        //     case State.NotLockedOn:
                 MoveWithoutTarget();
-                break;
-            case State.LockedOn:
-                SteerTowardsTarget();
-                break;
-        }
+        //         break;
+        //     case State.LockedOn:
+                // SteerTowardsTarget();
+                // break;
+        // }
 
         // Steer towards desired velocity.
         desiredVelocity = desiredVelocity.normalized * maxSpeed;
@@ -171,7 +197,7 @@ public class PlayerMissile : MonoBehaviour {
         velocity *= decelerationOverLifetimeMultiplier;
 
         // Move
-        GetComponent<Rigidbody>().MovePosition(transform.position + velocity * Time.deltaTime);
+        GetComponent<Rigidbody>().velocity = velocity;
         RotateMesh();
 
         // Update perlin noise
@@ -184,10 +210,10 @@ public class PlayerMissile : MonoBehaviour {
         // Steer towards a random direction using perlin noise.
         Vector3 tempTarget = transform.position + initialDirection;
 
-        if (meanderNoise > 0) {
-            tempTarget.y += MyMath.Map(Mathf.PerlinNoise(noiseTimeX + noiseOffsetX, 0f), 0f, 1f, -meanderNoise, meanderNoise);
-            tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -meanderNoise, meanderNoise);
-        }
+        // if (meanderNoise > 0) {
+        //     tempTarget.y += MyMath.Map(Mathf.PerlinNoise(noiseTimeX + noiseOffsetX, 0f), 0f, 1f, -meanderNoise, meanderNoise);
+        //     tempTarget.x += MyMath.Map(Mathf.PerlinNoise(noiseTimeY + noiseOffsetY, 0f), 0f, 1f, -meanderNoise, meanderNoise);
+        // }
 
         desiredVelocity = tempTarget - transform.position;
 
@@ -219,7 +245,7 @@ public class PlayerMissile : MonoBehaviour {
 
 
     // Deletes game object.
-    public void GetDestroyed() {
+    public void Destroy() {
         if (GetComponentInChildren<TrailRenderer>() != null) {
             GameObject trail = Instantiate(GetComponentInChildren<TrailRenderer>().gameObject);
             trail.GetComponent<TrailRenderer>().autodestruct = true;
@@ -237,10 +263,11 @@ public class PlayerMissile : MonoBehaviour {
     }
 
 
-    void OnTriggerEnter(Collider collider) {
+    void OnCollisionEnter(Collision collision) {
+        Collider collider = collision.collider;
         if (collider.tag == "Obstacle" || LayerMask.LayerToName(collider.gameObject.layer).Contains("Floor") || collider.tag == "Wall") /* || (collider.name == "Floor" && collideWithFloor))*/ {
             Detonate();
-            GetDestroyed();
+            Destroy();
         }
 
         else if (collider.tag == "Enemy") {

@@ -63,15 +63,15 @@ public class AnalyticsManager : MonoBehaviour {
 
 
     void LevelCompletedHandler(GameEvent gameEvent) {
-        Analytics.CustomEvent("Level Complete", new Dictionary<string, object> {
-            { "Level name", Services.levelManager.currentlyLoadedLevelData.LevelName },
-            { "Level number", Services.levelManager.CurrentLevelNumber },
-            { "Time spent in level", timeInLevel },
-            { "Damage taken in level", damageTakenInLevel },
-            { "Average tuning value in level", MyMath.Average(tuningValuesLevel) },
-            { "Times special move used in level", timesSpecialMoveUsedInLevel },
-            { "Pickups obtained in level", pickupsObtainedInLevel }
-        });
+        // Analytics.CustomEvent("Level Complete", new Dictionary<string, object> {
+        //     { "Level name", Services.levelManager.currentlyLoadedLevelData.LevelName },
+        //     { "Level number", Services.levelManager.CurrentLevelNumber },
+        //     { "Time spent in level", timeInLevel },
+        //     { "Damage taken in level", damageTakenInLevel },
+        //     { "Average tuning value in level", MyMath.Average(tuningValuesLevel) },
+        //     { "Times special move used in level", timesSpecialMoveUsedInLevel },
+        //     { "Pickups obtained in level", pickupsObtainedInLevel }
+        // });
 
         timeInLevel = 0f;
         damageTakenInLevel = 0;

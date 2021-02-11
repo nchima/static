@@ -50,6 +50,15 @@ public class FieldOfViewController : MonoBehaviour {
         }
     }
 
+    private void OnEnable() {
+        GameEventManager.instance.Subscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
+    }
+
+    private void OnDisable() {
+        GameEventManager.instance.Unsubscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
+    }
     private void Awake() {
         // Go through all cameras in my children and add them to the right array.
         orthographicCams = new List<Camera>();
@@ -117,5 +126,27 @@ public class FieldOfViewController : MonoBehaviour {
         else { newClearFlags = CameraClearFlags.Depth; }
 
         perspectiveCams[0].clearFlags = newClearFlags;
+    }
+
+    private void RotateForFallingSequence() {
+        // Begin rotating player camera to face down.
+        transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast).OnComplete(FireRotationFinishedEvent);
+    }
+
+    private void FireRotationFinishedEvent() {
+        GameEventManager.instance.FireEvent(new GameEvents.PlayerLookedDown());
+    }
+
+    private void RotateOutOfFallingSequence() {
+        // Begin rotating camera back to regular position.
+        Services.playerTransform.Find("Cameras").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), Services.fallingSequenceManager.lookUpSpeed * 0.6f, RotateMode.Fast);
+    }
+
+    public void FallingSequenceStartedHandler(GameEvent gameEvent) {
+        RotateForFallingSequence();
+    }
+
+    public void PlayerLandedHandler(GameEvent gameEvent) {
+        RotateOutOfFallingSequence();
     }
 }

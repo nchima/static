@@ -23,6 +23,26 @@ namespace GameEvents {
         public PlayerUsedSpecialMove() { }
     }
 
+    public class PlayerUsedFallThroughFloorMove : GameEvent {
+        public PlayerUsedFallThroughFloorMove() {}
+    }
+
+    public class PlayerLookedDown : GameEvent {
+        public PlayerLookedDown() {}
+    }
+
+    public class FallingSequenceStarted : GameEvent {
+        public FallingSequenceStarted() {}
+    }
+
+    public class PlayerLanded : GameEvent {
+        public PlayerLanded() {}
+    }
+
+    public class FallingSequenceFinished : GameEvent {
+        public FallingSequenceFinished() {}
+    }
+
     public class PlayerKilledEnemy : GameEvent {
         public int scoreValue;
         public float specialValue;
@@ -50,10 +70,21 @@ namespace GameEvents {
         public Bullseye() { }
     }
 
+    public class LevelLoaded : GameEvent {
+        public LevelLoaded() {}
+    }
+
     public class EnableFeet : GameEvent {
         public bool value;
         public EnableFeet(bool value) {
             this.value = value;
+        }
+    }
+
+    public class NowEnteringScreenActivated : GameEvent {
+        public bool active;
+        public NowEnteringScreenActivated(bool active) {
+            this.active = active;
         }
     }
 }

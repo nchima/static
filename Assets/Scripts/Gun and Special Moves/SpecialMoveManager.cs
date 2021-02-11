@@ -18,25 +18,26 @@ public class SpecialMoveManager : MonoBehaviour {
     [SerializeField] float nearOrthoSize;
     [SerializeField] float middleOrthoSize;
     [SerializeField] float farOrthoSize;
+    [SerializeField] public SpecialMoveMode specialMoveMode;
 
     // References
     [SerializeField] Transform cameraNearPoint;
     [SerializeField] Transform cameraMidPoint;
     [SerializeField] Transform cameraFarPoint;
-    [SerializeField] private GameObject missilePrefab;
     [SerializeField] GameObject specialMoveShieldPrefab;
-    [SerializeField] ObjectPooler missilePooler;
+    [SerializeField] ObjectPooler fireFromGroundMissilePooler;
+    [SerializeField] ObjectPooler fireWhileFallingMissilePooler;
 
     /* OTHER STUF */
     public bool HasAmmo { get { return Services.specialBarManager.BothFirstBarsFull || Services.specialBarManager.ShotsSaved > 0; } }
+    // public bool HasAmmo { get { return true; } } // nice for debugging
 
     int missilesFired = 0;
     float missileTimer;
-    [HideInInspector] public bool isFiringMissiles = false;
+    bool isFiringMissiles = false;
+    private bool fireMissilesWhenFallingTrigger;    // Trigger used to activate the special missiles as soon as the now entering screen disappears
     bool returnCameraTrigger = false;    // Used to exit missile firing state early.
-
     [HideInInspector] public bool canShoot = false;
-   
     Vector3 originalCameraPosition;
     Quaternion originalCameraRotation;
     float originalFOV;
@@ -44,17 +45,49 @@ public class SpecialMoveManager : MonoBehaviour {
     Coroutine cameraMovementCoroutine;
     enum CameraState { Idle, PullingBack, PulledBack, WaitingForMoveToFinish, Returning }
     CameraState cameraState = CameraState.Idle;
+    public enum SpecialMoveMode { FireWhileOnGround, ActivateFallingSequence }
+    private ObjectPooler missilePooler;
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerLookedDown>(PlayerLookedDownHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerLookedDown>(PlayerLookedDownHandler);
     }
 
     public void LevelCompletedHandler(GameEvent gameEvent) {
         returnCameraTrigger = true;
+    }
+
+    public void PlayerLandedHandler(GameEvent gameEvent) {
+        isFiringMissiles = false;
+    }
+
+    public void PlayerLookedDownHandler(GameEvent gameEvent) {
+        if (fireMissilesWhenFallingTrigger) {
+            isFiringMissiles = true;
+            fireMissilesWhenFallingTrigger = false;
+        }
+    }
+
+    private void Awake() {
+        switch (specialMoveMode)
+        {
+            case SpecialMoveMode.ActivateFallingSequence:
+                missilePooler = fireWhileFallingMissilePooler;
+                Destroy(fireFromGroundMissilePooler.gameObject);
+                break;
+
+            case SpecialMoveMode.FireWhileOnGround:
+                missilePooler = fireFromGroundMissilePooler;
+                Destroy(fireWhileFallingMissilePooler.gameObject);
+                break;
+        }
     }
 
     private void Start() {
@@ -68,28 +101,44 @@ public class SpecialMoveManager : MonoBehaviour {
 
         if (cameraState == CameraState.Idle) {
             // See if the player has fired a special move & if so, initialize proper variables.
-            if (InputManager.specialMoveButtonDown && canShoot && !isFiringMissiles && HasAmmo && Services.playerController.state != PlayerController.State.Dead) {
-                //cameraMovementCoroutine = StartCoroutine(MoveCameraToPositionCoroutine(GetCameraPullbackPosition(), GetCameraPullbackRotation().eulerAngles, CameraState.PulledBack));
-                returnCameraTrigger = false;
-                Services.gun.canShoot = false;
-                cameraMovementCoroutine = StartCoroutine(ANewCoroutineToCelebrateWithAllOurFriends());
-                Services.specialBarManager.PlayerUsedSpecialMove();
-                GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedSpecialMove());
+            
+            if (GetIsActivated()) {    
                 missilesFired = 0;
                 missileTimer = 0f;
-                isFiringMissiles = true;
+                returnCameraTrigger = false;
+                GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedSpecialMove());
+                Services.specialBarManager.PlayerUsedSpecialMove();
+            
+                switch (specialMoveMode) {
+                    case SpecialMoveMode.FireWhileOnGround:
+                        // Begin the on-ground firing sequence
+                        //cameraMovementCoroutine = StartCoroutine(MoveCameraToPositionCoroutine(GetCameraPullbackPosition(), GetCameraPullbackRotation().eulerAngles, CameraState.PulledBack));
+                        Services.gun.canShoot = false;
+                        cameraMovementCoroutine = StartCoroutine(FireWhileOnGroundCoroutine());
+                        isFiringMissiles = true;
+                        //cameraState = CameraState.WaitingForMoveToFinish;
+                        break;
 
-                //cameraState = CameraState.WaitingForMoveToFinish;
+                    case SpecialMoveMode.ActivateFallingSequence:
+                        if (Services.fallingSequenceManager.isPlayerFalling) {
+                            isFiringMissiles = true;
+                        }
+                        else {
+                            fireMissilesWhenFallingTrigger = true;
+                        }
+                        break;
+                }
+
             }
         }
 
         // Deprecated:
-        else if (cameraState == CameraState.PullingBack) {
+        // else if (cameraState == CameraState.PullingBack) {
             // Wait for the coroutine to complete.
             //cameraState = CameraState.FollowingMouse;
-        }
+        // }
 
-        else if (cameraState == CameraState.PulledBack) {
+        // else if (cameraState == CameraState.PulledBack) {
             //Services.fieldOfViewController.transform.localPosition = GetCameraPullbackPosition();
             //Services.fieldOfViewController.transform.localRotation = GetCameraPullbackRotation();
 
@@ -103,15 +152,29 @@ public class SpecialMoveManager : MonoBehaviour {
 
             //    cameraState = CameraState.WaitingForMoveToFinish;
             //}
-        }
+        // }
 
         //else if (cameraState == CameraState.WaitingForMoveToFinish) {}
 
         //else if (cameraState == CameraState.Returning) {}
 
-        // Any state:
-        if (isFiringMissiles) {
-            Services.gun.canShoot = false;
+        // Decide whether to fire a missile
+        bool shouldFire = false;
+        switch (specialMoveMode) {
+            case SpecialMoveMode.FireWhileOnGround:
+                shouldFire = isFiringMissiles;
+                break;
+
+            case SpecialMoveMode.ActivateFallingSequence:
+                shouldFire = isFiringMissiles;
+                shouldFire &= Services.fallingSequenceManager.GetCurrentState() is FallIntoLevelState;
+                shouldFire &= missilesFired <= 50;
+                if (missilesFired >= 50) isFiringMissiles = false;
+                break;
+        }
+
+        if (shouldFire) {
+            // Services.gun.canShoot = false;
             FireMissiles();
         }
     }
@@ -154,7 +217,7 @@ public class SpecialMoveManager : MonoBehaviour {
         PlayerMissile newMissile = missilePooler.GrabObject().GetComponent<PlayerMissile>();
         newMissile.transform.position = newPosition;
         newMissile.transform.rotation = Services.gun.tip.rotation;
-        newMissile.GetFired();
+        newMissile.Fire();
     }
 
     IEnumerator MoveCameraToPositionCoroutine(Vector3 position, Vector3 rotation, float fov, float orthoSize, CameraState completionState) {
@@ -169,7 +232,7 @@ public class SpecialMoveManager : MonoBehaviour {
         yield return null;
     }
 
-    IEnumerator ANewCoroutineToCelebrateWithAllOurFriends() {
+    IEnumerator FireWhileOnGroundCoroutine() {
         // Pull camera back.
         float duration = 0.45f;
         Services.fieldOfViewController.transform.DOLocalMove(GetCameraPullbackPosition(), duration).SetEase(Ease.OutExpo);
@@ -275,5 +338,19 @@ public class SpecialMoveManager : MonoBehaviour {
         }
 
         return orthoSize;
+    }
+
+    // Returns true when the player has activated the special move
+    bool GetIsActivated() {
+        bool isActivated;
+        isActivated = !GameManager.isGamePaused;  
+        isActivated &= !isFiringMissiles;
+        isActivated &= HasAmmo;
+        isActivated &= Services.playerController.state != PlayerController.State.Dead;
+        isActivated &= InputManager.specialMoveButtonDown;
+        if (specialMoveMode == SpecialMoveMode.FireWhileOnGround) {
+            isActivated &= !(Services.fallingSequenceManager.GetCurrentState() is FallIntoLevelState);
+        }
+        return isActivated;
     }
 }

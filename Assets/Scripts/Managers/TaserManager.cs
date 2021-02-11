@@ -61,6 +61,7 @@ public class TaserManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
     }
 
     private void OnDisable() {
@@ -71,6 +72,7 @@ public class TaserManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.Bullseye>(BullseyeHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
     }
 
     private void Awake() {
@@ -155,11 +157,6 @@ public class TaserManager : MonoBehaviour {
         yield return null;
     }
 
-    public void PlayerUsedFallThroughFloorMove() {
-        mainTimer = maxTime;
-        HangTimer += fallThroughFloorHangTime;
-    }
-
     public void EpisodeComplete() {
         mainTimer = maxTime;
         HangTimer += episodeCompleteHangTime;
@@ -168,6 +165,11 @@ public class TaserManager : MonoBehaviour {
     public void PlayerShotEnemy() {
         BulletHangTimer += bulletHitHangTime;
         mainTimer += bulletHitBonus;
+    }
+
+    public void PlayerUsedFallThroughFloorMoveHandler(GameEvent gameEvent) {
+        mainTimer = maxTime;
+        HangTimer += fallThroughFloorHangTime;
     }
 
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {

@@ -151,6 +151,7 @@ public class UIManager : MonoBehaviour {
     public void ShowNowEnteringScreen(bool value) {
         nowEnteringScreen.SetActive(value);
         nowEnteringScreen.GetComponent<NowEnteringScreen>().UpdateText();
+        GameEventManager.instance.FireEvent(new GameEvents.NowEnteringScreenActivated(value));
     }
 
     public void ShowGameOverScreen() {

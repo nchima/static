@@ -115,7 +115,8 @@ public class FallingSequenceManager : StateController {
         Services.gun.canShoot = true;
         Services.gun.fireOnEveryMouseDown = true;
         DOTween.To
-            (() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, duration * 0.4f).SetEase(Ease.InQuad).SetUpdate(true);
+            (() => Services.gun.burstsPerSecondSloMoModifierCurrent, x => Services.gun.burstsPerSecondSloMoModifierCurrent = x, gunRate, duration * 0.4f)
+            .SetEase(Ease.InQuad).SetUpdate(true);
 
         Services.specialMoveManager.canShoot = true;
 
@@ -155,9 +156,6 @@ public class FallingSequenceManager : StateController {
         // Turn off fog.
         savedFogColor = RenderSettings.fogColor;
         RenderSettings.fogColor = Color.white;
-
-        // Begin rotating player camera to face down.
-        GameObject.Find("Cameras").transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.75f, RotateMode.Fast);
     }
 
     public void BeginFalling() {
