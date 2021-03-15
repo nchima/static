@@ -56,11 +56,13 @@ public class FallingSequenceManager : StateController {
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerFellOutOfLevel>(PlayerFellOutOfLevelHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerFellOutOfLevel>(PlayerFellOutOfLevelHandler);
     }
 
     protected override void Update() {
@@ -94,7 +96,6 @@ public class FallingSequenceManager : StateController {
         // In case the game is currently running in slow motion, return to full speed.
         if (!Services.timeScaleManager.IsAtFullSpeed) { Services.timeScaleManager.ReturnToFullSpeed(1f); }
 
-        // If the player is not currently set to falling state, set them to that state.
         if (Services.playerController.state != PlayerController.State.SpeedFalling) {
             Services.playerController.state = PlayerController.State.Falling;
         }
@@ -127,13 +128,22 @@ public class FallingSequenceManager : StateController {
         TransitionToState(GetComponentInChildren<FallIntoLevelState>());
     }
 
-    public void LevelLoadedHandler(GameEvent gameEvent) {
+    public void PlayerFellOutOfLevelHandler(GameEvent gameEvent) {
         if (GetCurrentState() is FallIntoLevelState) {
             BeginFalling();
         }
         else {
             fallingTrigger.isTriggerSet = true;
         }
+    }
+
+    public void LevelLoadedHandler(GameEvent gameEvent) {
+        // if (GetCurrentState() is FallIntoLevelState) {
+        //     BeginFalling();
+        // }
+        // else {
+        //     fallingTrigger.isTriggerSet = true;
+        // }
     }
 
     public void GameStartedHandler(GameEvent gameEvent) {

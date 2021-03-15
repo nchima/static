@@ -151,6 +151,7 @@ public class PlayerController : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
         GameEventManager.instance.Subscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerLookedDown>(PlayerLookedDownHandler);
     }
 
     private void OnDisable() {
@@ -159,6 +160,7 @@ public class PlayerController : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerLookedDown>(PlayerLookedDownHandler);
     }
 
     private void Start() {
@@ -234,7 +236,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        if (transform.position.y < -50f && !fellOutOfLevelEventFired) {
+        if (transform.position.y < -5 && !fellOutOfLevelEventFired) {
             GameEventManager.instance.FireEvent(new GameEvents.PlayerFellOutOfLevel());
             fellOutOfLevelEventFired = true;
         }
@@ -494,8 +496,11 @@ public class PlayerController : MonoBehaviour {
 
     public void LevelLoadedHandler(GameEvent gameEvent) {
         m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, -100f, m_Rigidbody.velocity.y);
-        state = PlayerController.State.Falling;
         Services.fallingSequenceManager.isSpeedFallActive = false;
         Services.musicManager.EnterFallingSequence();
+    }
+
+    public void PlayerLookedDownHandler(GameEvent gameEvent) {
+        state = PlayerController.State.Falling;
     }
 }

@@ -51,13 +51,13 @@ public class FieldOfViewController : MonoBehaviour {
     }
 
     private void OnEnable() {
-        GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerFellOutOfLevel>(PlayerFellOutOfLevelHandler);
     }
 
     private void OnDisable() {
-        GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerFellOutOfLevel>(PlayerFellOutOfLevelHandler);
     }
@@ -144,7 +144,7 @@ public class FieldOfViewController : MonoBehaviour {
         Services.playerTransform.Find("Cameras").transform.DOLocalRotate(new Vector3(0f, 0f, 0f), Services.fallingSequenceManager.lookUpSpeed * 0.6f, RotateMode.Fast);
     }
 
-    public void LevelLoadedHandler(GameEvent gameEvent) {
+    public void FallingSequenceStartedHandler(GameEvent gameEvent) {
         RotateForFallingSequence();
     }
 
@@ -153,6 +153,6 @@ public class FieldOfViewController : MonoBehaviour {
     }
 
     public void PlayerFellOutOfLevelHandler(GameEvent gameEvent) {
-        RotateForFallingSequence();
+        // RotateForFallingSequence();
     }
 }

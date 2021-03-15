@@ -13,7 +13,7 @@ public class PauseAfterLevelCompleteFallingState : State {
         Services.playerGameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
         //Services.playerGameObject.GetComponent<Rigidbody>().AddForce(new Vector3(0f, 500f, 0f), ForceMode.Impulse);
         Services.playerController.isMovementEnabled = false;
-        Services.playerController.state = PlayerController.State.Falling;
+        // Services.playerController.state = PlayerController.State.Falling;
         fallingSequenceManager.timesMissedLevel = 0;
     }
 
