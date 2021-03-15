@@ -41,10 +41,12 @@ public class MusicManager : MonoBehaviour {
 
     private void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     private void Start() {
@@ -80,8 +82,10 @@ public class MusicManager : MonoBehaviour {
                 break;
 
             case State.FallingSequence:
-                float newPitch = GunValueManager.MapTo(0.5f, 3f);
-                SetAllAudioSourcePitch(newPitch, 0f);
+                if (Services.playerController.fallSpeedControlType == PlayerController.FallSpeedControlType.Mouse) {
+                    float newPitch = GunValueManager.MapTo(0.5f, 3f);
+                    SetAllAudioSourcePitch(newPitch, 0f);
+                }
                 break;
 
             case State.SpeedFall:
@@ -130,7 +134,8 @@ public class MusicManager : MonoBehaviour {
 
         masterMixer.SetFloat("Lowpass Cutoff Freq", 300f);
         masterMixer.SetFloat("Lowpass Resonance", 6f);
-        //masterMixer.SetFloat("Pitch", 0.5f);
+        // masterMixer.SetFloat("Pitch", 0.5f);
+        SetAllAudioSourcePitch(0.5f, 0.2f);
         musicMasterMixer.SetFloat("Master Volume", -5f);
         RandomizeAllMusicVolumeLevels();
         state = State.FallingSequence;
@@ -151,6 +156,7 @@ public class MusicManager : MonoBehaviour {
         masterMixer.SetFloat("Lowpass Cutoff Freq", 5000f);
         masterMixer.SetFloat("Lowpass Resonance", 3f);
         masterMixer.SetFloat("Pitch", 1f);
+        SetAllAudioSourcePitch(1f, 0.5f);
         state = State.Normal;
     }
 
@@ -272,6 +278,11 @@ public class MusicManager : MonoBehaviour {
         musicMasterMixer.SetFloat("Layer B Volume", -80f);
         musicMasterMixer.SetFloat("Rhythm Volume", -80f);
         musicAudioSource.Play();
+        EnterFallingSequence();
+    }
+
+    public void LevelLoadedHandler(GameEvent gameEvent) {
+        EnterFallingSequence();
     }
 
     public void SetMasterVolumeSliderValue(float value) {

@@ -31,6 +31,10 @@ namespace GameEvents {
         public PlayerLookedDown() {}
     }
 
+    public class PlayerFellOutOfLevel : GameEvent {
+        public PlayerFellOutOfLevel() {}
+    }
+
     public class FallingSequenceStarted : GameEvent {
         public FallingSequenceStarted() {}
     }

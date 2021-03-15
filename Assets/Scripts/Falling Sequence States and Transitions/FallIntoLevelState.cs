@@ -13,12 +13,10 @@ public class FallIntoLevelState : State {
 
     public override void Initialize(StateController stateController) {
         FallingSequenceManager fallingSequenceManager = stateController as FallingSequenceManager;
-        Services.playerTransform.position = fallingSequenceManager.playerSpawnPoint.position;
-        Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Vector3.down * 100f, ForceMode.VelocityChange);
+        // Services.playerGameObject.GetComponent<Rigidbody>().AddForce(Vector3.down * 100f, ForceMode.VelocityChange);
         Services.levelManager.SetFloorCollidersActive(true);
         Services.fieldOfViewController.SetClearVeilActive(true);
         Services.fieldOfViewController.ActivateCameraClearing(true);
-        Services.musicManager.EnterFallingSequence();
         Services.colorPaletteManager.LoadFallingSequencePalette();
         fallingSequenceManager.SetUpFallingVariables();
         speedFallInputFrames = 5;
@@ -45,18 +43,16 @@ public class FallIntoLevelState : State {
             }
         }
 
-        if (Services.levelManager.isLevelCompleted) {
-            if (Services.playerTransform.position.y <= 1450f && (Services.uiManager.levelCompleteScreen.activeInHierarchy || Services.uiManager.nowEnteringScreen.activeInHierarchy)) {
-                Services.uiManager.HideCompleteScreens();
-            }
+        // if (Services.playerTransform.position.y <= 1450f && (Services.uiManager.levelCompleteScreen.activeInHierarchy || Services.uiManager.nowEnteringScreen.activeInHierarchy)) {
+        //     Services.uiManager.HideCompleteScreens();
+        // }
 
-            if (!GameManager.isGamePaused && Services.playerTransform.position.y <= 1400f && !Services.uiManager.nowEnteringScreen.activeInHierarchy) {
-                Services.uiManager.ShowNowEnteringScreen(true);
-            }
+        // if (!GameManager.isGamePaused && Services.playerTransform.position.y <= 1400f && !Services.uiManager.nowEnteringScreen.activeInHierarchy) {
+        //     Services.uiManager.ShowNowEnteringScreen(true);
+        // }
 
-            if (Services.playerTransform.position.y <= 900f && Services.uiManager.nowEnteringScreen.activeInHierarchy) {
-                Services.uiManager.ShowNowEnteringScreen(false);
-            }
+        if (Services.playerTransform.position.y <= 1100f && Services.uiManager.nowEnteringScreen.activeInHierarchy) {
+            Services.uiManager.ShowNowEnteringScreen(false);
         }
 
         // Move the player off of any obstacles they might land on.
@@ -79,7 +75,6 @@ public class FallIntoLevelState : State {
         Services.fieldOfViewController.SetClearVeilActive(false);
         Services.fieldOfViewController.ActivateCameraClearing(false);
         Services.colorPaletteManager.LoadLevelPalette();
-        Services.levelManager.isLevelCompleted = false;
     }
 
     private void BeginSpeedFall(StateController stateController) {

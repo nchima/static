@@ -54,6 +54,7 @@ public class LevelManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
         GameEventManager.instance.Subscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
+        GameEventManager.instance.Subscribe<GameEvents.PlayerFellOutOfLevel>(PlayerFellOutOfLevelHandler);
     }
 
     private void OnDisable() {
@@ -61,6 +62,7 @@ public class LevelManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedFallThroughFloorMove>(PlayerUsedFallThroughFloorMoveHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerUsedSpecialMove>(PlayerUsedSpecialMoveHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.PlayerFellOutOfLevel>(PlayerFellOutOfLevelHandler);
 
         if (currentBranchNode != null) {
             currentBranchNode.levelSet.levelsCompleted = 0;
@@ -85,6 +87,15 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
+    public void PlayerFellOutOfLevelHandler(GameEvent gameEvent) {
+        if (isLevelCompleted) {
+            // Determine whether the player has completed an episode:
+            bool playerCompletedEpisode = currentLevelSet.AllLevelsCompleted;
+            if (playerCompletedEpisode) { StartCoroutine(EpisodeCompleteSequence()); }
+            else { StartCoroutine(LevelCompleteSequence()); }
+        }
+    }
+
     public void LevelCompletedHandler(GameEvent gameEvent) {
         uiSequencedFinishedTrigger = false;
         loadingSequenceFinishedTrigger = false;
@@ -103,12 +114,6 @@ public class LevelManager : MonoBehaviour {
             Services.gameManager.PlayerCompletedGame();
             return;
         }
-
-        // Determine whether the player has completed an episode:
-        bool playerCompletedEpisode = currentLevelSet.AllLevelsCompleted;
-
-        if (playerCompletedEpisode) { StartCoroutine(EpisodeCompleteSequence()); }
-        else { StartCoroutine(LevelCompleteSequence()); }
 
         // Begin loading the next level
         //LoadNextLevel(1f);
@@ -196,13 +201,9 @@ public class LevelManager : MonoBehaviour {
     }
 
     IEnumerator LevelCompleteSequence() {
-        Services.uiManager.ShowLevelCompleteScreen(true);
-        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel, 2f));
-
+        StartCoroutine(LoadLevelCoroutine(currentLevelSet.NextLevel, 0f));
         yield return new WaitForSeconds(1.5f);
-
         uiSequencedFinishedTrigger = true;
-
         yield return null;
     }
 
@@ -267,9 +268,11 @@ public class LevelManager : MonoBehaviour {
             }
         }
 
+
         GameEventManager.instance.FireEvent(new GameEvents.EnableFeet(Services.gameManager.feetEnabled));
         GameEventManager.instance.FireEvent(new GameEvents.LevelLoaded());
 
+        isLevelCompleted = false;
         loadingSequenceFinishedTrigger = true;
 
         yield return null;
@@ -318,8 +321,9 @@ public class LevelManager : MonoBehaviour {
 
     public void SetFloorCollidersActive(bool value) {
         if (!GameObject.Find("Floor Planes")) { return; }
-        Collider[] floorColliders = GameObject.Find("Floor Planes").GetComponentsInChildren<Collider>();
-        foreach (Collider collider in floorColliders) collider.enabled = value;
+        Collider[] floorColliders = GameObject.Find("Floor Planes").GetComponentsInChildren<Collider>(true);
+        // foreach (Collider collider in floorColliders) collider.enabled = value;
+        foreach (Collider collider in floorColliders) collider.gameObject.SetActive(value);
     }
 
     public void LockInLevel() {

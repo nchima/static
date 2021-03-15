@@ -91,9 +91,54 @@ public class PlayerController : MonoBehaviour {
             return returnValue;
         }
     }
+
+        public bool IsWithinLevelBoundsOnXZAxes {
+        get {
+            bool returnValue = false;
+
+            // See if the player is over a floor tile.
+            RaycastHit hit1;
+            RaycastHit hit2;
+            RaycastHit hit3;
+            RaycastHit hit4;
+
+            float colliderRadius = GetComponent<CapsuleCollider>().radius;
+            float distance = 200f;
+
+            // If we didn't find anything, return false.
+            float radiusMod = 0.9f;
+            Vector3 origin1 = transform.position + transform.forward * colliderRadius * radiusMod;
+            Vector3 origin2 = transform.position + transform.forward * -colliderRadius * radiusMod;
+
+            // Test if we're above the floor
+            if (!Physics.Raycast(origin1, Vector3.down, out hit1, distance, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(origin2, Vector3.down, out hit2, distance, (1 << 20 | 1 << 24))) { return false; }
+
+            // Test if we're below the floor
+            if (!Physics.Raycast(origin1, Vector3.up, out hit3, distance, (1 << 20 | 1 << 24))) { return false; }
+            if (!Physics.Raycast(origin2, Vector3.up, out hit4, distance, (1 << 20 | 1 << 24))) { return false; }
+            
+            // If see if any of the raycasts hit the floor
+            bool hitDownward = hit1.transform.name.ToLower().Contains("floor") || hit2.transform.name.ToLower().Contains("floor");
+            bool hitUpward = hit3.transform.name.ToLower().Contains("floor") || hit4.transform.name.ToLower().Contains("floor");
+            if (hitDownward || hitUpward) {
+                returnValue = true;
+            }
+
+            // If it wasn't the floor, return false.
+            else {
+                return false;
+            }
+
+            return returnValue;
+        }
+    }
+
+
     public static Vector3 currentVelocity;
     Vector3 previousPosition;   // Used to calculate velocity.
     [HideInInspector] public bool skipRotationForThisFrame = false;
+    private bool fellOutOfLevelEventFired = false;
     
     private void Awake() {
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -104,12 +149,16 @@ public class PlayerController : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     private void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerWasHurt>(PlayerWasHurtHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.FallingSequenceStarted>(FallingSequenceStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     private void Start() {
@@ -183,6 +232,11 @@ public class PlayerController : MonoBehaviour {
                 m_Rigidbody.velocity = newVelocity;
                 GameEventManager.instance.FireEvent(new GameEvents.PlayerUsedFallThroughFloorMove());
             }
+        }
+
+        if (transform.position.y < -50f && !fellOutOfLevelEventFired) {
+            GameEventManager.instance.FireEvent(new GameEvents.PlayerFellOutOfLevel());
+            fellOutOfLevelEventFired = true;
         }
 
         HandleCursorLocking();
@@ -424,6 +478,10 @@ public class PlayerController : MonoBehaviour {
         movementKickReady = true;
     }
 
+    public void FallingSequenceStartedHandler(GameEvent gameEvent) {
+        fellOutOfLevelEventFired = false;
+    }
+
     public void GameOverHandler(GameEvent gameEvent) {
         m_Rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         state = State.Dead;
@@ -432,5 +490,12 @@ public class PlayerController : MonoBehaviour {
 
     public void GameStartedHandler(GameEvent gameEvent) {
         isMovementEnabled = true;
+    }
+
+    public void LevelLoadedHandler(GameEvent gameEvent) {
+        m_Rigidbody.velocity = new Vector3(m_Rigidbody.velocity.x, -100f, m_Rigidbody.velocity.y);
+        state = PlayerController.State.Falling;
+        Services.fallingSequenceManager.isSpeedFallActive = false;
+        Services.musicManager.EnterFallingSequence();
     }
 }

@@ -9,7 +9,11 @@ public class PlayerTouchedDownTransition : Transition {
         //bool playerGrounded = Physics.Raycast(Services.playerTransform.position, Vector3.down, 7f);
         bool playerGrounded = Services.playerController.isAboveFloor;
         bool playerBelowFloor = Services.playerTransform.position.y <= 0f;
-        if (playerGrounded || (Services.playerTransform.position.y <= 0f && controller.PlayerIsWithinLevelBoundsOnXZAxes)) { return true; } 
-        else { return false; }
+        if (playerGrounded || (playerBelowFloor && Services.playerController.IsWithinLevelBoundsOnXZAxes)) { 
+            return true; 
+        } 
+        else { 
+            return false; 
+        }
     }
 }

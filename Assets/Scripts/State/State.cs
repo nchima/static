@@ -35,6 +35,7 @@ public abstract class State : MonoBehaviour {
         for (int i = 0; i < transitions.Length; i++) {
             if (transitions[i].IsConditionTrue(stateController)) {
                 stateController.TransitionToState(transitions[i].nextState);
+                break;
             }
         }
     }

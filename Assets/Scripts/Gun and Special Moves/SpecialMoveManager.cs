@@ -27,10 +27,15 @@ public class SpecialMoveManager : MonoBehaviour {
     [SerializeField] GameObject specialMoveShieldPrefab;
     [SerializeField] ObjectPooler fireFromGroundMissilePooler;
     [SerializeField] ObjectPooler fireWhileFallingMissilePooler;
+    [SerializeField] bool debugInfiniteAmmo = false;
 
     /* OTHER STUF */
-    public bool HasAmmo { get { return Services.specialBarManager.BothFirstBarsFull || Services.specialBarManager.ShotsSaved > 0; } }
-    // public bool HasAmmo { get { return true; } } // nice for debugging
+    public bool HasAmmo { 
+        get { 
+            if (debugInfiniteAmmo == true) return true;
+            else return Services.specialBarManager.BothFirstBarsFull || Services.specialBarManager.ShotsSaved > 0; 
+        } 
+    }
 
     int missilesFired = 0;
     float missileTimer;

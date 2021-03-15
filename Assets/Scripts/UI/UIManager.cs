@@ -45,11 +45,15 @@ public class UIManager : MonoBehaviour {
     public void OnEnable() {
         GameEventManager.instance.Subscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     public void OnDisable() {
         GameEventManager.instance.Unsubscribe<GameEvents.GameOver>(GameOverHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
+        GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
     public void ShowTitleScreen(bool value) {
@@ -150,8 +154,10 @@ public class UIManager : MonoBehaviour {
 
     public void ShowNowEnteringScreen(bool value) {
         nowEnteringScreen.SetActive(value);
-        nowEnteringScreen.GetComponent<NowEnteringScreen>().UpdateText();
-        GameEventManager.instance.FireEvent(new GameEvents.NowEnteringScreenActivated(value));
+        // GameEventManager.instance.FireEvent(new GameEvents.NowEnteringScreenActivated(value));
+        if (value == true) {
+            nowEnteringScreen.GetComponent<NowEnteringScreen>().UpdateText();
+        }
     }
 
     public void ShowGameOverScreen() {
@@ -203,6 +209,16 @@ public class UIManager : MonoBehaviour {
     public void GameStartedHandler(GameEvent gameEvent) {
         pauseVeil.SetActive(false);
         ShowTitleScreen(false);
+    }
+
+    public void LevelCompletedHandler(GameEvent gameEvent) {
+        ShowNowEnteringScreen(false);
+        ShowLevelCompleteScreen(true);
+    }
+
+    public void LevelLoadedHandler(GameEvent gameEvent) {
+        ShowLevelCompleteScreen(false);
+        ShowNowEnteringScreen(true);
     }
 
     public void SetHealthWarningTemporaryVisibility(bool value) {

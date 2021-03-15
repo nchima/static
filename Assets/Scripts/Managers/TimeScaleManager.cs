@@ -12,8 +12,13 @@ public class TimeScaleManager : MonoBehaviour {
     public bool IsAtFullSpeed { get { return Time.timeScale == normalTimeScale; } }
     bool keepAtZero;
 
+    private void Awake() {
+        Time.timeScale = normalTimeScale;
+    }
+
     private void Update() {
         if (keepAtZero) { Time.timeScale = 0; }
+        // Debug.Log(Time.timeScale);
     }
 
     public void Pause(bool value) {

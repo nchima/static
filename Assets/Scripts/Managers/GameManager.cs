@@ -69,7 +69,6 @@ public class GameManager : MonoBehaviour {
         GameEventManager.instance.Subscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Subscribe<GameEvents.GameStarted>(GameStartedHandler);
-        GameEventManager.instance.Subscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
         GameEventManager.instance.Subscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
@@ -77,7 +76,6 @@ public class GameManager : MonoBehaviour {
         GameEventManager.instance.Unsubscribe<GameEvents.PlayerKilledEnemy>(PlayerKilledEnemyHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelCompleted>(LevelCompletedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.GameStarted>(GameStartedHandler);
-        GameEventManager.instance.Unsubscribe<GameEvents.PlayerLanded>(PlayerLandedHandler);
         GameEventManager.instance.Unsubscribe<GameEvents.LevelLoaded>(LevelLoadedHandler);
     }
 
@@ -158,14 +156,7 @@ public class GameManager : MonoBehaviour {
     public void PlayerKilledEnemyHandler(GameEvent gameEvent) {
         // If player has killed all the enemies in the current level, begin the level completion sequence.
         currentEnemyAmt -= 1;
-        if (currentEnemyAmt == 0 && !Services.fallingSequenceManager.isPlayerFalling && !dontChangeLevel) {
-            GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
-            Debug.Log("lev compl because of kill");
-        }
-    }
-
-    public void PlayerLandedHandler(GameEvent gameEvent) {
-        if (currentEnemyAmt == 0) {
+        if (currentEnemyAmt == 0 && !dontChangeLevel) {
             GameEventManager.instance.FireEvent(new GameEvents.LevelCompleted());
         }
     }
@@ -185,7 +176,6 @@ public class GameManager : MonoBehaviour {
 
     public void CountEnemies() {
         currentEnemyAmt = GameObject.FindGameObjectsWithTag("Enemy").Length;
-        Debug.Log("enemy amt: " + currentEnemyAmt);
     }
 
 
