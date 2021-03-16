@@ -40,7 +40,7 @@ public class SpecialMoveManager : MonoBehaviour {
     int missilesFired = 0;
     float missileTimer;
     bool isFiringMissiles = false;
-    private bool fireMissilesWhenFallingTrigger;    // Trigger used to activate the special missiles as soon as the now entering screen disappears
+    [HideInInspector] public bool fireMissilesWhenFallingTrigger;    // Trigger used to activate the special missiles as soon as the now entering screen disappears
     bool returnCameraTrigger = false;    // Used to exit missile firing state early.
     [HideInInspector] public bool canShoot = false;
     Vector3 originalCameraPosition;
